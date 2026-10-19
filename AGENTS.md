@@ -20,6 +20,12 @@ No adelantar agentes de IA, informes PDF, asignación de docentes ni carga autom
 - YARP, SQL Server, RabbitMQ según el papel especificado en la arquitectura.
 - xUnit, Docker Compose y GitHub Actions.
 - Separación por microservicios; cada servicio es dueño de sus datos.
+- **Obligatorio:** aplicar Clean Architecture a cada microservicio de negocio ASP.NET Core, con proyectos independientes `Domain`, `Application`, `Infrastructure` y `Api` (Presentation), conservando los cambios ya desarrollados y migrando progresivamente.
+- `Domain` no referencia capas externas ni frameworks de persistencia; `Application` solo referencia `Domain`; `Infrastructure` implementa interfaces de capas internas; `Api` es la raíz de composición e invoca casos de uso.
+- Las interfaces para acceso a datos pertenecen a `Application` cuando sirven a sus casos de uso; las implementaciones con EF Core/SQL Server pertenecen a `Infrastructure`.
+- Controladores/endpoints y Swagger en `Api`; reglas de negocio deterministas en `Domain`, orquestación en `Application`.
+- Gateway YARP es un componente de infraestructura: **no** añadirle capas de negocio vacías. React se mantiene separado como frontend.
+- Cada microservicio mantiene sus entidades y dependencias propias; no compartir `DbContext` ni referenciar proyectos `Domain` de otros microservicios.
 - Motor determinista independiente de LLM.
 
 ## Distribución de trabajo vigente
@@ -31,7 +37,7 @@ No adelantar agentes de IA, informes PDF, asignación de docentes ni carga autom
 
 ## Reglas de implementación
 1. Consultar los criterios locales y tareas del Issue cuando GitHub sea accesible; no bloquear el trabajo si la sesión no tiene integración de GitHub.
-2. Proponer y ejecutar autónomamente una solución simple, explicando decisiones relevantes y archivos afectados; detenerse a consultar solo si cambia el alcance o existe ambigüedad normativa/material.
+2. Proponer y ejecutar autónomamente una solución simple, explicando decisiones relevantes y archivos afectados; detenerse a consultar solo si cambia el alcance o existe ambigüedad normativa/material. Si ya existe código, **auditar y refactorizar en pasos pequeños** en lugar de reescribirlo o borrar cambios.
 3. Aplicar TDD a reglas y validaciones: primero prueba fallida, luego implementación, luego refactorización.
 4. Mantener el cálculo de horas y créditos acotado a 100 %.
 5. No inventar datos de sílabos ni normas. Si falta información, registrar 'información incompleta'.
