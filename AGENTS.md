@@ -22,9 +22,16 @@ No adelantar agentes de IA, informes PDF, asignación de docentes ni carga autom
 - Separación por microservicios; cada servicio es dueño de sus datos.
 - Motor determinista independiente de LLM.
 
+## Distribución de trabajo vigente
+- Pablo: HU-01 (auth-service, Gateway y login), HU-14, HU-15 y HU-16 (homologacion-service y pruebas).
+- Leslie: HU-04, HU-05, HU-06 (catalogo-service, datos académicos y frontend del catálogo).
+- Shirley: Product Owner, aceptación y priorización.
+- Edwin: análisis funcional, datos de prueba, pruebas manuales, evidencias y documentación técnica.
+- Consultar `docs/contexto-proyecto.md` para las reglas de negocio y el alcance, `docs/sprint-1/criterios-aceptacion.md` para cada historia y `docs/arquitectura/decisiones-y-contratos.md` cuando se alteren contratos.
+
 ## Reglas de implementación
 1. Leer la historia, criterios y tareas del Issue antes de cambiar archivos.
-2. Proponer un plan corto y enumerar archivos afectados.
+2. Proponer y ejecutar autónomamente una solución simple, explicando decisiones relevantes y archivos afectados; detenerse a consultar solo si cambia el alcance o existe ambigüedad normativa/material.
 3. Aplicar TDD a reglas y validaciones: primero prueba fallida, luego implementación, luego refactorización.
 4. Mantener el cálculo de horas y créditos acotado a 100 %.
 5. No inventar datos de sílabos ni normas. Si falta información, registrar 'información incompleta'.
