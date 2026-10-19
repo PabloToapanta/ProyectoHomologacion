@@ -1,0 +1,28 @@
+name: Auth service — HU-01
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'src/auth-service/**'
+      - 'tests/AuthService.Tests/**'
+      - 'Homologacion.sln'
+      - '.github/workflows/auth-service.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore Homologacion.sln
+      - run: dotnet build Homologacion.sln --configuration Release --no-restore
+      - run: dotnet test Homologacion.sln --configuration Release --no-build --logger trx --results-directory TestResults
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: auth-test-results
+          path: TestResults/*.trx
