@@ -25,14 +25,14 @@ Este flujo completo aporta contexto, pero **solo implementar las 7 HU del Sprint
 | HU-01 | Login por roles, JWT, Gateway, rutas protegidas | Pablo | #1 |
 | HU-04 | Gestión de carreras y restricciones por duplicado | Leslie | #2 |
 | HU-05 | Asignaturas por carrera, créditos, horas y nivel | Leslie | #3 |
-| HU-06 | Unidades, contenidos y resultados de aprendizaje | Leslie | #4 |
+| HU-06 | Unidades, contenidos y resultados de aprendizaje | Edwin | #4 |
 | HU-14 | Comparar cuatro dimensiones y verificar umbral | Pablo | #5 |
-| HU-15 | Aprobación y antigüedad de diez años | Pablo | #6 |
-| HU-16 | Requisitos de cambios internos/externos | Pablo | #7 |
+| HU-15 | Aprobación y antigüedad de diez años | Edwin | #6 |
+| HU-16 | Requisitos de cambios internos/externos | Edwin | #7 |
 
-Equipo: Shirley = Product Owner; Pablo = Scrum Master y desarrollador; Leslie = desarrolladora; Edwin = análisis funcional, datos académicos, documentación y pruebas de aceptación.
+Equipo: Shirley = Product Owner (aceptación, QA y Scrum); Pablo = Scrum Master y desarrollador HU-01/HU-14; Leslie = desarrolladora HU-04/HU-05; Edwin = desarrollador HU-06/HU-15/HU-16. Los tres desarrolladores disponen de Codex.
 
-Consultas normativas y criterios exactos se encuentran en `docs/sprint-1/criterios-aceptacion.md`. Las estimaciones originales suman **45 h** (21 h Pablo y 24 h Leslie), no las 43 h del cuadro resumen del PDF.
+Consultas normativas y criterios exactos se encuentran en `docs/sprint-1/criterios-aceptacion.md`. Las estimaciones originales suman **45 h** (15 h Pablo, 14 h Leslie, 16 h Edwin), no las 43 h del cuadro resumen del PDF.
 
 ## Reglas de negocio planteadas en el documento
 
@@ -79,7 +79,7 @@ Ejemplo de prueba mencionado en el documento: **Álgebra Lineal**, carrera Softw
 - RabbitMQ reservado para eventos de negocio del flujo que se implementará después.
 - Ollama o API alternativa con agentes en Sprint 2; el motor del Sprint 1 debe funcionar **sin un LLM**.
 - xUnit, Docker Compose, GitHub Actions, Swagger; GitFlow y Conventional Commits en español.
-- Clean/Onion propuesto internamente; mantener el diseño proporcional al plazo.
+- Clean/Onion **obligatorio** dentro de cada microservicio ASP.NET Core: Domain, Application, Infrastructure y Api. Gateway YARP y frontend React no necesitan esas cuatro capas de negocio. Mantener el diseño proporcional al plazo.
 
 ## Sprints siguientes (solo para contexto)
 Sprint 2: crear solicitudes y asignar dos docentes, analizar cambios internos/externos mediante agentes, guardar resultados y visualizar análisis; parte de la carga de programas analíticos.
