@@ -22,12 +22,15 @@ No adelantar agentes de IA, informes PDF, asignación de docentes ni carga autom
 - Separación por microservicios; cada servicio es dueño de sus datos.
 - Motor determinista independiente de LLM.
 
-## Distribución de trabajo vigente
-- Pablo: HU-01 (auth-service, Gateway y login), HU-14, HU-15 y HU-16 (homologacion-service y pruebas).
-- Leslie: HU-04, HU-05, HU-06 (catalogo-service, datos académicos y frontend del catálogo).
-- Shirley: Product Owner, aceptación y priorización.
-- Edwin: análisis funcional, datos de prueba, pruebas manuales, evidencias y documentación técnica.
-- Consultar `docs/contexto-proyecto.md` para las reglas de negocio y el alcance, `docs/sprint-1/criterios-aceptacion.md` para cada historia y `docs/arquitectura/decisiones-y-contratos.md` cuando se alteren contratos.
+## Distribución de trabajo vigente — tres desarrolladores con Codex
+- **Pablo:** Scrum Master y desarrollo HU-01 (T1–T3) y HU-14 (T9–T10). Estimación técnica original: 15 h. T1 y T2 ya están codificadas en `feature/hu-01-autenticacion`; T3 pendiente de comprobar.
+- **Leslie:** desarrollo HU-04 (T4–T5) y HU-05 (T6–T8). Estimación: 14 h.
+- **Edwin:** desarrollo HU-06 (T13–T15), HU-15 (T11) y HU-16 (T12). Estimación: 16 h. Comenzar por HU-15/HU-16 con reglas y TDD, sin editar archivos compartidos de Pablo; HU-06 depende de modelos del catálogo de Leslie.
+- **Shirley:** única Product Owner, Product Backlog, criterios de aceptación, pruebas manuales, evidencias Scrum/XP, Sprint Review y retrospectiva.
+- **Revisión cruzada:** Pablo revisa a Leslie; Leslie revisa a Edwin; Edwin revisa a Pablo. Nadie acepta sus propios cambios sin revisión.
+- **Contratos y propiedad de archivos:** Pablo es responsable inicial de los archivos de arranque React, autenticación, Gateway y comparador; Leslie mantiene carreras/asignaturas; Edwin añade unidades y reglas de antigüedad/cambio. No editar simultáneamente `Program.cs`, `Homologacion.sln`, configuración del Gateway ni `frontend/src/App.tsx` sin coordinar.
+- **Clean Architecture:** cada microservicio de negocio separado en Domain, Application, Infrastructure y Api; interfaces en Application, implementaciones técnicas en Infrastructure, reglas deterministas en Domain. Gateway YARP y frontend React no requieren cuatro capas .NET artificiales.
+- Consultar `docs/contexto-proyecto.md`, `docs/sprint-1/criterios-aceptacion.md`, `docs/arquitectura/decisiones-y-contratos.md` y `docs/sprint-1/planificacion-detallada.md`.
 
 ## Reglas de implementación
 1. Consultar los criterios locales y tareas del Issue cuando GitHub sea accesible; no bloquear el trabajo si la sesión no tiene integración de GitHub.
