@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace AuthService.Security;
+namespace Auth.Infrastructure.Security;
 
 public sealed class JwtOptions : IValidatableObject
 {

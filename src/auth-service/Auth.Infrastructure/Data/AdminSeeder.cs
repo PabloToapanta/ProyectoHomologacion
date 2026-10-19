@@ -1,9 +1,9 @@
-using AuthService.Models;
+using Auth.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace AuthService.Data;
+namespace Auth.Infrastructure.Data;
 
 public sealed class AdminSeedOptions
 {

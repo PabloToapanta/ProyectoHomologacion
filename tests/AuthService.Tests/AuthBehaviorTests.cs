@@ -1,10 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using AuthService.Contracts;
-using AuthService.Data;
-using AuthService.Models;
-using AuthService.Security;
-using AuthService.Services;
+using Auth.Infrastructure.Repositories;
+using Auth.Application.Login;
+using Auth.Infrastructure.Data;
+using Auth.Domain.Entities;
+using Auth.Infrastructure.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +35,7 @@ public sealed class AuthBehaviorTests : IDisposable
         db.Database.EnsureCreated();
     }
 
-    private LoginService Service() => new(db, hasher, new JwtTokenIssuer(Options.Create(jwt), new FixedClock(now)));
+    private LoginService Service() => new(new UserRepository(db), new PasswordService(hasher), new JwtTokenIssuer(Options.Create(jwt), new FixedClock(now)));
 
     private async Task<Usuario> AddUser(bool activo = true)
     {
@@ -54,7 +54,7 @@ public sealed class AuthBehaviorTests : IDisposable
     public async Task CredencialesCorrectas_EmitenJwtFirmadoConRolYExpiracion()
     {
         var user = await AddUser();
-        var result = await Service().LoginAsync(new LoginRequest(" ADMIN-prueba ", TestPassword));
+        var result = await Service().LoginAsync(new LoginCommand(" ADMIN-prueba ", TestPassword));
         Assert.NotNull(result);
         Assert.Equal("Bearer", result.TokenType);
         Assert.Equal(now.AddMinutes(15), result.ExpiresAtUtc);
@@ -82,7 +82,7 @@ public sealed class AuthBehaviorTests : IDisposable
     public async Task CredencialesIncorrectasOUsuarioInactivo_NoEmitenToken(string nombre, string password, bool activo)
     {
         await AddUser(activo);
-        Assert.Null(await Service().LoginAsync(new LoginRequest(nombre, password)));
+        Assert.Null(await Service().LoginAsync(new LoginCommand(nombre, password)));
     }
 
     [Fact]
@@ -164,7 +164,7 @@ public sealed class AuthBehaviorTests : IDisposable
         user.PasswordHash = legacyHasher.HashPassword(user, TestPassword);
         await db.SaveChangesAsync();
         var originalHash = user.PasswordHash;
-        Assert.NotNull(await Service().LoginAsync(new LoginRequest(user.NombreUsuario, TestPassword)));
+        Assert.NotNull(await Service().LoginAsync(new LoginCommand(user.NombreUsuario, TestPassword)));
         Assert.NotEqual(originalHash, user.PasswordHash);
         Assert.Equal(PasswordVerificationResult.Success, hasher.VerifyHashedPassword(user, user.PasswordHash, TestPassword));
     }

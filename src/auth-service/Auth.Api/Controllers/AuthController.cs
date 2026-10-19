@@ -1,9 +1,9 @@
-using AuthService.Contracts;
-using AuthService.Services;
+using Auth.Api.Contracts;
+using Auth.Application.Login;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AuthService.Controllers;
+namespace Auth.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
@@ -20,10 +20,10 @@ public sealed class AuthController(LoginService login) : ControllerBase
     {
         Response.Headers.CacheControl = "no-store";
         Response.Headers.Pragma = "no-cache";
-        var result = await login.LoginAsync(request, cancellationToken);
+        var result = await login.LoginAsync(new LoginCommand(request.NombreUsuario, request.Password), cancellationToken);
         if (result is null)
             return Problem(statusCode: StatusCodes.Status401Unauthorized, title: "Credenciales incorrectas",
                 detail: "El usuario o la contraseña no son válidos.");
-        return Ok(result);
+        return Ok(new LoginResponse(result.AccessToken, result.TokenType, result.ExpiresAtUtc));
     }
 }

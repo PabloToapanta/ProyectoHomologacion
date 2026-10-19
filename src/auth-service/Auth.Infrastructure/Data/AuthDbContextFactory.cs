@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace AuthService.Data;
+namespace Auth.Infrastructure.Data;
 
 // Las herramientas de migraciones no necesitan arrancar la API ni conocer una clave JWT.
 public sealed class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>

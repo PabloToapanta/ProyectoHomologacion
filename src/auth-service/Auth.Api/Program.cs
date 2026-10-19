@@ -1,11 +1,9 @@
 using System.Text;
-using AuthService.Data;
-using AuthService.Models;
-using AuthService.Security;
-using AuthService.Services;
+using Auth.Infrastructure.Data;
+using Auth.Infrastructure;
+using Auth.Infrastructure.Security;
+using Auth.Application.Login;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -23,13 +21,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.Section)
     .ValidateDataAnnotations().ValidateOnStart();
 builder.Services.Configure<AdminSeedOptions>(builder.Configuration.GetSection("SeedAdmin"));
-builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(
-    builder.Configuration.GetConnectionString("Auth")));
-builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
-builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddSingleton<JwtTokenIssuer>();
+builder.Services.AddAuthInfrastructure(builder.Configuration);
 builder.Services.AddScoped<LoginService>();
-builder.Services.AddScoped<AdminSeeder>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
     .Configure<IOptions<JwtOptions>>((bearer, configured) =>
@@ -55,9 +48,8 @@ if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Auth"))
 _ = app.Services.GetRequiredService<IOptions<JwtOptions>>().Value;
 using (var scope = app.Services.CreateScope())
 {
-    if (builder.Configuration.GetValue<bool>("Database:ApplyMigrations"))
-        await scope.ServiceProvider.GetRequiredService<AuthDbContext>().Database.MigrateAsync();
-    await scope.ServiceProvider.GetRequiredService<AdminSeeder>().SeedAsync();
+    await scope.ServiceProvider.GetRequiredService<AuthDatabaseInitializer>()
+        .InitializeAsync(builder.Configuration.GetValue<bool>("Database:ApplyMigrations"));
 }
 app.UseExceptionHandler();
 app.UseStatusCodePages();

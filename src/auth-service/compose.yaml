@@ -15,7 +15,10 @@ services:
       retries: 30
       start_period: 20s
   auth-service:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"

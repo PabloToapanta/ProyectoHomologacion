@@ -1,5 +1,7 @@
 # Evidencia técnica HU-01 — T1
 
+Esta es la evidencia de la implementación original en un proyecto. La estructura fue refactorizada posteriormente: consultar [evidencia de Clean Architecture](evidencia-hu-01-clean-architecture.md) y `src/auth-service/README.md` para rutas de proyectos, dependencias y verificaciones actuales.
+
 **Fecha:** 19 de octubre de 2026 (America/Guayaquil).
 
 **Vínculo:** [Issue #1 — Inicio de sesión y autorización](https://github.com/PabloToapanta/ProyectoHomologacion/issues/1).

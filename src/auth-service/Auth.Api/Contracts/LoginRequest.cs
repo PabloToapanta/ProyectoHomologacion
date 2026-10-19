@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AuthService.Contracts;
+namespace Auth.Api.Contracts;
 
 public sealed record LoginRequest(
     [Required, StringLength(256)] string NombreUsuario,

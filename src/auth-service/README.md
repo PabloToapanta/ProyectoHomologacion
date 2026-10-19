@@ -4,6 +4,37 @@ Relacionado con [Issue #1](https://github.com/PabloToapanta/ProyectoHomologacion
 Servicio independiente ASP.NET Core 8, con base SQL Server exclusiva de Auth.
 No consulta datos del catálogo ni implementa Gateway (T2) o frontend (T3).
 
+## Capas y dependencias
+
+HU-01 / Issue #1 se implementa con cuatro proyectos independientes:
+
+```text
+src/auth-service/
+├── Auth.Domain/           # Entidades Usuario y Rol, sin paquetes ni frameworks externos
+├── Auth.Application/      # LoginService, entrada/resultado del caso de uso y puertos
+├── Auth.Infrastructure/   # EF Core, migraciones, repositorio, hashing, semilla y JWT
+└── Auth.Api/              # Controlador, DTO HTTP, Swagger y composición
+
+tests/
+├── Auth.Application.Tests/ # Pruebas del caso de uso sin EF Core ni ASP.NET
+└── AuthService.Tests/      # Regresión HTTP, adaptadores, persistencia y arquitectura
+```
+
+Referencias directas de producción:
+
+| Proyecto | Referencia proyectos |
+|---|---|
+| `Auth.Domain` | Ninguno |
+| `Auth.Application` | `Auth.Domain` |
+| `Auth.Infrastructure` | `Auth.Application`, `Auth.Domain` |
+| `Auth.Api` | `Auth.Application`, `Auth.Infrastructure` |
+
+Domain y Application son bibliotecas .NET 8 sin `PackageReference` ni `FrameworkReference`. Application usa únicamente `IUserRepository`, `IPasswordService` e `ITokenIssuer`. No conoce EF, JWT, ASP.NET, opciones de configuración ni DTO HTTP. `LoginCommand` y `LoginResult` describen el caso de uso; Api los transforma desde/hacia `LoginRequest` y `LoginResponse`, conservando el contrato JSON.
+
+Infrastructure implementa los tres puertos. Su registro de adaptadores se invoca desde `Program` de Api, que también configura JWT bearer, validación de opciones, Swagger y arranque de base/semilla mediante `AuthDatabaseInitializer`. Api no hace consultas EF. No se añadieron MediatR, repositorios genéricos ni una unidad de trabajo adicional.
+
+La migración `20261019123906_InitialAuth` conserva identificador y operaciones SQL. Se trasladaron los archivos a Infrastructure y se ajustaron los nombres CLR del modelo y snapshot; no se creó una migración adicional ni se requiere borrar una base existente.
+
 ## Decisiones de implementación
 
 - EF Core 8 con migración versionada; `Usuarios` y `Roles` pertenecen únicamente a Auth.
@@ -69,7 +100,14 @@ Compose es exclusivo del desarrollo de T1. SQL no publica puertos al host; la AP
 
 El entorno usa SQL Server Developer con `sa`, certificado autofirmado aceptado y Swagger activo; estas opciones son para desarrollo local. Mantener contraseñas hexadecimales con un sufijo de complejidad evita problemas de interpolación de `$` y delimitadores `;` en el archivo de configuración. El lector del smoke acepta el formato simple `VARIABLE=valor`, sin comillas ni interpolación.
 
-Sin Docker: exportar las variables de la API y ejecutar `dotnet run --project src/auth-service/AuthService --urls http://127.0.0.1:5081`, con SQL Server accesible y esquema previamente migrado, o con `Database__ApplyMigrations=true` para desarrollo. Las herramientas `dotnet ef` 8.0.30 pueden generar/aplicar migraciones mediante `--project src/auth-service/AuthService`; la fábrica de diseño permite generar SQL sin una clave JWT.
+Sin Docker: exportar las variables de la API y ejecutar `dotnet run --project src/auth-service/Auth.Api --urls http://127.0.0.1:5081`, con SQL Server accesible y esquema previamente migrado, o con `Database__ApplyMigrations=true` para desarrollo. Las herramientas `dotnet ef` 8.0.30 operan directamente sobre Infrastructure mediante su fábrica de diseño, sin arrancar Api ni requerir un secreto JWT. Infrastructure genera su archivo de configuración de runtime para permitir esa ejecución como biblioteca:
+
+```bash
+dotnet ef migrations has-pending-model-changes --project src/auth-service/Auth.Infrastructure --configuration Release --no-build
+dotnet ef migrations script --idempotent --project src/auth-service/Auth.Infrastructure --configuration Release --no-build --output /tmp/auth-migrations.sql
+```
+
+Para aplicar migraciones con `dotnet ef database update --project src/auth-service/Auth.Infrastructure`, exportar `ConnectionStrings__Auth` con la conexión de destino.
 
 ## Compilación y pruebas
 
@@ -79,6 +117,6 @@ dotnet build Homologacion.sln --configuration Release --no-restore
 dotnet test Homologacion.sln --configuration Release --no-build
 ```
 
-xUnit usa SQLite relacional en memoria para aislar las pruebas de lógica y HTTP; no sustituye la verificación SQL Server de Compose. Las rutas `/_test/*` se agregan únicamente al host de pruebas y no existen en la API publicada. El workflow `auth-service.yml` ejecutará build/tests al abrir un PR hacia `develop`; no se ha ejecutado remotamente en esta sesión.
+Las pruebas originales de integración usan SQLite relacional en memoria para aislar persistencia y HTTP. El nuevo proyecto `Auth.Application.Tests` solo referencia Application y usa dobles manuales de los tres puertos; estas pruebas no sustituyen la verificación SQL Server de Compose. Las pruebas de arquitectura comprueban referencias de proyecto y ensamblados, ausencia de dependencias técnicas en las capas internas y uso de interfaces en el constructor de `LoginService`. Las rutas `/_test/*` se agregan únicamente al host de pruebas y no existen en la API publicada. El workflow `auth-service.yml` ejecutará build/tests al abrir un PR hacia `develop`; no se ha ejecutado remotamente en esta sesión.
 
-Evidencia y pendientes: `docs/sprint-1/evidencia-hu-01-t1.md`.
+Evidencia original: `docs/sprint-1/evidencia-hu-01-t1.md`. Refactorización y resultados actuales: `docs/sprint-1/evidencia-hu-01-clean-architecture.md`. T2/T3 y la aceptación de la Product Owner siguen pendientes.

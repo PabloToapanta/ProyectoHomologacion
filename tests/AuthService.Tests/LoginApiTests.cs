@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
-using AuthService.Contracts;
-using AuthService.Data;
-using AuthService.Models;
+using Auth.Api.Contracts;
+using Auth.Infrastructure.Data;
+using Auth.Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;

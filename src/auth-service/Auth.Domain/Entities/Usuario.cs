@@ -1,4 +1,4 @@
-namespace AuthService.Models;
+namespace Auth.Domain.Entities;
 
 public sealed class Usuario
 {
@@ -9,10 +9,4 @@ public sealed class Usuario
     public bool Activo { get; set; } = true;
     public Guid RolId { get; set; }
     public Rol Rol { get; set; } = null!;
-}
-
-public sealed class Rol
-{
-    public Guid Id { get; set; }
-    public string Nombre { get; set; } = "";
 }

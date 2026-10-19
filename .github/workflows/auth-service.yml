@@ -5,6 +5,8 @@ on:
     paths:
       - 'src/auth-service/**'
       - 'tests/AuthService.Tests/**'
+      - 'tests/Auth.Application.Tests/**'
+      - 'tests/auth-service/**'
       - 'Homologacion.sln'
       - '.github/workflows/auth-service.yml'
   workflow_dispatch:

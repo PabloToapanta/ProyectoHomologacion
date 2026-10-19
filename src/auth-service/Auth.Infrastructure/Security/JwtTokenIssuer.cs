@@ -1,16 +1,17 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using AuthService.Contracts;
-using AuthService.Models;
+using Auth.Application.Abstractions;
+using Auth.Application.Login;
+using Auth.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace AuthService.Security;
+namespace Auth.Infrastructure.Security;
 
-public sealed class JwtTokenIssuer(IOptions<JwtOptions> options, TimeProvider clock)
+public sealed class JwtTokenIssuer(IOptions<JwtOptions> options, TimeProvider clock) : ITokenIssuer
 {
-    public LoginResponse Create(Usuario usuario)
+    public LoginResult Create(Usuario usuario)
     {
         var settings = options.Value;
         var now = clock.GetUtcNow();
@@ -30,6 +31,6 @@ public sealed class JwtTokenIssuer(IOptions<JwtOptions> options, TimeProvider cl
             expires: expires.UtcDateTime,
             signingCredentials: new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey)), SecurityAlgorithms.HmacSha256));
-        return new LoginResponse(new JwtSecurityTokenHandler().WriteToken(token), "Bearer", expires);
+        return new LoginResult(new JwtSecurityTokenHandler().WriteToken(token), "Bearer", expires);
     }
 }
