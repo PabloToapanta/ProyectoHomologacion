@@ -8,8 +8,8 @@ Proyecto académico de la asignatura **Metodologías Ágiles**. Se desarrolla co
 
 - **Shirley Amaguaña:** Product Owner, priorización y aceptación.
 - **Pablo Toapanta:** Scrum Master, desarrollo técnico e integración.
-- **Edwin Caraguay:** desarrollo técnico.
-- **Leslie Coello:** apoyo de producto, documentación y pruebas de aceptación.
+- **Leslie Coello:** desarrollo del catálogo y frontend.
+- **Edwin Caraguay:** análisis académico, documentación y pruebas manuales.
 
 ## Sprint 1 — 15 al 21 de octubre de 2026
 
@@ -42,6 +42,10 @@ Historias comprometidas (26 puntos):
 3. Se usa el estilo **Conventional Commits**, con descripción en español: `feat(catalogo): registrar carreras`.
 4. Se abre un Pull Request de la rama `feature/*` hacia `develop`; otro integrante revisa y se ejecutan las pruebas.
 5. Para la entrega se prepara `release/0.1.0` y, tras su validación, se publica en `main`.
+
+## Contexto para Codex
+
+Consultar `AGENTS.md` y `docs/contexto-proyecto.md` para alcance, reglas de negocio y responsabilidades. Para codificar en paralelo, seguir `docs/codex/arranque-pablo-leslie.md`.
 
 ## Documentación
 
