@@ -48,13 +48,19 @@ Ambos deben tener permisos de escritura en el repositorio y un `git config user.
 - Usar `/model` para seleccionar, `/status` para revisar cuota y el modelo activo. Alternativa en `~/.codex/config.toml`: `model_reasoning_effort = "medium"`.
 - No enviar una solicitud del tipo 'implementa todo el sprint': una HU o tarea autocontenida por ejecución.
 
+## Exigencia de Clean Architecture
+
+Antes de seguir programando, pedir a Codex que audite las carpetas actuales. Cada microservicio de negocio ASP.NET Core debe contar con `Domain`, `Application`, `Infrastructure` y `Api` en proyectos diferenciados. No borrar ni rehacer código válido: moverlo incrementalmente, corregir referencias e inyección de dependencias y ejecutar `dotnet build` / `dotnet test` cuando existan las soluciones y proyectos.
+
+Pedir primero: «Inspecciona el repositorio y dime qué capas ya existen, qué dependencias violan Clean Architecture y cuál es el plan mínimo de refactorización. Ejecuta luego los cambios en pequeños pasos comprobables. No sobrescribas cambios no confirmados y no realices commits ni pushes sin autorización.»
+
 ## Primera instrucción de Pablo
 > Lee AGENTS.md y docs/contexto-proyecto.md. Para trabajar HU-01 consulta docs/sprint-1/criterios-aceptacion.md, docs/arquitectura/decisiones-y-contratos.md y el Issue #1. Implementa T1 en esta rama: auth-service .NET 8 con usuarios y roles, contraseña hasheada, inicio de sesión JWT y un administrador de prueba seguro. Propón y aplica decisiones técnicas simples compatibles con el proyecto; documenta supuestos. Ejecuta el build y pruebas disponibles. No hagas push, merge ni commits sin que los revise. Al final resume los archivos cambiados, comandos ejecutados, criterios comprobados y el siguiente paso.
 
 Después: T2/T3; crear nuevas ramas desde `develop` para HU-14, HU-15 y HU-16. No acumular siete historias en una rama.
 
 ## Primera instrucción de Leslie
-> Lee AGENTS.md, docs/contexto-proyecto.md y docs/arquitectura/decisiones-y-contratos.md. Consulta los criterios del Issue #2 y docs/sprint-1/criterios-aceptacion.md. Implementa T4 en la rama actual: catálogo .NET 8 con entidad Carrera, persistencia SQL Server, CRUD, validación de duplicado por facultad y prohibición de eliminar carreras con asignaturas. Incluye tests y Swagger. Decide los detalles técnicos menores por tu cuenta respetando los contratos y registra supuestos. No cambies auth-service ni homologacion-service. Ejecuta build y pruebas, informa archivos modificados y errores; no hagas push ni merge por tu cuenta.
+> Lee AGENTS.md, docs/contexto-proyecto.md y docs/arquitectura/decisiones-y-contratos.md. Consulta los criterios del Issue #2 y docs/sprint-1/criterios-aceptacion.md. Implementa T4 en la rama actual: catálogo .NET 8 con Clean Architecture (proyectos Domain, Application, Infrastructure, Api), entidad Carrera, persistencia SQL Server, CRUD, validación de duplicado por facultad y prohibición de eliminar carreras con asignaturas. Incluye tests y Swagger. Decide los detalles técnicos menores por tu cuenta respetando los contratos y registra supuestos. No cambies auth-service ni homologacion-service. Ejecuta build y pruebas, informa archivos modificados y errores; no hagas push ni merge por tu cuenta.
 
 Después: HU-05 y HU-06 en ramas independientes, frontend del catálogo y datos académicos provistos por Edwin.
 
