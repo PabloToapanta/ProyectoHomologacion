@@ -6,8 +6,8 @@
 **Duración disponible en la replanificación:** lunes, martes y miércoles.  
 **Product Owner:** Shirley Amaguaña  
 **Scrum Master:** Pablo Toapanta  
-**Desarrolladores de código:** Pablo Toapanta y Edwin Caraguay  
-**Documentación, apoyo de producto y QA:** Shirley Amaguaña y Leslie Coello
+**Desarrolladores de código:** Pablo Toapanta y Leslie Coello  
+**Documentación, apoyo de producto y QA:** Shirley Amaguaña y Edwin Caraguay
 
 > Basado en el documento académico «Sprint 0: Planificación Scrum + XP — Sistema de Homologación de Materias». Este archivo no certifica que el código esté terminado. Los responsables de ejecución se redistribuyeron por disponibilidad del equipo; las siete historias comprometidas permanecen en el Sprint 1.
 
@@ -20,9 +20,9 @@ Que un administrador autenticado pueda mantener el catálogo de carreras y asign
 | Historia | Descripción | Prioridad | PH | Responsable de código |
 |---|---|---|---:|---|
 | HU-01 | Iniciar sesión con rol | Alta | 3 | Pablo |
-| HU-04 | Gestionar carreras | Alta | 3 | Edwin |
-| HU-05 | Gestionar asignaturas | Alta | 5 | Edwin |
-| HU-06 | Gestionar unidades, contenidos y resultados | Alta | 5 | Edwin |
+| HU-04 | Gestionar carreras | Alta | 3 | Leslie |
+| HU-05 | Gestionar asignaturas | Alta | 5 | Leslie |
+| HU-06 | Gestionar unidades, contenidos y resultados | Alta | 5 | Leslie |
 | HU-14 | Calcular equivalencia de asignaturas | Alta | 5 | Pablo |
 | HU-15 | Validar aprobación y antigüedad | Alta | 2 | Pablo |
 | HU-16 | Validar mínimos de cambio interno/externo | Alta | 3 | Pablo |
@@ -35,19 +35,19 @@ Que un administrador autenticado pueda mantener el catálogo de carreras y asign
 | T1 | HU-01 | auth-service: Usuario/Rol, JWT, administrador semilla | 3 | Pablo |
 | T2 | HU-01 | Gateway YARP: ruteo y validación JWT | 2 | Pablo |
 | T3 | HU-01 | Pantalla de inicio de sesión y rutas protegidas | 3 | Pablo |
-| T4 | HU-04 | catalogo-service: carrera, CRUD y pruebas | 2 | Edwin |
-| T5 | HU-04 | UI: gestión de carreras | 3 | Edwin |
-| T6 | HU-05 | Asignatura, validaciones y API | 3 | Edwin |
-| T7 | HU-05 | UI: asignaturas por carrera | 4 | Edwin |
-| T8 | HU-05 | Datos de prueba: Álgebra Lineal | 2 | Edwin |
+| T4 | HU-04 | catalogo-service: carrera, CRUD y pruebas | 2 | Leslie |
+| T5 | HU-04 | UI: gestión de carreras | 3 | Leslie |
+| T6 | HU-05 | Asignatura, validaciones y API | 3 | Leslie |
+| T7 | HU-05 | UI: asignaturas por carrera | 4 | Leslie |
+| T8 | HU-05 | Datos de prueba: Álgebra Lineal | 2 | Leslie |
 | T9 | HU-14 | Comparador: contenido, profundidad, horas, créditos, TDD | 5 | Pablo |
 | T10 | HU-14 | Umbral configurable y casos 79,9 %/80 % | 2 | Pablo |
 | T11 | HU-15 | Aprobación y antigüedad máxima de diez años | 3 | Pablo |
 | T12 | HU-16 | Mínimos para cambios internos y externos | 3 | Pablo |
-| T13 | HU-06 | Entidades y API de unidades curriculares y contenidos | 4 | Edwin |
-| T14 | HU-06 | UI: unidades, contenidos y resultados | 4 | Edwin |
-| T15 | HU-06 | Carga de cuatro unidades de Álgebra Lineal | 2 | Edwin |
-| **Total corregido** | | | **45** | **Pablo 21 h; Edwin 24 h** |
+| T13 | HU-06 | Entidades y API de unidades curriculares y contenidos | 4 | Leslie |
+| T14 | HU-06 | UI: unidades, contenidos y resultados | 4 | Leslie |
+| T15 | HU-06 | Carga de cuatro unidades de Álgebra Lineal | 2 | Leslie |
+| **Total corregido** | | | **45** | **Pablo 21 h; Leslie 24 h** |
 
 **Corrección respecto al PDF:** en el cuadro resumen la tarea de carga aparece repetida como T10 y figura «43 h». Según el desglose individual, corresponde a **T15** y la suma correcta es **45 h**.
 
@@ -67,7 +67,7 @@ Las 45 h son estimaciones de trabajo de desarrollo del documento y no incluyen d
 
 ## Calendario de ejecución
 
-| Día | Pablo (desarrollo) | Edwin (desarrollo) | Shirley y Leslie (documentación/aceptación) |
+| Día | Pablo (desarrollo) | Leslie (desarrollo) | Shirley y Edwin (documentación/aceptación) |
 |---|---|---|---|
 | **Lun 19** | Estructura común, T1–T2, pruebas iniciales de T9 | T4, T6 y T13; modelos y persistencia | Corregir planificación, crear Issues, definir aceptación y registrar riesgos |
 | **Mar 20** | T3, T9, T10 y pruebas | T5, T7, T8 y T14 | Validar criterios, actualizar tablero, preparar evidencias |
