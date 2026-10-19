@@ -15,9 +15,9 @@ Duración sugerida: 10–15 minutos. Preparar datos de prueba reproducibles y mo
 
 ## Responsabilidades
 - **Pablo:** infraestructura, autenticación, motor de homologación y TDD.
-- **Edwin:** APIs y pantallas del catálogo.
+- **Leslie:** APIs y pantallas del catálogo.
 - **Shirley:** Product Owner, objetivos y aceptación.
-- **Leslie:** seguimiento del Sprint, evidencias y retroalimentación.
+- **Edwin:** análisis de requisitos, datos académicos, evidencias y retroalimentación.
 
 ## Preparativos
 - [ ] Entorno local funciona con las variables configuradas.
