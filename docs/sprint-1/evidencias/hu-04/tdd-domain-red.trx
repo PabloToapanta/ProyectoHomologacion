@@ -1,0 +1,461 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="80d2077e-9234-4e6b-8bb4-789625742e5d" name="ASUS@DESKTOP-MV69426 2026-10-19 14:20:09" runUser="DESKTOP-MV69426\ASUS" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-19T14:20:09.3351123-05:00" queuing="2026-10-19T14:20:09.3351128-05:00" start="2026-10-19T14:20:07.6005674-05:00" finish="2026-10-19T14:20:09.3795868-05:00" />
+  <TestSettings name="default" id="f0100fc2-fe5c-41d0-a4c3-57d9d4116188">
+    <Deployment runDeploymentRoot="ASUS_DESKTOP-MV69426_2026-10-19_14_20_09" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="bafc9b08-44b6-4fa4-a7d0-a435616974cd" testId="d2e4d427-c16c-862c-3ca2-517df83fdba1" testName="Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" computerName="DESKTOP-MV69426" duration="00:00:00.0013115" startTime="2026-10-19T14:20:09.2787405-05:00" endTime="2026-10-19T14:20:09.2787410-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bafc9b08-44b6-4fa4-a7d0-a435616974cd">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs:line 25&#xD;
+   at Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 46&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2d903d4a-f537-4754-b145-e2607abd97e3" testId="d881be25-13cd-f299-57da-a5df0181116f" testName="Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode" computerName="DESKTOP-MV69426" duration="00:00:00.0003036" startTime="2026-10-19T14:20:09.2389364-05:00" endTime="2026-10-19T14:20:09.2389367-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d903d4a-f537-4754-b145-e2607abd97e3">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs:line 14&#xD;
+   at Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 38&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ad2f56e1-631c-4f6f-80c6-98a97ef8a4d6" testId="ee5c3c96-24cc-7f24-ede3-059e726b8e82" testName="Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad" computerName="DESKTOP-MV69426" duration="00:00:00.0007695" startTime="2026-10-19T14:20:09.2773517-05:00" endTime="2026-10-19T14:20:09.2773521-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ad2f56e1-631c-4f6f-80c6-98a97ef8a4d6">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs:line 25&#xD;
+   at Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 29&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b4cb11d6-02b1-4fe0-bb2c-8bb9ca8aac89" testId="60539169-bef8-0838-fd08-8d462e4deafa" testName="Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas" computerName="DESKTOP-MV69426" duration="00:00:00.0005298" startTime="2026-10-19T14:20:09.2782509-05:00" endTime="2026-10-19T14:20:09.2782512-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b4cb11d6-02b1-4fe0-bb2c-8bb9ca8aac89">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 30&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs:line 14&#xD;
+   at Catalogo.Tests.CarreraTests.&lt;&gt;c.&lt;Rechaza_longitudes_excesivas&gt;b__2_0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 30</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="de1e6575-537b-437a-9aab-6ac0f8f0bfa9" testId="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5" testName="Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad" computerName="DESKTOP-MV69426" duration="00:00:00.0008237" startTime="2026-10-19T14:20:09.2406069-05:00" endTime="2026-10-19T14:20:09.2406073-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="de1e6575-537b-437a-9aab-6ac0f8f0bfa9">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs:line 25&#xD;
+   at Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 38&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="81399fa7-af6a-40ba-bafc-dee2448358e5" testId="a4678edd-fdea-4a2d-ddbf-8287b87a682d" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot; &quot;, facultad: &quot;FISEI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0001234" startTime="2026-10-19T14:20:09.2378454-05:00" endTime="2026-10-19T14:20:09.2378457-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="81399fa7-af6a-40ba-bafc-dee2448358e5">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(String nombre, String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 25&#xD;
+   at InvokeStub_CarreraTests.Rechaza_campos_requeridos(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs:line 14&#xD;
+   at Catalogo.Tests.CarreraTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_campos_requeridos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 25</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="54fa2726-97ea-4f95-bfe2-e045aa5de596" testId="a6707574-b0bd-cfd8-7553-acb0f9dbe984" testName="Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia" computerName="DESKTOP-MV69426" duration="00:00:00.0003062" startTime="2026-10-19T14:20:09.2396851-05:00" endTime="2026-10-19T14:20:09.2396855-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="54fa2726-97ea-4f95-bfe2-e045aa5de596">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs:line 14&#xD;
+   at Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 11&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2423e7ad-fa45-4509-b799-7c0b3b5a42c4" testId="43fab6cb-f322-0f69-a05f-1252bc078773" testName="Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada" computerName="DESKTOP-MV69426" duration="00:00:00.0011014" startTime="2026-10-19T14:20:09.2802489-05:00" endTime="2026-10-19T14:20:09.2802491-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2423e7ad-fa45-4509-b799-7c0b3b5a42c4">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 76&#xD;
+--- End of stack trace from previous location ---&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Application.CarreraService.ObtenerAsync(Guid id, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs:line 24&#xD;
+   at Catalogo.Tests.CarreraServiceTests.&lt;&gt;c__DisplayClass10_0.&lt;Id_inexistente_devuelve_no_encontrada&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 76</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2cc5024b-3b9e-4425-94ae-18068e7a0f38" testId="504ed02e-13c3-359f-e119-37391ac87053" testName="Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente" computerName="DESKTOP-MV69426" duration="00:00:00.0008998" startTime="2026-10-19T14:20:09.2809074-05:00" endTime="2026-10-19T14:20:09.2809077-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2cc5024b-3b9e-4425-94ae-18068e7a0f38">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs:line 25&#xD;
+   at Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 57&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="773178e9-6fac-4543-bfe7-f68b56e1da26" testId="49d8c3b3-c802-fc75-153b-96c3ace215fe" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: &quot;\t&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0094921" startTime="2026-10-19T14:20:09.2289875-05:00" endTime="2026-10-19T14:20:09.2290084-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="773178e9-6fac-4543-bfe7-f68b56e1da26">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(String nombre, String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 25&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs:line 14&#xD;
+   at Catalogo.Tests.CarreraTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_campos_requeridos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 25</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="08094e99-0f09-4ff1-83e7-8fb01e9d8963" testId="84ee4445-9d60-73df-cde6-cc10a7ffc662" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: null)" computerName="DESKTOP-MV69426" duration="00:00:00.0001794" startTime="2026-10-19T14:20:09.2358716-05:00" endTime="2026-10-19T14:20:09.2358719-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="08094e99-0f09-4ff1-83e7-8fb01e9d8963">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(String nombre, String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 25&#xD;
+   at InvokeStub_CarreraTests.Rechaza_campos_requeridos(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs:line 14&#xD;
+   at Catalogo.Tests.CarreraTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_campos_requeridos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 25</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="34a46f49-8d41-4c8e-8c8e-936fce54e0a6" testId="f51f454b-6442-65d7-e5f2-bceeae7b2657" testName="Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" computerName="DESKTOP-MV69426" duration="00:00:00.0004107" startTime="2026-10-19T14:20:09.2765096-05:00" endTime="2026-10-19T14:20:09.2765097-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="34a46f49-8d41-4c8e-8c8e-936fce54e0a6">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs:line 14&#xD;
+   at Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 47&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="58feb2ef-fbe0-4c17-ac96-a96c1ec8ef12" testId="5f1f0e85-041d-8e83-b98e-d8e83e7d8354" testName="Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste" computerName="DESKTOP-MV69426" duration="00:00:00.0103961" startTime="2026-10-19T14:20:09.2370660-05:00" endTime="2026-10-19T14:20:09.2370663-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58feb2ef-fbe0-4c17-ac96-a96c1ec8ef12">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 67&#xD;
+--- End of stack trace from previous location ---&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs:line 25&#xD;
+   at Catalogo.Tests.CarreraServiceTests.&lt;Validacion_no_persiste&gt;b__9_0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 67</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2f62b22d-90f5-4555-b1a1-750e7af1e3d5" testId="1ad91be6-365c-b2db-0fff-864b67210d4e" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: &quot;FISEI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0004089" startTime="2026-10-19T14:20:09.2341966-05:00" endTime="2026-10-19T14:20:09.2341968-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2f62b22d-90f5-4555-b1a1-750e7af1e3d5">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(String nombre, String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 25&#xD;
+   at InvokeStub_CarreraTests.Rechaza_campos_requeridos(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs:line 14&#xD;
+   at Catalogo.Tests.CarreraTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_campos_requeridos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 25</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3947f926-39f1-43c2-8c86-5427bc78765d" testId="ff30275d-71d0-62f5-e5a6-1ba73396ae36" testName="Catalogo.Tests.CarreraServiceTests.CRUD_completo" computerName="DESKTOP-MV69426" duration="00:00:00.0013852" startTime="2026-10-19T14:20:09.2793115-05:00" endTime="2026-10-19T14:20:09.2793117-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3947f926-39f1-43c2-8c86-5427bc78765d">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs:line 25&#xD;
+   at Catalogo.Tests.CarreraServiceTests.CRUD_completo() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 16&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot; &quot;, facultad: &quot;FISEI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a4678edd-fdea-4a2d-ddbf-8287b87a682d">
+      <Execution id="81399fa7-af6a-40ba-bafc-dee2448358e5" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="5f1f0e85-041d-8e83-b98e-d8e83e7d8354">
+      <Execution id="58feb2ef-fbe0-4c17-ac96-a96c1ec8ef12" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Validacion_no_persiste" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="ee5c3c96-24cc-7f24-ede3-059e726b8e82">
+      <Execution id="ad2f56e1-631c-4f6f-80c6-98a97ef8a4d6" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Rechaza_duplicados_normalizados_en_misma_facultad" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="43fab6cb-f322-0f69-a05f-1252bc078773">
+      <Execution id="2423e7ad-fa45-4509-b799-7c0b3b5a42c4" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Id_inexistente_devuelve_no_encontrada" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.CRUD_completo" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="ff30275d-71d0-62f5-e5a6-1ba73396ae36">
+      <Execution id="3947f926-39f1-43c2-8c86-5427bc78765d" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="CRUD_completo" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="f51f454b-6442-65d7-e5f2-bceeae7b2657">
+      <Execution id="34a46f49-8d41-4c8e-8c8e-936fce54e0a6" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: null)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="84ee4445-9d60-73df-cde6-cc10a7ffc662">
+      <Execution id="08094e99-0f09-4ff1-83e7-8fb01e9d8963" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: &quot;FISEI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="1ad91be6-365c-b2db-0fff-864b67210d4e">
+      <Execution id="2f62b22d-90f5-4555-b1a1-750e7af1e3d5" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5">
+      <Execution id="de1e6575-537b-437a-9aab-6ac0f8f0bfa9" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Permite_mismo_nombre_en_otra_facultad" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="60539169-bef8-0838-fd08-8d462e4deafa">
+      <Execution id="b4cb11d6-02b1-4fe0-bb2c-8bb9ca8aac89" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_longitudes_excesivas" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="d881be25-13cd-f299-57da-a5df0181116f">
+      <Execution id="2d903d4a-f537-4754-b145-e2607abd97e3" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Clave_ignora_caso_espacios_y_variantes_unicode" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="504ed02e-13c3-359f-e119-37391ac87053">
+      <Execution id="2cc5024b-3b9e-4425-94ae-18068e7a0f38" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Impide_eliminar_con_asignaturas_incluso_no_vigente" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="d2e4d427-c16c-862c-3ca2-517df83fdba1">
+      <Execution id="bafc9b08-44b6-4fa4-a7d0-a435616974cd" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a6707574-b0bd-cfd8-7553-acb0f9dbe984">
+      <Execution id="54fa2726-97ea-4f95-bfe2-e045aa5de596" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Crear_normaliza_campos_y_conserva_vigencia" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: &quot;\t&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="49d8c3b3-c802-fc75-153b-96c3ace215fe">
+      <Execution id="773178e9-6fac-4543-bfe7-f68b56e1da26" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="d2e4d427-c16c-862c-3ca2-517df83fdba1" executionId="bafc9b08-44b6-4fa4-a7d0-a435616974cd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d881be25-13cd-f299-57da-a5df0181116f" executionId="2d903d4a-f537-4754-b145-e2607abd97e3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ee5c3c96-24cc-7f24-ede3-059e726b8e82" executionId="ad2f56e1-631c-4f6f-80c6-98a97ef8a4d6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="60539169-bef8-0838-fd08-8d462e4deafa" executionId="b4cb11d6-02b1-4fe0-bb2c-8bb9ca8aac89" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5" executionId="de1e6575-537b-437a-9aab-6ac0f8f0bfa9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4678edd-fdea-4a2d-ddbf-8287b87a682d" executionId="81399fa7-af6a-40ba-bafc-dee2448358e5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a6707574-b0bd-cfd8-7553-acb0f9dbe984" executionId="54fa2726-97ea-4f95-bfe2-e045aa5de596" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="43fab6cb-f322-0f69-a05f-1252bc078773" executionId="2423e7ad-fa45-4509-b799-7c0b3b5a42c4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="504ed02e-13c3-359f-e119-37391ac87053" executionId="2cc5024b-3b9e-4425-94ae-18068e7a0f38" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="49d8c3b3-c802-fc75-153b-96c3ace215fe" executionId="773178e9-6fac-4543-bfe7-f68b56e1da26" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="84ee4445-9d60-73df-cde6-cc10a7ffc662" executionId="08094e99-0f09-4ff1-83e7-8fb01e9d8963" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f51f454b-6442-65d7-e5f2-bceeae7b2657" executionId="34a46f49-8d41-4c8e-8c8e-936fce54e0a6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5f1f0e85-041d-8e83-b98e-d8e83e7d8354" executionId="58feb2ef-fbe0-4c17-ac96-a96c1ec8ef12" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ad91be6-365c-b2db-0fff-864b67210d4e" executionId="2f62b22d-90f5-4555-b1a1-750e7af1e3d5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ff30275d-71d0-62f5-e5a6-1ba73396ae36" executionId="3947f926-39f1-43c2-8c86-5427bc78765d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados sin formato de lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos los resultados cargados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="15" executed="15" passed="0" failed="15" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 8.0.30)&#xD;
+[xUnit.net 00:00:00.16]   Discovering: Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.24]   Discovered:  Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.25]   Starting:    Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.33]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.33]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.33]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.33]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.33]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.33]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(25,0): at Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(String nombre, String facultad)&#xD;
+[xUnit.net 00:00:00.33]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.33]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.33]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.33]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs(14,0): at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad)&#xD;
+[xUnit.net 00:00:00.33]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(25,0): at Catalogo.Tests.CarreraTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_campos_requeridos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.34]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.34]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.34]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.34]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.34]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(25,0): at Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(String nombre, String facultad)&#xD;
+[xUnit.net 00:00:00.34]            at InvokeStub_CarreraTests.Rechaza_campos_requeridos(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.34]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.34]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs(14,0): at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad)&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(25,0): at Catalogo.Tests.CarreraTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_campos_requeridos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.34]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.34]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.34]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.34]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.34]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(25,0): at Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(String nombre, String facultad)&#xD;
+[xUnit.net 00:00:00.34]            at InvokeStub_CarreraTests.Rechaza_campos_requeridos(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.34]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.34]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs(14,0): at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad)&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(25,0): at Catalogo.Tests.CarreraTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_campos_requeridos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.34]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.34]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.34]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.34]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.34]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(67,0): at Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste()&#xD;
+[xUnit.net 00:00:00.34]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.34]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs(25,0): at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(67,0): at Catalogo.Tests.CarreraServiceTests.&lt;Validacion_no_persiste&gt;b__9_0()&#xD;
+[xUnit.net 00:00:00.34]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.34]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.34]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.34]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.34]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(25,0): at Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(String nombre, String facultad)&#xD;
+[xUnit.net 00:00:00.34]            at InvokeStub_CarreraTests.Rechaza_campos_requeridos(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.34]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.34]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs(14,0): at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad)&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(25,0): at Catalogo.Tests.CarreraTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_campos_requeridos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.34]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.34]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs(14,0): at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad)&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(38,0): at Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode()&#xD;
+[xUnit.net 00:00:00.34]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.34]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.34]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.34]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs(14,0): at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad)&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(11,0): at Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia()&#xD;
+[xUnit.net 00:00:00.34]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.34]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.34]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.34]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs(25,0): at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.34]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(38,0): at Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad()&#xD;
+[xUnit.net 00:00:00.34]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.38]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.38]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs(14,0): at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad)&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(47,0): at Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos()&#xD;
+[xUnit.net 00:00:00.38]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.38]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.38]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.38]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs(25,0): at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(29,0): at Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad()&#xD;
+[xUnit.net 00:00:00.38]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.38]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.38]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.38]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.38]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.38]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(30,0): at Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas()&#xD;
+[xUnit.net 00:00:00.38]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.38]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.38]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Carrera.cs(14,0): at Catalogo.Domain.Carrera..ctor(String nombre, String facultad, Boolean vigencia, String modalidad)&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(30,0): at Catalogo.Tests.CarreraTests.&lt;&gt;c.&lt;Rechaza_longitudes_excesivas&gt;b__2_0()&#xD;
+[xUnit.net 00:00:00.38]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.38]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs(25,0): at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(46,0): at Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar()&#xD;
+[xUnit.net 00:00:00.38]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.38]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.38]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs(25,0): at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(16,0): at Catalogo.Tests.CarreraServiceTests.CRUD_completo()&#xD;
+[xUnit.net 00:00:00.38]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.38]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.38]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.38]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.38]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.38]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(76,0): at Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada()&#xD;
+[xUnit.net 00:00:00.38]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.38]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs(24,0): at Catalogo.Application.CarreraService.ObtenerAsync(Guid id, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(76,0): at Catalogo.Tests.CarreraServiceTests.&lt;&gt;c__DisplayClass10_0.&lt;Id_inexistente_devuelve_no_encontrada&gt;b__0()&#xD;
+[xUnit.net 00:00:00.38]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.38]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Carreras.cs(25,0): at Catalogo.Application.CarreraService.CrearAsync(CarreraInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(57,0): at Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente()&#xD;
+[xUnit.net 00:00:00.38]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.39]   Finished:    Catalogo.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.2259837-05:00">
+        <Text>[xUnit.net 00:00:00.33]     Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: "Software", facultad: "\t") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.2338916-05:00">
+        <Text>[xUnit.net 00:00:00.34]     Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: "FISEI") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.2356644-05:00">
+        <Text>[xUnit.net 00:00:00.34]     Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: "Software", facultad: null) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.2363963-05:00">
+        <Text>[xUnit.net 00:00:00.34]     Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.2376174-05:00">
+        <Text>[xUnit.net 00:00:00.34]     Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: " ", facultad: "FISEI") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.2388992-05:00">
+        <Text>[xUnit.net 00:00:00.34]     Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.2392769-05:00">
+        <Text>[xUnit.net 00:00:00.34]     Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.2402810-05:00">
+        <Text>[xUnit.net 00:00:00.34]     Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.3533478-05:00">
+        <Text>[xUnit.net 00:00:00.38]     Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.3534148-05:00">
+        <Text>[xUnit.net 00:00:00.38]     Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.3534806-05:00">
+        <Text>[xUnit.net 00:00:00.38]     Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.3535361-05:00">
+        <Text>[xUnit.net 00:00:00.38]     Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.3535878-05:00">
+        <Text>[xUnit.net 00:00:00.38]     Catalogo.Tests.CarreraServiceTests.CRUD_completo [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.3536309-05:00">
+        <Text>[xUnit.net 00:00:00.38]     Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:20:09.3536808-05:00">
+        <Text>[xUnit.net 00:00:00.38]     Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

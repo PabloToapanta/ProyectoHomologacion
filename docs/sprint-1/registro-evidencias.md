@@ -15,7 +15,7 @@
 | Historia | PR | Resultado pruebas | Evidencia API/UI | PO acepta | Observaciones |
 |---|---|---|---|---|---|
 | HU-01 | | Pendiente | | No evaluado | |
-| HU-04 | | Pendiente | | No evaluado | |
+| HU-04 | Sin PR; rama `feature/hu-04-carreras` | 28 backend y 59 frontend correctas (19/10/2026) | [T4/T5 y evidencia TDD](evidencia-hu-04-t4-t5.md) | No evaluado | Commits y push autorizados por Leslie; pendientes SQL Server/Compose, ruta protegida con Pablo, revisión cruzada y aceptación de Shirley |
 | HU-05 | | Pendiente | | No evaluado | |
 | HU-06 | | Pendiente | | No evaluado | |
 | HU-14 | | Pendiente | | No evaluado | |
