@@ -1,0 +1,39 @@
+# Entorno aislado de desarrollo de T1 / HU-01 / Issue #1.
+services:
+  auth-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${AUTH_SQL_PASSWORD:?Configure AUTH_SQL_PASSWORD fuera de Git}
+    volumes:
+      - auth-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__Auth: "Server=auth-db;Database=HomologacionAuth;User Id=sa;Password=${AUTH_SQL_PASSWORD:?Configure AUTH_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
+      Jwt__Audience: ${AUTH_JWT_AUDIENCE:?Configure AUTH_JWT_AUDIENCE}
+      Jwt__SigningKey: ${AUTH_JWT_KEY:?Configure AUTH_JWT_KEY}
+      Database__ApplyMigrations: "true"
+      SeedAdmin__Enabled: "true"
+      SeedAdmin__NombreUsuario: ${AUTH_ADMIN_USERNAME:?Configure AUTH_ADMIN_USERNAME}
+      SeedAdmin__Password: ${AUTH_ADMIN_PASSWORD:?Configure AUTH_ADMIN_PASSWORD}
+    ports:
+      - "127.0.0.1:${AUTH_HTTP_PORT:-5081}:8080"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+volumes:
+  auth-data:

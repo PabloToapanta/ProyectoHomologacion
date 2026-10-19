@@ -1,0 +1,22 @@
+# Overlay opcional T2; usar primero src/auth-service/compose.yaml.
+# Las rutas relativas de Compose se resuelven desde el directorio de ese primer archivo.
+services:
+  gateway:
+    build:
+      context: ../gateway
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
+      Jwt__Audience: ${AUTH_JWT_AUDIENCE:?Configure AUTH_JWT_AUDIENCE}
+      Jwt__SigningKey: ${AUTH_JWT_KEY:?Configure AUTH_JWT_KEY}
+      ReverseProxy__Clusters__auth__Destinations__primary__Address: http://auth-service:8080/
+      ReverseProxy__Clusters__catalogo__Destinations__primary__Address: ${CATALOGO_SERVICE_URL:?Configure CATALOGO_SERVICE_URL}
+      ReverseProxy__Clusters__homologacion__Destinations__primary__Address: ${HOMOLOGACION_SERVICE_URL:?Configure HOMOLOGACION_SERVICE_URL}
+    ports:
+      - "127.0.0.1:${GATEWAY_HTTP_PORT:-5080}:8080"
+    depends_on:
+      auth-service:
+        condition: service_started
