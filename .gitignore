@@ -44,3 +44,6 @@ sqlserver-data/
 # Registros
 *.log
 logs/
+
+# Documentos originales de referencia almacenados solo en equipos locales
+docs/referencias/*.pdf
