@@ -1,0 +1,10 @@
+{
+  "origen": { "id": "origen-sintetico", "horas": 180, "creditos": 4, "temas": ["O1", "O2"] },
+  "receptora": { "id": "receptora-sintetica", "horas": 144, "creditos": 3, "temas": ["R1", "R2", "R3", "R4", "R5"] },
+  "correspondencias": [
+    { "temaOrigen": "O1", "temaReceptor": "R1" },
+    { "temaOrigen": "O1", "temaReceptor": "R2" },
+    { "temaOrigen": "O2", "temaReceptor": "R3" },
+    { "temaOrigen": "O2", "temaReceptor": "R4" }
+  ]
+}

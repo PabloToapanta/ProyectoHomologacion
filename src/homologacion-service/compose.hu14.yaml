@@ -1,0 +1,21 @@
+# Tercer archivo, después de auth-service/compose.yaml y gateway/compose.t2.yaml.
+# Rutas relativas al primer archivo (src/auth-service).
+services:
+  homologacion-service:
+    build:
+      context: ../homologacion-service
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
+      Jwt__Audience: ${AUTH_JWT_AUDIENCE:?Configure AUTH_JWT_AUDIENCE}
+      Jwt__SigningKey: ${AUTH_JWT_KEY:?Configure AUTH_JWT_KEY}
+      Equivalencia__UmbralPct: ${EQUIVALENCIA_UMBRAL_PCT:-80}
+  gateway:
+    environment:
+      ReverseProxy__Clusters__homologacion__Destinations__primary__Address: http://homologacion-service:8080/
+    depends_on:
+      homologacion-service:
+        condition: service_started
