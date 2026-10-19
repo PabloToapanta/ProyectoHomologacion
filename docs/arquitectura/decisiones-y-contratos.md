@@ -22,6 +22,41 @@ Sprints siguientes:
 
 No se deben compartir entidades EF Core ni acoplar servicios mediante consultas directas a las bases de datos ajenas. Una instancia física de SQL Server puede alojar bases separadas. El motor no necesita persistencia de resultados hasta la historia HU-20 del Sprint 2.
 
+## Clean Architecture obligatoria dentro de cada microservicio
+
+El documento original exige estilo **Onion/Clean** por microservicio, con cuatro responsabilidades bien separadas. Crear proyectos independientes en cada servicio de negocio, sin introducir capas vacías en el Gateway.
+
+Ejemplo para `homologacion-service` (repetir el patrón en `auth-service` y `catalogo-service`):
+
+```text
+services/
+  homologacion-service/
+    Homologacion.sln
+    src/
+      Homologacion.Domain/
+      Homologacion.Application/
+      Homologacion.Infrastructure/
+      Homologacion.Api/
+    tests/
+      Homologacion.Domain.Tests/
+      Homologacion.Application.Tests/
+```
+
+### Reglas de referencias y responsabilidades
+
+- **Domain**: entidades, objetos de valor, políticas de negocio y comparaciones puras. No depende de otras capas ni de EF Core, HTTP, JWT o LLM.
+- **Application**: casos de uso, DTO, validaciones de aplicación e interfaces (puertos) para repositorios y servicios externos; **solo referencia Domain**.
+- **Infrastructure**: EF Core, `DbContext`, migraciones, persistencia SQL Server, JWT como infraestructura de autenticación y adaptadores; referencia Application y Domain según se necesite.
+- **Api/Presentation**: controladores/endpoints, OpenAPI/Swagger, manejo HTTP y registro de dependencias. Referencia Application y, exclusivamente en su punto de composición, Infrastructure.
+- La regla de dependencias es hacia el interior: Domain <- Application <- Infrastructure y Api como capa de entrada/composición.
+- Cada microservicio posee datos, contratos y capas propias; nunca referenciar directamente el `Domain` de otro microservicio.
+- Integración entre servicios mediante contratos HTTP/eventos y DTO, sin compartir `DbContext`.
+- **Gateway YARP**: aplicación de infraestructura para enrutamiento/autorización, no un microservicio con reglas de negocio. **React**: frontend separado.
+
+### Adaptación de código existente
+
+Si Codex ya generó archivos, primero inventariarlos y analizar dependencias reales. Moverlos progresivamente a proyectos Clean, ajustar namespaces e inyección de dependencias, compilar y ejecutar pruebas tras cada movimiento. No reescribir lógica correcta ni perder cambios sin commit. El objetivo es preservar todos los criterios de aceptación del Sprint 1.
+
 ## Rutas propuestas en el Gateway
 
 | Método | Ruta | Servicio | HU |
