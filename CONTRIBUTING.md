@@ -1,10 +1,12 @@
 # Guía de contribución
 
 ## Roles durante el Sprint 1
-- **Pablo:** Scrum Master y desarrollo de autenticación / homologación.
-- **Leslie:** desarrollo del catálogo académico, SQL Server y frontend.
-- **Shirley:** Product Owner, priorización y aceptación.
-- **Edwin:** análisis funcional, documentación técnica, datos de prueba y pruebas de aceptación.
+- **Pablo:** Scrum Master, autenticación y Gateway (HU-01), comparador (HU-14), integración técnica.
+- **Leslie:** carreras y asignaturas, sus APIs y pantallas (HU-04 y HU-05).
+- **Edwin:** unidades/contenidos, antigüedad y requisitos de cambio (HU-06, HU-15 y HU-16).
+- **Shirley:** Product Owner, priorización, QA manual, documentación Scrum y aceptación.
+
+Los tres desarrolladores tienen Codex. Codex asiste al desarrollo; cada integrante mantiene responsabilidad sobre código y pruebas. Revisiones cruzadas: Pablo revisa a Leslie, Leslie a Edwin y Edwin a Pablo. No cerrar una HU hasta validar criterios y contar con revisión.
 
 ## GitFlow
 - `main`: releases estables.

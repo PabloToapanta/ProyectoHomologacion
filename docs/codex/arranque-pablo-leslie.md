@@ -1,3 +1,5 @@
+> **Documento histórico (redistribución anterior).** La distribución vigente con tres desarrolladores es [arranque-tres-desarrolladores.md](arranque-tres-desarrolladores.md). No utilizar las asignaciones de este archivo para nuevos Issues.
+
 # Arranque para Pablo y Leslie con Codex CLI
 
 Este documento describe el trabajo humano con asistencia de Codex. Codex actúa en el repositorio local; las decisiones sobre normas ambiguas, entregas y merges requieren confirmación humana.
