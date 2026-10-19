@@ -30,7 +30,7 @@ No adelantar agentes de IA, informes PDF, asignación de docentes ni carga autom
 - Consultar `docs/contexto-proyecto.md` para las reglas de negocio y el alcance, `docs/sprint-1/criterios-aceptacion.md` para cada historia y `docs/arquitectura/decisiones-y-contratos.md` cuando se alteren contratos.
 
 ## Reglas de implementación
-1. Leer la historia, criterios y tareas del Issue antes de cambiar archivos.
+1. Consultar los criterios locales y tareas del Issue cuando GitHub sea accesible; no bloquear el trabajo si la sesión no tiene integración de GitHub.
 2. Proponer y ejecutar autónomamente una solución simple, explicando decisiones relevantes y archivos afectados; detenerse a consultar solo si cambia el alcance o existe ambigüedad normativa/material.
 3. Aplicar TDD a reglas y validaciones: primero prueba fallida, luego implementación, luego refactorización.
 4. Mantener el cálculo de horas y créditos acotado a 100 %.
