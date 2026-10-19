@@ -2,9 +2,9 @@
 
 ## Roles durante el Sprint 1
 - **Pablo:** Scrum Master y desarrollo de autenticación / homologación.
-- **Edwin:** desarrollo del catálogo académico.
+- **Leslie:** desarrollo del catálogo académico, SQL Server y frontend.
 - **Shirley:** Product Owner, priorización y aceptación.
-- **Leslie:** documentación, seguimiento y pruebas de aceptación.
+- **Edwin:** análisis funcional, documentación técnica, datos de prueba y pruebas de aceptación.
 
 ## GitFlow
 - `main`: releases estables.
