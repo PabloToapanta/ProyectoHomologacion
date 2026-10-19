@@ -79,7 +79,7 @@ Ejemplo de prueba mencionado en el documento: **Álgebra Lineal**, carrera Softw
 - RabbitMQ reservado para eventos de negocio del flujo que se implementará después.
 - Ollama o API alternativa con agentes en Sprint 2; el motor del Sprint 1 debe funcionar **sin un LLM**.
 - xUnit, Docker Compose, GitHub Actions, Swagger; GitFlow y Conventional Commits en español.
-- Clean/Onion propuesto internamente; mantener el diseño proporcional al plazo.
+- **Clean/Onion obligatorio en cada microservicio de negocio**: proyectos Domain, Application, Infrastructure y Api (Presentation) con dependencias hacia el dominio; mantener el diseño proporcional al plazo. No imponer las cuatro capas al Gateway YARP ni a React. Ver `docs/arquitectura/decisiones-y-contratos.md`.
 
 ## Sprints siguientes (solo para contexto)
 Sprint 2: crear solicitudes y asignar dos docentes, analizar cambios internos/externos mediante agentes, guardar resultados y visualizar análisis; parte de la carga de programas analíticos.
