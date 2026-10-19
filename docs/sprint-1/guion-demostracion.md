@@ -14,10 +14,10 @@ Duración sugerida: 10–15 minutos. Preparar datos de prueba reproducibles y mo
 10. **Scrum + XP:** mostrar Issues y evidencia de aceptación, más impedimentos reales.
 
 ## Responsabilidades
-- **Pablo:** infraestructura, autenticación, motor de homologación y TDD.
-- **Leslie:** APIs y pantallas del catálogo.
-- **Shirley:** Product Owner, objetivos y aceptación.
-- **Edwin:** análisis de requisitos, datos académicos, evidencias y retroalimentación.
+- **Pablo:** autenticación, Gateway, motor comparador HU-14 e integración.
+- **Leslie:** APIs y pantallas de carreras/asignaturas HU-04/HU-05.
+- **Shirley:** Product Owner, objetivos, evidencias, pruebas manuales y aceptación.
+- **Edwin:** unidades curriculares HU-06 y reglas de antigüedad/cambio HU-15/HU-16.
 
 ## Preparativos
 - [ ] Entorno local funciona con las variables configuradas.
