@@ -1,0 +1,32 @@
+services:
+  catalogo-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${CATALOGO_SQL_PASSWORD:?Configura CATALOGO_SQL_PASSWORD}
+    volumes:
+      - catalogo-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+  catalogo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:5082:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Catalogo: Server=catalogo-db;Database=Catalogo;User Id=sa;Password=${CATALOGO_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True
+      Jwt__Issuer: ${JWT_ISSUER:?Configura JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE:?Configura JWT_AUDIENCE}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?Configura JWT_SIGNING_KEY}
+      Database__ApplyMigrations: "true"
+    depends_on:
+      catalogo-db:
+        condition: service_healthy
+volumes:
+  catalogo-data:
