@@ -5,7 +5,7 @@ import { expect, it, vi } from 'vitest';
 import { loginResponse } from '../test/fixtures';
 import { App } from './App';
 
-const carrera = { id: 'carrera-demo', nombre: 'Software de prueba', facultad: 'Facultad sintética', vigencia: true, modalidad: null };
+const carrera = { id: 'carrera-demo', nombre: 'Software de prueba', facultad: 'FISEI', vigencia: true, modalidad: null };
 const asignatura = { id: 'asignatura-demo', carreraId: carrera.id, codigo: 'DEMO-ALG', nombre: 'Álgebra Lineal', nivel: 1, creditos: 3, horas: 144 };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 

@@ -43,7 +43,32 @@ public class CatalogoApiTests
     }
 
     [Fact]
-    public async Task Duplicado_en_creacion_y_edicion_devuelve_409_y_otra_facultad_permitida()
+    public async Task Leer_registros_anteriores_conserva_facultad_UUID_y_asignaturas()
+    {
+        using var factory = new CatalogoFactory();
+        using var client = factory.Admin();
+        var id = Guid.NewGuid();
+        var asignaturaId = Guid.NewGuid();
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<CatalogoDbContext>();
+            // Simula datos previos al cambio sin pasar por la política de escritura nueva.
+            await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO Carreras (Id, Nombre, Facultad, Vigencia, NombreNormalizado, FacultadNormalizada) VALUES ({id}, {"Carrera anterior"}, {"Facultad anterior"}, {true}, {"CARRERA ANTERIOR"}, {"FACULTAD ANTERIOR"})");
+            var asignatura = new Asignatura(id, "DEMO-ANTERIOR", "Asignatura anterior", 1, 3, 144);
+            asignaturaId = asignatura.Id;
+            db.Asignaturas.Add(asignatura);
+            await db.SaveChangesAsync();
+        }
+        var anterior = await client.GetFromJsonAsync<CarreraDto>($"/api/carreras/{id}");
+        Assert.Equal(id, anterior!.Id);
+        Assert.Equal("Facultad anterior", anterior.Facultad);
+        var listado = (await client.GetFromJsonAsync<AsignaturaDto[]>($"/api/carreras/{id}/asignaturas"))!;
+        Assert.Equal(asignaturaId, Assert.Single(listado).Id);
+        Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync($"/api/carreras/{id}")).StatusCode);
+    }
+
+    [Fact]
+    public async Task Duplicado_en_creacion_y_edicion_devuelve_409()
     {
         using var factory = new CatalogoFactory();
         using var client = factory.Admin();
@@ -51,18 +76,37 @@ public class CatalogoApiTests
         var duplicado = await client.PostAsJsonAsync("/api/carreras", Input(" carrera   sintética ", " fisei "));
         Assert.Equal(HttpStatusCode.Conflict, duplicado.StatusCode);
         Assert.Contains("duplicado", await duplicado.Content.ReadAsStringAsync());
-        var otra = await client.PostAsJsonAsync("/api/carreras", Input(facultad: "Otra"));
+        var otra = await client.PostAsJsonAsync("/api/carreras", Input(nombre: "Otra carrera"));
         Assert.Equal(HttpStatusCode.Created, otra.StatusCode);
         var dto = (await otra.Content.ReadFromJsonAsync<CarreraDto>())!;
         Assert.Equal(HttpStatusCode.Conflict, (await client.PutAsJsonAsync($"/api/carreras/{dto.Id}", Input())).StatusCode);
     }
 
     [Theory]
+    [InlineData("Otra facultad")]
+    [InlineData("FISEI UTA")]
+    public async Task Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(string facultad)
+    {
+        using var factory = new CatalogoFactory();
+        using var client = factory.Admin();
+        var invalid = await client.PostAsJsonAsync("/api/carreras", Input(facultad: facultad));
+        Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        Assert.Contains("FISEI", await invalid.Content.ReadAsStringAsync());
+        Assert.Empty((await client.GetFromJsonAsync<CarreraDto[]>("/api/carreras"))!);
+        var valid = await client.PostAsJsonAsync("/api/carreras", Input(facultad: " fisei "));
+        var carrera = (await valid.Content.ReadFromJsonAsync<CarreraDto>())!;
+        Assert.Equal("FISEI", carrera.Facultad);
+        var edit = await client.PutAsJsonAsync($"/api/carreras/{carrera.Id}", Input("Cambio rechazado", facultad, false));
+        Assert.Equal(HttpStatusCode.BadRequest, edit.StatusCode);
+        Assert.Equal(carrera, await client.GetFromJsonAsync<CarreraDto>($"/api/carreras/{carrera.Id}"));
+    }
+
+    [Theory]
     [InlineData("{}")]
-    [InlineData("{\"nombre\":\"N\",\"facultad\":\"F\"}")]
-    [InlineData("{\"nombre\":\"N\",\"facultad\":\"F\",\"vigencia\":null}")]
-    [InlineData("{\"nombre\":\" \",\"facultad\":\"F\",\"vigencia\":true}")]
-    [InlineData("{\"nombre\":\"N\",\"facultad\":\"F\",\"vigencia\":\"si\"}")]
+    [InlineData("{\"nombre\":\"N\",\"facultad\":\"FISEI\"}")]
+    [InlineData("{\"nombre\":\"N\",\"facultad\":\"FISEI\",\"vigencia\":null}")]
+    [InlineData("{\"nombre\":\" \",\"facultad\":\"FISEI\",\"vigencia\":true}")]
+    [InlineData("{\"nombre\":\"N\",\"facultad\":\"FISEI\",\"vigencia\":\"si\"}")]
     [InlineData("null")]
     public async Task Rechaza_JSON_invalido_o_campos_faltantes(string json)
     {
@@ -139,6 +183,7 @@ public class CatalogoApiTests
         Assert.Contains("Bearer", json);
         Assert.Contains("409", json);
         Assert.Contains("vigencia", json);
+        Assert.Contains("FISEI", json);
     }
 
     [Fact]

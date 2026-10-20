@@ -1,0 +1,313 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="dca55381-57d9-4635-86bb-44cf00ef0a6c" name="ASUS@DESKTOP-MV69426 2026-10-20 14:41:47" runUser="DESKTOP-MV69426\ASUS" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-20T14:41:47.8989364-05:00" queuing="2026-10-20T14:41:47.8989368-05:00" start="2026-10-20T14:41:46.2936978-05:00" finish="2026-10-20T14:41:51.4358604-05:00" />
+  <TestSettings name="default" id="ebfcacc9-02d0-4cab-8337-4844d656f37b">
+    <Deployment runDeploymentRoot="ASUS_DESKTOP-MV69426_2026-10-20_14_41_47" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="bb972a74-9c26-4b21-81b1-818f47d7c3c5" testId="28343130-587c-b76c-b092-462e4a87e420" testName="Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(facultad: &quot;Otra facultad&quot;)" computerName="DESKTOP-MV69426" duration="00:00:03.2606543" startTime="2026-10-20T14:41:51.0050204-05:00" endTime="2026-10-20T14:41:51.0050210-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bb972a74-9c26-4b21-81b1-818f47d7c3c5">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure: Values differ&#xD;
+Expected: BadRequest&#xD;
+Actual:   Created</Message>
+          <StackTrace>   at Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs:line 68&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="14dcb349-f819-43ca-92d7-cc31aefe51e1" testId="aef38cd8-e042-1f04-cf44-2aaa636f15f5" testName="Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: &quot;Facultad de Ingeniería en Sistemas, Electrónica e &quot;···)" computerName="DESKTOP-MV69426" duration="00:00:00.0005164" startTime="2026-10-20T14:41:47.7942346-05:00" endTime="2026-10-20T14:41:47.7942347-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="14dcb349-f819-43ca-92d7-cc31aefe51e1">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: No exception was thrown&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 24&#xD;
+   at InvokeStub_CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2387488d-e04a-4ae7-a593-c7f0c8769123" testId="d9e0b023-7004-6164-98ef-3f5d1bb5ec91" testName="Catalogo.Tests.CarreraServiceTests.Rechaza_otra_facultad_sin_persistir" computerName="DESKTOP-MV69426" duration="00:00:00.0134595" startTime="2026-10-20T14:41:47.7977269-05:00" endTime="2026-10-20T14:41:47.7977273-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2387488d-e04a-4ae7-a593-c7f0c8769123">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: No exception was thrown&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraServiceTests.Rechaza_otra_facultad_sin_persistir() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs:line 39&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="551a5f81-b317-4b40-91cd-3171b7db76c4" testId="08d680f0-fc80-1542-e797-6f7ba6381972" testName="Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: &quot;FISEI UTA&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0125029" startTime="2026-10-20T14:41:47.7874343-05:00" endTime="2026-10-20T14:41:47.7874658-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="551a5f81-b317-4b40-91cd-3171b7db76c4">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: No exception was thrown&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 24&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="225941ab-b20a-4275-95be-c0820f24d5fb" testId="a6707574-b0bd-cfd8-7553-acb0f9dbe984" testName="Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia" computerName="DESKTOP-MV69426" duration="00:00:00.0068951" startTime="2026-10-20T14:41:47.8474802-05:00" endTime="2026-10-20T14:41:47.8474802-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="225941ab-b20a-4275-95be-c0820f24d5fb" />
+    <UnitTestResult executionId="64445011-f6f6-4b11-88f4-60adb8e4fc1d" testId="f51f454b-6442-65d7-e5f2-bceeae7b2657" testName="Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" computerName="DESKTOP-MV69426" duration="00:00:00.0034442" startTime="2026-10-20T14:41:47.8475532-05:00" endTime="2026-10-20T14:41:47.8475532-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="64445011-f6f6-4b11-88f4-60adb8e4fc1d" />
+    <UnitTestResult executionId="e000a262-1d8c-4b89-b3a9-b5c9c0a1e1b8" testId="078dfa14-862b-c2b5-f645-92622429c17e" testName="Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: &quot;Otra facultad&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0002286" startTime="2026-10-20T14:41:47.7965306-05:00" endTime="2026-10-20T14:41:47.7965309-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e000a262-1d8c-4b89-b3a9-b5c9c0a1e1b8">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: No exception was thrown&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 24&#xD;
+   at InvokeStub_CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3295e5df-a97e-4dcc-ac2e-0cf2c3542441" testId="a9ef2e68-b60c-eb37-a153-235de4ac7c19" testName="Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(facultad: &quot;FISEI UTA&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.2707223" startTime="2026-10-20T14:41:51.2802376-05:00" endTime="2026-10-20T14:41:51.2802378-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3295e5df-a97e-4dcc-ac2e-0cf2c3542441">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure: Values differ&#xD;
+Expected: BadRequest&#xD;
+Actual:   Created</Message>
+          <StackTrace>   at Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs:line 68&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="292aabc6-33d5-4029-bb46-56f40ef4ea2a" testId="1ad91be6-365c-b2db-0fff-864b67210d4e" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: &quot;FISEI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0004176" startTime="2026-10-20T14:41:47.8020953-05:00" endTime="2026-10-20T14:41:47.8020953-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="292aabc6-33d5-4029-bb46-56f40ef4ea2a" />
+    <UnitTestResult executionId="aa1ac2b3-4d14-42b5-8e51-60eb82f7d8a4" testId="d881be25-13cd-f299-57da-a5df0181116f" testName="Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode" computerName="DESKTOP-MV69426" duration="00:00:00.0002312" startTime="2026-10-20T14:41:47.8465269-05:00" endTime="2026-10-20T14:41:47.8465269-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="aa1ac2b3-4d14-42b5-8e51-60eb82f7d8a4" />
+    <UnitTestResult executionId="ced0584f-fb8d-4c27-8951-143fe764da7e" testId="361015e7-9ee0-f73d-9d7d-ae487fe4e7a2" testName="Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(facultad: &quot;FiSeI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0005435" startTime="2026-10-20T14:41:47.8008063-05:00" endTime="2026-10-20T14:41:47.8008068-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ced0584f-fb8d-4c27-8951-143fe764da7e">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure: Strings differ&#xD;
+            ↓ (pos 1)&#xD;
+Expected: "FISEI"&#xD;
+Actual:   "FiSeI"&#xD;
+            ↑ (pos 1)</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 14&#xD;
+   at InvokeStub_CarreraTests.Canoniza_facultad_receptora(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d555f78b-6e4b-4e2a-94bb-590c0e5feb2b" testId="185cf480-e607-bd24-f13a-8f68fe6849a1" testName="Catalogo.Tests.CarreraTests.Cambiar_facultad_no_modifica_ningun_dato" computerName="DESKTOP-MV69426" duration="00:00:00.0009455" startTime="2026-10-20T14:41:47.8473681-05:00" endTime="2026-10-20T14:41:47.8473684-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d555f78b-6e4b-4e2a-94bb-590c0e5feb2b">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: No exception was thrown&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Cambiar_facultad_no_modifica_ningun_dato() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 34&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c4b26ae7-5210-44cf-a60b-8fb68b6fba1e" testId="49d8c3b3-c802-fc75-153b-96c3ace215fe" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: &quot;\t&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0014309" startTime="2026-10-20T14:41:47.8018850-05:00" endTime="2026-10-20T14:41:47.8018856-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c4b26ae7-5210-44cf-a60b-8fb68b6fba1e" />
+    <UnitTestResult executionId="484879aa-966b-41e6-a51b-4086b4492284" testId="84ee4445-9d60-73df-cde6-cc10a7ffc662" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: null)" computerName="DESKTOP-MV69426" duration="00:00:00.0000780" startTime="2026-10-20T14:41:47.8460790-05:00" endTime="2026-10-20T14:41:47.8460791-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="484879aa-966b-41e6-a51b-4086b4492284" />
+    <UnitTestResult executionId="dc89de3f-9f8a-4546-a96c-ffdb544f3c2e" testId="a4678edd-fdea-4a2d-ddbf-8287b87a682d" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot; &quot;, facultad: &quot;FISEI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0000534" startTime="2026-10-20T14:41:47.8464404-05:00" endTime="2026-10-20T14:41:47.8464404-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dc89de3f-9f8a-4546-a96c-ffdb544f3c2e" />
+    <UnitTestResult executionId="f6d2ff2a-aeb3-4761-9da3-72e79d5f67e6" testId="f97ed5e0-7df1-421b-0bb6-f2526f167768" testName="Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(facultad: &quot; fisei &quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0034793" startTime="2026-10-20T14:41:47.7992114-05:00" endTime="2026-10-20T14:41:47.7992190-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f6d2ff2a-aeb3-4761-9da3-72e79d5f67e6">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure: Strings differ&#xD;
+           ↓ (pos 0)&#xD;
+Expected: "FISEI"&#xD;
+Actual:   "fisei"&#xD;
+           ↑ (pos 0)</Message>
+          <StackTrace>   at Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(String facultad) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs:line 14&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="94c93b8c-d0b7-4f57-89e1-fca91d32c1bd" testId="60539169-bef8-0838-fd08-8d462e4deafa" testName="Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas" computerName="DESKTOP-MV69426" duration="00:00:00.0012911" startTime="2026-10-20T14:41:47.8475863-05:00" endTime="2026-10-20T14:41:47.8475864-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="94c93b8c-d0b7-4f57-89e1-fca91d32c1bd" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot; &quot;, facultad: &quot;FISEI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a4678edd-fdea-4a2d-ddbf-8287b87a682d">
+      <Execution id="dc89de3f-9f8a-4546-a96c-ffdb544f3c2e" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(facultad: &quot;Otra facultad&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="28343130-587c-b76c-b092-462e4a87e420">
+      <Execution id="bb972a74-9c26-4b21-81b1-818f47d7c3c5" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(facultad: &quot;FiSeI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="361015e7-9ee0-f73d-9d7d-ae487fe4e7a2">
+      <Execution id="ced0584f-fb8d-4c27-8951-143fe764da7e" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Canoniza_facultad_receptora" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Rechaza_otra_facultad_sin_persistir" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="d9e0b023-7004-6164-98ef-3f5d1bb5ec91">
+      <Execution id="2387488d-e04a-4ae7-a593-c7f0c8769123" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Rechaza_otra_facultad_sin_persistir" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="f51f454b-6442-65d7-e5f2-bceeae7b2657">
+      <Execution id="64445011-f6f6-4b11-88f4-60adb8e4fc1d" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: null)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="84ee4445-9d60-73df-cde6-cc10a7ffc662">
+      <Execution id="484879aa-966b-41e6-a51b-4086b4492284" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: &quot;FISEI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="1ad91be6-365c-b2db-0fff-864b67210d4e">
+      <Execution id="292aabc6-33d5-4029-bb46-56f40ef4ea2a" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: &quot;Facultad de Ingeniería en Sistemas, Electrónica e &quot;···)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="aef38cd8-e042-1f04-cf44-2aaa636f15f5">
+      <Execution id="14dcb349-f819-43ca-92d7-cc31aefe51e1" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_facultad_fuera_del_catalogo_receptor" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(facultad: &quot;FISEI UTA&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a9ef2e68-b60c-eb37-a153-235de4ac7c19">
+      <Execution id="3295e5df-a97e-4dcc-ac2e-0cf2c3542441" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="60539169-bef8-0838-fd08-8d462e4deafa">
+      <Execution id="94c93b8c-d0b7-4f57-89e1-fca91d32c1bd" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_longitudes_excesivas" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="d881be25-13cd-f299-57da-a5df0181116f">
+      <Execution id="aa1ac2b3-4d14-42b5-8e51-60eb82f7d8a4" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Clave_ignora_caso_espacios_y_variantes_unicode" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: &quot;FISEI UTA&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="08d680f0-fc80-1542-e797-6f7ba6381972">
+      <Execution id="551a5f81-b317-4b40-91cd-3171b7db76c4" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_facultad_fuera_del_catalogo_receptor" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a6707574-b0bd-cfd8-7553-acb0f9dbe984">
+      <Execution id="225941ab-b20a-4275-95be-c0820f24d5fb" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Crear_normaliza_campos_y_conserva_vigencia" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(facultad: &quot; fisei &quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="f97ed5e0-7df1-421b-0bb6-f2526f167768">
+      <Execution id="f6d2ff2a-aeb3-4761-9da3-72e79d5f67e6" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Canoniza_facultad_receptora" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Cambiar_facultad_no_modifica_ningun_dato" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="185cf480-e607-bd24-f13a-8f68fe6849a1">
+      <Execution id="d555f78b-6e4b-4e2a-94bb-590c0e5feb2b" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Cambiar_facultad_no_modifica_ningun_dato" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: &quot;\t&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="49d8c3b3-c802-fc75-153b-96c3ace215fe">
+      <Execution id="c4b26ae7-5210-44cf-a60b-8fb68b6fba1e" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: &quot;Otra facultad&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="078dfa14-862b-c2b5-f645-92622429c17e">
+      <Execution id="e000a262-1d8c-4b89-b3a9-b5c9c0a1e1b8" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_facultad_fuera_del_catalogo_receptor" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="28343130-587c-b76c-b092-462e4a87e420" executionId="bb972a74-9c26-4b21-81b1-818f47d7c3c5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="aef38cd8-e042-1f04-cf44-2aaa636f15f5" executionId="14dcb349-f819-43ca-92d7-cc31aefe51e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d9e0b023-7004-6164-98ef-3f5d1bb5ec91" executionId="2387488d-e04a-4ae7-a593-c7f0c8769123" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="08d680f0-fc80-1542-e797-6f7ba6381972" executionId="551a5f81-b317-4b40-91cd-3171b7db76c4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a6707574-b0bd-cfd8-7553-acb0f9dbe984" executionId="225941ab-b20a-4275-95be-c0820f24d5fb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f51f454b-6442-65d7-e5f2-bceeae7b2657" executionId="64445011-f6f6-4b11-88f4-60adb8e4fc1d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="078dfa14-862b-c2b5-f645-92622429c17e" executionId="e000a262-1d8c-4b89-b3a9-b5c9c0a1e1b8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a9ef2e68-b60c-eb37-a153-235de4ac7c19" executionId="3295e5df-a97e-4dcc-ac2e-0cf2c3542441" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ad91be6-365c-b2db-0fff-864b67210d4e" executionId="292aabc6-33d5-4029-bb46-56f40ef4ea2a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d881be25-13cd-f299-57da-a5df0181116f" executionId="aa1ac2b3-4d14-42b5-8e51-60eb82f7d8a4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="361015e7-9ee0-f73d-9d7d-ae487fe4e7a2" executionId="ced0584f-fb8d-4c27-8951-143fe764da7e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="185cf480-e607-bd24-f13a-8f68fe6849a1" executionId="d555f78b-6e4b-4e2a-94bb-590c0e5feb2b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="49d8c3b3-c802-fc75-153b-96c3ace215fe" executionId="c4b26ae7-5210-44cf-a60b-8fb68b6fba1e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="84ee4445-9d60-73df-cde6-cc10a7ffc662" executionId="484879aa-966b-41e6-a51b-4086b4492284" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4678edd-fdea-4a2d-ddbf-8287b87a682d" executionId="dc89de3f-9f8a-4546-a96c-ffdb544f3c2e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f97ed5e0-7df1-421b-0bb6-f2526f167768" executionId="f6d2ff2a-aeb3-4761-9da3-72e79d5f67e6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="60539169-bef8-0838-fd08-8d462e4deafa" executionId="94c93b8c-d0b7-4f57-89e1-fca91d32c1bd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados sin formato de lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos los resultados cargados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="17" executed="17" passed="8" failed="9" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 8.0.30)&#xD;
+[xUnit.net 00:00:00.18]   Discovering: Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.26]   Discovered:  Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.27]   Starting:    Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.38]       Assert.Throws() Failure: No exception was thrown&#xD;
+[xUnit.net 00:00:00.38]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.38]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.38]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(24,0): at Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(String facultad)&#xD;
+[xUnit.net 00:00:00.38]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.38]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.39]       Assert.Throws() Failure: No exception was thrown&#xD;
+[xUnit.net 00:00:00.39]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.39]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.39]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(24,0): at Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(String facultad)&#xD;
+[xUnit.net 00:00:00.39]            at InvokeStub_CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.39]            at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.39]       Assert.Throws() Failure: No exception was thrown&#xD;
+[xUnit.net 00:00:00.39]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.39]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.39]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(24,0): at Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(String facultad)&#xD;
+[xUnit.net 00:00:00.39]            at InvokeStub_CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.39]            at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.39]       Assert.Throws() Failure: No exception was thrown&#xD;
+[xUnit.net 00:00:00.39]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.39]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.39]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraServiceTests.cs(39,0): at Catalogo.Tests.CarreraServiceTests.Rechaza_otra_facultad_sin_persistir()&#xD;
+[xUnit.net 00:00:00.39]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.40]       Assert.Equal() Failure: Strings differ&#xD;
+[xUnit.net 00:00:00.40]                  ↓ (pos 0)&#xD;
+[xUnit.net 00:00:00.40]       Expected: "FISEI"&#xD;
+[xUnit.net 00:00:00.40]       Actual:   "fisei"&#xD;
+[xUnit.net 00:00:00.40]                  ↑ (pos 0)&#xD;
+[xUnit.net 00:00:00.40]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.40]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(14,0): at Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(String facultad)&#xD;
+[xUnit.net 00:00:00.40]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.40]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.40]       Assert.Equal() Failure: Strings differ&#xD;
+[xUnit.net 00:00:00.40]                   ↓ (pos 1)&#xD;
+[xUnit.net 00:00:00.40]       Expected: "FISEI"&#xD;
+[xUnit.net 00:00:00.40]       Actual:   "FiSeI"&#xD;
+[xUnit.net 00:00:00.40]                   ↑ (pos 1)&#xD;
+[xUnit.net 00:00:00.40]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.40]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(14,0): at Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(String facultad)&#xD;
+[xUnit.net 00:00:00.40]            at InvokeStub_CarreraTests.Canoniza_facultad_receptora(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.40]            at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.44]       Assert.Throws() Failure: No exception was thrown&#xD;
+[xUnit.net 00:00:00.44]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.44]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CarreraTests.cs(34,0): at Catalogo.Tests.CarreraTests.Cambiar_facultad_no_modifica_ningun_dato()&#xD;
+[xUnit.net 00:00:00.44]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.44]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:03.60]       Assert.Equal() Failure: Values differ&#xD;
+[xUnit.net 00:00:03.60]       Expected: BadRequest&#xD;
+[xUnit.net 00:00:03.60]       Actual:   Created&#xD;
+[xUnit.net 00:00:03.60]       Stack Trace:&#xD;
+[xUnit.net 00:00:03.60]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs(68,0): at Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(String facultad)&#xD;
+[xUnit.net 00:00:03.60]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:03.88]       Assert.Equal() Failure: Values differ&#xD;
+[xUnit.net 00:00:03.88]       Expected: BadRequest&#xD;
+[xUnit.net 00:00:03.88]       Actual:   Created&#xD;
+[xUnit.net 00:00:03.88]       Stack Trace:&#xD;
+[xUnit.net 00:00:03.88]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs(68,0): at Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(String facultad)&#xD;
+[xUnit.net 00:00:03.88]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:03.89]   Finished:    Catalogo.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:47.7823162-05:00">
+        <Text>[xUnit.net 00:00:00.38]     Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: "FISEI UTA") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:47.7942324-05:00">
+        <Text>[xUnit.net 00:00:00.39]     Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: "Facultad de Ingeniería en Sistemas, Electrónica e "···) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:47.7961109-05:00">
+        <Text>[xUnit.net 00:00:00.39]     Catalogo.Tests.CarreraTests.Rechaza_facultad_fuera_del_catalogo_receptor(facultad: "Otra facultad") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:47.7973988-05:00">
+        <Text>[xUnit.net 00:00:00.39]     Catalogo.Tests.CarreraServiceTests.Rechaza_otra_facultad_sin_persistir [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:47.7985285-05:00">
+        <Text>[xUnit.net 00:00:00.39]     Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(facultad: " fisei ") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:47.7999910-05:00">
+        <Text>[xUnit.net 00:00:00.40]     Catalogo.Tests.CarreraTests.Canoniza_facultad_receptora(facultad: "FiSeI") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:47.9162932-05:00">
+        <Text>[xUnit.net 00:00:00.44]     Catalogo.Tests.CarreraTests.Cambiar_facultad_no_modifica_ningun_dato [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:51.0044838-05:00">
+        <Text>[xUnit.net 00:00:03.60]     Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(facultad: "Otra facultad") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-20T14:41:51.2798845-05:00">
+        <Text>[xUnit.net 00:00:03.88]     Catalogo.Tests.CatalogoApiTests.Facultad_no_permitida_devuelve_400_en_POST_y_PUT_sin_modificar(facultad: "FISEI UTA") [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

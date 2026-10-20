@@ -1,7 +1,7 @@
 # SC-01 — Delimitar el catálogo receptor a FISEI
 
 Fecha: 20/10/2026. Solicitante: Pablo.
-Estado: propuesta de cambio preparada para coordinación; no implementada ni enviada a integrantes.
+Estado: alcance acordado con Shirley según confirmación de Leslie en este chat el 20/10/2026; implementación en `feature/hu-04-alcance-fisei`. Aceptación funcional del incremento pendiente.
 Historias afectadas: HU-04 / Issue #2; integración con HU-05 / #3,
 HU-06 / #4 y HU-16 / #7. HU-01 y la fórmula de HU-14 se conservan.
 
@@ -58,9 +58,16 @@ flujo de asignación de docentes de sprints posteriores.
 6. No modificar el cálculo de equivalencia, las validaciones de antigüedad ni
    los mínimos de cambio por este ajuste de catálogo.
 
-Este cambio conserva la forma JSON, pero restringe valores antes admitidos:
-es un cambio de comportamiento que debe anunciarse y coordinarse. No consta
-todavía acuerdo con Leslie ni aceptación de Shirley.
+Este cambio conserva la forma JSON, pero restringe valores antes admitidos.
+Leslie confirmó el acuerdo con Shirley y autorizó su implementación el 20/10/2026.
+Esto registra una decisión de alcance del equipo; no equivale a aceptar funcionalmente
+el código nuevo ni a una disposición normativa institucional.
+
+Implementación: crear/editar solo admite `FISEI` (caso y espacios externos
+normalizados). El nombre completo no se acepta como alias sin un acuerdo específico.
+Los registros anteriores se siguen consultando con su facultad original; la UI
+los identifica como pendientes de revisión y bloquea su edición para evitar
+reasignarlos silenciosamente. No se ejecuta una conversión masiva ni migración SQL.
 
 ## Datos y migración
 
@@ -137,7 +144,7 @@ como normativa oficial.
 > integración y demostración. No borrar datos ni cambiar contratos antes del
 > acuerdo. Criterios y pruebas detallados en SC-01.
 
-Pablo autorizó publicar este documento en la rama de trabajo. Su publicación
-no equivale a un acuerdo del equipo: no se ha creado una solicitud o comentario
-en los Issues ni enviado mensajes a los integrantes. No se han modificado sus
-archivos ni los criterios de aceptación vigentes.
+La propuesta original fue publicada por autorización de Pablo. La confirmación
+posterior de Leslie permite implementar este ajuste del catálogo y actualizar
+sus criterios. La procedencia en HU-16 y los archivos de Edwin siguen sujetos
+a coordinación. No se han enviado mensajes personales a los integrantes.

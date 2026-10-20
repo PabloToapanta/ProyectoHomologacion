@@ -1,5 +1,8 @@
 [CmdletBinding()]
-param([string]$EnvFile = '.env.hu05-validacion')
+param(
+    [string]$EnvFile = '.env.hu05-validacion',
+    [string]$OutputDirectory = 'docs/sprint-1/evidencias/hu-05-integracion/navegador'
+)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $envPath = [IO.Path]::GetFullPath($EnvFile)
@@ -16,7 +19,7 @@ try {
     $env:E2E_ADMIN_PASSWORD = $settings.AUTH_ADMIN_PASSWORD
     $env:E2E_BASE_URL = 'http://127.0.0.1:' + $settings.FRONTEND_HTTP_PORT
     $env:PLAYWRIGHT_BROWSERS_PATH = Join-Path $frontendRoot 'node_modules/.cache/playwright'
-    & node (Join-Path $frontendRoot 'node_modules/@playwright/test/cli.js') test e2e/catalogo.spec.ts --config (Join-Path $frontendRoot 'playwright.config.ts') --output (Join-Path $repoRoot 'docs/sprint-1/evidencias/hu-05-integracion/navegador')
+    & node (Join-Path $frontendRoot 'node_modules/@playwright/test/cli.js') test e2e/catalogo.spec.ts --config (Join-Path $frontendRoot 'playwright.config.ts') --output (Join-Path $repoRoot $OutputDirectory)
     if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas de navegador; consulta la salida anterior.' }
 } finally {
     foreach ($name in $previous.Keys) { [Environment]::SetEnvironmentVariable($name, $previous[$name], 'Process') }

@@ -6,6 +6,19 @@ import { CarrerasPage } from './CarrerasPage';
 const carrera = { id: '1', nombre: 'Carrera sintética', facultad: 'FISEI', vigencia: true, modalidad: null };
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status });
 
+it('conserva registros anteriores y exige revisar su facultad antes de editar', async () => {
+  const user = userEvent.setup();
+  const anterior = { ...carrera, facultad: 'Facultad sintética anterior' };
+  const request = vi.fn().mockResolvedValue(json([anterior]));
+  render(<CarrerasPage request={request} />);
+  await user.click(await screen.findByRole('button', { name: `Editar ${carrera.nombre}` }));
+  expect(screen.getByLabelText('Facultad')).toHaveValue(anterior.facultad);
+  expect(screen.getByLabelText('Facultad')).toHaveAttribute('readonly');
+  expect(screen.getByText(/requiere revisión antes de editar/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Guardar carrera' })).toBeDisabled();
+  expect(request).toHaveBeenCalledTimes(1);
+});
+
 it('lista carreras con su vigencia', async () => {
   render(<CarrerasPage request={vi.fn().mockResolvedValue(json([carrera]))} />);
   expect(await screen.findByText(carrera.nombre)).toBeInTheDocument();
@@ -19,26 +32,28 @@ it('crea, muestra en listado y permite cancelar edición', async () => {
   await screen.findByText('No hay carreras registradas.');
   await user.click(screen.getByRole('button', { name: 'Nueva carrera' }));
   await user.type(screen.getByLabelText('Nombre'), carrera.nombre);
-  await user.type(screen.getByLabelText('Facultad'), carrera.facultad);
+  expect(screen.getByLabelText('Facultad')).toHaveValue('FISEI');
+  expect(screen.getByLabelText('Facultad')).toHaveAttribute('readonly');
   await user.click(screen.getByRole('button', { name: 'Guardar carrera' }));
   expect(await screen.findByText(carrera.nombre)).toBeInTheDocument();
+  expect(JSON.parse(request.mock.calls[1][1].body)).toMatchObject({ facultad: 'FISEI' });
   await user.click(screen.getByRole('button', { name: `Editar ${carrera.nombre}` }));
   expect(screen.getByLabelText('Nombre')).toHaveValue(carrera.nombre);
   await user.click(screen.getByRole('button', { name: 'Cancelar' }));
   expect(screen.queryByLabelText('Nombre')).not.toBeInTheDocument();
 });
 
-it('actualiza facultad y vigencia', async () => {
+it('conserva FISEI fija al editar y actualiza vigencia', async () => {
   const user = userEvent.setup();
-  const request = vi.fn().mockResolvedValueOnce(json([carrera])).mockResolvedValueOnce(json({ ...carrera, facultad: 'Otra', vigencia: false }));
+  const request = vi.fn().mockResolvedValueOnce(json([carrera])).mockResolvedValueOnce(json({ ...carrera, vigencia: false }));
   render(<CarrerasPage request={request} />);
   await user.click(await screen.findByRole('button', { name: `Editar ${carrera.nombre}` }));
-  await user.clear(screen.getByLabelText('Facultad'));
-  await user.type(screen.getByLabelText('Facultad'), 'Otra');
+  expect(screen.getByLabelText('Facultad')).toHaveAttribute('readonly');
+  expect(screen.getByLabelText('Facultad')).toHaveValue('FISEI');
   await user.click(screen.getByLabelText('Vigente'));
   await user.click(screen.getByRole('button', { name: 'Guardar carrera' }));
   expect(await screen.findByText('No vigente')).toBeInTheDocument();
-  expect(screen.getByText('Otra')).toBeInTheDocument();
+  expect(JSON.parse(request.mock.calls[1][1].body)).toMatchObject({ facultad: 'FISEI', vigencia: false });
 });
 
 it('valida espacios en blanco antes de enviar', async () => {
@@ -48,9 +63,8 @@ it('valida espacios en blanco antes de enviar', async () => {
   await screen.findByText('No hay carreras registradas.');
   await user.click(screen.getByRole('button', { name: 'Nueva carrera' }));
   await user.type(screen.getByLabelText('Nombre'), '   ');
-  await user.type(screen.getByLabelText('Facultad'), 'F');
   await user.click(screen.getByRole('button', { name: 'Guardar carrera' }));
-  expect(await screen.findByRole('alert')).toHaveTextContent('Nombre y facultad son obligatorios');
+  expect(await screen.findByRole('alert')).toHaveTextContent('Nombre es obligatorio');
   expect(request).toHaveBeenCalledTimes(1);
 });
 
@@ -89,7 +103,6 @@ it('conserva formulario y datos ante nombre duplicado', async () => {
   await screen.findByText('No hay carreras registradas.');
   await user.click(screen.getByRole('button', { name: 'Nueva carrera' }));
   await user.type(screen.getByLabelText('Nombre'), carrera.nombre);
-  await user.type(screen.getByLabelText('Facultad'), carrera.facultad);
   await user.click(screen.getByRole('button', { name: 'Guardar carrera' }));
   expect(await screen.findByRole('alert')).toHaveTextContent('Ya existe una carrera');
   expect(screen.getByLabelText('Nombre')).toHaveValue(carrera.nombre);
@@ -114,7 +127,6 @@ it('deshabilita guardado mientras la solicitud está pendiente', async () => {
   await screen.findByText('No hay carreras registradas.');
   await user.click(screen.getByRole('button', { name: 'Nueva carrera' }));
   await user.type(screen.getByLabelText('Nombre'), carrera.nombre);
-  await user.type(screen.getByLabelText('Facultad'), carrera.facultad);
   await user.click(screen.getByRole('button', { name: 'Guardar carrera' }));
   expect(screen.getByRole('button', { name: 'Guardando…' })).toBeDisabled();
   expect(screen.getByLabelText('Nombre')).toBeDisabled();

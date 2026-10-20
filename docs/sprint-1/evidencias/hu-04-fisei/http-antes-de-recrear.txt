@@ -1,0 +1,3 @@
+PASS: sin sesión no accede al catálogo (HTTP 401)
+PASS: credenciales incorrectas rechazadas (HTTP 401)
+PASS: login real por Gateway y Auth (HTTP 200)

@@ -1,0 +1,12 @@
+Changed database context to 'Catalogo'.
+Facultad                                                                                                                                                                                                 Carreras
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -----------
+Facultad sintética                                                                                                                                                                                                 3
+Facultad sintética de pruebas                                                                                                                                                                                      4
+Validación sintética f9f96195                                                                                                                                                                                      1
+Carreras    ComprobacionCarreras
+----------- --------------------
+          8           1822697085
+Asignaturas ComprobacionAsignaturas
+----------- -----------------------
+          9              -134029971

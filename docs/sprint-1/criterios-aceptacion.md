@@ -8,7 +8,10 @@ Transcripción organizada de los criterios detallados para HU-01, HU-04, HU-05, 
 - [ ] Ruta protegida sin token válido: Gateway responde HTTP 401.
 
 ## HU-04 — Gestión de carreras
+- Aclaración SC-01 (20/10/2026): Leslie confirmó el acuerdo con Shirley. El catálogo receptor corresponde a FISEI; es una decisión de alcance del equipo, no una norma institucional.
 - [ ] Crear carrera con nombre, facultad y vigencia; debe aparecer en el listado.
+- [ ] La UI muestra FISEI fija al crear/editar y envía `facultad: "FISEI"`; POST/PUT rechazan otra facultad con 400 sin persistir cambios. Se admiten diferencias de caso y espacios externos, conservando FISEI canónica.
+- [ ] Los registros anteriores conservan UUID, facultad y asignaturas; los ajenos a FISEI quedan señalados para revisión, sin conversión automática ni edición silenciosa.
 - [ ] Nombre duplicado en la misma facultad: rechazar con mensaje claro.
 - [ ] Eliminar carrera sin asignaturas: permitido; con asignaturas: prohibido.
 

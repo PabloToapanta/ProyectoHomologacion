@@ -74,7 +74,7 @@ Publica solo la API en loopback:5082; SQL Server queda en la red interna con vol
 Entrada y salida (salida añade `id` UUID):
 
 ```json
-{ "nombre": "Carrera sintética", "facultad": "Facultad de prueba", "vigencia": true, "modalidad": null }
+{ "nombre": "Carrera sintética", "facultad": "FISEI", "vigencia": true, "modalidad": null }
 ```
 
 | Método | Ruta | Resultado |
@@ -85,7 +85,14 @@ Entrada y salida (salida añade `id` UUID):
 | PUT | `/api/carreras/{id}` | 200 DTO / 400 / 404 / 409 |
 | DELETE | `/api/carreras/{id}` | 204 / 404 / 409 si tiene asignaturas |
 
-Nombre y facultad obligatorios, 200 caracteres; modalidad opcional, 100. Vigencia es booleana obligatoria (no se infiere false si falta). Duplicado por nombre/facultad normalizados: Unicode FormKC, espacios compactados, mayúsculas invariantes; se distinguen acentos. El índice único evita duplicados concurrentes; la FK sin cascada evita eliminar carreras relacionadas. Errores de negocio: ProblemDetails con `code` y `detail`; binding: ValidationProblemDetails con `errors`.
+Nombre obligatorio, hasta 200 caracteres; facultad obligatoria y restringida a FISEI
+(caso y espacios externos normalizados). Otra facultad devuelve 400 en POST/PUT.
+Modalidad opcional, 100 caracteres. Vigencia es booleana obligatoria (no se infiere false si falta). Duplicado por nombre/facultad normalizados: Unicode FormKC, espacios compactados, mayúsculas invariantes; se distinguen acentos. El índice único evita duplicados concurrentes; la FK sin cascada evita eliminar carreras relacionadas. Errores de negocio: ProblemDetails con `code` y `detail`; binding: ValidationProblemDetails con `errors`.
+
+SC-01 conserva esquema, UUID y datos previos. No convierte otras facultades: esas
+carreras siguen consultables con sus asignaturas y la UI las señala para revisión.
+Su corrección requiere inventario, respaldo y decisión explícita por registro.
+`tests/catalogo-service/inventario-fisei.sql` permite inventariar sin modificar datos.
 
 ## Asignaturas — HU-05 / T6–T8
 

@@ -5,7 +5,14 @@ Documento de consulta operativa derivado de la planificación académica «Sprin
 ## Propósito y límites
 Sistema web de apoyo al análisis de homologación cuando una persona solicita cambio de carrera. Compara asignaturas aprobadas de origen contra la carrera receptora, considerando compatibilidad académica (contenidos y resultados combinados), horaria y de créditos, y permite generar una **sugerencia** fundamentada para la autoridad competente. **No** toma decisiones oficiales, aprueba solicitudes, matricula, asigna cupos ni modifica sistemas institucionales.
 
-El diseño completo distingue homologación **interna UTA** y **externa** desde otras instituciones (incluidas extranjeras). Solicitudes originalmente llegan por **Quipux**, fuera de esta aplicación.
+El alcance aclarado en SC-01 (20/10/2026, acuerdo con Shirley confirmado por Leslie)
+delimita la carrera receptora y el origen interno a **FISEI-UTA**. El origen externo
+corresponde a **otra universidad del Ecuador**, representado por separado del catálogo
+receptor. Las referencias del documento original a instituciones extranjeras se
+conservan como contexto histórico fuera de este alcance; no activan apostilla para
+una universidad ecuatoriana externa a la UTA. Solicitudes originalmente llegan por
+**Quipux**, fuera de esta aplicación. El contrato de procedencia con HU-16 queda
+pendiente de coordinación; no se modifican aquí sus mínimos académicos.
 
 ## Usuarios y proceso completo previsto
 - Administrador: gestiona usuarios, roles, carreras, asignaturas, programas y parámetros.
@@ -43,7 +50,7 @@ Estas reglas provienen de la planificación. **Las fórmulas y las interpretacio
 - **RN-03:** materia de origen aprobada y con un máximo de diez años desde su aprobación; después, corresponde validación de conocimientos.
 - **RN-04:** cambio interno: un período cursado y al menos una materia homologable; condición adicional de gratuidad según normativa.
 - **RN-05:** cambio desde otra IES: al menos dos períodos y dos materias homologables, sin cambio anterior de carrera.
-- **RN-06:** IES extranjera: requisitos de RN-05 y documentos apostillados aplicables.
+- **RN-06 (referencia histórica fuera de SC-01):** IES extranjera: requisitos de RN-05 y documentos apostillados aplicables. No se aplica por ser externa a la UTA si la universidad está en Ecuador.
 - **RN-07:** regla de tercera matrícula según la malla receptora (se programa en Sprint 3, HU-17).
 - **RN-08:** la carrera receptora debe garantizar el perfil de egreso; evaluación académica humana.
 - **RN-09:** flujo institucional y decisión de autoridades, fuera del software para este sprint.
@@ -71,7 +78,7 @@ Escribir casos TDD con fecha de aprobación válida, exactamente diez años, men
 ### Cambio de carrera
 - Interno: al menos un período cursado y al menos una asignatura homologable.
 - Externo: al menos dos períodos y dos asignaturas homologables; sin cambios previos.
-- Reglas sobre instituciones extranjeras y apostilla pueden requerir datos que este sprint aún no captura; explicitar pendiente si una API no los incorpora. No inventar estado de documentos.
+- SC-01 excluye instituciones de otros países de este incremento. No inferir procedencia ni estado documental a partir de datos ausentes. Coordinar el contrato con Edwin sin alterar sus mínimos.
 
 ## Datos académicos relevantes
 Entidades de catálogo: Carrera (facultad, modalidad, estado), Malla (versión, estado), Asignatura (código, carrera, nivel, créditos y horas), UnidadCurricular (unidades y resultados de aprendizaje), Contenido (temas y orden).
