@@ -1,0 +1,51 @@
+# Stack de validación HU-04/HU-05. Proyecto aislado, sin modificar datos existentes.
+services:
+  auth-db:
+    extends:
+      file: src/auth-service/compose.yaml
+      service: auth-db
+  auth-service:
+    extends:
+      file: src/auth-service/compose.yaml
+      service: auth-service
+    build:
+      context: ./src/auth-service
+      dockerfile: Dockerfile
+      target: runtime
+  catalogo-db:
+    extends:
+      file: src/catalogo-service/compose.yaml
+      service: catalogo-db
+  catalogo-api:
+    extends:
+      file: src/catalogo-service/compose.yaml
+      service: catalogo-api
+    build:
+      context: ./src/catalogo-service
+      dockerfile: Dockerfile
+  gateway:
+    extends:
+      file: src/gateway/compose.t2.yaml
+      service: gateway
+    build:
+      context: ./src/gateway
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ReverseProxy__Clusters__catalogo__Destinations__primary__Address: http://catalogo-api:8080/
+    depends_on:
+      auth-service:
+        condition: service_started
+      catalogo-api:
+        condition: service_started
+  frontend:
+    extends:
+      file: frontend/compose.t3.yaml
+      service: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: runtime
+volumes:
+  auth-data:
+  catalogo-data:

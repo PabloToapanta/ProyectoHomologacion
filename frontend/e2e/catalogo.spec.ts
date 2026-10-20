@@ -1,0 +1,84 @@
+import { expect, test } from '@playwright/test';
+
+async function login(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Usuario', { exact: true }).fill(process.env.E2E_ADMIN_USERNAME!);
+  await page.getByLabel('Contraseña', { exact: true }).fill(process.env.E2E_ADMIN_PASSWORD!);
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Panel de administración' })).toBeVisible();
+  await page.getByRole('link', { name: 'Gestionar carreras y asignaturas' }).click();
+  await expect(page.getByRole('heading', { name: 'Gestión de carreras' })).toBeVisible();
+}
+
+test('catálogo real: login, carrera, validaciones, asignatura, eliminación restringida y logout', async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  const policyErrors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => {
+    if (message.type() === 'error' && /Content Security Policy|violates.*policy/i.test(message.text())) policyErrors.push(message.text());
+  });
+  await page.goto('/admin/carreras');
+  await expect(page).toHaveURL(/\/login$/);
+  await login(page);
+  const nombre = `Carrera navegador ${Date.now()}`;
+  await page.getByRole('button', { name: 'Nueva carrera', exact: true }).click();
+  await page.getByLabel('Nombre', { exact: true }).fill(nombre);
+  await page.getByLabel('Facultad', { exact: true }).fill('Facultad sintética de pruebas');
+  await page.getByRole('button', { name: 'Guardar carrera' }).click();
+  await expect(page.getByRole('cell', { name: nombre, exact: true })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('carreras-escritorio.png'), fullPage: true });
+  await page.getByRole('button', { name: 'Asignaturas', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Carrera', exact: true }).selectOption({ label: `${nombre} · Facultad sintética de pruebas` });
+  await expect(page.getByText('No hay asignaturas registradas en esta carrera.')).toBeVisible();
+  await page.getByRole('button', { name: 'Nueva asignatura' }).click();
+  await page.getByLabel('Código', { exact: true }).fill('DEMO-NAVEGADOR');
+  await page.getByLabel('Nombre', { exact: true }).fill('Asignatura sintética de navegador');
+  await page.getByLabel('Nivel', { exact: true }).fill('1');
+  await page.getByLabel('Créditos', { exact: true }).fill('0');
+  await page.getByLabel('Horas', { exact: true }).fill('144');
+  await page.getByRole('button', { name: 'Guardar asignatura' }).click();
+  await expect(page.getByRole('alert')).toContainText('positivos');
+  await page.getByLabel('Créditos', { exact: true }).fill('3');
+  await page.getByRole('button', { name: 'Guardar asignatura' }).click();
+  await expect(page.getByRole('cell', { name: 'Asignatura sintética de navegador', exact: true })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('asignaturas-escritorio.png'), fullPage: true });
+  await page.getByRole('button', { name: 'Carreras', exact: true }).click();
+  await page.getByRole('button', { name: `Eliminar ${nombre}`, exact: true }).click();
+  await page.getByRole('button', { name: 'Confirmar eliminación' }).click();
+  await expect(page.getByRole('alert')).toContainText('asignaturas relacionadas');
+  await expect(page.getByRole('cell', { name: nombre, exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Volver al panel' }).click();
+  await expect(page.getByRole('heading', { name: 'Panel de administración' })).toBeVisible();
+  await page.getByRole('button', { name: 'Cerrar sesión' }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(errors).toEqual([]);
+  expect(policyErrors).toEqual([]);
+});
+
+test('catálogo real en móvil: navegación protegida, sin desbordamiento de página y recarga', async ({ page }, testInfo) => {
+  const session = await page.request.post('/api/auth/login', { data: { nombreUsuario: process.env.E2E_ADMIN_USERNAME!, password: process.env.E2E_ADMIN_PASSWORD! } });
+  expect(session.status()).toBe(200);
+  const headers = { Authorization: `Bearer ${(await session.json()).accessToken}` };
+  const created = await page.request.post('/api/carreras', { headers, data: { nombre: `Carrera móvil ${Date.now()}`, facultad: 'Facultad sintética', vigencia: true } });
+  expect(created.status()).toBe(201);
+  const carrera = await created.json();
+  const subject = await page.request.post('/api/asignaturas', { headers, data: { carreraId: carrera.id, codigo: 'DEMO-MOVIL', nombre: 'Asignatura de demostración móvil', nivel: 1, creditos: 3, horas: 144 } });
+  expect(subject.status()).toBe(201);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await login(page);
+  await expect(page.getByRole('button', { name: 'Nueva carrera', exact: true })).toBeEnabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('carreras-movil.png'), fullPage: true });
+  await page.getByRole('button', { name: 'Asignaturas', exact: true }).click();
+  await expect(page.getByRole('combobox', { name: 'Carrera', exact: true })).toBeVisible();
+  await page.getByRole('combobox', { name: 'Carrera', exact: true }).selectOption(carrera.id);
+  await expect(page.getByRole('table')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('asignaturas-movil.png'), fullPage: true });
+  const scrollRegion = page.getByRole('region', { name: 'Tabla de asignaturas con desplazamiento horizontal' });
+  expect(await scrollRegion.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  await scrollRegion.evaluate(element => { element.scrollLeft = element.scrollWidth; });
+  await page.screenshot({ path: testInfo.outputPath('asignaturas-movil-datos.png'), fullPage: true });
+  await page.reload();
+  await expect(page).toHaveURL(/\/login$/);
+});
