@@ -14,7 +14,7 @@ export function AdminPanel() {
         <div><p className="eyebrow">ACCESO CONFIRMADO</p><h2 id="welcome-title">Sesión iniciada correctamente</h2><p>Has ingresado con tu cuenta de administrador.</p></div>
         <dl className="session-details"><div><dt>Usuario</dt><dd>{session?.name}</dd></div><div><dt>Perfil</dt><dd>{session?.role}</dd></div></dl>
       </section>
-      <p><Link to="/admin/carreras" className="app-button app-button--primary" style={{ textDecoration: 'none' }}>Gestionar carreras y asignaturas</Link></p>
+      <p><Link to="/admin/carreras" className="app-button app-button--primary catalogo-link">Gestionar carreras y asignaturas</Link></p>
     </main>
     <footer className="workspace-footer">FISEI · Universidad Técnica de Ambato</footer>
   </div>;

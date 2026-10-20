@@ -11,7 +11,7 @@ export function CatalogoRoute() {
   const [seccion, setSeccion] = useState<'carreras' | 'asignaturas'>('carreras');
   return <div className="workspace">
     <header className="workspace-header catalogo-header"><Brand /><div className="catalogo-actions">
-      <Link to="/panel" className="app-button app-button--secondary" style={{ textDecoration: 'none' }}>Volver al panel</Link>
+      <Link to="/panel" className="app-button app-button--secondary catalogo-link">Volver al panel</Link>
       <button className="app-button app-button--secondary" onClick={logout}>Cerrar sesión</button>
     </div></header>
     <nav className="catalogo-nav" aria-label="Catálogo académico">
