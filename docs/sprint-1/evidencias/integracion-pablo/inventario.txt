@@ -1,0 +1,2 @@
+PASS inventario antes : 2 carreras; 1 asignaturas; volumen SQL y base de catálogo verificados
+PASS inventario despues : 2 carreras; 1 asignaturas; volumen SQL y base de catálogo verificados

@@ -22,6 +22,15 @@
 | HU-15 | | Pendiente | | No evaluado | |
 | HU-16 | | Pendiente | | No evaluado | |
 
+## Integración local de Pablo — 20/10/2026
+
+Composición HU-15 corregida con TDD (8 fallos HTTP 500 antes, 9 pruebas nuevas
+correctas después) y HU-16 (10 fallos antes, 11 pruebas nuevas correctas después).
+Compose integrado y demo conservando datos. Resultado final:
+374 pruebas .NET, 85 frontend y 2 E2E de autenticación aprobadas, más smoke HTTP
+real por Gateway para HU-01/04/05/14/15/16. Ver [informe y salidas](evidencia-integracion-pablo.md).
+Evidencia técnica local; no marca aceptación de la PO ni cierre del Sprint.
+
 ## Evidencia XP
 
 - **TDD:** enlace a pruebas previas al cambio y evidencia de fallo previo/corrección.

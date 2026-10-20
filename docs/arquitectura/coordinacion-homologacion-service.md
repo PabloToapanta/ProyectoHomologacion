@@ -2,6 +2,13 @@
 
 Fecha: 2026-10-19. Responsable inicial de composición y equivalencias: Pablo.
 Actualización vigente: [tres criterios confirmados](cambio-hu-14-tres-criterios.md). El contrato de equivalencia anterior es incompatible con el nuevo; no se modifican módulos de Edwin.
+Actualización de integración 20/10/2026: HU-15 y HU-16 están incorporadas en `develop` mediante
+PR #24 y PR #26. Pablo completa en `feature/hu-15-integracion-sprint-1` los registros DI que
+Edwin dejó solicitados en sus evidencias. Las pruebas nuevas de composición no agregan
+registros de servicios. Ver [arranque integrado](../sprint-1/ejecucion-integrada.md)
+y [evidencia de integración](../sprint-1/evidencia-integracion-pablo.md).
+Las secciones de estructura propuesta siguientes se conservan como antecedente
+y no son una declaración del estado actual de HU-15/HU-16.
 Este documento registra la estructura disponible y una **propuesta para acordar con Edwin y Leslie**;
 no afirma que se haya celebrado un acuerdo ni modifica sus contratos o archivos.
 

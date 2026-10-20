@@ -1,0 +1,14 @@
+  Homologacion.Domain -> /home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/src/homologacion-service/Homologacion.Domain/bin/Release/net8.0/Homologacion.Domain.dll
+  Gateway -> /home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/src/gateway/bin/Release/net8.0/Gateway.dll
+  Homologacion.Application -> /home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/src/homologacion-service/Homologacion.Application/bin/Release/net8.0/Homologacion.Application.dll
+  Homologacion.Infrastructure -> /home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/src/homologacion-service/Homologacion.Infrastructure/bin/Release/net8.0/Homologacion.Infrastructure.dll
+  Homologacion.Api -> /home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/src/homologacion-service/Homologacion.Api/bin/Release/net8.0/Homologacion.Api.dll
+  Homologacion.Api.Tests -> /home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/tests/Homologacion.Api.Tests/bin/Release/net8.0/Homologacion.Api.Tests.dll
+Test run for /home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/tests/Homologacion.Api.Tests/bin/Release/net8.0/Homologacion.Api.Tests.dll (.NETCoreApp,Version=v8.0)
+Microsoft (R) Test Execution Command Line Tool Version 17.8.0 (x64)
+Copyright (c) Microsoft Corporation.  All rights reserved.
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     9, Skipped:     0, Total:     9, Duration: 222 ms - Homologacion.Api.Tests.dll (net8.0)

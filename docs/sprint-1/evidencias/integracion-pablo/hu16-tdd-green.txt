@@ -1,0 +1,12 @@
+Resultados de composición HU-16 extraídos del TRX de la suite completa: 11 aprobadas, 0 fallidas.
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Arranque_normal_resuelve_requisitos(tipo: "Externo", periodos: 2, homologables: 2, cambios: 0, esperado: True): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Composicion_conserva_roles(rol: "Coordinador", esperado: OK): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Composicion_conserva_roles(rol: "Docente", esperado: OK): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Arranque_normal_resuelve_requisitos(tipo: "Externo", periodos: 2, homologables: 2, cambios: 1, esperado: False): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Composicion_conserva_roles(rol: "Estudiante", esperado: Forbidden): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Arranque_normal_resuelve_requisitos(tipo: "Interno", periodos: 1, homologables: 0, cambios: 0, esperado: False): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Composicion_conserva_roles(rol: "Administrador", esperado: OK): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Arranque_normal_resuelve_requisitos(tipo: "Externo", periodos: 2, homologables: 1, cambios: 0, esperado: False): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Arranque_normal_resuelve_requisitos(tipo: "Externo", periodos: 1, homologables: 2, cambios: 0, esperado: False): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Arranque_normal_resuelve_requisitos(tipo: "Interno", periodos: 0, homologables: 1, cambios: 0, esperado: False): Passed
+Homologacion.Api.Tests.RequisitosCambioComposicionTests.Arranque_normal_resuelve_requisitos(tipo: "Interno", periodos: 1, homologables: 1, cambios: 0, esperado: True): Passed

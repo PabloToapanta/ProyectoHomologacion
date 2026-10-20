@@ -1,0 +1,30 @@
+PASS HU-01: login real, credenciales incorrectas y JWT obligatorio en los servicios
+PASS HU-04/05: 2 carreras consultadas; otra facultad rechazada con 400
+PASS HU-15: cinco escenarios académicos por Gateway; datos inválidos e incompletos 400
+PASS HU-16: siete escenarios sintéticos por Gateway; datos inválidos/incompletos/campos adicionales 400
+PASS: varios orígenes no duplican cobertura ni suman horas/créditos
+PASS: login Auth + SQL Server → JWT → Gateway YARP → Homologación
+PASS: sin JWT 401; JWT inválido 401; datos inválidos 400
+{
+  "asignaturasOrigen": [
+    "origen-sintetico"
+  ],
+  "asignaturaReceptora": "receptora-sintetica",
+  "compatibilidadAcademicaPct": 80.0,
+  "compatibilidadHorariaPct": 80.0,
+  "compatibilidadCreditosPct": 80.0,
+  "umbralPct": 80,
+  "estado": "Homologable",
+  "homologable": true,
+  "justificacion": "Los tres criterios alcanzan individualmente el umbral de 80 %.",
+  "contenidosSinCobertura": [
+    "C9",
+    "C10"
+  ],
+  "resultadosAprendizajeSinCobertura": [
+    "R5"
+  ],
+  "informacionFaltante": []
+}
+PASS frontend: React publicado; las pruebas de navegador se ejecutan por separado
+HU-06 pendiente de integración; no se certifica aceptación de la PO
