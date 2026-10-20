@@ -4,6 +4,7 @@ Ejecutar con el stack local levantado y AUTH_ADMIN_USERNAME / AUTH_ADMIN_PASSWOR
 inyectados en el entorno. GATEWAY_URL por defecto: http://127.0.0.1:5080.
 EQUIVALENCIA_UMBRAL_PCT debe coincidir con la configuración del servicio (80 por defecto).
 """
+import copy
 import json
 import os
 from pathlib import Path
@@ -36,13 +37,25 @@ def main():
     token = login["accessToken"]
     status, result = request(ruta, data, token)
     assert status == 200, f"Evaluación esperada 200, recibida {status}"
-    assert result["contenidoPct"] == 80
-    assert result["cargaHorariaPct"] == result["creditosPct"] == 100
-    assert result["profundidadPct"] is None and result["homologable"] is False
-    assert result["umbralPct"] == float(os.environ.get("EQUIVALENCIA_UMBRAL_PCT", "80"))
-    assert result["temasSinCobertura"] == ["R5"]
-    assert "Información incompleta" in result["justificacion"]
-    assert request(ruta, {"origen": {"horas": -1}}, token)[0] == 400
+    assert result["compatibilidadAcademicaPct"] == 80
+    assert result["compatibilidadHorariaPct"] == result["compatibilidadCreditosPct"] == 80
+    umbral = float(os.environ.get("EQUIVALENCIA_UMBRAL_PCT", "80"))
+    assert result["umbralPct"] == umbral
+    assert result["homologable"] is (umbral <= 80)
+    assert result["estado"] == ("Homologable" if umbral <= 80 else "NoHomologable")
+    assert result["contenidosSinCobertura"] == ["C9", "C10"]
+    assert result["resultadosAprendizajeSinCobertura"] == ["R5"]
+    assert request(ruta, {"receptora": {"horas": -1}}, token)[0] == 400
+    varios = copy.deepcopy(data)
+    segundo = copy.deepcopy(varios["origenes"][0]); segundo["id"] = "otro-origen-sintetico"
+    varios["origenes"].append(segundo)
+    duplicada = copy.deepcopy(varios["correspondenciasContenidos"][0]); duplicada["asignaturaOrigen"] = segundo["id"]
+    varios["correspondenciasContenidos"].append(duplicada)
+    status, parcial = request(ruta, varios, token)
+    assert status == 200 and parcial["compatibilidadAcademicaPct"] == 80
+    assert parcial["compatibilidadHorariaPct"] is None and parcial["compatibilidadCreditosPct"] is None
+    assert parcial["estado"] == "InformacionIncompleta" and parcial["homologable"] is False
+    print("PASS: varios orígenes no duplican cobertura ni suman horas/créditos")
     print("PASS: login Auth + SQL Server → JWT → Gateway YARP → Homologación")
     print("PASS: sin JWT 401; JWT inválido 401; datos inválidos 400")
     print(json.dumps(result, ensure_ascii=False, indent=2))
