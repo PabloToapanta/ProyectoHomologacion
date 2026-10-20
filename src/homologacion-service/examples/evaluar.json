@@ -1,0 +1,171 @@
+{
+  "origenes": [
+    {
+      "aprobada": true,
+      "id": "origen-sintetico",
+      "planAnalitico": "plan-sintetico-origen-sintetico-v1",
+      "horas": 80,
+      "unidadHoras": "hora-reloj",
+      "creditos": 8,
+      "sistemaCreditos": "sistema-sintetico-A",
+      "contenidos": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10"
+      ],
+      "resultadosAprendizaje": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    }
+  ],
+  "receptora": {
+    "id": "receptora-sintetica",
+    "planAnalitico": "plan-sintetico-receptora-sintetica-v1",
+    "horas": 100,
+    "unidadHoras": "hora-reloj",
+    "creditos": 10,
+    "sistemaCreditos": "sistema-sintetico-A",
+    "contenidos": [
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "C5",
+      "C6",
+      "C7",
+      "C8",
+      "C9",
+      "C10"
+    ],
+    "resultadosAprendizaje": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+    ]
+  },
+  "correspondenciasContenidos": [
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "C1",
+      "elementoReceptor": "C1",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/C1",
+        "ubicacionReceptora": "unidad-sintetica/C1"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "C2",
+      "elementoReceptor": "C2",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/C2",
+        "ubicacionReceptora": "unidad-sintetica/C2"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "C3",
+      "elementoReceptor": "C3",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/C3",
+        "ubicacionReceptora": "unidad-sintetica/C3"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "C4",
+      "elementoReceptor": "C4",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/C4",
+        "ubicacionReceptora": "unidad-sintetica/C4"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "C5",
+      "elementoReceptor": "C5",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/C5",
+        "ubicacionReceptora": "unidad-sintetica/C5"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "C6",
+      "elementoReceptor": "C6",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/C6",
+        "ubicacionReceptora": "unidad-sintetica/C6"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "C7",
+      "elementoReceptor": "C7",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/C7",
+        "ubicacionReceptora": "unidad-sintetica/C7"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "C8",
+      "elementoReceptor": "C8",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/C8",
+        "ubicacionReceptora": "unidad-sintetica/C8"
+      }
+    }
+  ],
+  "correspondenciasResultadosAprendizaje": [
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "R1",
+      "elementoReceptor": "R1",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/R1",
+        "ubicacionReceptora": "unidad-sintetica/R1"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "R2",
+      "elementoReceptor": "R2",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/R2",
+        "ubicacionReceptora": "unidad-sintetica/R2"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "R3",
+      "elementoReceptor": "R3",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/R3",
+        "ubicacionReceptora": "unidad-sintetica/R3"
+      }
+    },
+    {
+      "asignaturaOrigen": "origen-sintetico",
+      "elementoOrigen": "R4",
+      "elementoReceptor": "R4",
+      "evidencia": {
+        "ubicacionOrigen": "unidad-sintetica/R4",
+        "ubicacionReceptora": "unidad-sintetica/R4"
+      }
+    }
+  ]
+}

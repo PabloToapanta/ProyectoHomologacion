@@ -40,7 +40,7 @@ Que un administrador autenticado pueda mantener el catálogo de carreras y asign
 | T6 | HU-05 | Asignatura, validaciones y API | 3 | Leslie |
 | T7 | HU-05 | UI: asignaturas por carrera | 4 | Leslie |
 | T8 | HU-05 | Datos de prueba: Álgebra Lineal | 2 | Leslie |
-| T9 | HU-14 | Comparador: contenido, profundidad, horas, créditos, TDD | 5 | Pablo |
+| T9 | HU-14 | Comparador: académico combinado, horas y créditos; múltiples orígenes y evidencia, TDD (aclaración 19/10) | 5 | Pablo |
 | T10 | HU-14 | Umbral configurable y casos 79,9 %/80 % | 2 | Pablo |
 | T11 | HU-15 | Aprobación y antigüedad máxima de diez años | 3 | Edwin |
 | T12 | HU-16 | Mínimos para cambios internos y externos | 3 | Edwin |
@@ -95,3 +95,11 @@ Planning Game, TDD en reglas, revisión en parejas, integración continua con Gi
 ## Alcance fuera del Sprint 1
 
 Los agentes de IA de homologación interna/externa, registro de solicitudes Quipux, revisión de dos docentes, generación de informes y el PDF corresponden a historias de posteriores sprints. No declarar esas funcionalidades implementadas en este incremento.
+
+### Aclaración de HU-14 del 19/10/2026
+
+El docente confirmó tres criterios; la compatibilidad académica combina contenidos y resultados
+con igual peso por elemento. Se permite cobertura académica desde varios orígenes aprobados,
+sin duplicar receptores. Esto sustituye profundidad como dimensión independiente de T9.
+No se cambian tareas, criterios ni estimaciones de HU-15/HU-16 de Edwin. Las estimaciones T9/T10
+se conservan como planificación original; no se afirman horas reales ni aprobación normativa.

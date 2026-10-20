@@ -1,0 +1,33 @@
+HU-14 / Issue #5 / T9–T10 — 2026-10-19
+.NET SDK 8.0.130; Release; comandos terminados con código 0.
+
+BASE PREVIA: 115 pruebas existentes aprobadas.
+
+TDD: ejecuciones previas a la implementación
+domain: Failed!  - Failed:    35, Passed:     0, Skipped:     0, Total:    35, Duration: 64 ms - Homologacion.Domain.Tests.dll (net8.0)
+app: Failed!  - Failed:    14, Passed:     0, Skipped:     0, Total:    14, Duration: 50 ms - Homologacion.Application.Tests.dll (net8.0)
+api: Failed!  - Failed:    24, Passed:     2, Skipped:     0, Total:    26, Duration: 493 ms - Homologacion.Api.Tests.dll (net8.0)
+
+dotnet restore Homologacion.sln
+Determining projects to restore...
+  All projects are up-to-date for restore.
+
+dotnet build Homologacion.sln --configuration Release --no-restore -m:1 -p:UseSharedCompilation=false
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:17.70
+
+dotnet test Homologacion.sln --configuration Release --no-build --no-restore -m:1 --logger trx --results-directory /tmp/hu14-final-results
+Passed!  - Failed:     0, Passed:    43, Skipped:     0, Total:    43, Duration: 2 s - AuthService.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 36 ms - Auth.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    59, Skipped:     0, Total:    59, Duration: 2 s - Gateway.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    35, Skipped:     0, Total:    35, Duration: 40 ms - Homologacion.Domain.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    14, Skipped:     0, Total:    14, Duration: 42 ms - Homologacion.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    28, Skipped:     0, Total:    28, Duration: 1 s - Homologacion.Api.Tests.dll (net8.0)
+
+TOTAL: 192 aprobadas, 0 fallidas, 0 omitidas (77 nuevas; 115 previas).
+TestServer emite advertencias sobre el límite de cuerpo: no implementa IHttpMaxRequestBodySizeFeature.
+El límite de 1 MiB se aplica en Kestrel; no se declara comprobado por TestServer.
+TRX locales generados en /tmp/hu14-final-results; no se incluyen rutas de usuario de esos archivos en Git.

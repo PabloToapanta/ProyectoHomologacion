@@ -1,0 +1,16 @@
+PASS: login Auth + SQL Server → JWT → Gateway YARP → Homologación
+PASS: sin JWT 401; JWT inválido 401; datos inválidos 400
+{
+  "asignaturaOrigen": "origen-sintetico",
+  "asignaturaReceptora": "receptora-sintetica",
+  "contenidoPct": 80.0,
+  "profundidadPct": null,
+  "cargaHorariaPct": 100,
+  "creditosPct": 100,
+  "umbralPct": 85,
+  "homologable": false,
+  "justificacion": "Información incompleta: criterio académico verificable de profundidad pendiente de definición. La propuesta del equipo requiere validación académica.",
+  "temasSinCobertura": [
+    "R5"
+  ]
+}

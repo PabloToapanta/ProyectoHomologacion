@@ -1,0 +1,62 @@
+HU-14 / Issue #5 — revisión del bloqueo de profundidad
+Fecha UTC: 2026-10-19T15:53:55.311230+00:00
+Base revisada: 11dbb68. Sin cambios en reglas ni contratos HTTP.
+
+dotnet restore Homologacion.sln
+Determining projects to restore...
+  All projects are up-to-date for restore.
+
+dotnet build Homologacion.sln --configuration Release --no-restore -m:1 -p:UseSharedCompilation=false
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:36.30
+
+dotnet test Homologacion.sln --configuration Release --no-build --no-restore -m:1 --logger trx --results-directory /tmp/hu14-revision-results
+Passed!  - Failed:     0, Passed:    43, Skipped:     0, Total:    43, Duration: 3 s - AuthService.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 37 ms - Auth.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    59, Skipped:     0, Total:    59, Duration: 2 s - Gateway.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    38, Skipped:     0, Total:    38, Duration: 55 ms - Homologacion.Domain.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    15, Skipped:     0, Total:    15, Duration: 43 ms - Homologacion.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    28, Skipped:     0, Total:    28, Duration: 1 s - Homologacion.Api.Tests.dll (net8.0)
+
+TOTAL .NET: 196 aprobadas, 0 fallidas, 0 omitidas.
+Las cuatro pruebas nuevas caracterizan reglas existentes: no se modificó su comportamiento.
+TRX locales: /tmp/hu14-revision-results (no versionados).
+
+npm run build (frontend; incluye tsc --noEmit)
+> homologacion-fisei-frontend@0.1.0 build
+> npm run typecheck && vite build
+
+
+> homologacion-fisei-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 30 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.56 kB │ gzip:  0.34 kB
+dist/assets/index-ihlhrP-U.css    8.13 kB │ gzip:  2.53 kB
+dist/assets/index-CtMw1gz4.js   271.02 kB │ gzip: 86.17 kB
+
+✓ built in 281ms
+
+npm test (frontend)
+> homologacion-fisei-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 [repositorio]/frontend
+
+
+ Test Files  4 passed (4)
+      Tests  43 passed (43)
+   Start at  10:51:58
+   Duration  3.52s (environment 61%, tests 26%, setup 9%, import 2%, transform 1%)
+
+Todos los comandos anteriores terminaron con código 0.
+No se repitieron Docker Compose ni Playwright/E2E en esta revisión.
+Las advertencias de TestServer sobre el límite HTTP de cuerpo no verifican el límite de Kestrel.

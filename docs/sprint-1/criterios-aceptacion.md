@@ -23,11 +23,28 @@ Transcripción organizada de los criterios detallados para HU-01, HU-04, HU-05, 
 - [ ] Consulta de asignatura incluye unidades, contenidos y resultados.
 - [ ] Registrar y consultar el programa analítico usado como dato de prueba.
 
-## HU-14 — Equivalencia de asignaturas
-- [ ] Si horas y créditos de origen son iguales o mayores que las receptoras, su porcentaje es 100 %.
-- [ ] Una dimensión de 79,9 % con umbral de 80 %: no homologable.
-- [ ] Las cuatro dimensiones con exactamente 80 %: homologable.
-- [ ] Con umbral de 85 %, una dimensión de 82 %: no homologable.
+## HU-14 — Equivalencia de asignaturas (aclaración académica del 19/10/2026)
+
+Cambio confirmado por el docente y transmitido por el equipo: **tres criterios**, sustituyendo las
+cuatro dimensiones anteriores. No implica atribución a una norma oficial no proporcionada.
+El estado de las casillas corresponde a aceptación de la PO, no solo a pruebas técnicas.
+
+- [ ] Compatibilidad académica: `(contenidos cubiertos + resultados cubiertos) / (contenidos receptores + resultados receptores) × 100`; igual peso por elemento, sin promedio 50/50.
+- [ ] 8 contenidos y 4 resultados de 10 contenidos y 5 resultados receptores: 80 %.
+- [ ] 7 contenidos y 4 resultados de esos totales: menos del 80 %, no homologable con umbral 80 %.
+- [ ] Varias asignaturas de origen aprobadas cubren elementos receptores sin doble conteo por categoría.
+- [ ] Correspondencias explícitas con evidencia en ambos planes; identificadores inexistentes se rechazan.
+- [ ] Un único origen y unidades comparables: horas/créditos de origen iguales o mayores producen 100 %, nunca más.
+- [ ] Tres criterios exactamente al 80 %: homologable, también mediante API con evidencia válida.
+- [ ] Cualquiera de los tres criterios inferior al umbral: no homologable, sin compensación.
+- [ ] Umbral externo de 85 % y un criterio de 82 %: no homologable.
+- [ ] Información obligatoria ausente, aprobación no acreditada, inventarios desconocidos o sin elementos receptores: información incompleta y sin recomendación.
+- [ ] Varias fuentes sin regla de agregación horaria/de créditos, o unidades/sistemas no comparables: información incompleta; no sumar ni convertir por suposición.
+- [ ] Respuesta distingue estados y explica los elementos receptores sin cobertura acreditada.
+
+Ver el [contrato y cambio incompatible](../arquitectura/decisiones-y-contratos.md) y
+las [evidencias vigentes](evidencia-hu-14-tres-criterios.md). El Issue #5 remoto consultado conserva
+la descripción histórica; su actualización externa queda pendiente de coordinación/autorización.
 
 ## HU-15 — Aprobación y antigüedad
 - [ ] Asignatura aprobada hace menos de diez años: elegible.
@@ -45,4 +62,4 @@ Transcripción organizada de los criterios detallados para HU-01, HU-04, HU-05, 
 Para cada prueba, registrar entrada o pasos, resultado esperado, resultado real, captura o salida de test, fecha y responsable. La Product Owner acepta solo después de comprobar todos los criterios.
 
 ## Advertencia sobre normativa
-El documento del equipo plantea cuatro dimensiones con umbral configurable del 80 %. El propio documento señala que la fórmula y sus interpretaciones deben contrastarse con la Coordinación de Carrera. No convertir esta propuesta en afirmación de normativa oficial sin validación.
+El diseño inicial de cuatro dimensiones fue sustituido para HU-14 por la aclaración académica del equipo: tres criterios con umbral configurable inicialmente del 80 %. La confirmación comunicada por el usuario no debe presentarse como una norma oficial no aportada. Agregación entre varias asignaturas y conversiones de unidades/sistemas siguen pendientes.

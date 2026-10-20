@@ -1,0 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text;
+
+namespace Homologacion.Api.Security;
+
+public sealed class JwtOptions : IValidatableObject
+{
+    [Required] public string Issuer { get; set; } = "";
+    [Required] public string Audience { get; set; } = "";
+    [Required] public string SigningKey { get; set; } = "";
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (string.IsNullOrWhiteSpace(Issuer) || string.IsNullOrWhiteSpace(Audience))
+            yield return new ValidationResult("Jwt:Issuer y Jwt:Audience son obligatorios.");
+        if (string.IsNullOrWhiteSpace(SigningKey) || Encoding.UTF8.GetByteCount(SigningKey) < 32)
+            yield return new ValidationResult("Jwt:SigningKey requiere al menos 32 bytes UTF-8.");
+    }
+}
