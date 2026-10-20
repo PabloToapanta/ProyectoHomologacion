@@ -53,27 +53,34 @@ public class EvaluarEndpointTests
     public const string Ruta = "/api/homologaciones/evaluar";
     public static object Datos() => new
     {
-        origen = new { id = "O", horas = 180, creditos = 4, temas = new[] { "O1" } },
-        receptora = new { id = "R", horas = 144, creditos = 3, temas = new[] { "R1" } },
-        correspondencias = new[] { new { temaOrigen = "O1", temaReceptor = "R1" } }
+        origenes = new[] { new { id = "O", aprobada = true, planAnalitico = "plan-sintetico-O-v1",
+            horas = 80, unidadHoras = "hora-reloj", creditos = 8, sistemaCreditos = "sistema-sintetico-A",
+            contenidos = Enumerable.Range(1, 10).Select(i => "C" + i), resultadosAprendizaje = Enumerable.Range(1, 5).Select(i => "R" + i) } },
+        receptora = new { id = "D", planAnalitico = "plan-sintetico-D-v1", horas = 100, unidadHoras = "hora-reloj",
+            creditos = 10, sistemaCreditos = "sistema-sintetico-A",
+            contenidos = Enumerable.Range(1, 10).Select(i => "C" + i), resultadosAprendizaje = Enumerable.Range(1, 5).Select(i => "R" + i) },
+        correspondenciasContenidos = Enumerable.Range(1, 8).Select(i => Mapeo("C" + i)),
+        correspondenciasResultadosAprendizaje = Enumerable.Range(1, 4).Select(i => Mapeo("R" + i))
     };
+    private static object Mapeo(string id) => new { asignaturaOrigen = "O", elementoOrigen = id, elementoReceptor = id,
+        evidencia = new { ubicacionOrigen = "unidad-sintetica/" + id, ubicacionReceptora = "unidad-sintetica/" + id } };
 
     [Fact]
-    public async Task Contrato_json_conservado_y_profundidad_pendiente_no_homologa()
+    public async Task Tres_criterios_al_ochenta_generan_resultado_positivo_mediante_API()
     {
         using var factory = new MotorFactory(); using var client = factory.Autenticado();
         var response = await client.PostAsJsonAsync(Ruta, Datos());
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal(new[] { "asignaturaOrigen", "asignaturaReceptora", "cargaHorariaPct", "contenidoPct", "creditosPct",
-            "homologable", "justificacion", "profundidadPct", "temasSinCobertura", "umbralPct" },
-            json.EnumerateObject().Select(p => p.Name).Order().ToArray());
-        Assert.Equal(100, json.GetProperty("contenidoPct").GetDecimal());
-        Assert.Equal(100, json.GetProperty("cargaHorariaPct").GetDecimal());
-        Assert.Equal(100, json.GetProperty("creditosPct").GetDecimal());
-        Assert.Equal(JsonValueKind.Null, json.GetProperty("profundidadPct").ValueKind);
-        Assert.False(json.GetProperty("homologable").GetBoolean());
-        Assert.Contains("Información incompleta", json.GetProperty("justificacion").GetString());
+        Assert.Equal(80, json.GetProperty("compatibilidadAcademicaPct").GetDecimal());
+        Assert.Equal(80, json.GetProperty("compatibilidadHorariaPct").GetDecimal());
+        Assert.Equal(80, json.GetProperty("compatibilidadCreditosPct").GetDecimal());
+        Assert.True(json.GetProperty("homologable").GetBoolean());
+        Assert.Equal("Homologable", json.GetProperty("estado").GetString());
+        Assert.Equal(new[] { "C9", "C10" }, json.GetProperty("contenidosSinCobertura").EnumerateArray().Select(x => x.GetString()));
+        Assert.Equal(new[] { "R5" }, json.GetProperty("resultadosAprendizajeSinCobertura").EnumerateArray().Select(x => x.GetString()));
+        Assert.False(json.TryGetProperty("profundidadPct", out _));
+        Assert.False(json.TryGetProperty("contenidoPct", out _));
     }
 
     [Fact]
@@ -84,18 +91,18 @@ public class EvaluarEndpointTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.False(json.GetProperty("homologable").GetBoolean());
-        Assert.Equal(JsonValueKind.Null, json.GetProperty("contenidoPct").ValueKind);
+        Assert.Equal(JsonValueKind.Null, json.GetProperty("compatibilidadAcademicaPct").ValueKind);
     }
 
     [Theory]
     [InlineData("null")]
     [InlineData("{malformado")]
-    [InlineData("{\"origen\":{\"horas\":-1}}")]
+    [InlineData("{\"origenes\":[{\"horas\":-1}]}")]
     [InlineData("{\"receptora\":{\"creditos\":0}}")]
-    [InlineData("{\"origen\":{\"temas\":[null]}}")]
-    [InlineData("{\"origen\":{\"temas\":[\"T\",\"T\"]}}")]
-    [InlineData("{\"correspondencias\":[null]}")]
-    [InlineData("{\"correspondencias\":[{\"temaOrigen\":\"inexistente\",\"temaReceptor\":\"R\"}]}")]
+    [InlineData("{\"origenes\":[{\"contenidos\":[null]}]}")]
+    [InlineData("{\"origenes\":[{\"resultadosAprendizaje\":[\"R\",\"R\"]}]}")]
+    [InlineData("{\"correspondenciasContenidos\":[null]}")]
+    [InlineData("{\"correspondenciasContenidos\":[{\"asignaturaOrigen\":\"inexistente\",\"elementoOrigen\":\"C\",\"elementoReceptor\":\"C\"}]}")]
     public async Task Datos_invalidos_producen_400_problem_details(string body)
     {
         using var factory = new MotorFactory(); using var client = factory.Autenticado();
@@ -104,15 +111,47 @@ public class EvaluarEndpointTests
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
     }
 
-    [Fact]
-    public async Task Porcentaje_de_profundidad_enviado_por_cliente_no_se_acepta_como_calculo()
+    [Theory]
+    [InlineData("{\"origen\":{\"id\":\"O\"},\"correspondencias\":[]}")]
+    [InlineData("{\"compatibilidadAcademicaPct\":100,\"umbralPct\":1}")]
+    public async Task Contrato_anterior_y_porcentajes_de_cliente_se_rechazan(string body)
     {
         using var factory = new MotorFactory(); using var client = factory.Autenticado();
-        var response = await client.PostAsJsonAsync(Ruta, new { profundidadPct = 100, umbralPct = 1 });
+        var response = await client.PostAsync(Ruta, new StringContent(body, Encoding.UTF8, "application/json"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Sin_evidencia_no_recomienda_homologacion()
+    {
+        using var factory = new MotorFactory(); using var client = factory.Autenticado();
+        var body = System.Text.Json.Nodes.JsonNode.Parse(JsonSerializer.Serialize(Datos()))!;
+        body["correspondenciasContenidos"]![0]!["evidencia"] = null;
+        var response = await client.PostAsJsonAsync(Ruta, body);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("InformacionIncompleta", json.GetProperty("estado").GetString());
         Assert.False(json.GetProperty("homologable").GetBoolean());
-        Assert.Equal(JsonValueKind.Null, json.GetProperty("profundidadPct").ValueKind);
-        Assert.Equal(80, json.GetProperty("umbralPct").GetDecimal());
+        Assert.Contains("evidencia", json.GetProperty("justificacion").GetString());
+    }
+
+    [Fact]
+    public async Task Varios_origenes_combinan_cobertura_pero_no_inventan_agregacion_cuantitativa()
+    {
+        using var factory = new MotorFactory(); using var client = factory.Autenticado();
+        var body = System.Text.Json.Nodes.JsonNode.Parse(JsonSerializer.Serialize(Datos()))!;
+        var segundo = body["origenes"]![0]!.DeepClone(); segundo["id"] = "O2";
+        body["origenes"]!.AsArray().Add(segundo);
+        var duplicada = body["correspondenciasContenidos"]![0]!.DeepClone(); duplicada["asignaturaOrigen"] = "O2";
+        body["correspondenciasContenidos"]!.AsArray().Add(duplicada);
+        var response = await client.PostAsJsonAsync(Ruta, body);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(80, json.GetProperty("compatibilidadAcademicaPct").GetDecimal());
+        Assert.Equal(JsonValueKind.Null, json.GetProperty("compatibilidadHorariaPct").ValueKind);
+        Assert.Equal(JsonValueKind.Null, json.GetProperty("compatibilidadCreditosPct").ValueKind);
+        Assert.Equal("InformacionIncompleta", json.GetProperty("estado").GetString());
+        Assert.False(json.GetProperty("homologable").GetBoolean());
     }
 
     [Theory]
@@ -150,6 +189,8 @@ public class EvaluarEndpointTests
         var response = await client.PostAsJsonAsync(Ruta, Datos());
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal(85, json.GetProperty("umbralPct").GetDecimal());
+        Assert.Equal("NoHomologable", json.GetProperty("estado").GetString());
+        Assert.False(json.GetProperty("homologable").GetBoolean());
     }
 
     [Theory]
@@ -214,8 +255,8 @@ public class IntegracionGatewayTests
         if (esperado == HttpStatusCode.OK)
         {
             var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-            Assert.Equal("O", json.GetProperty("asignaturaOrigen").GetString());
-            Assert.False(json.GetProperty("homologable").GetBoolean());
+            Assert.Equal("O", json.GetProperty("asignaturasOrigen")[0].GetString());
+            Assert.True(json.GetProperty("homologable").GetBoolean());
         }
     }
 }

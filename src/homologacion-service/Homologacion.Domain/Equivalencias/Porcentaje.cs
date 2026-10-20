@@ -16,7 +16,4 @@ public readonly record struct Porcentaje
         return new Porcentaje(origen >= receptora ? 100 : origen.Value / receptora.Value * 100);
     }
 
-    public static Porcentaje? DesdeCobertura(int cubiertos, int totalReceptores)
-        => totalReceptores <= 0 || cubiertos < 0 || cubiertos > totalReceptores
-            ? null : new Porcentaje((decimal)cubiertos / totalReceptores * 100);
 }

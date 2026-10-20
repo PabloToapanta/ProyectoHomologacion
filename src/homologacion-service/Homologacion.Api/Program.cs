@@ -49,7 +49,7 @@ public partial class Program
         builder.Services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Homologación FISEI-UTA — HU-14 / Issue #5", Version = "v1",
-                Description = "Motor determinista. Propuesta académica pendiente de validación; profundidad sin fórmula acordada." });
+                Description = "Tres criterios confirmados por aclaración académica del equipo: contenidos y resultados combinados por elemento, horas y créditos. Contrato incompatible con la versión anterior. Múltiples orígenes no suman horas ni créditos sin regla aprobada." });
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             { Type = SecuritySchemeType.Http, Scheme = "bearer", BearerFormat = "JWT" });
             options.AddSecurityRequirement(new OpenApiSecurityRequirement

@@ -10,9 +10,10 @@ namespace Homologacion.Api.Controllers;
 [Route("api/homologaciones")]
 public sealed class EquivalenciasController(EvaluarEquivalencia evaluar) : ControllerBase
 {
-    /// <summary>Evalúa las dimensiones disponibles bajo la propuesta del equipo (HU-14 / T9–T10 / Issue #5).</summary>
-    /// <remarks>Profundidad pendiente de criterio académico: porcentaje null, información incompleta y homologable false.
-    /// No implementa aprobación, antigüedad ni requisitos de cambio. No persiste resultados.</remarks>
+    /// <summary>Evalúa compatibilidad académica, horaria y de créditos (HU-14 / T9–T10 / Issue #5).</summary>
+    /// <remarks>La cobertura combina contenidos y resultados receptores con igual peso por elemento y evidencia explícita.
+    /// Para varios orígenes no se agregan horas ni créditos sin una regla aprobada: información incompleta.
+    /// Recibe constancia de aprobación; no determina aprobación, antigüedad ni requisitos de cambio. No persiste resultados.</remarks>
     [HttpPost("evaluar")]
     [RequestSizeLimit(1_048_576)]
     [ProducesResponseType(typeof(EvaluarResponse), StatusCodes.Status200OK)]

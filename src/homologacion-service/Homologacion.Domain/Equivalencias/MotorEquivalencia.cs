@@ -7,17 +7,15 @@ public sealed record ResultadoEquivalencia(EstadoEquivalencia Estado)
     public bool Homologable => Estado == EstadoEquivalencia.Homologable;
 }
 
-/// <summary>Decisión técnica según la propuesta del equipo; no constituye una resolución académica.</summary>
+/// <summary>Decisión con los tres criterios confirmados por el equipo; no es una resolución institucional.</summary>
 public static class MotorEquivalencia
 {
-    public static ResultadoEquivalencia Evaluar(decimal? contenido, decimal? profundidad,
-        decimal? horas, decimal? creditos, decimal umbral)
+    public static ResultadoEquivalencia Evaluar(decimal? academica, decimal? horas, decimal? creditos, decimal umbral)
     {
         if (umbral is <= 0 or > 100) throw new ArgumentOutOfRangeException(nameof(umbral));
-        Porcentaje?[] dimensiones = [Porcentaje.DesdeValor(contenido), Porcentaje.DesdeValor(profundidad),
-            Porcentaje.DesdeValor(horas), Porcentaje.DesdeValor(creditos)];
-        if (dimensiones.Any(p => p is null)) return new(EstadoEquivalencia.InformacionIncompleta);
-        return new(dimensiones.All(p => p!.Value.Valor >= umbral)
+        Porcentaje?[] criterios = [Porcentaje.DesdeValor(academica), Porcentaje.DesdeValor(horas), Porcentaje.DesdeValor(creditos)];
+        if (criterios.Any(p => p is null)) return new(EstadoEquivalencia.InformacionIncompleta);
+        return new(criterios.All(p => p!.Value.Valor >= umbral)
             ? EstadoEquivalencia.Homologable : EstadoEquivalencia.NoHomologable);
     }
 }
