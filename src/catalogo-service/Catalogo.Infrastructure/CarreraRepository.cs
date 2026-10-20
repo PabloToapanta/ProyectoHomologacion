@@ -12,7 +12,7 @@ public sealed class CarreraRepository(CatalogoDbContext db) : ICarreraRepository
     public Task<Carrera?> BuscarAsync(Guid id, CancellationToken ct) => db.Carreras.SingleOrDefaultAsync(c => c.Id == id, ct);
     public Task<bool> ExisteNombreAsync(string nombre, string facultad, Guid? excluirId, CancellationToken ct) =>
         db.Carreras.AnyAsync(c => c.NombreNormalizado == nombre && c.FacultadNormalizada == facultad && c.Id != excluirId, ct);
-    public Task<bool> TieneAsignaturasAsync(Guid id, CancellationToken ct) => db.Set<AsignaturaReferencia>().AnyAsync(a => a.CarreraId == id, ct);
+    public Task<bool> TieneAsignaturasAsync(Guid id, CancellationToken ct) => db.Asignaturas.AnyAsync(a => a.CarreraId == id, ct);
 
     public async Task GuardarAsync(Carrera carrera, bool nueva, CancellationToken ct)
     {

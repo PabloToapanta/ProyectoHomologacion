@@ -1,10 +1,12 @@
-# Gestión de carreras — HU-04 / T5 / Issue #2
+# Catálogo — HU-04/HU-05, Issues #2/#3
 
 `CarrerasPage` recibe la función `request` de autenticación como propiedad. Incluye listado, formulario de alta/edición, modalidad opcional, vigencia, errores, reintentos y confirmación de eliminación. Reutiliza las clases compartidas `workspace-main`, `auth-input`, `app-button` y los colores existentes; sus estilos adicionales están en `catalogo.css`.
 
-`CatalogoRoute` es el adaptador listo para que Pablo lo monte bajo la ruta protegida de Administrador. No se ha modificado App.tsx, el panel, autenticación, arranque ni configuración común. La pantalla aún no es accesible desde la navegación de la aplicación: integración propuesta en `docs/arquitectura/propuesta-integracion-hu-04.md`, pendiente de acuerdo con Pablo.
+Con autorización expresa de Leslie, `CatalogoRoute` está montado en `/admin/carreras` bajo la protección existente de Administrador en App.tsx. El panel ofrece «Gestionar carreras y asignaturas» y el catálogo permite volver al panel o cerrar sesión. No se modificaron la lógica de autenticación, el arranque ni la configuración común. La navegación de React está integrada localmente; la conexión real de Gateway/SQL Server sigue pendiente de verificación.
 
-La interfaz pública de autenticación está en `features/auth/index.ts`: `useAuth().request` adjunta el JWT al Gateway y cierra sesión ante HTTP 401. El cliente del catálogo consume exclusivamente `/api/carreras` y gestiona ProblemDetails/ValidationProblemDetails. No usa fetch directo ni lee el token.
+`AsignaturasPage` recibe el mismo `request`, carga carreras, permite seleccionar una, consultar su listado por nivel y registrar asignaturas. Incluye errores, reintentos, cancelación de solicitudes anteriores y bloqueo durante el guardado. `CatalogoRoute` ofrece los botones Carreras/Asignaturas dentro del módulo; no necesita una segunda aplicación React.
+
+La interfaz pública de autenticación está en `features/auth/index.ts`: `useAuth().request` adjunta el JWT al Gateway y cierra sesión ante HTTP 401. Los clientes consumen `/api/carreras`, `/api/carreras/{id}/asignaturas` y `/api/asignaturas`, gestionando ProblemDetails/ValidationProblemDetails. No usan fetch directo ni leen el token.
 
 ## Verificación
 
@@ -16,4 +18,4 @@ npm test
 npm run build
 ```
 
-Las pruebas de componentes usan Testing Library y solicitudes simuladas; no sustituyen el recorrido integrado con SQL Server/Gateway. No se han añadido dependencias ni una segunda aplicación React. Las decisiones propuestas sobre UUID, JSON y permisos están detalladas en el documento de integración. HU-05 y HU-06 permanecen fuera de este módulo por ahora.
+Las pruebas de componentes usan Testing Library y solicitudes simuladas; no sustituyen el recorrido integrado con SQL Server/Gateway. No se han añadido dependencias ni una segunda aplicación React. Las decisiones sobre UUID, JSON y permisos están detalladas en los documentos de integración de HU-04/HU-05. HU-06 permanece fuera de este módulo.

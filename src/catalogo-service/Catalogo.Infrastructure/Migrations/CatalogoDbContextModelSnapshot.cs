@@ -22,6 +22,55 @@ namespace Catalogo.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Catalogo.Domain.Asignatura", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CarreraId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CodigoNormalizado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<decimal>("Creditos")
+                        .HasPrecision(9, 2)
+                        .HasColumnType("decimal(9,2)");
+
+                    b.Property<int>("Horas")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Nivel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarreraId", "CodigoNormalizado")
+                        .IsUnique();
+
+                    b.ToTable("Asignaturas", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Asignaturas_CreditosPositivos", "[Creditos] > 0");
+
+                            t.HasCheckConstraint("CK_Asignaturas_HorasPositivas", "[Horas] > 0");
+
+                            t.HasCheckConstraint("CK_Asignaturas_NivelPositivo", "[Nivel] > 0");
+                        });
+                });
+
             modelBuilder.Entity("Catalogo.Domain.Carrera", b =>
                 {
                     b.Property<Guid>("Id")
@@ -64,22 +113,7 @@ namespace Catalogo.Infrastructure.Migrations
                     b.ToTable("Carreras", (string)null);
                 });
 
-            modelBuilder.Entity("Catalogo.Infrastructure.AsignaturaReferencia", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CarreraId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CarreraId");
-
-                    b.ToTable("Asignaturas", (string)null);
-                });
-
-            modelBuilder.Entity("Catalogo.Infrastructure.AsignaturaReferencia", b =>
+            modelBuilder.Entity("Catalogo.Domain.Asignatura", b =>
                 {
                     b.HasOne("Catalogo.Domain.Carrera", null)
                         .WithMany()

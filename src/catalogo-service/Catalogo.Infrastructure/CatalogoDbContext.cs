@@ -6,6 +6,7 @@ namespace Catalogo.Infrastructure;
 public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> options) : DbContext(options)
 {
     public DbSet<Carrera> Carreras => Set<Carrera>();
+    public DbSet<Asignatura> Asignaturas => Set<Asignatura>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,17 +26,21 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
         }
         carrera.HasIndex(c => new { c.NombreNormalizado, c.FacultadNormalizada }).IsUnique();
 
-        // Ancla relacional mínima. HU-05 la ampliará con su entidad académica.
-        var referencia = modelBuilder.Entity<AsignaturaReferencia>();
-        referencia.ToTable("Asignaturas");
-        referencia.HasKey(a => a.Id);
-        referencia.Property(a => a.Id).ValueGeneratedNever();
-        referencia.HasOne<Carrera>().WithMany().HasForeignKey(a => a.CarreraId).OnDelete(DeleteBehavior.Restrict);
+        var asignatura = modelBuilder.Entity<Asignatura>();
+        asignatura.ToTable("Asignaturas", t =>
+        {
+            t.HasCheckConstraint("CK_Asignaturas_NivelPositivo", "[Nivel] > 0");
+            t.HasCheckConstraint("CK_Asignaturas_CreditosPositivos", "[Creditos] > 0");
+            t.HasCheckConstraint("CK_Asignaturas_HorasPositivas", "[Horas] > 0");
+        });
+        asignatura.HasKey(a => a.Id);
+        asignatura.Property(a => a.Id).ValueGeneratedNever();
+        asignatura.Property(a => a.Codigo).HasMaxLength(50).IsRequired();
+        asignatura.Property(a => a.CodigoNormalizado).HasMaxLength(50).IsRequired();
+        if (Database.IsSqlServer()) asignatura.Property(a => a.CodigoNormalizado).UseCollation("Latin1_General_100_BIN2");
+        asignatura.Property(a => a.Nombre).HasMaxLength(200).IsRequired();
+        asignatura.Property(a => a.Creditos).HasPrecision(9, 2);
+        asignatura.HasIndex(a => new { a.CarreraId, a.CodigoNormalizado }).IsUnique();
+        asignatura.HasOne<Carrera>().WithMany().HasForeignKey(a => a.CarreraId).OnDelete(DeleteBehavior.Restrict);
     }
-}
-
-internal sealed class AsignaturaReferencia
-{
-    public Guid Id { get; set; }
-    public Guid CarreraId { get; set; }
 }
