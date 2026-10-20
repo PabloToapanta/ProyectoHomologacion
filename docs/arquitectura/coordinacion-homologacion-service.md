@@ -1,6 +1,7 @@
 # Propuesta de coordinación — homologacion-service / Issue #5
 
 Fecha: 2026-10-19. Responsable inicial de composición y equivalencias: Pablo.
+Actualización vigente: [tres criterios confirmados](cambio-hu-14-tres-criterios.md). El contrato de equivalencia anterior es incompatible con el nuevo; no se modifican módulos de Edwin.
 Este documento registra la estructura disponible y una **propuesta para acordar con Edwin y Leslie**;
 no afirma que se haya celebrado un acuerdo ni modifica sus contratos o archivos.
 
@@ -40,8 +41,9 @@ No es necesario modificar el motor para implementar esas reglas independientes.
 ## Leslie: integración posterior del catálogo
 
 No se referencia ningún proyecto, entidad, DbContext o base del catálogo. El endpoint recibe
-instantáneas con identificador opaco, horas, créditos e identificadores de temas; también recibe
-correspondencias explícitas de origen a receptora. El detalle y ejemplo están en
+instantáneas de varias asignaturas de origen, constancia de aprobación, unidades de horas/créditos,
+inventarios de contenidos y resultados de aprendizaje y referencias a los planes analíticos; recibe
+correspondencias explícitas con evidencia hacia los elementos receptores. El detalle y ejemplo están en
 `src/homologacion-service/README.md`. No se agrega un cliente HTTP sin un contrato de catálogo acordado.
 
 Propuesta pendiente de acuerdo:
@@ -49,10 +51,11 @@ Propuesta pendiente de acuerdo:
 1. Acordar cómo traducir identificadores y versiones de asignaturas/temas del catálogo a las instantáneas.
 2. Acordar la procedencia verificable de las correspondencias. HU-14 cuenta las declaradas;
    no certifica académicamente su corrección ni las genera por similitud de texto.
-3. Definir con Coordinación el criterio de profundidad, escala, datos y evidencia necesaria sobre
-   resultados de aprendizaje; los niveles por sí solos no tienen una fórmula aprobada.
-4. Acordar un contrato de integración nuevo si se necesitan resultados de aprendizaje u otra evidencia.
-   Hasta entonces, profundidad es `null` y no hay homologación automática por HTTP.
+3. Aplicar la fórmula académica combinada confirmada, con inventarios de contenidos y resultados
+   del catálogo y ubicaciones de evidencia validadas por humanos; no inferir correspondencias con IA.
+4. Acordar cómo agregar horas/créditos de varios orígenes y convertir sistemas no comparables.
+   Hasta entonces esas situaciones producen información incompleta. Un origen con evidencia completa
+   y unidades comparables ya puede producir un resultado positivo por HTTP.
 
 ## Archivos compartidos: coordinar antes de modificarlos
 
@@ -75,3 +78,17 @@ La incorporación del microservicio, pruebas y referencias de HU-14 a la soluci�
 `feature/hu-14-equivalencia`, basada en `develop`, sin cambios iniciales ajenos.
 No se envió ningún mensaje a colaboradores ni se creó un PR. Los commits y el push de HU-14
 se realizan tras la autorización explícita del usuario, posterior a la entrega inicial.
+
+## Revisión de profundidad y aislamiento de módulos
+
+Se revisó la dependencia del caso de uso: únicamente consume `IUmbralEquivalencia` y las reglas
+puras de `Equivalencias`. No existen referencias a módulos de antigüedad o cambio ni dependencias
+sobre sus futuros DTO. Edwin puede agregar sus clases hermanas sin editar las de equivalencia;
+los registros de composición compartidos sí requieren coordinación, por lo que no se afirma
+que cualquier edición simultánea esté libre de conflictos.
+
+El antiguo punto de extensión de profundidad fue sustituido por `CoberturaAcademica` y tres
+criterios, por aclaración académica del docente. La [consulta anterior](profundidad-hu-14-pendiente-academico.md)
+queda como registro histórico. El [cambio actual](cambio-hu-14-tres-criterios.md) detalla la migración:
+las firmas de DTO y del motor cambiaron; Edwin no debe copiar llamadas antiguas de cuatro porcentajes.
+La composición de DI y los proyectos no cambian; en Program.cs solo se actualiza texto de Swagger.

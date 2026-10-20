@@ -1,3 +1,5 @@
+> **Registro histórico sustituido.** La aclaración académica del 19/10/2026 reemplaza las cuatro dimensiones y el bloqueo de profundidad por tres criterios. Consultar el [estado vigente](evidencia-hu-14-tres-criterios.md). Las cifras y decisiones anteriores se conservan como evidencia de su ejecución, no como contrato actual.
+
 # Evidencia HU-14 — T9 y T10 — Issue #5
 
 Fecha: 2026-10-19. Desarrollo: Pablo. Rama: `feature/hu-14-equivalencia`, basada en `develop`.
@@ -117,3 +119,9 @@ con `down --volumes`, y se eliminó el archivo temporal de secretos.
 
 Guía completa de contrato, capas, configuración y comandos:
 [README del servicio](../../src/homologacion-service/README.md).
+
+## Revisión posterior de profundidad
+
+La revisión de estados, punto mínimo de extensión y decisiones pendientes del docente tiene
+su [registro independiente](evidencia-hu-14-revision-profundidad.md). Los resultados de 192
+pruebas y Compose de este documento son históricos; la nueva ejecución se detalla allí.

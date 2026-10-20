@@ -1,182 +1,175 @@
 # homologacion-service — HU-14 / T9–T10 / Issue #5
 
-Motor determinista del Sprint 1. Issue: https://github.com/PabloToapanta/ProyectoHomologacion/issues/5.
-No persiste evaluaciones, no consulta otras bases y no utiliza LLM ni mensajería.
+Contrato actual: **tres criterios**, según aclaración del docente transmitida por el equipo el
+19/10/2026. Sustituye el diseño de cuatro dimensiones. No se atribuye a una norma institucional
+no aportada. Issue: https://github.com/PabloToapanta/ProyectoHomologacion/issues/5.
 
-## Capas y referencias
+## Arquitectura y alcance
 
 ```text
-src/homologacion-service/
-├── Homologacion.Domain/
-│   └── Equivalencias/           Porcentaje, decisión y estado explícito
-├── Homologacion.Application/
-│   └── Equivalencias/           caso de uso, DTO, validaciones e IUmbralEquivalencia
-├── Homologacion.Infrastructure/
-│   └── Configuration/          adaptador real de configuración externa
-├── Homologacion.Api/
-│   ├── Contracts/              contratos HTTP separados de los DTO internos
-│   ├── Controllers/            POST /api/homologaciones/evaluar
-│   ├── Security/               opciones JWT
-│   └── Program.cs              composición, JWT, autorización y Swagger
-├── examples/evaluar.json       fixture sintética; no representa un sílabo real
-├── Dockerfile
-└── compose.hu14.yaml
-
-tests/
-├── Homologacion.Domain.Tests/
-├── Homologacion.Application.Tests/
-├── Homologacion.Api.Tests/      incluye integración YARP real con TestServer
-└── homologacion-service/smoke.py
+Homologacion.Domain/Equivalencias/         fórmula combinada, porcentajes y decisión pura
+Homologacion.Application/Equivalencias/    caso de uso, DTO, evidencia e IUmbralEquivalencia
+Homologacion.Infrastructure/Configuration/ adaptador de configuración del umbral
+Homologacion.Api/                         contratos, controlador, JWT, Swagger y composición
 ```
 
-Referencias de proyecto: `Application → Domain`; `Infrastructure → Application`;
-`Api → Application, Infrastructure`; `Domain → ninguna capa ni paquete`.
-Infrastructure recibe Domain transitivamente. Application tampoco contiene dependencias técnicas.
-El único puerto de aplicación es `IUmbralEquivalencia`, implementado con Options en Infrastructure.
-No se necesitan repositorios, EF, base de datos ni un adaptador del catálogo todavía.
-Las comprobaciones de referencias de ensamblados forman parte de las pruebas.
+Referencias: Application → Domain; Infrastructure → Application; Api → Application/Infrastructure.
+Domain no tiene paquetes ni dependencias técnicas. No se añade persistencia, EF, repositorios,
+LLM, RabbitMQ ni acceso a bases ajenas. Se conserva la separación por funcionalidades para Edwin.
+HU-14 recibe la constancia de aprobación; no determina aprobación, antigüedad ni requisitos de cambio.
 
-## Reglas y límite académico
+## Reglas actuales
 
-- Horas/créditos: `min(100, origen / receptora × 100)`, con cantidades positivas.
-  Se compara antes de dividir para evitar desbordamiento; se usa `decimal`, sin redondear
-  antes de decidir. La representación decimal tiene precisión finita.
-- Contenido: propuesta del equipo `temas receptores cubiertos / total de temas receptores × 100`.
-  Los identificadores son opacos, únicos y sensibles a mayúsculas. Las correspondencias se
-  proporcionan explícitamente; no se deduce cobertura por igualdad de nombres o similitud textual.
-  Varios temas de origen asociados al mismo receptor cuentan una sola vez. Un tema de origen
-  puede cubrir varios receptores cuando así se declara; esa declaración requiere validación académica.
-- Profundidad: **no hay una fórmula ni una escala acordada** para alinear niveles/resultados.
-  No se inventa una ponderación, una escala de Bloom ni un porcentaje. El caso de uso devuelve
-  `profundidadPct: null`, estado interno `InformacionIncompleta`, `homologable: false` y explicación.
-  El cliente no puede aportar un porcentaje ni reducir el umbral desde el cuerpo HTTP.
-- Decisión del dominio: las cuatro dimensiones válidas deben alcanzar individualmente el umbral.
-  Una dimensión insuficiente no se compensa con otra. Porcentajes ausentes o inválidos producen
-  `InformacionIncompleta`, nunca una homologación automática.
-- Umbral inicial 80 %, configurable en `(0, 100]`. **Es propuesta del equipo, no normativa oficial**.
-  Un umbral mal configurado impide arrancar. Cambiar configuración requiere reiniciar el servicio.
+1. `compatibilidadAcademicaPct = (contenidos receptores cubiertos + resultados receptores cubiertos)
+   / (total contenidos receptores + total resultados receptores) × 100`.
+   Cada elemento tiene el mismo peso. No se promedian porcentajes de las dos categorías.
+2. La cobertura puede provenir de varias asignaturas de origen aprobadas. Se cuentan identificadores
+   receptores distintos por categoría; varias correspondencias hacia un elemento cuentan una sola vez.
+   Contenido y resultado con el mismo identificador siguen siendo elementos de categorías diferentes.
+3. Las correspondencias son explícitas y requieren el origen, ambos identificadores, referencia al
+   plan analítico de cada asignatura y ubicaciones de evidencia dentro de esos planes. No se infieren
+   coincidencias por texto ni se utiliza IA. Se valida la coherencia estructural de las referencias;
+   el equipo debe verificar su sustento semántico en los planes autorizados. No se descarga ni abre
+   ninguna referencia desde el servicio, ni se inventan sílabos.
+4. Para **un único origen**, con cantidades positivas y unidades comparables:
+   horas y créditos mantienen `min(100, origen / receptora × 100)`. Se usa `decimal` sin redondear
+   antes de comparar; se compara antes de dividir para evitar desbordar. Precisión decimal finita.
+   La comparabilidad exige el mismo identificador explícito de unidad horaria y de sistema de créditos,
+   respectivamente (igualdad ordinal exacta, sin alias ni factores de conversión implícitos).
+5. Para **varios orígenes**, se calcula la cobertura académica; horas y créditos quedan `null` porque
+   no hay regla aprobada para su agregación. Tampoco se calcula una conversión de unidades o sistemas
+   externos diferentes. No se aceptan totales agregados o porcentajes enviados por el cliente.
+6. Los tres criterios deben alcanzar individualmente el umbral externo (80 % inicial, rango `(0,100]`).
+   Profundidad deja de existir como requisito independiente. El umbral inválido impide arrancar.
+   Cambiar la configuración requiere reiniciar el servicio.
+7. Datos obligatorios ausentes o evidencia insuficiente: `InformacionIncompleta`, sin recomendación.
+   Cuatro porcentajes anteriores y la profundidad independiente no forman parte de este contrato.
 
-Las pruebas positivas de cuatro dimensiones al 80 % usan porcentajes **sintéticos** para verificar
-la decisión pura. No prueban una fórmula de profundidad ni una aprobación institucional.
-Actualmente ningún request HTTP puede producir `homologable: true` hasta definir e integrar ese criterio.
-La prioridad ante dimensiones desconocidas es información incompleta, aunque una dimensión conocida sea insuficiente.
+## Contrato HTTP nuevo — incompatible con la versión anterior
 
-## Contrato HTTP implementado para HU-14
-
-Ruta pública existente en Gateway: `POST /api/homologaciones/evaluar`.
-`Content-Type: application/json`, `Authorization: Bearer <JWT>`.
-
-La solicitud nueva se define localmente para comparar instantáneas; su adaptación al catálogo
-queda como propuesta de integración, sin modificar el contrato compartido ni archivos de Leslie.
+`POST /api/homologaciones/evaluar`, `Content-Type: application/json`, `Authorization: Bearer <JWT>`.
+Ejemplo mínimo **sintético**, sin correspondencias académicas reales:
 
 ```json
 {
-  "origen": { "id": "origen-sintetico", "horas": 180, "creditos": 4, "temas": ["O1", "O2"] },
-  "receptora": { "id": "receptora-sintetica", "horas": 144, "creditos": 3, "temas": ["R1", "R2", "R3", "R4", "R5"] },
-  "correspondencias": [
-    { "temaOrigen": "O1", "temaReceptor": "R1" },
-    { "temaOrigen": "O1", "temaReceptor": "R2" },
-    { "temaOrigen": "O2", "temaReceptor": "R3" },
-    { "temaOrigen": "O2", "temaReceptor": "R4" }
-  ]
+  "origenes": [{
+    "id": "O", "aprobada": true, "planAnalitico": "plan-sintetico-O-v1",
+    "horas": 80, "unidadHoras": "hora-reloj", "creditos": 8, "sistemaCreditos": "sistema-sintetico-A",
+    "contenidos": ["CO"], "resultadosAprendizaje": ["RO"]
+  }],
+  "receptora": {
+    "id": "D", "planAnalitico": "plan-sintetico-D-v1",
+    "horas": 100, "unidadHoras": "hora-reloj", "creditos": 10, "sistemaCreditos": "sistema-sintetico-A",
+    "contenidos": ["CD"], "resultadosAprendizaje": ["RD"]
+  },
+  "correspondenciasContenidos": [{
+    "asignaturaOrigen": "O", "elementoOrigen": "CO", "elementoReceptor": "CD",
+    "evidencia": {"ubicacionOrigen": "unidad-sintetica/CO", "ubicacionReceptora": "unidad-sintetica/CD"}
+  }],
+  "correspondenciasResultadosAprendizaje": [{
+    "asignaturaOrigen": "O", "elementoOrigen": "RO", "elementoReceptor": "RD",
+    "evidencia": {"ubicacionOrigen": "unidad-sintetica/RO", "ubicacionReceptora": "unidad-sintetica/RD"}
+  }]
 }
 ```
 
-Con el umbral por defecto, la respuesta conserva todas las claves propuestas en
-`docs/arquitectura/decisiones-y-contratos.md`:
+Con el umbral 80, ese ejemplo devuelve:
 
 ```json
 {
-  "asignaturaOrigen": "origen-sintetico",
-  "asignaturaReceptora": "receptora-sintetica",
-  "contenidoPct": 80,
-  "profundidadPct": null,
-  "cargaHorariaPct": 100,
-  "creditosPct": 100,
-  "umbralPct": 80,
-  "homologable": false,
-  "justificacion": "Información incompleta: criterio académico verificable de profundidad pendiente de definición. La propuesta del equipo requiere validación académica.",
-  "temasSinCobertura": ["R5"]
+  "asignaturasOrigen": ["O"], "asignaturaReceptora": "D",
+  "compatibilidadAcademicaPct": 100, "compatibilidadHorariaPct": 80, "compatibilidadCreditosPct": 80,
+  "umbralPct": 80, "estado": "Homologable", "homologable": true,
+  "justificacion": "Los tres criterios alcanzan individualmente el umbral de 80 %.",
+  "contenidosSinCobertura": [], "resultadosAprendizajeSinCobertura": [], "informacionFaltante": []
 }
 ```
 
-Semántica de datos y errores:
+`examples/evaluar.json` incluye una fixture sintética mayor: 8 contenidos y 4 resultados cubiertos,
+frente a 10 y 5 requeridos. Devuelve los tres criterios al 80 %, deja C9/C10 y R5 sin cobertura y
+sí recomienda con umbral 80. Con umbral 85 devuelve `NoHomologable`.
 
-| Caso | Resultado |
+### Migración obligatoria de consumidores
+
+| Anterior | Actual |
 |---|---|
-| Datos presentes y válidos, profundidad pendiente | 200, porcentaje desconocido `null`, explicación y `homologable: false` |
-| `{}` o instantáneas/cantidades/temas ausentes | 200, información incompleta y porcentajes calculables conservados |
-| `correspondencias: null` o ausente | cobertura desconocida; `contenidoPct: null` |
-| `correspondencias: []` con temas válidos en ambas asignaturas | cobertura declarada cero, temas receptores sin cobertura listados |
-| Sin evidencia de contenido | `temasSinCobertura: []`; no se afirma que los temas estén cubiertos, consultar `contenidoPct: null` |
-| Horas/créditos presentes ≤ 0, temas nulos/vacíos/duplicados o referencias inexistentes | 400 `application/problem+json` |
-| Cuerpo nulo, malformado o valores incompatibles con el modelo | 400 Problem Details de ASP.NET Core |
-| JWT ausente, firma/emisor/audiencia/algoritmo/expiración inválidos | 401 |
-| JWT válido con rol ajeno a los tres roles académicos | 403 |
+| `origen` singular | `origenes[]`, cada uno con `aprobada: true` y referencia al plan |
+| `temas` | `contenidos` y `resultadosAprendizaje`, ambos inventarios explícitos |
+| `correspondencias` / `temaOrigen` / `temaReceptor` | dos listas de correspondencias con asignatura de origen, elementos y evidencia |
+| sin unidad o sistema explícito | `unidadHoras` y `sistemaCreditos` para acreditar comparabilidad |
+| `asignaturaOrigen` en respuesta | `asignaturasOrigen[]` |
+| `contenidoPct` / `profundidadPct` | `compatibilidadAcademicaPct`; profundidad eliminada |
+| `cargaHorariaPct` / `creditosPct` | `compatibilidadHorariaPct` / `compatibilidadCreditosPct` |
+| `temasSinCobertura` | dos listas: contenidos y resultados de aprendizaje sin cobertura acreditada |
+| estado solo interno | `estado` e `informacionFaltante` explícitos en respuesta |
 
-No se añaden claves a la respuesta compartida. El estado explícito del dominio se representa
-externamente con porcentaje nullable, `homologable` y `justificacion`.
-`temasSinCobertura` contiene identificadores receptores, en el orden de entrada.
-El cuerpo máximo en Kestrel es 1 MiB. Swagger está disponible en Development en
-`/swagger` y `/swagger/v1/swagger.json`, incluyendo esquema Bearer y respuestas documentadas.
+La ruta y JWT permanecen iguales. Se actualiza el contrato en la ruta existente por autorización
+expresa del usuario; no se mantienen interpretaciones silenciosas del contrato antiguo ni se crea
+una segunda API. Propiedades JSON desconocidas, incluidos campos antiguos o porcentajes/umbrales
+aportados por el cliente, se rechazan con 400. Los consumidores y los futuros módulos de Edwin
+que utilicen DTO antiguos deben migrar; no se cambia su código en esta tarea.
 
-## Configuración y ejecución local
+### Datos, estados y errores
 
-Variables para ejecutar la API directamente:
+- `estado`: `InformacionIncompleta`, `NoHomologable` o `Homologable`; `homologable` es true solo en el último.
+- `null` en un inventario o lista de correspondencias significa desconocido. `[]` declara que la lista
+  es conocida y vacía. Las dos categorías deben estar presentes; una puede estar vacía si la otra
+  tiene elementos. Si el total receptor es cero, no se divide: información incompleta.
+- Cada inventario tiene identificadores no vacíos y únicos. Orígenes con ID repetido se rechazan;
+  contenidos con el mismo ID en asignaturas distintas se distinguen por el ID de origen.
+- Evidencia ausente/vacía, referencia al plan ausente o constancia de aprobación desconocida/false:
+  información incompleta. Las correspondencias sin evidencia/aprobación/planes no acreditan cobertura.
+  El porcentaje académico se devuelve null cuando falta información académica obligatoria.
+- Las listas de elementos sin cobertura incluyen todo lo que no tiene cobertura acreditada; no
+  implican un juicio semántico negativo. Conservan el orden del inventario receptor.
+- Una dimensión desconocida mantiene estado incompleto aunque otra sea insuficiente. Con los tres
+  porcentajes válidos, cualquiera inferior al umbral produce NoHomologable; no hay compensación.
+- `{}`: 200 incompleto. Cuerpo nulo/malformado, IDs referenciados inexistentes, inventarios inválidos,
+  cantidades proporcionadas ≤0 o campos desconocidos: 400 `application/problem+json`.
+  Un inventario ausente no prueba que un elemento sea inexistente: se informa incompletitud.
+- Sin JWT o con firma/emisor/audiencia/algoritmo/expiración inválidos: 401; rol ajeno: 403.
+  Roles permitidos: Administrador, Docente y Coordinador. API y Gateway validan el token.
 
-```text
-Jwt__Issuer=<mismo emisor que Auth y Gateway>
-Jwt__Audience=<misma audiencia>
-Jwt__SigningKey=<misma clave externa, al menos 32 bytes UTF-8>
-Equivalencia__UmbralPct=80
-ASPNETCORE_ENVIRONMENT=Development
-ASPNETCORE_URLS=http://127.0.0.1:5083
-```
+## Configuración, Swagger y pruebas
+
+Variables de API directa: `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey` (externa, mínimo 32 bytes
+UTF-8), `Equivalencia__UmbralPct` (80), `ASPNETCORE_ENVIRONMENT=Development`,
+`ASPNETCORE_URLS=http://127.0.0.1:5083`. Se conserva HS256 y validación compatible con Auth/YARP,
+expiración obligatoria y cero tolerancia adicional de reloj. No hay secretos en Git.
 
 ```bash
 dotnet run --project src/homologacion-service/Homologacion.Api
-```
-
-Se valida HS256, firma, emisor, audiencia, expiración obligatoria y token firmado, sin tolerancia
-adicional de reloj. Roles: Administrador, Docente, Coordinador. Gateway y servicio validan JWT.
-No hay secretos de ejemplo en Git ni se confía en cabeceras de identidad sin firma.
-
-Compose usa las configuraciones de Auth y Gateway existentes y agrega el motor sin puerto público:
-
-```bash
-docker compose --env-file /ruta/privada/hu14.env -p hu14-local \
-  -f src/auth-service/compose.yaml \
-  -f src/gateway/compose.t2.yaml \
-  -f src/homologacion-service/compose.hu14.yaml up -d --build
-```
-
-El archivo privado necesita las variables existentes `AUTH_SQL_PASSWORD`, `AUTH_JWT_ISSUER`,
-`AUTH_JWT_AUDIENCE`, `AUTH_JWT_KEY`, `AUTH_ADMIN_USERNAME`, `AUTH_ADMIN_PASSWORD`,
-`CATALOGO_SERVICE_URL` y `HOMOLOGACION_SERVICE_URL` (el overlay sustituye el último destino por
-`http://homologacion-service:8080/`, pero Compose interpola primero el archivo T2).
-`CATALOGO_SERVICE_URL` debe ser una URL sintácticamente válida: esta prueba no llama al catálogo.
-Opcionales: `GATEWAY_HTTP_PORT` (5080), `AUTH_HTTP_PORT` (5081), `EQUIVALENCIA_UMBRAL_PCT` (80).
-Los valores secretos se generan o suministran fuera del repositorio.
-
-El overlay es de desarrollo; no constituye una configuración de publicación.
-Las imágenes ejecutan el motor como usuario sin privilegios. No se agrega una base al motor.
-
-## Verificación
-
-Desde la raíz:
-
-```bash
 dotnet restore Homologacion.sln
 dotnet build Homologacion.sln --configuration Release --no-restore
 dotnet test Homologacion.sln --configuration Release --no-build
+```
+
+Swagger en Development: `/swagger` y `/swagger/v1/swagger.json`, esquema Bearer y modelos actuales.
+Límite de cuerpo en Kestrel: 1 MiB. TestServer no aplica ese límite y emite advertencias al respecto.
+
+Compose (sin base ni puerto público para el motor):
+
+```bash
+docker compose --env-file /ruta/privada/hu14.env -p hu14-local \
+  -f src/auth-service/compose.yaml -f src/gateway/compose.t2.yaml \
+  -f src/homologacion-service/compose.hu14.yaml up -d --build
 python3 tests/homologacion-service/smoke.py
 ```
 
-El smoke necesita el stack levantado y `AUTH_ADMIN_USERNAME`, `AUTH_ADMIN_PASSWORD` exportados
-sin imprimirlos; `GATEWAY_URL` por defecto es `http://127.0.0.1:5080` y el umbral esperado se lee
-con `EQUIVALENCIA_UMBRAL_PCT` (80 por defecto). No registra el JWT ni la respuesta de login.
-El workflow `homologacion-service.yml` ejecuta restore/build/test y conserva TRX; su ejecución
-remota queda pendiente de autorización de push/PR. Ver evidencias y coordinación:
+El archivo privado requiere las variables de Auth existentes: `AUTH_SQL_PASSWORD`, `AUTH_JWT_ISSUER`,
+`AUTH_JWT_AUDIENCE`, `AUTH_JWT_KEY`, `AUTH_ADMIN_USERNAME`, `AUTH_ADMIN_PASSWORD`, además de
+`CATALOGO_SERVICE_URL` y `HOMOLOGACION_SERVICE_URL`. El overlay sustituye el último destino por el
+servicio interno, pero T2 interpola primero su variable. La URL de catálogo no se consulta en el smoke.
+Opcionales: `GATEWAY_HTTP_PORT` (5080), `AUTH_HTTP_PORT` (5081), `EQUIVALENCIA_UMBRAL_PCT` (80).
+El smoke necesita credenciales exportadas y `GATEWAY_URL` (por defecto localhost:5080); no imprime JWT.
 
-- [Evidencias T9–T10](../../docs/sprint-1/evidencia-hu-14-t9-t10.md).
-- [Propuesta de coordinación](../../docs/arquitectura/coordinacion-homologacion-service.md).
+## Documentación y pendientes
+
+- [Cambio académico y coordinación](../../docs/arquitectura/cambio-hu-14-tres-criterios.md).
+- [Evidencias actuales](../../docs/sprint-1/evidencia-hu-14-tres-criterios.md).
+- [Estructura para Edwin y Leslie](../../docs/arquitectura/coordinacion-homologacion-service.md).
+
+Pendientes académicos: cómo agregar horas/créditos de varios orígenes, comparabilidad/conversión de
+unidades y sistemas distintos, y verificación de correspondencias con planes reales autorizados.
+Profundidad independiente ya no es un pendiente: quedó sustituida por la fórmula combinada confirmada.
+Pendientes de entrega: revisión cruzada, aceptación de Shirley y actualización coordinada del Issue remoto.

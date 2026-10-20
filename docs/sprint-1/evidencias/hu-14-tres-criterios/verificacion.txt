@@ -1,0 +1,82 @@
+HU-14 / Issue #5 — aclaración académica: tres criterios
+Fecha UTC: 2026-10-20T00:24:03.025220+00:00
+Sin commits/push/merge. Base Git: 11dbb68; se conservaron los cambios locales de la revisión previa.
+
+TDD: reglas y contratos antes de implementar
+domain: Failed!  - Failed:    27, Passed:    13, Skipped:     0, Total:    40, Duration: 62 ms - Homologacion.Domain.Tests.dll (net8.0)
+app: Failed!  - Failed:    26, Passed:     0, Skipped:     0, Total:    26, Duration: 59 ms - Homologacion.Application.Tests.dll (net8.0)
+api: Failed!  - Failed:    17, Passed:    14, Skipped:     0, Total:    31, Duration: 1 s - Homologacion.Api.Tests.dll (net8.0)
+
+dotnet restore Homologacion.sln
+Determining projects to restore...
+  All projects are up-to-date for restore.
+
+dotnet build Homologacion.sln --configuration Release --no-restore -m:1 -p:UseSharedCompilation=false
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:18.17
+
+dotnet test Homologacion.sln --configuration Release --no-build --no-restore -m:1 --logger trx --results-directory /tmp/hu14-tres-results
+Passed!  - Failed:     0, Passed:    43, Skipped:     0, Total:    43, Duration: 2 s - AuthService.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 40 ms - Auth.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    59, Skipped:     0, Total:    59, Duration: 2 s - Gateway.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    40, Skipped:     0, Total:    40, Duration: 41 ms - Homologacion.Domain.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    26, Skipped:     0, Total:    26, Duration: 49 ms - Homologacion.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    31, Skipped:     0, Total:    31, Duration: 1 s - Homologacion.Api.Tests.dll (net8.0)
+
+TOTAL .NET: 212 aprobadas, 0 fallidas, 0 omitidas.
+Las 115 pruebas previas de HU-01 permanecen aprobadas; 97 pruebas de homologación actualizadas.
+Advertencias de TestServer sobre el límite de cuerpo: no verifica la característica de Kestrel.
+TRX locales en /tmp/hu14-tres-results, sin versionarlos.
+
+npm run build (incluye tsc --noEmit)
+> homologacion-fisei-frontend@0.1.0 build
+> npm run typecheck && vite build
+
+
+> homologacion-fisei-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 30 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.56 kB │ gzip:  0.34 kB
+dist/assets/index-ihlhrP-U.css    8.13 kB │ gzip:  2.53 kB
+dist/assets/index-CtMw1gz4.js   271.02 kB │ gzip: 86.17 kB
+
+✓ built in 315ms
+
+npm test
+> homologacion-fisei-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 [repositorio]/frontend
+
+
+ Test Files  4 passed (4)
+      Tests  43 passed (43)
+   Start at  19:21:19
+   Duration  3.59s (environment 60%, tests 26%, setup 10%, import 2%, transform 1%)
+
+npm run test:e2e -- --output=/tmp/hu14-tres-playwright-results
+> homologacion-fisei-frontend@0.1.0 test:e2e
+> playwright test --output=/tmp/hu14-tres-playwright-results
+
+
+Running 2 tests using 1 worker
+
+(node:39924) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › e2e/auth.spec.ts:10:1 › React → Gateway → Auth: protección, errores, login, recarga y logout (1.2s)
+  ✓  2 [chromium] › e2e/auth.spec.ts:45:1 › login y panel utilizables en móvil sin desbordamiento horizontal (449ms)
+
+  2 passed (2.4s)
+
+Los comandos finales terminaron con código 0.
+React, Gateway, Auth, SQL Server y Homologación se ejecutaron con Docker Compose.
+Ver compose-smoke.txt y compose-estado.txt para el flujo integrado de HU-14.

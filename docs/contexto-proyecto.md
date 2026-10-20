@@ -3,7 +3,7 @@
 Documento de consulta operativa derivado de la planificación académica «Sprint 0: Planificación Scrum + XP — Sistema de Homologación de Materias (FISEI-UTA)» (41 páginas). **No sustituye al PDF original**: cuando se requiera una interpretación jurídica o de sílabos, verificar la fuente con el equipo y docente.
 
 ## Propósito y límites
-Sistema web de apoyo al análisis de homologación cuando una persona solicita cambio de carrera. Compara asignaturas aprobadas de origen contra la carrera receptora, considerando contenido, profundidad, horas y créditos, y permite generar una **sugerencia** fundamentada para la autoridad competente. **No** toma decisiones oficiales, aprueba solicitudes, matricula, asigna cupos ni modifica sistemas institucionales.
+Sistema web de apoyo al análisis de homologación cuando una persona solicita cambio de carrera. Compara asignaturas aprobadas de origen contra la carrera receptora, considerando compatibilidad académica (contenidos y resultados combinados), horaria y de créditos, y permite generar una **sugerencia** fundamentada para la autoridad competente. **No** toma decisiones oficiales, aprueba solicitudes, matricula, asigna cupos ni modifica sistemas institucionales.
 
 El diseño completo distingue homologación **interna UTA** y **externa** desde otras instituciones (incluidas extranjeras). Solicitudes originalmente llegan por **Quipux**, fuera de esta aplicación.
 
@@ -26,7 +26,7 @@ Este flujo completo aporta contexto, pero **solo implementar las 7 HU del Sprint
 | HU-04 | Gestión de carreras y restricciones por duplicado | Leslie | #2 |
 | HU-05 | Asignaturas por carrera, créditos, horas y nivel | Leslie | #3 |
 | HU-06 | Unidades, contenidos y resultados de aprendizaje | Edwin | #4 |
-| HU-14 | Comparar cuatro dimensiones y verificar umbral | Pablo | #5 |
+| HU-14 | Comparar tres criterios y verificar umbral | Pablo | #5 |
 | HU-15 | Aprobación y antigüedad de diez años | Edwin | #6 |
 | HU-16 | Requisitos de cambios internos/externos | Edwin | #7 |
 
@@ -38,7 +38,7 @@ Consultas normativas y criterios exactos se encuentran en `docs/sprint-1/criteri
 
 Estas reglas provienen de la planificación. **Las fórmulas y las interpretaciones legales pendientes se deben distinguir de disposiciones oficiales y confirmar con el docente.**
 
-- **RN-01:** análisis comparativo de contenido, profundidad y carga horaria, con umbral propuesto del 80 % respecto de la receptora.
+- **RN-01 (aclaración académica 19/10/2026):** tres criterios: compatibilidad académica combinada, horaria y de créditos, cada uno con umbral configurable inicialmente 80 % respecto de la receptora. Sustituye contenido/profundidad independientes.
 - **RN-02:** en movilidad académica, correspondencia de resultados de aprendizaje bajo el umbral aplicable.
 - **RN-03:** materia de origen aprobada y con un máximo de diez años desde su aprobación; después, corresponde validación de conocimientos.
 - **RN-04:** cambio interno: un período cursado y al menos una materia homologable; condición adicional de gratuidad según normativa.
@@ -49,15 +49,21 @@ Estas reglas provienen de la planificación. **Las fórmulas y las interpretacio
 - **RN-09:** flujo institucional y decisión de autoridades, fuera del software para este sprint.
 - **RN-10:** equivalencia de calificaciones configurable, fuera del incremento actual.
 
-### Equivalencia — propuesta a validar
-Cuatro porcentajes comparados respecto a la **asignatura receptora**:
-1. Contenido: temas receptores cubiertos por origen / temas receptores.
-2. Profundidad: alineación de nivel y resultados de aprendizaje; el método exacto es propuesta del equipo, no una fórmula normada verificada.
-3. Horas: `min(100, horasOrigen / horasReceptora × 100)`.
-4. Créditos: `min(100, creditosOrigen / creditosReceptora × 100)`.
+### Equivalencia — aclaración académica confirmada por el equipo
 
-La propuesta del equipo exige **cada dimensión >= umbral** (inicial 80 %), nunca un promedio compensatorio. Probar 79,9 %, 80 % y el cambio a 85 %.
-Cuando faltan temas, resultados u horas/creditos válidos, devolver **información incompleta**, no simular un cálculo ni inventar datos.
+Fuente: docente, confirmación transmitida por el usuario el 19/10/2026. Sustituye el diseño anterior;
+no se afirma que sea una norma institucional oficial. Tres criterios:
+
+1. Académico: `(contenidos receptores cubiertos + resultados receptores cubiertos) / (total contenidos receptores + total resultados receptores) × 100`. Igual peso por elemento, sin promedio 50/50 ni profundidad independiente.
+2. Horas: `min(100, horasOrigen / horasReceptora × 100)`, solo con unidades comparables y un único origen.
+3. Créditos: la misma razón respecto a la receptora, con sistema comparable y un único origen.
+
+Cada criterio debe alcanzar el umbral configurado; no se compensan entre sí. Varias asignaturas
+aprobadas pueden aportar cobertura académica, contando cada elemento receptor una sola vez por
+categoría. Las correspondencias requieren evidencia explícita de ambos planes, sin IA.
+Datos obligatorios ausentes: información incompleta. No inferir agregaciones de horas/créditos
+entre varios orígenes ni factores de conversión de sistemas externos; siguen pendientes.
+Ver [cambio autorizado y coordinación](arquitectura/cambio-hu-14-tres-criterios.md).
 
 ### Antigüedad
 Escribir casos TDD con fecha de aprobación válida, exactamente diez años, menos de diez, más de diez, estado aprobado/reprobado/no cursado, zona temporal consistente. Evitar aproximar diez años como 3650 días; comparar fechas de calendario.

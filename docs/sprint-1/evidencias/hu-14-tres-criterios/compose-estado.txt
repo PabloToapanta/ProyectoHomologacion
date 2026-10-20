@@ -1,0 +1,6 @@
+NAME                                        IMAGE                                        COMMAND                  SERVICE                CREATED             STATUS                   PORTS
+hu14-tres-20261019-auth-db-1                mcr.microsoft.com/mssql/server:2022-latest   "/opt/mssql/bin/laun…"   auth-db                4 minutes ago       Up 4 minutes (healthy)   1433/tcp
+hu14-tres-20261019-auth-service-1           hu14-tres-20261019-auth-service              "dotnet Auth.Api.dll"    auth-service           4 minutes ago       Up 4 minutes             127.0.0.1:15841->8080/tcp
+hu14-tres-20261019-frontend-1               hu14-tres-20261019-frontend                  "/docker-entrypoint.…"   frontend               2 minutes ago       Up 2 minutes             80/tcp, 127.0.0.1:15843->8080/tcp
+hu14-tres-20261019-gateway-1                hu14-tres-20261019-gateway                   "dotnet Gateway.dll"     gateway                4 minutes ago       Up 4 minutes             127.0.0.1:15840->8080/tcp
+hu14-tres-20261019-homologacion-service-1   hu14-tres-20261019-homologacion-service      "dotnet Homologacion…"   homologacion-service   4 minutes ago       Up 4 minutes             8080/tcp
