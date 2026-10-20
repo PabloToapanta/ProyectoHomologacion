@@ -1,9 +1,9 @@
 name: catalogo-service
 on:
   push:
-    paths: ['src/catalogo-service/**', 'tests/Catalogo.Tests/**', '.github/workflows/catalogo-service.yml']
+    paths: ['src/catalogo-service/**', 'tests/Catalogo.Tests/**', 'tests/catalogo-service/**', '.github/workflows/catalogo-service.yml']
   pull_request:
-    paths: ['src/catalogo-service/**', 'tests/Catalogo.Tests/**', '.github/workflows/catalogo-service.yml']
+    paths: ['src/catalogo-service/**', 'tests/Catalogo.Tests/**', 'tests/catalogo-service/**', '.github/workflows/catalogo-service.yml']
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,6 +15,9 @@ jobs:
       - run: dotnet restore src/catalogo-service/Catalogo.sln
       - run: dotnet build src/catalogo-service/Catalogo.sln --no-restore -c Release
       - run: dotnet test src/catalogo-service/Catalogo.sln --no-restore --no-build -c Release --logger trx --results-directory TestResults
+      - name: Verificar carga de demostración HU-05 con transporte simulado
+        shell: pwsh
+        run: ./tests/catalogo-service/hu05-demo.tests.ps1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
