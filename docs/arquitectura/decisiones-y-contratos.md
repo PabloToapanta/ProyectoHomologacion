@@ -43,6 +43,20 @@ El equipo debe revisar y acordar estas rutas antes de implementar frontend y Gat
 
 ## Entidades esenciales
 
+### SC-01 — Catálogo receptor FISEI (20/10/2026)
+
+Leslie confirmó el acuerdo con Shirley para delimitar el catálogo a FISEI.
+POST/PUT de carreras conservan DTO, rutas y `facultad` obligatorio: solo FISEI,
+sin distinguir mayúsculas ni espacios externos, guardado como `FISEI`.
+Otro valor devuelve 400 con ProblemDetails; nombres duplicados siguen dando 409.
+La UI presenta la facultad fija. Registros históricos se consultan sin alterar sus
+datos ni relaciones; una facultad anterior diferente requiere revisión y corrección
+explícita antes de editar desde la UI. No hay cambio de esquema ni migración masiva.
+Una lectura histórica no implica que su facultad esté permitida para nuevas escrituras.
+Las carreras de origen externas a la UTA corresponden a otras universidades del
+Ecuador y requieren un contrato separado: este ajuste no añade endpoints de
+procedencia ni modifica HU-16. Ver `propuesta-alcance-fisei.md`.
+
 **Catálogo:** Carrera, Malla, Asignatura, UnidadCurricular, Contenido. Campos académicos del documento de planificación: carrera y facultad; nivel; créditos; horas; unidad; tema; resultado de aprendizaje; versión de malla si aplica.
 
 **Autenticación:** Usuario y Rol (Administrador, Docente, Coordinador).

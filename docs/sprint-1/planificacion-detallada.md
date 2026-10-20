@@ -57,6 +57,11 @@ Las 45 h son estimaciones de trabajo de desarrollo del documento y no incluyen d
 
 ## Dependencias
 
+SC-01, 20/10/2026: Leslie confirma acuerdo con Shirley para fijar el catálogo
+receptor a FISEI. Ajuste de T4/T5 con regresión HU-05: política de dominio,
+facultad fija en UI y conservación de datos anteriores. No altera las estimaciones
+originales ni adelanta el contrato de procedencia o las reglas de Edwin.
+
 - Antes de desarrollo paralelo: definir contratos entre Gateway, Auth, Catálogo y Homologación.
 - HU-01: T1 → T2 y T3 → integración con rutas protegidas.
 - HU-04: T4 → T5.

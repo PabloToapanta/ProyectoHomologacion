@@ -14,7 +14,7 @@ El código fue aprobado por Pablo e integrado mediante PR #20. La revisión de c
 
 | Paso | Acción | Resultado esperado | Resultado de Shirley |
 |---|---|---|---|
-| 1 | En Carreras, registrar Software en una facultad de demostración diferente de las ya existentes | Carrera visible en la lista | Pendiente |
+| 1 | En Carreras, registrar una carrera de demostración con nombre único (o seleccionar Software FISEI para T8); comprobar facultad FISEI fija | Carrera visible en la lista, sin escribir facultad | Pendiente |
 | 2 | Abrir Asignaturas, seleccionar esa carrera y registrar una asignatura con nivel 2, 3 créditos y 144 horas | Registro confirmado y visible en la carrera seleccionada | Pendiente |
 | 3 | Registrar Álgebra Lineal con código DEMO-ALG-LIN-001, nivel 1, 3 créditos y 144 horas | Registro confirmado; aparece antes del nivel 2 | Pendiente |
 | 4 | Intentar registrar otra asignatura con créditos 0 y luego -1 | Mensaje de validación, sin crear registro | Pendiente |
@@ -24,6 +24,11 @@ El código fue aprobado por Pablo e integrado mediante PR #20. La revisión de c
 | 8 | Cerrar sesión e intentar acceder directamente a /admin/carreras | Redirección al inicio de sesión | Pendiente |
 
 ## Decisión
+
+SC-01: Leslie confirmó acuerdo de alcance con Shirley el 20/10/2026. La aceptación
+funcional del código sigue pendiente. Al editar, FISEI permanece fija. Solicitudes
+API con otra facultad deben devolver 400 y conservar los datos. Registros anteriores
+con otra facultad se mantienen visibles para revisión y no se convierten automáticamente.
 
 - [ ] Registrar asignatura con nivel, horas y créditos positivos vinculada a una carrera: aceptado.
 - [ ] Rechazar horas o créditos menores o iguales a cero: aceptado.
