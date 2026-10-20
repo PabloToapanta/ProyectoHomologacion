@@ -84,7 +84,8 @@ public class CatalogoApiTests
         using (var scope = factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<CatalogoDbContext>();
-            await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO Asignaturas (Id, CarreraId) VALUES ({Guid.NewGuid()}, {carrera.Id})");
+            db.Asignaturas.Add(new Asignatura(carrera.Id, "DEMO-REL", "Referencia sintética HU-04", 1, 1, 1));
+            await db.SaveChangesAsync();
         }
         var result = await client.DeleteAsync($"/api/carreras/{carrera.Id}");
         Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
@@ -104,7 +105,9 @@ public class CatalogoApiTests
         db.Carreras.Add(new Carrera(" carrera sintética ", "fisei", true));
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
         db.ChangeTracker.Clear();
-        await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO Asignaturas (Id, CarreraId) VALUES ({Guid.NewGuid()}, {carrera.Id})");
+        db.Asignaturas.Add(new Asignatura(carrera.Id, "DEMO-REL", "Referencia sintética HU-04", 1, 1, 1));
+        await db.SaveChangesAsync();
+        db.ChangeTracker.Clear();
         var entity = await db.Carreras.SingleAsync();
         db.Carreras.Remove(entity);
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());

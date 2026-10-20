@@ -73,3 +73,128 @@ GO
 
 COMMIT;
 GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    IF EXISTS (SELECT 1 FROM [Asignaturas])
+        THROW 51000, 'HU-05: existen referencias de asignaturas sin datos academicos. Acordar una migracion de datos antes de continuar; no se eliminaron registros.', 1;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    DROP INDEX [IX_Asignaturas_CarreraId] ON [Asignaturas];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    ALTER TABLE [Asignaturas] ADD [Codigo] nvarchar(50) NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    ALTER TABLE [Asignaturas] ADD [CodigoNormalizado] nvarchar(50) COLLATE Latin1_General_100_BIN2 NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    ALTER TABLE [Asignaturas] ADD [Creditos] decimal(9,2) NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    ALTER TABLE [Asignaturas] ADD [Horas] int NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    ALTER TABLE [Asignaturas] ADD [Nivel] int NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    ALTER TABLE [Asignaturas] ADD [Nombre] nvarchar(200) NOT NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Asignaturas_CarreraId_CodigoNormalizado] ON [Asignaturas] ([CarreraId], [CodigoNormalizado]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    EXEC(N'ALTER TABLE [Asignaturas] ADD CONSTRAINT [CK_Asignaturas_CreditosPositivos] CHECK ([Creditos] > 0)');
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    EXEC(N'ALTER TABLE [Asignaturas] ADD CONSTRAINT [CK_Asignaturas_HorasPositivas] CHECK ([Horas] > 0)');
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    EXEC(N'ALTER TABLE [Asignaturas] ADD CONSTRAINT [CK_Asignaturas_NivelPositivo] CHECK ([Nivel] > 0)');
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261020000355_AmpliarAsignaturasHu05'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261020000355_AmpliarAsignaturasHu05', N'8.0.30');
+END;
+GO
+
+COMMIT;
+GO
