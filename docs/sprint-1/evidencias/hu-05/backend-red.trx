@@ -1,0 +1,554 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="83f54add-29c9-4b1a-9a18-42cbe526183c" name="ASUS@DESKTOP-MV69426 2026-10-19 19:01:08" runUser="DESKTOP-MV69426\ASUS" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-19T19:01:08.6232137-05:00" queuing="2026-10-19T19:01:08.6232141-05:00" start="2026-10-19T19:01:07.1072407-05:00" finish="2026-10-19T19:01:10.9567865-05:00" />
+  <TestSettings name="default" id="1f2c0c72-b6b1-4176-861c-d27d31d4504d">
+    <Deployment runDeploymentRoot="ASUS_DESKTOP-MV69426_2026-10-19_19_01_08" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="af5bcd54-ffa9-4151-8a6a-70244ba34495" testId="5c302bfb-ce92-d2d8-e6ee-35ea7d390100" testName="Catalogo.Tests.AsignaturaServiceTests.Rechaza_codigo_repetido_en_carrera" computerName="DESKTOP-MV69426" duration="00:00:00.0012666" startTime="2026-10-19T19:01:08.5618553-05:00" endTime="2026-10-19T19:01:08.5618557-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="af5bcd54-ffa9-4151-8a6a-70244ba34495">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Application.AsignaturaService.CrearAsync(AsignaturaInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Asignaturas.cs:line 21&#xD;
+   at Catalogo.Tests.AsignaturaServiceTests.Rechaza_codigo_repetido_en_carrera() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs:line 37&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="eda32b22-86fc-432c-992a-295ea823c10b" testId="77296826-e987-432a-1fc4-e2dde70e1249" testName="Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: &quot; &quot;, nombre: &quot;N&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0006246" startTime="2026-10-19T19:01:08.5612979-05:00" endTime="2026-10-19T19:01:08.5612980-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eda32b22-86fc-432c-992a-295ea823c10b">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(String codigo, String nombre) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 39&#xD;
+   at InvokeStub_AsignaturaTests.Rechaza_campos_vacios(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass2_0.&lt;Rechaza_campos_vacios&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 39</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="44dd39f8-fd76-4419-b45f-3790540f8f6f" testId="a5d518e3-5bfa-2d30-3a13-b88f58a48af9" testName="Catalogo.Tests.AsignaturaServiceTests.Carrera_sin_asignaturas_y_asignatura_inexistente" computerName="DESKTOP-MV69426" duration="00:00:00.0012573" startTime="2026-10-19T19:01:08.5597878-05:00" endTime="2026-10-19T19:01:08.5597883-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="44dd39f8-fd76-4419-b45f-3790540f8f6f">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Application.AsignaturaService.ListarAsync(Guid carreraId, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Asignaturas.cs:line 23&#xD;
+   at Catalogo.Tests.AsignaturaServiceTests.Carrera_sin_asignaturas_y_asignatura_inexistente() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs:line 48&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d73e5183-3e0b-4191-b104-89104452f7b4" testId="0c595f7f-2a84-71fe-2889-80b191fd9c0e" testName="Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: &quot;C&quot;, nombre: null)" computerName="DESKTOP-MV69426" duration="00:00:00.0003505" startTime="2026-10-19T19:01:08.5632515-05:00" endTime="2026-10-19T19:01:08.5632517-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d73e5183-3e0b-4191-b104-89104452f7b4">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(String codigo, String nombre) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 39&#xD;
+   at InvokeStub_AsignaturaTests.Rechaza_campos_vacios(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass2_0.&lt;Rechaza_campos_vacios&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 39</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="27204bed-0958-4680-aa26-2c181a243321" testId="504ed02e-13c3-359f-e119-37391ac87053" testName="Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente" computerName="DESKTOP-MV69426" duration="00:00:00.0312341" startTime="2026-10-19T19:01:08.4635657-05:00" endTime="2026-10-19T19:01:08.4635913-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="27204bed-0958-4680-aa26-2c181a243321" />
+    <UnitTestResult executionId="52e84b2b-1cf4-4ab8-8efb-0665e9961858" testId="10637d78-4d9f-a8ce-2f3e-5298e99462b6" testName="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: -1, horas: 144)" computerName="DESKTOP-MV69426" duration="00:00:00.0176321" startTime="2026-10-19T19:01:08.4835357-05:00" endTime="2026-10-19T19:01:08.4835363-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="52e84b2b-1cf4-4ab8-8efb-0665e9961858">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9918d9c1-f1ef-41f0-ba6c-09c441d96073" testId="43380a50-8429-ab9e-e98d-5fed99268fa2" testName="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 0, creditos: 3, horas: 144)" computerName="DESKTOP-MV69426" duration="00:00:00.0002061" startTime="2026-10-19T19:01:08.4938408-05:00" endTime="2026-10-19T19:01:08.4938413-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9918d9c1-f1ef-41f0-ba6c-09c441d96073">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31&#xD;
+   at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3e0e330c-f934-4400-acad-ecd1e7151d44" testId="9624d7ac-b2b9-05a2-bc09-4d7496feb978" testName="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 3, horas: 0)" computerName="DESKTOP-MV69426" duration="00:00:00.0001992" startTime="2026-10-19T19:01:08.4951911-05:00" endTime="2026-10-19T19:01:08.4951914-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e0e330c-f934-4400-acad-ecd1e7151d44">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31&#xD;
+   at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="26e602fa-aad8-4bbb-af09-67b28256bea1" testId="2e07d8f6-01e4-44a5-2790-d96bdfca8d91" testName="Catalogo.Tests.AsignaturaServiceTests.Carrera_inexistente_no_registra_y_listado_devuelve_404" computerName="DESKTOP-MV69426" duration="00:00:00.0182561" startTime="2026-10-19T19:01:08.4922128-05:00" endTime="2026-10-19T19:01:08.4922134-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="26e602fa-aad8-4bbb-af09-67b28256bea1">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaServiceTests.Carrera_inexistente_no_registra_y_listado_devuelve_404() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs:line 27&#xD;
+--- End of stack trace from previous location ---&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Application.AsignaturaService.CrearAsync(AsignaturaInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Asignaturas.cs:line 21&#xD;
+   at Catalogo.Tests.AsignaturaServiceTests.&lt;&gt;c__DisplayClass1_0.&lt;Carrera_inexistente_no_registra_y_listado_devuelve_404&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs:line 27</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="319a05d1-49f9-474e-b987-e6057b9d6692" testId="0b89b8b4-414e-643d-3b7b-a70a274d967e" testName="Catalogo.Tests.AsignaturaTests.Rechaza_carrera_vacia_y_valores_no_representables" computerName="DESKTOP-MV69426" duration="00:00:00.0009301" startTime="2026-10-19T19:01:08.5651678-05:00" endTime="2026-10-19T19:01:08.5651679-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="319a05d1-49f9-474e-b987-e6057b9d6692">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_carrera_vacia_y_valores_no_representables() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 44&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c.&lt;Rechaza_carrera_vacia_y_valores_no_representables&gt;b__3_0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 44</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c6987279-a4e8-4067-b360-4f68f9ac3f57" testId="85d0b683-93d3-c152-4cda-66de1559f5df" testName="Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: null, nombre: &quot;N&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0005134" startTime="2026-10-19T19:01:08.5606936-05:00" endTime="2026-10-19T19:01:08.5606937-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c6987279-a4e8-4067-b360-4f68f9ac3f57">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(String codigo, String nombre) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 39&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass2_0.&lt;Rechaza_campos_vacios&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 39</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a87809cd-a25f-405b-9525-fae8f255b263" testId="f88e656e-0210-db0e-6df3-f4002e5a3f51" testName="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 0, horas: 144)" computerName="DESKTOP-MV69426" duration="00:00:00.0002472" startTime="2026-10-19T19:01:08.4904718-05:00" endTime="2026-10-19T19:01:08.4904722-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a87809cd-a25f-405b-9525-fae8f255b263">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31&#xD;
+   at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="827eebae-7bb3-4c37-970a-1848419335d6" testId="9406d651-fd7a-2aae-008c-4df52e3db157" testName="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: -1, creditos: 3, horas: 144)" computerName="DESKTOP-MV69426" duration="00:00:00.0001820" startTime="2026-10-19T19:01:08.5589930-05:00" endTime="2026-10-19T19:01:08.5589933-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="827eebae-7bb3-4c37-970a-1848419335d6">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31&#xD;
+   at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="94f277bb-85ff-4d78-99d9-a4a19e9827ed" testId="e69a7b01-8786-6d66-e0b8-d26f164315c7" testName="Catalogo.Tests.CatalogoApiTests.Asignatura_relacionada_impide_eliminar_y_conserva_carrera" computerName="DESKTOP-MV69426" duration="00:00:02.4159041" startTime="2026-10-19T19:01:10.8503375-05:00" endTime="2026-10-19T19:01:10.8503380-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="94f277bb-85ff-4d78-99d9-a4a19e9827ed" />
+    <UnitTestResult executionId="ee8edff9-f6ef-4344-95af-72a50cc3cc22" testId="e5da9315-a2d6-7707-78b8-541f59be4f20" testName="Catalogo.Tests.AsignaturaTests.Registra_datos_positivos_con_identidad_y_normaliza_textos" computerName="DESKTOP-MV69426" duration="00:00:00.0005829" startTime="2026-10-19T19:01:08.5677720-05:00" endTime="2026-10-19T19:01:08.5677722-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ee8edff9-f6ef-4344-95af-72a50cc3cc22">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.Registra_datos_positivos_con_identidad_y_normaliza_textos() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 12&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="20739a8d-7e9f-4086-b986-032d734e24f6" testId="99545611-9836-8291-39d9-fb08433983b9" testName="Catalogo.Tests.AsignaturaServiceTests.Crea_consulta_y_ordena_por_nivel_y_codigo" computerName="DESKTOP-MV69426" duration="00:00:00.0017956" startTime="2026-10-19T19:01:08.5646030-05:00" endTime="2026-10-19T19:01:08.5646032-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="20739a8d-7e9f-4086-b986-032d734e24f6">
+      <Output>
+        <ErrorInfo>
+          <Message>System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Application.AsignaturaService.CrearAsync(AsignaturaInput input, CancellationToken ct) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Asignaturas.cs:line 21&#xD;
+   at Catalogo.Tests.AsignaturaServiceTests.Crea_consulta_y_ordena_por_nivel_y_codigo() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs:line 14&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="77fedfad-a082-4bb6-ae00-134e87f3499a" testId="5c2893a8-68ff-2c99-740c-307b1bbb78b6" testName="Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: &quot;C&quot;, nombre: &quot; &quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0003156" startTime="2026-10-19T19:01:08.5642040-05:00" endTime="2026-10-19T19:01:08.5642042-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="77fedfad-a082-4bb6-ae00-134e87f3499a">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(String codigo, String nombre) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 39&#xD;
+   at InvokeStub_AsignaturaTests.Rechaza_campos_vacios(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass2_0.&lt;Rechaza_campos_vacios&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 39</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="afd4a821-a43d-4d36-a7e4-fee3a01cdc1a" testId="6b700bd6-d815-7f20-c275-daade6ce57bd" testName="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 3, horas: -1)" computerName="DESKTOP-MV69426" duration="00:00:00.0009368" startTime="2026-10-19T19:01:08.4855783-05:00" endTime="2026-10-19T19:01:08.4855787-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="afd4a821-a43d-4d36-a7e4-fee3a01cdc1a">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Throws() Failure: Exception type was not an exact match&#xD;
+Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+Actual:   typeof(System.NotImplementedException)&#xD;
+---- System.NotImplementedException : The method or operation is not implemented.</Message>
+          <StackTrace>   at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31&#xD;
+   at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+----- Inner Stack Trace -----&#xD;
+   at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs:line 14&#xD;
+   at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0() in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs:line 31</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: &quot;C&quot;, nombre: &quot; &quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="5c2893a8-68ff-2c99-740c-307b1bbb78b6">
+      <Execution id="77fedfad-a082-4bb6-ae00-134e87f3499a" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_campos_vacios" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 0, horas: 144)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="f88e656e-0210-db0e-6df3-f4002e5a3f51">
+      <Execution id="a87809cd-a25f-405b-9525-fae8f255b263" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_nivel_creditos_u_horas_no_positivos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaServiceTests.Rechaza_codigo_repetido_en_carrera" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="5c302bfb-ce92-d2d8-e6ee-35ea7d390100">
+      <Execution id="af5bcd54-ffa9-4151-8a6a-70244ba34495" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaServiceTests" name="Rechaza_codigo_repetido_en_carrera" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_carrera_vacia_y_valores_no_representables" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="0b89b8b4-414e-643d-3b7b-a70a274d967e">
+      <Execution id="319a05d1-49f9-474e-b987-e6057b9d6692" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_carrera_vacia_y_valores_no_representables" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 0, creditos: 3, horas: 144)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="43380a50-8429-ab9e-e98d-5fed99268fa2">
+      <Execution id="9918d9c1-f1ef-41f0-ba6c-09c441d96073" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_nivel_creditos_u_horas_no_positivos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: -1, horas: 144)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="10637d78-4d9f-a8ce-2f3e-5298e99462b6">
+      <Execution id="52e84b2b-1cf4-4ab8-8efb-0665e9961858" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_nivel_creditos_u_horas_no_positivos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Asignatura_relacionada_impide_eliminar_y_conserva_carrera" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="e69a7b01-8786-6d66-e0b8-d26f164315c7">
+      <Execution id="94f277bb-85ff-4d78-99d9-a4a19e9827ed" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Asignatura_relacionada_impide_eliminar_y_conserva_carrera" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaServiceTests.Carrera_inexistente_no_registra_y_listado_devuelve_404" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="2e07d8f6-01e4-44a5-2790-d96bdfca8d91">
+      <Execution id="26e602fa-aad8-4bbb-af09-67b28256bea1" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaServiceTests" name="Carrera_inexistente_no_registra_y_listado_devuelve_404" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaServiceTests.Carrera_sin_asignaturas_y_asignatura_inexistente" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a5d518e3-5bfa-2d30-3a13-b88f58a48af9">
+      <Execution id="44dd39f8-fd76-4419-b45f-3790540f8f6f" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaServiceTests" name="Carrera_sin_asignaturas_y_asignatura_inexistente" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Registra_datos_positivos_con_identidad_y_normaliza_textos" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="e5da9315-a2d6-7707-78b8-541f59be4f20">
+      <Execution id="ee8edff9-f6ef-4344-95af-72a50cc3cc22" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Registra_datos_positivos_con_identidad_y_normaliza_textos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: null, nombre: &quot;N&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="85d0b683-93d3-c152-4cda-66de1559f5df">
+      <Execution id="c6987279-a4e8-4067-b360-4f68f9ac3f57" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_campos_vacios" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 3, horas: 0)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="9624d7ac-b2b9-05a2-bc09-4d7496feb978">
+      <Execution id="3e0e330c-f934-4400-acad-ecd1e7151d44" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_nivel_creditos_u_horas_no_positivos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: &quot;C&quot;, nombre: null)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="0c595f7f-2a84-71fe-2889-80b191fd9c0e">
+      <Execution id="d73e5183-3e0b-4191-b104-89104452f7b4" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_campos_vacios" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: -1, creditos: 3, horas: 144)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="9406d651-fd7a-2aae-008c-4df52e3db157">
+      <Execution id="827eebae-7bb3-4c37-970a-1848419335d6" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_nivel_creditos_u_horas_no_positivos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 3, horas: -1)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="6b700bd6-d815-7f20-c275-daade6ce57bd">
+      <Execution id="afd4a821-a43d-4d36-a7e4-fee3a01cdc1a" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_nivel_creditos_u_horas_no_positivos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: &quot; &quot;, nombre: &quot;N&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="77296826-e987-432a-1fc4-e2dde70e1249">
+      <Execution id="eda32b22-86fc-432c-992a-295ea823c10b" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaTests" name="Rechaza_campos_vacios" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="504ed02e-13c3-359f-e119-37391ac87053">
+      <Execution id="27204bed-0958-4680-aa26-2c181a243321" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Impide_eliminar_con_asignaturas_incluso_no_vigente" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.AsignaturaServiceTests.Crea_consulta_y_ordena_por_nivel_y_codigo" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="99545611-9836-8291-39d9-fb08433983b9">
+      <Execution id="20739a8d-7e9f-4086-b986-032d734e24f6" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.AsignaturaServiceTests" name="Crea_consulta_y_ordena_por_nivel_y_codigo" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="5c302bfb-ce92-d2d8-e6ee-35ea7d390100" executionId="af5bcd54-ffa9-4151-8a6a-70244ba34495" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="77296826-e987-432a-1fc4-e2dde70e1249" executionId="eda32b22-86fc-432c-992a-295ea823c10b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a5d518e3-5bfa-2d30-3a13-b88f58a48af9" executionId="44dd39f8-fd76-4419-b45f-3790540f8f6f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0c595f7f-2a84-71fe-2889-80b191fd9c0e" executionId="d73e5183-3e0b-4191-b104-89104452f7b4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="504ed02e-13c3-359f-e119-37391ac87053" executionId="27204bed-0958-4680-aa26-2c181a243321" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10637d78-4d9f-a8ce-2f3e-5298e99462b6" executionId="52e84b2b-1cf4-4ab8-8efb-0665e9961858" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="43380a50-8429-ab9e-e98d-5fed99268fa2" executionId="9918d9c1-f1ef-41f0-ba6c-09c441d96073" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9624d7ac-b2b9-05a2-bc09-4d7496feb978" executionId="3e0e330c-f934-4400-acad-ecd1e7151d44" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2e07d8f6-01e4-44a5-2790-d96bdfca8d91" executionId="26e602fa-aad8-4bbb-af09-67b28256bea1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0b89b8b4-414e-643d-3b7b-a70a274d967e" executionId="319a05d1-49f9-474e-b987-e6057b9d6692" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="85d0b683-93d3-c152-4cda-66de1559f5df" executionId="c6987279-a4e8-4067-b360-4f68f9ac3f57" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f88e656e-0210-db0e-6df3-f4002e5a3f51" executionId="a87809cd-a25f-405b-9525-fae8f255b263" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9406d651-fd7a-2aae-008c-4df52e3db157" executionId="827eebae-7bb3-4c37-970a-1848419335d6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e69a7b01-8786-6d66-e0b8-d26f164315c7" executionId="94f277bb-85ff-4d78-99d9-a4a19e9827ed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e5da9315-a2d6-7707-78b8-541f59be4f20" executionId="ee8edff9-f6ef-4344-95af-72a50cc3cc22" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="99545611-9836-8291-39d9-fb08433983b9" executionId="20739a8d-7e9f-4086-b986-032d734e24f6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5c2893a8-68ff-2c99-740c-307b1bbb78b6" executionId="77fedfad-a082-4bb6-ae00-134e87f3499a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6b700bd6-d815-7f20-c275-daade6ce57bd" executionId="afd4a821-a43d-4d36-a7e4-fee3a01cdc1a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados sin formato de lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos los resultados cargados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="18" executed="18" passed="2" failed="16" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 8.0.30)&#xD;
+[xUnit.net 00:00:00.22]   Discovering: Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.32]   Discovered:  Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.32]   Starting:    Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.43]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.43]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.43]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.43]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.43]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.43]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.43]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.43]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.43]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.43]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.43]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.43]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.43]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.43]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.43]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.43]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.43]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.43]            at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.43]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.43]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.43]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.43]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.44]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.44]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.44]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.44]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.44]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.44]            at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.44]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.44]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.44]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.44]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.44]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.44]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.44]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs(27,0): at Catalogo.Tests.AsignaturaServiceTests.Carrera_inexistente_no_registra_y_listado_devuelve_404()&#xD;
+[xUnit.net 00:00:00.44]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.44]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Asignaturas.cs(21,0): at Catalogo.Application.AsignaturaService.CrearAsync(AsignaturaInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs(27,0): at Catalogo.Tests.AsignaturaServiceTests.&lt;&gt;c__DisplayClass1_0.&lt;Carrera_inexistente_no_registra_y_listado_devuelve_404&gt;b__0()&#xD;
+[xUnit.net 00:00:00.44]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.44]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.44]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.44]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.44]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.44]            at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.44]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.44]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.44]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.44]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.44]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.44]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.44]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.44]            at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.44]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.44]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.44]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.51]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.51]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.51]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.51]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.51]            at InvokeStub_AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.51]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.51]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(31,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass1_0.&lt;Rechaza_nivel_creditos_u_horas_no_positivos&gt;b__0()&#xD;
+[xUnit.net 00:00:00.51]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Asignaturas.cs(23,0): at Catalogo.Application.AsignaturaService.ListarAsync(Guid carreraId, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs(48,0): at Catalogo.Tests.AsignaturaServiceTests.Carrera_sin_asignaturas_y_asignatura_inexistente()&#xD;
+[xUnit.net 00:00:00.51]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.51]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.51]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.51]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.51]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(39,0): at Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(String codigo, String nombre)&#xD;
+[xUnit.net 00:00:00.51]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.51]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.51]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(39,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass2_0.&lt;Rechaza_campos_vacios&gt;b__0()&#xD;
+[xUnit.net 00:00:00.51]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.51]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.51]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.51]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(39,0): at Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(String codigo, String nombre)&#xD;
+[xUnit.net 00:00:00.51]            at InvokeStub_AsignaturaTests.Rechaza_campos_vacios(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.51]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.51]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(39,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass2_0.&lt;Rechaza_campos_vacios&gt;b__0()&#xD;
+[xUnit.net 00:00:00.51]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Asignaturas.cs(21,0): at Catalogo.Application.AsignaturaService.CrearAsync(AsignaturaInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs(37,0): at Catalogo.Tests.AsignaturaServiceTests.Rechaza_codigo_repetido_en_carrera()&#xD;
+[xUnit.net 00:00:00.51]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.51]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.51]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.51]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.51]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(39,0): at Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(String codigo, String nombre)&#xD;
+[xUnit.net 00:00:00.51]            at InvokeStub_AsignaturaTests.Rechaza_campos_vacios(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.51]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.51]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(39,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass2_0.&lt;Rechaza_campos_vacios&gt;b__0()&#xD;
+[xUnit.net 00:00:00.51]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.51]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.51]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.51]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(39,0): at Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(String codigo, String nombre)&#xD;
+[xUnit.net 00:00:00.51]            at InvokeStub_AsignaturaTests.Rechaza_campos_vacios(Object, Span`1)&#xD;
+[xUnit.net 00:00:00.51]            at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+[xUnit.net 00:00:00.51]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(39,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c__DisplayClass2_0.&lt;Rechaza_campos_vacios&gt;b__0()&#xD;
+[xUnit.net 00:00:00.51]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Application\Asignaturas.cs(21,0): at Catalogo.Application.AsignaturaService.CrearAsync(AsignaturaInput input, CancellationToken ct)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaServiceTests.cs(14,0): at Catalogo.Tests.AsignaturaServiceTests.Crea_consulta_y_ordena_por_nivel_y_codigo()&#xD;
+[xUnit.net 00:00:00.51]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:00.51]       Assert.Throws() Failure: Exception type was not an exact match&#xD;
+[xUnit.net 00:00:00.51]       Expected: typeof(Catalogo.Domain.CatalogoException)&#xD;
+[xUnit.net 00:00:00.51]       Actual:   typeof(System.NotImplementedException)&#xD;
+[xUnit.net 00:00:00.51]       ---- System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.51]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(44,0): at Catalogo.Tests.AsignaturaTests.Rechaza_carrera_vacia_y_valores_no_representables()&#xD;
+[xUnit.net 00:00:00.51]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.51]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.51]         ----- Inner Stack Trace -----&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.51]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(44,0): at Catalogo.Tests.AsignaturaTests.&lt;&gt;c.&lt;Rechaza_carrera_vacia_y_valores_no_representables&gt;b__3_0()&#xD;
+[xUnit.net 00:00:00.52]       System.NotImplementedException : The method or operation is not implemented.&#xD;
+[xUnit.net 00:00:00.52]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.52]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\src\catalogo-service\Catalogo.Domain\Asignatura.cs(14,0): at Catalogo.Domain.Asignatura..ctor(Guid carreraId, String codigo, String nombre, Int32 nivel, Decimal creditos, Int32 horas)&#xD;
+[xUnit.net 00:00:00.52]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\AsignaturaTests.cs(12,0): at Catalogo.Tests.AsignaturaTests.Registra_datos_positivos_con_identidad_y_normaliza_textos()&#xD;
+[xUnit.net 00:00:00.52]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.52]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:02.81]   Finished:    Catalogo.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.4783815-05:00">
+        <Text>[xUnit.net 00:00:00.43]     Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: -1, horas: 144) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.4847696-05:00">
+        <Text>[xUnit.net 00:00:00.43]     Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 3, horas: -1) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.4870985-05:00">
+        <Text>[xUnit.net 00:00:00.43]     Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 0, horas: 144) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.4912638-05:00">
+        <Text>[xUnit.net 00:00:00.44]     Catalogo.Tests.AsignaturaServiceTests.Carrera_inexistente_no_registra_y_listado_devuelve_404 [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.4931177-05:00">
+        <Text>[xUnit.net 00:00:00.44]     Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 0, creditos: 3, horas: 144) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.4946915-05:00">
+        <Text>[xUnit.net 00:00:00.44]     Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: 1, creditos: 3, horas: 0) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6418686-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaTests.Rechaza_nivel_creditos_u_horas_no_positivos(nivel: -1, creditos: 3, horas: 144) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6420292-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaServiceTests.Carrera_sin_asignaturas_y_asignatura_inexistente [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6421989-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: null, nombre: "N") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6423647-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: " ", nombre: "N") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6424700-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaServiceTests.Rechaza_codigo_repetido_en_carrera [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6427780-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: "C", nombre: null) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6429259-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaTests.Rechaza_campos_vacios(codigo: "C", nombre: " ") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6430101-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaServiceTests.Crea_consulta_y_ordena_por_nivel_y_codigo [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6430969-05:00">
+        <Text>[xUnit.net 00:00:00.51]     Catalogo.Tests.AsignaturaTests.Rechaza_carrera_vacia_y_valores_no_representables [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T19:01:08.6504566-05:00">
+        <Text>[xUnit.net 00:00:00.52]     Catalogo.Tests.AsignaturaTests.Registra_datos_positivos_con_identidad_y_normaliza_textos [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>
