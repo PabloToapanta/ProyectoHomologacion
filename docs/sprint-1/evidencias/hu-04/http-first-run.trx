@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="6cfd2477-f7be-4622-bf32-6cf173c093e1" name="ASUS@DESKTOP-MV69426 2026-10-19 14:27:54" runUser="DESKTOP-MV69426\ASUS" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-19T14:27:54.5433323-05:00" queuing="2026-10-19T14:27:54.5433325-05:00" start="2026-10-19T14:27:53.3938407-05:00" finish="2026-10-19T14:27:58.3392195-05:00" />
+  <TestSettings name="default" id="4be1a205-9e55-483e-b8da-bffef2c95c01">
+    <Deployment runDeploymentRoot="ASUS_DESKTOP-MV69426_2026-10-19_14_27_54" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="068d3d59-c375-43a2-a55d-b675c21f9212" testId="a6707574-b0bd-cfd8-7553-acb0f9dbe984" testName="Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia" computerName="DESKTOP-MV69426" duration="00:00:00.0027194" startTime="2026-10-19T14:27:54.4374761-05:00" endTime="2026-10-19T14:27:54.4374762-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="068d3d59-c375-43a2-a55d-b675c21f9212" />
+    <UnitTestResult executionId="57b30b28-7820-4301-912b-8e5637ecf67c" testId="d881be25-13cd-f299-57da-a5df0181116f" testName="Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode" computerName="DESKTOP-MV69426" duration="00:00:00.0004535" startTime="2026-10-19T14:27:54.4373616-05:00" endTime="2026-10-19T14:27:54.4373617-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="57b30b28-7820-4301-912b-8e5637ecf67c" />
+    <UnitTestResult executionId="f6296de4-9df9-4239-a34f-d105c7c5092a" testId="ff30275d-71d0-62f5-e5a6-1ba73396ae36" testName="Catalogo.Tests.CarreraServiceTests.CRUD_completo" computerName="DESKTOP-MV69426" duration="00:00:00.0067306" startTime="2026-10-19T14:27:54.4861848-05:00" endTime="2026-10-19T14:27:54.4861848-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f6296de4-9df9-4239-a34f-d105c7c5092a" />
+    <UnitTestResult executionId="ec14b8af-7dae-480b-8c3c-a73a9a61ad01" testId="2cff0a61-9cae-65bb-3600-ad50aacd5f14" testName="Catalogo.Tests.CatalogoApiTests.Protege_todas_las_operaciones_y_rechaza_rol_docente" computerName="DESKTOP-MV69426" duration="00:00:00.1257716" startTime="2026-10-19T14:27:58.1853875-05:00" endTime="2026-10-19T14:27:58.1853882-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ec14b8af-7dae-480b-8c3c-a73a9a61ad01" />
+    <UnitTestResult executionId="61e9f2b8-8444-4165-93e5-83987e5ebaa4" testId="de1664e9-9e99-896b-8ed5-a08c168061ba" testName="Catalogo.Tests.CatalogoApiTests.Base_relacional_impone_indice_unico_y_FK_sin_cascada" computerName="DESKTOP-MV69426" duration="00:00:00.1871242" startTime="2026-10-19T14:27:58.0585981-05:00" endTime="2026-10-19T14:27:58.0585987-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="61e9f2b8-8444-4165-93e5-83987e5ebaa4" />
+    <UnitTestResult executionId="cd474f70-182e-4f07-bb47-092816dca4a1" testId="0a6f0e8f-2ac6-af38-af10-4398ae7e5029" testName="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{\&quot;nombre\&quot;:\&quot;N\&quot;,\&quot;facultad\&quot;:\&quot;F\&quot;,\&quot;vigencia\&quot;:&quot;···)" computerName="DESKTOP-MV69426" duration="00:00:00.0345603" startTime="2026-10-19T14:27:56.4160581-05:00" endTime="2026-10-19T14:27:56.4160583-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cd474f70-182e-4f07-bb47-092816dca4a1">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "application/json"&#xD;
+Not found: "problem+json"</Message>
+          <StackTrace>   at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs:line 72&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a37b3681-b148-4081-83db-9713daa755fd" testId="49d8c3b3-c802-fc75-153b-96c3ace215fe" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: &quot;\t&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0082826" startTime="2026-10-19T14:27:54.4330190-05:00" endTime="2026-10-19T14:27:54.4330418-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a37b3681-b148-4081-83db-9713daa755fd" />
+    <UnitTestResult executionId="5cfeb92e-2610-42fc-85ac-6659931d63a7" testId="84ee4445-9d60-73df-cde6-cc10a7ffc662" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: null)" computerName="DESKTOP-MV69426" duration="00:00:00.0001188" startTime="2026-10-19T14:27:54.4371907-05:00" endTime="2026-10-19T14:27:54.4371908-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5cfeb92e-2610-42fc-85ac-6659931d63a7" />
+    <UnitTestResult executionId="95e7aa12-6888-4ea9-b833-4502cb173eda" testId="504ed02e-13c3-359f-e119-37391ac87053" testName="Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente" computerName="DESKTOP-MV69426" duration="00:00:00.0012990" startTime="2026-10-19T14:27:54.4862979-05:00" endTime="2026-10-19T14:27:54.4862980-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="95e7aa12-6888-4ea9-b833-4502cb173eda" />
+    <UnitTestResult executionId="9bb5ad82-b55f-4d2a-9977-e605456bb5df" testId="445068b1-c4d4-ca9c-b3a4-ebb311f874fc" testName="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;null&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0424094" startTime="2026-10-19T14:27:56.5135777-05:00" endTime="2026-10-19T14:27:56.5135779-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9bb5ad82-b55f-4d2a-9977-e605456bb5df">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "application/json"&#xD;
+Not found: "problem+json"</Message>
+          <StackTrace>   at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs:line 72&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="7c377f69-e823-4037-80c2-e198b8fbf98a" testId="f51f454b-6442-65d7-e5f2-bceeae7b2657" testName="Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" computerName="DESKTOP-MV69426" duration="00:00:00.0013591" startTime="2026-10-19T14:27:54.4855707-05:00" endTime="2026-10-19T14:27:54.4855707-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7c377f69-e823-4037-80c2-e198b8fbf98a" />
+    <UnitTestResult executionId="fd827e20-11c0-49f5-b59d-e078a1d1a597" testId="33d27cde-e4ac-77e6-3c17-ece39ec69856" testName="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{\&quot;nombre\&quot;:\&quot; \&quot;,\&quot;facultad\&quot;:\&quot;F\&quot;,\&quot;vigencia\&quot;:&quot;···)" computerName="DESKTOP-MV69426" duration="00:00:00.0524724" startTime="2026-10-19T14:27:56.4701919-05:00" endTime="2026-10-19T14:27:56.4701922-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fd827e20-11c0-49f5-b59d-e078a1d1a597">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "application/json"&#xD;
+Not found: "problem+json"</Message>
+          <StackTrace>   at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs:line 72&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="cd9540e8-10d5-4be4-a9d0-5c51ce48ee1c" testId="60539169-bef8-0838-fd08-8d462e4deafa" testName="Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas" computerName="DESKTOP-MV69426" duration="00:00:00.0005073" startTime="2026-10-19T14:27:54.4858991-05:00" endTime="2026-10-19T14:27:54.4858991-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cd9540e8-10d5-4be4-a9d0-5c51ce48ee1c" />
+    <UnitTestResult executionId="cb67a6ea-7596-4551-8ddf-8995f1c5cb14" testId="a4181f16-b7eb-9755-b1bc-8bf9ed7f7f01" testName="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{\&quot;nombre\&quot;:\&quot;N\&quot;,\&quot;facultad\&quot;:\&quot;F\&quot;,\&quot;vigencia\&quot;:&quot;···)" computerName="DESKTOP-MV69426" duration="00:00:00.0377971" startTime="2026-10-19T14:27:56.3806625-05:00" endTime="2026-10-19T14:27:56.3806628-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cb67a6ea-7596-4551-8ddf-8995f1c5cb14">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "application/json"&#xD;
+Not found: "problem+json"</Message>
+          <StackTrace>   at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs:line 72&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c768d4e5-b29e-4442-be00-9bb034614f88" testId="ee730ef7-d270-8221-50b4-ab7779b6b5ec" testName="Catalogo.Tests.CatalogoApiTests.CRUD_HTTP_y_location" computerName="DESKTOP-MV69426" duration="00:00:00.2016536" startTime="2026-10-19T14:27:57.7461683-05:00" endTime="2026-10-19T14:27:57.7461687-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c768d4e5-b29e-4442-be00-9bb034614f88" />
+    <UnitTestResult executionId="0633fc87-66b2-440d-b9bc-f4a1ab113559" testId="43fab6cb-f322-0f69-a05f-1252bc078773" testName="Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada" computerName="DESKTOP-MV69426" duration="00:00:00.0016407" startTime="2026-10-19T14:27:54.4862477-05:00" endTime="2026-10-19T14:27:54.4862478-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0633fc87-66b2-440d-b9bc-f4a1ab113559" />
+    <UnitTestResult executionId="94c2528a-63bf-47b5-9173-3724e5cec357" testId="65203c3a-a661-67be-822c-4f01d5cf386f" testName="Catalogo.Tests.CatalogoApiTests.Swagger_documenta_rutas_respuestas_y_Bearer" computerName="DESKTOP-MV69426" duration="00:00:01.6074238" startTime="2026-10-19T14:27:56.0311253-05:00" endTime="2026-10-19T14:27:56.0311258-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="94c2528a-63bf-47b5-9173-3724e5cec357" />
+    <UnitTestResult executionId="eb5143d1-e707-45ed-aec8-6b67dcc66bce" testId="a4678edd-fdea-4a2d-ddbf-8287b87a682d" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot; &quot;, facultad: &quot;FISEI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0000509" startTime="2026-10-19T14:27:54.4372619-05:00" endTime="2026-10-19T14:27:54.4372620-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eb5143d1-e707-45ed-aec8-6b67dcc66bce" />
+    <UnitTestResult executionId="b07c44f3-23f4-4c4a-8317-9de6c4585aa3" testId="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5" testName="Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad" computerName="DESKTOP-MV69426" duration="00:00:00.0039305" startTime="2026-10-19T14:27:54.4858450-05:00" endTime="2026-10-19T14:27:54.4858450-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b07c44f3-23f4-4c4a-8317-9de6c4585aa3" />
+    <UnitTestResult executionId="be017c01-9a1b-40e8-99fe-43750785cb25" testId="1ad91be6-365c-b2db-0fff-864b67210d4e" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: &quot;FISEI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0003876" startTime="2026-10-19T14:27:54.4368121-05:00" endTime="2026-10-19T14:27:54.4368122-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="be017c01-9a1b-40e8-99fe-43750785cb25" />
+    <UnitTestResult executionId="a0eb294f-69fb-4475-a989-57d6e816250d" testId="0d9c6d99-9988-a0db-3696-1169606eafba" testName="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{}&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.2065422" startTime="2026-10-19T14:27:56.2547590-05:00" endTime="2026-10-19T14:27:56.2547593-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a0eb294f-69fb-4475-a989-57d6e816250d">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "application/json"&#xD;
+Not found: "problem+json"</Message>
+          <StackTrace>   at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs:line 72&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d940cff3-bef4-40b3-8cf7-d107d62fa2e1" testId="e69a7b01-8786-6d66-e0b8-d26f164315c7" testName="Catalogo.Tests.CatalogoApiTests.Asignatura_relacionada_impide_eliminar_y_conserva_carrera" computerName="DESKTOP-MV69426" duration="00:00:01.0270216" startTime="2026-10-19T14:27:57.5410988-05:00" endTime="2026-10-19T14:27:57.5410994-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d940cff3-bef4-40b3-8cf7-d107d62fa2e1" />
+    <UnitTestResult executionId="e15d8757-5399-4763-b4e1-580a62a2a285" testId="ee5c3c96-24cc-7f24-ede3-059e726b8e82" testName="Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad" computerName="DESKTOP-MV69426" duration="00:00:00.0016331" startTime="2026-10-19T14:27:54.4860021-05:00" endTime="2026-10-19T14:27:54.4860021-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e15d8757-5399-4763-b4e1-580a62a2a285" />
+    <UnitTestResult executionId="eefc07c6-9c08-4187-99d6-0184490375f0" testId="d2e4d427-c16c-862c-3ca2-517df83fdba1" testName="Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" computerName="DESKTOP-MV69426" duration="00:00:00.0027003" startTime="2026-10-19T14:27:54.4861175-05:00" endTime="2026-10-19T14:27:54.4861177-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eefc07c6-9c08-4187-99d6-0184490375f0" />
+    <UnitTestResult executionId="6104fece-56a8-48c6-b570-4cb0a807bb81" testId="8631c993-463e-e2f1-daa4-7506d4722377" testName="Catalogo.Tests.CatalogoApiTests.Capas_de_negocio_no_dependen_de_HTTP_ni_EF" computerName="DESKTOP-MV69426" duration="00:00:00.0017833" startTime="2026-10-19T14:27:57.5429925-05:00" endTime="2026-10-19T14:27:57.5429929-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6104fece-56a8-48c6-b570-4cb0a807bb81" />
+    <UnitTestResult executionId="88364f31-ab43-45be-b57b-eb863c69c4f6" testId="5f1f0e85-041d-8e83-b98e-d8e83e7d8354" testName="Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste" computerName="DESKTOP-MV69426" duration="00:00:00.0138360" startTime="2026-10-19T14:27:54.4374263-05:00" endTime="2026-10-19T14:27:54.4374263-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="88364f31-ab43-45be-b57b-eb863c69c4f6" />
+    <UnitTestResult executionId="558e52c8-fa77-4e31-8a5f-75f3f35df7bd" testId="9f094bb3-22f8-d863-c173-c4e1d760e9cc" testName="Catalogo.Tests.CatalogoApiTests.Duplicado_en_creacion_y_edicion_devuelve_409_y_otra_facultad_permitida" computerName="DESKTOP-MV69426" duration="00:00:00.1233552" startTime="2026-10-19T14:27:57.8703232-05:00" endTime="2026-10-19T14:27:57.8703237-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="558e52c8-fa77-4e31-8a5f-75f3f35df7bd" />
+    <UnitTestResult executionId="1dc8f937-3694-4995-b937-af087d9ab8ba" testId="da18bd14-13fa-ae7d-0250-8638b7eab9ca" testName="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{\&quot;nombre\&quot;:\&quot;N\&quot;,\&quot;facultad\&quot;:\&quot;F\&quot;}&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0912997" startTime="2026-10-19T14:27:56.3424627-05:00" endTime="2026-10-19T14:27:56.3424630-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1dc8f937-3694-4995-b937-af087d9ab8ba">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Contains() Failure: Sub-string not found&#xD;
+String:    "application/json"&#xD;
+Not found: "problem+json"</Message>
+          <StackTrace>   at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json) in C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs:line 72&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{\&quot;nombre\&quot;:\&quot;N\&quot;,\&quot;facultad\&quot;:\&quot;F\&quot;,\&quot;vigencia\&quot;:&quot;···)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="0a6f0e8f-2ac6-af38-af10-4398ae7e5029">
+      <Execution id="cd474f70-182e-4f07-bb47-092816dca4a1" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Rechaza_JSON_invalido_o_campos_faltantes" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot; &quot;, facultad: &quot;FISEI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a4678edd-fdea-4a2d-ddbf-8287b87a682d">
+      <Execution id="eb5143d1-e707-45ed-aec8-6b67dcc66bce" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="5f1f0e85-041d-8e83-b98e-d8e83e7d8354">
+      <Execution id="88364f31-ab43-45be-b57b-eb863c69c4f6" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Validacion_no_persiste" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;null&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="445068b1-c4d4-ca9c-b3a4-ebb311f874fc">
+      <Execution id="9bb5ad82-b55f-4d2a-9977-e605456bb5df" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Rechaza_JSON_invalido_o_campos_faltantes" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="ee5c3c96-24cc-7f24-ede3-059e726b8e82">
+      <Execution id="e15d8757-5399-4763-b4e1-580a62a2a285" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Rechaza_duplicados_normalizados_en_misma_facultad" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{\&quot;nombre\&quot;:\&quot; \&quot;,\&quot;facultad\&quot;:\&quot;F\&quot;,\&quot;vigencia\&quot;:&quot;···)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="33d27cde-e4ac-77e6-3c17-ece39ec69856">
+      <Execution id="fd827e20-11c0-49f5-b59d-e078a1d1a597" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Rechaza_JSON_invalido_o_campos_faltantes" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Asignatura_relacionada_impide_eliminar_y_conserva_carrera" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="e69a7b01-8786-6d66-e0b8-d26f164315c7">
+      <Execution id="d940cff3-bef4-40b3-8cf7-d107d62fa2e1" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Asignatura_relacionada_impide_eliminar_y_conserva_carrera" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{\&quot;nombre\&quot;:\&quot;N\&quot;,\&quot;facultad\&quot;:\&quot;F\&quot;,\&quot;vigencia\&quot;:&quot;···)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a4181f16-b7eb-9755-b1bc-8bf9ed7f7f01">
+      <Execution id="cb67a6ea-7596-4551-8ddf-8995f1c5cb14" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Rechaza_JSON_invalido_o_campos_faltantes" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="43fab6cb-f322-0f69-a05f-1252bc078773">
+      <Execution id="0633fc87-66b2-440d-b9bc-f4a1ab113559" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Id_inexistente_devuelve_no_encontrada" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.CRUD_completo" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="ff30275d-71d0-62f5-e5a6-1ba73396ae36">
+      <Execution id="f6296de4-9df9-4239-a34f-d105c7c5092a" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="CRUD_completo" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Duplicado_en_creacion_y_edicion_devuelve_409_y_otra_facultad_permitida" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="9f094bb3-22f8-d863-c173-c4e1d760e9cc">
+      <Execution id="558e52c8-fa77-4e31-8a5f-75f3f35df7bd" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Duplicado_en_creacion_y_edicion_devuelve_409_y_otra_facultad_permitida" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="f51f454b-6442-65d7-e5f2-bceeae7b2657">
+      <Execution id="7c377f69-e823-4037-80c2-e198b8fbf98a" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: null)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="84ee4445-9d60-73df-cde6-cc10a7ffc662">
+      <Execution id="5cfeb92e-2610-42fc-85ac-6659931d63a7" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: &quot;FISEI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="1ad91be6-365c-b2db-0fff-864b67210d4e">
+      <Execution id="be017c01-9a1b-40e8-99fe-43750785cb25" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5">
+      <Execution id="b07c44f3-23f4-4c4a-8317-9de6c4585aa3" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Permite_mismo_nombre_en_otra_facultad" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="60539169-bef8-0838-fd08-8d462e4deafa">
+      <Execution id="cd9540e8-10d5-4be4-a9d0-5c51ce48ee1c" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_longitudes_excesivas" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="d881be25-13cd-f299-57da-a5df0181116f">
+      <Execution id="57b30b28-7820-4301-912b-8e5637ecf67c" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Clave_ignora_caso_espacios_y_variantes_unicode" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{}&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="0d9c6d99-9988-a0db-3696-1169606eafba">
+      <Execution id="a0eb294f-69fb-4475-a989-57d6e816250d" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Rechaza_JSON_invalido_o_campos_faltantes" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="504ed02e-13c3-359f-e119-37391ac87053">
+      <Execution id="95e7aa12-6888-4ea9-b833-4502cb173eda" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Impide_eliminar_con_asignaturas_incluso_no_vigente" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="d2e4d427-c16c-862c-3ca2-517df83fdba1">
+      <Execution id="eefc07c6-9c08-4187-99d6-0184490375f0" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a6707574-b0bd-cfd8-7553-acb0f9dbe984">
+      <Execution id="068d3d59-c375-43a2-a55d-b675c21f9212" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Crear_normaliza_campos_y_conserva_vigencia" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Protege_todas_las_operaciones_y_rechaza_rol_docente" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="2cff0a61-9cae-65bb-3600-ad50aacd5f14">
+      <Execution id="ec14b8af-7dae-480b-8c3c-a73a9a61ad01" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Protege_todas_las_operaciones_y_rechaza_rol_docente" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Capas_de_negocio_no_dependen_de_HTTP_ni_EF" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="8631c993-463e-e2f1-daa4-7506d4722377">
+      <Execution id="6104fece-56a8-48c6-b570-4cb0a807bb81" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Capas_de_negocio_no_dependen_de_HTTP_ni_EF" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: &quot;\t&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="49d8c3b3-c802-fc75-153b-96c3ace215fe">
+      <Execution id="a37b3681-b148-4081-83db-9713daa755fd" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Swagger_documenta_rutas_respuestas_y_Bearer" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="65203c3a-a661-67be-822c-4f01d5cf386f">
+      <Execution id="94c2528a-63bf-47b5-9173-3724e5cec357" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Swagger_documenta_rutas_respuestas_y_Bearer" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Base_relacional_impone_indice_unico_y_FK_sin_cascada" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="de1664e9-9e99-896b-8ed5-a08c168061ba">
+      <Execution id="61e9f2b8-8444-4165-93e5-83987e5ebaa4" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Base_relacional_impone_indice_unico_y_FK_sin_cascada" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: &quot;{\&quot;nombre\&quot;:\&quot;N\&quot;,\&quot;facultad\&quot;:\&quot;F\&quot;}&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="da18bd14-13fa-ae7d-0250-8638b7eab9ca">
+      <Execution id="1dc8f937-3694-4995-b937-af087d9ab8ba" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="Rechaza_JSON_invalido_o_campos_faltantes" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CatalogoApiTests.CRUD_HTTP_y_location" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="ee730ef7-d270-8221-50b4-ab7779b6b5ec">
+      <Execution id="c768d4e5-b29e-4442-be00-9bb034614f88" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CatalogoApiTests" name="CRUD_HTTP_y_location" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="a6707574-b0bd-cfd8-7553-acb0f9dbe984" executionId="068d3d59-c375-43a2-a55d-b675c21f9212" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d881be25-13cd-f299-57da-a5df0181116f" executionId="57b30b28-7820-4301-912b-8e5637ecf67c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ff30275d-71d0-62f5-e5a6-1ba73396ae36" executionId="f6296de4-9df9-4239-a34f-d105c7c5092a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2cff0a61-9cae-65bb-3600-ad50aacd5f14" executionId="ec14b8af-7dae-480b-8c3c-a73a9a61ad01" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="de1664e9-9e99-896b-8ed5-a08c168061ba" executionId="61e9f2b8-8444-4165-93e5-83987e5ebaa4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0a6f0e8f-2ac6-af38-af10-4398ae7e5029" executionId="cd474f70-182e-4f07-bb47-092816dca4a1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="49d8c3b3-c802-fc75-153b-96c3ace215fe" executionId="a37b3681-b148-4081-83db-9713daa755fd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="84ee4445-9d60-73df-cde6-cc10a7ffc662" executionId="5cfeb92e-2610-42fc-85ac-6659931d63a7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="504ed02e-13c3-359f-e119-37391ac87053" executionId="95e7aa12-6888-4ea9-b833-4502cb173eda" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="445068b1-c4d4-ca9c-b3a4-ebb311f874fc" executionId="9bb5ad82-b55f-4d2a-9977-e605456bb5df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f51f454b-6442-65d7-e5f2-bceeae7b2657" executionId="7c377f69-e823-4037-80c2-e198b8fbf98a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="33d27cde-e4ac-77e6-3c17-ece39ec69856" executionId="fd827e20-11c0-49f5-b59d-e078a1d1a597" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="60539169-bef8-0838-fd08-8d462e4deafa" executionId="cd9540e8-10d5-4be4-a9d0-5c51ce48ee1c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4181f16-b7eb-9755-b1bc-8bf9ed7f7f01" executionId="cb67a6ea-7596-4551-8ddf-8995f1c5cb14" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ee730ef7-d270-8221-50b4-ab7779b6b5ec" executionId="c768d4e5-b29e-4442-be00-9bb034614f88" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="43fab6cb-f322-0f69-a05f-1252bc078773" executionId="0633fc87-66b2-440d-b9bc-f4a1ab113559" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="65203c3a-a661-67be-822c-4f01d5cf386f" executionId="94c2528a-63bf-47b5-9173-3724e5cec357" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4678edd-fdea-4a2d-ddbf-8287b87a682d" executionId="eb5143d1-e707-45ed-aec8-6b67dcc66bce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5" executionId="b07c44f3-23f4-4c4a-8317-9de6c4585aa3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ad91be6-365c-b2db-0fff-864b67210d4e" executionId="be017c01-9a1b-40e8-99fe-43750785cb25" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0d9c6d99-9988-a0db-3696-1169606eafba" executionId="a0eb294f-69fb-4475-a989-57d6e816250d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e69a7b01-8786-6d66-e0b8-d26f164315c7" executionId="d940cff3-bef4-40b3-8cf7-d107d62fa2e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ee5c3c96-24cc-7f24-ede3-059e726b8e82" executionId="e15d8757-5399-4763-b4e1-580a62a2a285" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d2e4d427-c16c-862c-3ca2-517df83fdba1" executionId="eefc07c6-9c08-4187-99d6-0184490375f0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8631c993-463e-e2f1-daa4-7506d4722377" executionId="6104fece-56a8-48c6-b570-4cb0a807bb81" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5f1f0e85-041d-8e83-b98e-d8e83e7d8354" executionId="88364f31-ab43-45be-b57b-eb863c69c4f6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9f094bb3-22f8-d863-c173-c4e1d760e9cc" executionId="558e52c8-fa77-4e31-8a5f-75f3f35df7bd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="da18bd14-13fa-ae7d-0250-8638b7eab9ca" executionId="1dc8f937-3694-4995-b937-af087d9ab8ba" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados sin formato de lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos los resultados cargados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="28" executed="28" passed="22" failed="6" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 8.0.30)&#xD;
+[xUnit.net 00:00:00.14]   Discovering: Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.20]   Discovered:  Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.21]   Starting:    Catalogo.Tests&#xD;
+[xUnit.net 00:00:02.09]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:02.09]       String:    "application/json"&#xD;
+[xUnit.net 00:00:02.09]       Not found: "problem+json"&#xD;
+[xUnit.net 00:00:02.09]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.09]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs(72,0): at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json)&#xD;
+[xUnit.net 00:00:02.09]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:02.18]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:02.18]       String:    "application/json"&#xD;
+[xUnit.net 00:00:02.18]       Not found: "problem+json"&#xD;
+[xUnit.net 00:00:02.18]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.18]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs(72,0): at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json)&#xD;
+[xUnit.net 00:00:02.18]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:02.22]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:02.22]       String:    "application/json"&#xD;
+[xUnit.net 00:00:02.22]       Not found: "problem+json"&#xD;
+[xUnit.net 00:00:02.22]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.22]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs(72,0): at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json)&#xD;
+[xUnit.net 00:00:02.22]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:02.26]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:02.26]       String:    "application/json"&#xD;
+[xUnit.net 00:00:02.26]       Not found: "problem+json"&#xD;
+[xUnit.net 00:00:02.26]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.26]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs(72,0): at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json)&#xD;
+[xUnit.net 00:00:02.26]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:02.31]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:02.31]       String:    "application/json"&#xD;
+[xUnit.net 00:00:02.31]       Not found: "problem+json"&#xD;
+[xUnit.net 00:00:02.31]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.31]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs(72,0): at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json)&#xD;
+[xUnit.net 00:00:02.31]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:02.35]       Assert.Contains() Failure: Sub-string not found&#xD;
+[xUnit.net 00:00:02.35]       String:    "application/json"&#xD;
+[xUnit.net 00:00:02.35]       Not found: "problem+json"&#xD;
+[xUnit.net 00:00:02.35]       Stack Trace:&#xD;
+[xUnit.net 00:00:02.35]         C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\CatalogoApiTests.cs(72,0): at Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(String json)&#xD;
+[xUnit.net 00:00:02.35]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:04.03]   Finished:    Catalogo.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:27:56.2521186-05:00">
+        <Text>[xUnit.net 00:00:02.09]     Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: "{}") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:27:56.3422902-05:00">
+        <Text>[xUnit.net 00:00:02.18]     Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: "{\"nombre\":\"N\",\"facultad\":\"F\"}") [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:27:56.3806703-05:00">
+        <Text>[xUnit.net 00:00:02.22]     Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: "{\"nombre\":\"N\",\"facultad\":\"F\",\"vigencia\":"···) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:27:56.4160083-05:00">
+        <Text>[xUnit.net 00:00:02.26]     Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: "{\"nombre\":\"N\",\"facultad\":\"F\",\"vigencia\":"···) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:27:56.4696221-05:00">
+        <Text>[xUnit.net 00:00:02.31]     Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: "{\"nombre\":\" \",\"facultad\":\"F\",\"vigencia\":"···) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="DESKTOP-MV69426" outcome="Error" timestamp="2026-10-19T14:27:56.5135026-05:00">
+        <Text>[xUnit.net 00:00:02.35]     Catalogo.Tests.CatalogoApiTests.Rechaza_JSON_invalido_o_campos_faltantes(json: "null") [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

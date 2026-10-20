@@ -1,15 +1,21 @@
-# Módulo reservado para Leslie
+# Catálogo — HU-04/HU-05, Issues #2/#3
 
-Esta carpeta se prepara durante HU-01 / T3 y no contiene funcionalidad de HU-04, HU-05 o HU-06.
+`CarrerasPage` recibe la función `request` de autenticación como propiedad. Incluye listado, formulario de alta/edición, modalidad opcional, vigencia, errores, reintentos y confirmación de eliminación. Reutiliza las clases compartidas `workspace-main`, `auth-input`, `app-button` y los colores existentes; sus estilos adicionales están en `catalogo.css`.
 
-Leslie puede crear aquí sus componentes, modelos, acceso a datos y estilos del catálogo. Mantener sus reglas y componentes dentro de `features/catalogo`; evitar dependencias de `features/admin` o de detalles internos de autenticación.
+Con autorización expresa de Leslie, `CatalogoRoute` está montado en `/admin/carreras` bajo la protección existente de Administrador en App.tsx. El panel ofrece «Gestionar carreras y asignaturas» y el catálogo permite volver al panel o cerrar sesión. No se modificaron la lógica de autenticación, el arranque ni la configuración común. La navegación de React está integrada localmente; la conexión real de Gateway/SQL Server sigue pendiente de verificación.
 
-La interfaz disponible de autenticación está en `features/auth/index.ts`: `useAuth()` entrega `session`, `logout()` y `request('/api/...', init)`. `request` adjunta el JWT al Gateway y cierra la sesión ante HTTP 401; devuelve la respuesta para que cada funcionalidad gestione su contrato y errores. Solo acepta rutas relativas `/api/`.
+`AsignaturasPage` recibe el mismo `request`, carga carreras, permite seleccionar una, consultar su listado por nivel y registrar asignaturas. Incluye errores, reintentos, cancelación de solicitudes anteriores y bloqueo durante el guardado. `CatalogoRoute` ofrece los botones Carreras/Asignaturas dentro del módulo; no necesita una segunda aplicación React.
 
-## Propuesta de integración pendiente de acuerdo
+La interfaz pública de autenticación está en `features/auth/index.ts`: `useAuth().request` adjunta el JWT al Gateway y cierra sesión ante HTTP 401. Los clientes consumen `/api/carreras`, `/api/carreras/{id}/asignaturas` y `/api/asignaturas`, gestionando ProblemDetails/ValidationProblemDetails. No usan fetch directo ni leen el token.
 
-No se ha contactado a Leslie ni se afirma un acuerdo previo. No existían archivos de frontend en esta rama al comenzar T3. La base nueva pertenece al trabajo de Pablo para HU-01.
+## Verificación
 
-Antes de integrar el catálogo, acordar con Leslie cualquier modificación a los puntos compartidos `src/app/App.tsx`, `src/main.tsx`, `src/shared/`, `package.json`, el lockfile y las configuraciones Vite/TypeScript. Pablo mantiene el login y su API pública; Leslie mantiene esta funcionalidad. La integración de rutas se revisa conjuntamente cuando el módulo esté listo.
+Desde `frontend`, con Node 24 y las dependencias fijadas por Pablo:
 
-No están definidos ni modificados por T3 los contratos de datos académicos, identificadores o permisos por operación del catálogo. Consultar `docs/arquitectura/decisiones-y-contratos.md` y acordarlos antes de conectar HU-04/05/06.
+```powershell
+npm ci
+npm test
+npm run build
+```
+
+Las pruebas de componentes usan Testing Library y solicitudes simuladas; no sustituyen el recorrido integrado con SQL Server/Gateway. No se han añadido dependencias ni una segunda aplicación React. Las decisiones sobre UUID, JSON y permisos están detalladas en los documentos de integración de HU-04/HU-05. HU-06 permanece fuera de este módulo.

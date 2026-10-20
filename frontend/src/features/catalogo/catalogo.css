@@ -1,0 +1,29 @@
+.catalogo-card { margin: 24px 0; padding: 26px; background: white; border: 1px solid var(--line); border-radius: 14px; }
+.catalogo-card h2 { font-size: 19px; margin-top: 0; }
+.catalogo-card h2 span { color: var(--muted); font-weight: 400; }
+.catalogo-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border: 0; padding: 0; margin: 24px 0; }
+.catalogo-fields .auth-input { margin-top: 9px; }
+.catalogo-check { display: flex; align-items: center; gap: 10px; }
+.catalogo-check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.catalogo-actions, .catalogo-list-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.catalogo-list-heading { justify-content: space-between; margin-bottom: 16px; }
+.catalogo-list-heading h2 { margin: 0; }
+.catalogo-table-scroll { overflow-x: auto; }
+.catalogo table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+.catalogo th { color: var(--muted); font-weight: 600; }
+.catalogo td, .catalogo th { padding: 16px 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.catalogo td:first-child { font-weight: 600; min-width: 150px; }
+.catalogo-badge { display: inline-block; white-space: nowrap; padding: 6px 9px; border-radius: 20px; color: #376542; background: #eef4e9; font-size: 11px; }
+.catalogo-badge--inactive { color: #65645e; background: #f0efe9; }
+.catalogo-danger { color: #8e3525; background: #fff3ee; border-color: #eacbc2; }
+.catalogo-empty { padding: 40px 0; color: var(--muted); text-align: center; }
+.catalogo-aviso { padding: 14px; color: #376542; background: #eef4e9; border-radius: 7px; }
+.catalogo dialog { max-width: min(480px, calc(100vw - 40px)); border: 1px solid var(--line); border-radius: 14px; padding: 28px; color: var(--ink); box-shadow: 0 15px 60px #18333133; }
+.catalogo dialog::backdrop { background: #18333166; }
+.catalogo dialog p { line-height: 1.7; }
+.catalogo-header { flex-wrap: wrap; }
+.catalogo-nav { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; max-width: 1200px; padding: 24px 5vw 0; margin: 0 auto; }
+.catalogo-nav [aria-pressed="true"] { background: var(--accent); color: white; }
+.catalogo-select-label { display: block; max-width: 600px; }
+.catalogo-select-label select { margin-top: 10px; }
+@media (max-width: 650px) { .catalogo-fields { grid-template-columns: 1fr; } .catalogo-card { padding: 18px; } .catalogo .workspace-heading > button { margin-top: 20px; } }

@@ -1,0 +1,7 @@
+PASS: primera carga envía Álgebra Lineal con 1 nivel, 3 créditos y 144 horas.
+PASS: repetición no registra duplicados.
+PASS: código existente con otros datos no se sobrescribe.
+PASS: rechaza una carrera diferente de Software.
+PASS: valida el origen HTTP de destino.
+PASS: exige sesión de administrador para cargar datos.
+6 pruebas correctas; transporte HTTP simulado, no certifica SQL Server/Gateway.

@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="771c2df4-0aa6-492e-91bc-96789cb12144" name="ASUS@DESKTOP-MV69426 2026-10-19 14:23:05" runUser="DESKTOP-MV69426\ASUS" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-19T14:23:05.2648623-05:00" queuing="2026-10-19T14:23:05.2648629-05:00" start="2026-10-19T14:23:04.1435614-05:00" finish="2026-10-19T14:23:05.3113454-05:00" />
+  <TestSettings name="default" id="29ee8184-2225-4af2-84d8-fa8f80aa6778">
+    <Deployment runDeploymentRoot="ASUS_DESKTOP-MV69426_2026-10-19_14_23_05" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="bf9d7bb2-7c24-418f-a8e2-9725b22dcd8e" testId="a6707574-b0bd-cfd8-7553-acb0f9dbe984" testName="Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia" computerName="DESKTOP-MV69426" duration="00:00:00.0050093" startTime="2026-10-19T14:23:05.1712971-05:00" endTime="2026-10-19T14:23:05.1712971-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bf9d7bb2-7c24-418f-a8e2-9725b22dcd8e" />
+    <UnitTestResult executionId="fc0e9613-5fa4-4b97-9e97-fe8770b0847d" testId="5f1f0e85-041d-8e83-b98e-d8e83e7d8354" testName="Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste" computerName="DESKTOP-MV69426" duration="00:00:00.0169618" startTime="2026-10-19T14:23:05.1656154-05:00" endTime="2026-10-19T14:23:05.1656154-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fc0e9613-5fa4-4b97-9e97-fe8770b0847d" />
+    <UnitTestResult executionId="85b26756-abe7-45fb-96b1-2e5a7a7d63d3" testId="ff30275d-71d0-62f5-e5a6-1ba73396ae36" testName="Catalogo.Tests.CarreraServiceTests.CRUD_completo" computerName="DESKTOP-MV69426" duration="00:00:00.0062220" startTime="2026-10-19T14:23:05.2118697-05:00" endTime="2026-10-19T14:23:05.2118698-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="85b26756-abe7-45fb-96b1-2e5a7a7d63d3" />
+    <UnitTestResult executionId="711eb816-ad27-4982-a03e-e59cc6499c73" testId="d2e4d427-c16c-862c-3ca2-517df83fdba1" testName="Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" computerName="DESKTOP-MV69426" duration="00:00:00.0044933" startTime="2026-10-19T14:23:05.2118171-05:00" endTime="2026-10-19T14:23:05.2118172-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="711eb816-ad27-4982-a03e-e59cc6499c73" />
+    <UnitTestResult executionId="ef9e3d87-2bfc-4811-adc5-850f6af9a2fc" testId="ee5c3c96-24cc-7f24-ede3-059e726b8e82" testName="Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad" computerName="DESKTOP-MV69426" duration="00:00:00.0034261" startTime="2026-10-19T14:23:05.2116780-05:00" endTime="2026-10-19T14:23:05.2116780-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ef9e3d87-2bfc-4811-adc5-850f6af9a2fc" />
+    <UnitTestResult executionId="5e440af0-2cee-40ac-8644-9bd77115b161" testId="d881be25-13cd-f299-57da-a5df0181116f" testName="Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode" computerName="DESKTOP-MV69426" duration="00:00:00.0060859" startTime="2026-10-19T14:23:05.1666220-05:00" endTime="2026-10-19T14:23:05.1666225-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5e440af0-2cee-40ac-8644-9bd77115b161" />
+    <UnitTestResult executionId="2acef5cc-118c-4f2e-9f83-054322c61d47" testId="1ad91be6-365c-b2db-0fff-864b67210d4e" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: &quot;FISEI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0003805" startTime="2026-10-19T14:23:05.1649378-05:00" endTime="2026-10-19T14:23:05.1649379-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2acef5cc-118c-4f2e-9f83-054322c61d47" />
+    <UnitTestResult executionId="c22fa031-a3f8-45c1-bc5e-0ed16b0b18e0" testId="43fab6cb-f322-0f69-a05f-1252bc078773" testName="Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada" computerName="DESKTOP-MV69426" duration="00:00:00.0011942" startTime="2026-10-19T14:23:05.2119317-05:00" endTime="2026-10-19T14:23:05.2119318-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c22fa031-a3f8-45c1-bc5e-0ed16b0b18e0" />
+    <UnitTestResult executionId="402aae2f-c2c0-4c38-9d2a-6f2c0b0d8e7d" testId="f51f454b-6442-65d7-e5f2-bceeae7b2657" testName="Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" computerName="DESKTOP-MV69426" duration="00:00:00.0020957" startTime="2026-10-19T14:23:05.2113380-05:00" endTime="2026-10-19T14:23:05.2113380-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="402aae2f-c2c0-4c38-9d2a-6f2c0b0d8e7d" />
+    <UnitTestResult executionId="7f04c274-dcd6-4039-844f-476591a1a876" testId="49d8c3b3-c802-fc75-153b-96c3ace215fe" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: &quot;\t&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0083687" startTime="2026-10-19T14:23:05.1604960-05:00" endTime="2026-10-19T14:23:05.1605176-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7f04c274-dcd6-4039-844f-476591a1a876" />
+    <UnitTestResult executionId="e626f6f5-4ba1-486c-9473-0adda094b285" testId="504ed02e-13c3-359f-e119-37391ac87053" testName="Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente" computerName="DESKTOP-MV69426" duration="00:00:00.0010713" startTime="2026-10-19T14:23:05.2119764-05:00" endTime="2026-10-19T14:23:05.2119765-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e626f6f5-4ba1-486c-9473-0adda094b285" />
+    <UnitTestResult executionId="17629715-1bdf-484c-8e30-9119a813e355" testId="a4678edd-fdea-4a2d-ddbf-8287b87a682d" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot; &quot;, facultad: &quot;FISEI&quot;)" computerName="DESKTOP-MV69426" duration="00:00:00.0000304" startTime="2026-10-19T14:23:05.1655104-05:00" endTime="2026-10-19T14:23:05.1655104-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="17629715-1bdf-484c-8e30-9119a813e355" />
+    <UnitTestResult executionId="2a3afea7-0ef5-400d-9895-d334013d861f" testId="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5" testName="Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad" computerName="DESKTOP-MV69426" duration="00:00:00.0077614" startTime="2026-10-19T14:23:05.1712399-05:00" endTime="2026-10-19T14:23:05.1712402-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2a3afea7-0ef5-400d-9895-d334013d861f" />
+    <UnitTestResult executionId="e9d4362d-f457-4ef9-bf76-06d29460a648" testId="60539169-bef8-0838-fd08-8d462e4deafa" testName="Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas" computerName="DESKTOP-MV69426" duration="00:00:00.0008526" startTime="2026-10-19T14:23:05.2116447-05:00" endTime="2026-10-19T14:23:05.2116447-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e9d4362d-f457-4ef9-bf76-06d29460a648" />
+    <UnitTestResult executionId="1bab41c7-f3f8-4fc2-81f9-cae643efa8cb" testId="84ee4445-9d60-73df-cde6-cc10a7ffc662" testName="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: null)" computerName="DESKTOP-MV69426" duration="00:00:00.0001259" startTime="2026-10-19T14:23:05.1654576-05:00" endTime="2026-10-19T14:23:05.1654576-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1bab41c7-f3f8-4fc2-81f9-cae643efa8cb" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot; &quot;, facultad: &quot;FISEI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a4678edd-fdea-4a2d-ddbf-8287b87a682d">
+      <Execution id="17629715-1bdf-484c-8e30-9119a813e355" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Validacion_no_persiste" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="5f1f0e85-041d-8e83-b98e-d8e83e7d8354">
+      <Execution id="fc0e9613-5fa4-4b97-9e97-fe8770b0847d" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Validacion_no_persiste" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Rechaza_duplicados_normalizados_en_misma_facultad" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="ee5c3c96-24cc-7f24-ede3-059e726b8e82">
+      <Execution id="ef9e3d87-2bfc-4811-adc5-850f6af9a2fc" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Rechaza_duplicados_normalizados_en_misma_facultad" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Id_inexistente_devuelve_no_encontrada" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="43fab6cb-f322-0f69-a05f-1252bc078773">
+      <Execution id="c22fa031-a3f8-45c1-bc5e-0ed16b0b18e0" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Id_inexistente_devuelve_no_encontrada" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.CRUD_completo" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="ff30275d-71d0-62f5-e5a6-1ba73396ae36">
+      <Execution id="85b26756-abe7-45fb-96b1-2e5a7a7d63d3" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="CRUD_completo" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="f51f454b-6442-65d7-e5f2-bceeae7b2657">
+      <Execution id="402aae2f-c2c0-4c38-9d2a-6f2c0b0d8e7d" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Actualiza_sin_cambiar_id_y_validacion_fallida_no_modifica_datos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: null)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="84ee4445-9d60-73df-cde6-cc10a7ffc662">
+      <Execution id="1bab41c7-f3f8-4fc2-81f9-cae643efa8cb" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: null, facultad: &quot;FISEI&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="1ad91be6-365c-b2db-0fff-864b67210d4e">
+      <Execution id="2acef5cc-118c-4f2e-9f83-054322c61d47" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Permite_mismo_nombre_en_otra_facultad" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5">
+      <Execution id="2a3afea7-0ef5-400d-9895-d334013d861f" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Permite_mismo_nombre_en_otra_facultad" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_longitudes_excesivas" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="60539169-bef8-0838-fd08-8d462e4deafa">
+      <Execution id="e9d4362d-f457-4ef9-bf76-06d29460a648" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_longitudes_excesivas" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Clave_ignora_caso_espacios_y_variantes_unicode" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="d881be25-13cd-f299-57da-a5df0181116f">
+      <Execution id="5e440af0-2cee-40ac-8644-9bd77115b161" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Clave_ignora_caso_espacios_y_variantes_unicode" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Impide_eliminar_con_asignaturas_incluso_no_vigente" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="504ed02e-13c3-359f-e119-37391ac87053">
+      <Execution id="e626f6f5-4ba1-486c-9473-0adda094b285" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Impide_eliminar_con_asignaturas_incluso_no_vigente" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraServiceTests.Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="d2e4d427-c16c-862c-3ca2-517df83fdba1">
+      <Execution id="711eb816-ad27-4982-a03e-e59cc6499c73" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraServiceTests" name="Editar_excluye_propio_id_y_rechaza_duplicado_sin_mutar" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Crear_normaliza_campos_y_conserva_vigencia" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="a6707574-b0bd-cfd8-7553-acb0f9dbe984">
+      <Execution id="bf9d7bb2-7c24-418f-a8e2-9725b22dcd8e" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Crear_normaliza_campos_y_conserva_vigencia" />
+    </UnitTest>
+    <UnitTest name="Catalogo.Tests.CarreraTests.Rechaza_campos_requeridos(nombre: &quot;Software&quot;, facultad: &quot;\t&quot;)" storage="c:\users\asus\onedrive\documentos\proyectohomologacion\tests\catalogo.tests\bin\debug\net8.0\catalogo.tests.dll" id="49d8c3b3-c802-fc75-153b-96c3ace215fe">
+      <Execution id="7f04c274-dcd6-4039-844f-476591a1a876" />
+      <TestMethod codeBase="C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\tests\Catalogo.Tests\bin\Debug\net8.0\Catalogo.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Catalogo.Tests.CarreraTests" name="Rechaza_campos_requeridos" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="a6707574-b0bd-cfd8-7553-acb0f9dbe984" executionId="bf9d7bb2-7c24-418f-a8e2-9725b22dcd8e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5f1f0e85-041d-8e83-b98e-d8e83e7d8354" executionId="fc0e9613-5fa4-4b97-9e97-fe8770b0847d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ff30275d-71d0-62f5-e5a6-1ba73396ae36" executionId="85b26756-abe7-45fb-96b1-2e5a7a7d63d3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d2e4d427-c16c-862c-3ca2-517df83fdba1" executionId="711eb816-ad27-4982-a03e-e59cc6499c73" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ee5c3c96-24cc-7f24-ede3-059e726b8e82" executionId="ef9e3d87-2bfc-4811-adc5-850f6af9a2fc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d881be25-13cd-f299-57da-a5df0181116f" executionId="5e440af0-2cee-40ac-8644-9bd77115b161" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ad91be6-365c-b2db-0fff-864b67210d4e" executionId="2acef5cc-118c-4f2e-9f83-054322c61d47" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="43fab6cb-f322-0f69-a05f-1252bc078773" executionId="c22fa031-a3f8-45c1-bc5e-0ed16b0b18e0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f51f454b-6442-65d7-e5f2-bceeae7b2657" executionId="402aae2f-c2c0-4c38-9d2a-6f2c0b0d8e7d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="49d8c3b3-c802-fc75-153b-96c3ace215fe" executionId="7f04c274-dcd6-4039-844f-476591a1a876" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="504ed02e-13c3-359f-e119-37391ac87053" executionId="e626f6f5-4ba1-486c-9473-0adda094b285" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4678edd-fdea-4a2d-ddbf-8287b87a682d" executionId="17629715-1bdf-484c-8e30-9119a813e355" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="22e7dcd9-2cdc-f8a7-2259-907a9a1690b5" executionId="2a3afea7-0ef5-400d-9895-d334013d861f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="60539169-bef8-0838-fd08-8d462e4deafa" executionId="e9d4362d-f457-4ef9-bf76-06d29460a648" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="84ee4445-9d60-73df-cde6-cc10a7ffc662" executionId="1bab41c7-f3f8-4fc2-81f9-cae643efa8cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados sin formato de lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos los resultados cargados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="15" executed="15" passed="15" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 8.0.30)&#xD;
+[xUnit.net 00:00:00.14]   Discovering: Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.21]   Discovered:  Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.21]   Starting:    Catalogo.Tests&#xD;
+[xUnit.net 00:00:00.34]   Finished:    Catalogo.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
