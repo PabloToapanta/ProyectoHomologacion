@@ -33,11 +33,12 @@ public class CarreraServiceTests
     }
 
     [Fact]
-    public async Task Permite_mismo_nombre_en_otra_facultad()
+    public async Task Rechaza_otra_facultad_sin_persistir()
     {
         await Service.CrearAsync(Input());
-        await Service.CrearAsync(Input(facultad: "Otra facultad"));
-        Assert.Equal(2, (await Service.ListarAsync()).Count);
+        var error = await Assert.ThrowsAsync<CatalogoException>(() => Service.CrearAsync(Input(facultad: "Otra facultad")));
+        Assert.Equal("validacion", error.Codigo);
+        Assert.Single(await Service.ListarAsync());
     }
 
     [Fact]

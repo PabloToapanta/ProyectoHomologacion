@@ -17,7 +17,7 @@ public class AsignaturasApiTests
 {
     private static async Task<Guid> CrearCarrera(HttpClient client, string nombre = "Software")
     {
-        var response = await client.PostAsJsonAsync("/api/carreras", new { nombre, facultad = "Facultad sintética HU-05", vigencia = true });
+        var response = await client.PostAsJsonAsync("/api/carreras", new { nombre, facultad = "FISEI", vigencia = true });
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         return (await response.Content.ReadFromJsonAsync<CarreraDto>())!.Id;
     }

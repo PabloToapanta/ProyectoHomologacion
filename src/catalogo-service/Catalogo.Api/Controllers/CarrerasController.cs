@@ -32,8 +32,8 @@ public sealed class CarrerasController(CarreraService service) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), 404)]
     public async Task<ActionResult<CarreraDto>> Obtener(Guid id, CancellationToken ct) => Ok(await service.ObtenerAsync(id, ct));
 
-    /// <summary>Crea una carrera. Nombre y facultad: 1–200 caracteres; modalidad opcional: hasta 100.</summary>
-    /// <remarks>Vigencia es obligatoria (true/false). Nombre único dentro de su facultad, ignorando caso y espacios repetidos.</remarks>
+    /// <summary>Crea una carrera receptora de FISEI. Nombre: 1–200 caracteres; modalidad opcional: hasta 100.</summary>
+    /// <remarks>Facultad es obligatoria y solo admite FISEI, ignorando mayúsculas y espacios externos; otra facultad devuelve 400. Vigencia es obligatoria (true/false). Nombre único normalizado en FISEI.</remarks>
     [HttpPost]
     [ProducesResponseType(typeof(CarreraDto), 201)]
     [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
@@ -44,7 +44,8 @@ public sealed class CarrerasController(CarreraService service) : ControllerBase
         return CreatedAtAction(nameof(Obtener), new { id = dto.Id }, dto);
     }
 
-    /// <summary>Reemplaza los datos editables de una carrera manteniendo su UUID.</summary>
+    /// <summary>Reemplaza los datos editables de una carrera FISEI manteniendo su UUID.</summary>
+    /// <remarks>Facultad obligatoria: FISEI. Otra facultad devuelve 400 sin modificar datos. No se convierten automáticamente registros anteriores.</remarks>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(CarreraDto), 200)]
     [ProducesResponseType(typeof(ValidationProblemDetails), 400)]

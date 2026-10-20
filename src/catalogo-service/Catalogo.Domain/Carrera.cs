@@ -4,6 +4,7 @@ namespace Catalogo.Domain;
 
 public sealed class Carrera
 {
+    public const string FacultadReceptora = "FISEI";
     public Guid Id { get; private set; }
     public string Nombre { get; private set; } = "";
     public string Facultad { get; private set; } = "";
@@ -23,6 +24,9 @@ public sealed class Carrera
         // Validar todo antes de modificar una entidad existente.
         var nuevoNombre = Limpiar(nombre, "Nombre", 200);
         var nuevaFacultad = Limpiar(facultad, "Facultad", 200);
+        if (!string.Equals(nuevaFacultad, FacultadReceptora, StringComparison.OrdinalIgnoreCase))
+            throw new CatalogoException("validacion", "El catálogo receptor admite únicamente carreras de FISEI.");
+        nuevaFacultad = FacultadReceptora;
         var nuevaModalidad = string.IsNullOrWhiteSpace(modalidad) ? null : Limpiar(modalidad, "Modalidad", 100);
         var nombreNormalizado = Limpiar(nuevoNombre.ToUpperInvariant(), "Nombre", 200);
         var facultadNormalizada = Limpiar(nuevaFacultad.ToUpperInvariant(), "Facultad", 200);

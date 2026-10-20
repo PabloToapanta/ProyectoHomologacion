@@ -51,7 +51,7 @@ public class AsignaturaServiceTests
 
     private sealed class Repository : IAsignaturaRepository, ICarreraRepository
     {
-        public Carrera Carrera { get; } = new("Carrera de prueba", "Facultad sintética", true);
+        public Carrera Carrera { get; } = new("Carrera de prueba", "FISEI", true);
         public List<Asignatura> Items { get; } = [];
         public Task<Asignatura?> BuscarAsync(Guid id, CancellationToken ct) => Task.FromResult(Items.SingleOrDefault(a => a.Id == id));
         public Task<IReadOnlyList<Asignatura>> ListarPorCarreraAsync(Guid carreraId, CancellationToken ct) => Task.FromResult<IReadOnlyList<Asignatura>>(Items.Where(a => a.CarreraId == carreraId).OrderBy(a => a.Nivel).ThenBy(a => a.CodigoNormalizado).ToList());
