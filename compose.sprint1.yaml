@@ -1,0 +1,104 @@
+# Sprint 1 disponible: HU-01/04/05/14/15/16. HU-06 no implementada aquí.
+# Una instancia física SQL Server, bases lógicas independientes por servicio.
+x-jwt: &jwt
+  Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
+  Jwt__Audience: ${AUTH_JWT_AUDIENCE:?Configure AUTH_JWT_AUDIENCE}
+  Jwt__SigningKey: ${AUTH_JWT_KEY:?Configure AUTH_JWT_KEY}
+
+services:
+  auth-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${AUTH_SQL_PASSWORD:?Configure AUTH_SQL_PASSWORD}
+    volumes:
+      - auth-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  auth-service:
+    build:
+      context: ./src/auth-service
+      target: runtime
+    environment:
+      <<: *jwt
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__Auth: "Server=auth-db;Database=HomologacionAuth;User Id=sa;Password=${AUTH_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Database__ApplyMigrations: "true"
+      SeedAdmin__Enabled: "true"
+      SeedAdmin__NombreUsuario: ${AUTH_ADMIN_USERNAME:?Configure AUTH_ADMIN_USERNAME}
+      SeedAdmin__Password: ${AUTH_ADMIN_PASSWORD:?Configure AUTH_ADMIN_PASSWORD}
+    ports:
+      - "127.0.0.1:${AUTH_HTTP_PORT:-5081}:8080"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  catalogo-api:
+    build:
+      context: ./src/catalogo-service
+    environment:
+      <<: *jwt
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__Catalogo: "Server=auth-db;Database=${CATALOGO_DATABASE:-HomologacionCatalogo};User Id=sa;Password=${AUTH_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Database__ApplyMigrations: "true"
+    ports:
+      - "127.0.0.1:${CATALOGO_HTTP_PORT:-5082}:8080"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  homologacion-service:
+    build:
+      context: ./src/homologacion-service
+      target: runtime
+    environment:
+      <<: *jwt
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      Equivalencia__UmbralPct: ${EQUIVALENCIA_UMBRAL_PCT:-80}
+    ports:
+      - "127.0.0.1:${HOMOLOGACION_HTTP_PORT:-5083}:8080"
+
+  gateway:
+    build:
+      context: ./src/gateway
+      target: runtime
+    environment:
+      <<: *jwt
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ReverseProxy__Clusters__auth__Destinations__primary__Address: ${AUTH_SERVICE_URL:-http://auth-service:8080/}
+      ReverseProxy__Clusters__catalogo__Destinations__primary__Address: ${CATALOGO_SERVICE_URL:-http://catalogo-api:8080/}
+      ReverseProxy__Clusters__homologacion__Destinations__primary__Address: ${HOMOLOGACION_SERVICE_URL:-http://homologacion-service:8080/}
+    ports:
+      - "127.0.0.1:${GATEWAY_HTTP_PORT:-5080}:8080"
+    depends_on:
+      auth-service:
+        condition: service_started
+      catalogo-api:
+        condition: service_started
+      homologacion-service:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      target: runtime
+    environment:
+      VITE_GATEWAY_URL: http://gateway:8080
+    ports:
+      - "127.0.0.1:${FRONTEND_HTTP_PORT:-5173}:8080"
+    depends_on:
+      gateway:
+        condition: service_started
+
+volumes:
+  auth-data:
