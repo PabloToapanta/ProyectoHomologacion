@@ -21,4 +21,9 @@
 .catalogo dialog { max-width: min(480px, calc(100vw - 40px)); border: 1px solid var(--line); border-radius: 14px; padding: 28px; color: var(--ink); box-shadow: 0 15px 60px #18333133; }
 .catalogo dialog::backdrop { background: #18333166; }
 .catalogo dialog p { line-height: 1.7; }
+.catalogo-header { flex-wrap: wrap; }
+.catalogo-nav { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; max-width: 1200px; padding: 24px 5vw 0; margin: 0 auto; }
+.catalogo-nav [aria-pressed="true"] { background: var(--accent); color: white; }
+.catalogo-select-label { display: block; max-width: 600px; }
+.catalogo-select-label select { margin-top: 10px; }
 @media (max-width: 650px) { .catalogo-fields { grid-template-columns: 1fr; } .catalogo-card { padding: 18px; } .catalogo .workspace-heading > button { margin-top: 20px; } }
