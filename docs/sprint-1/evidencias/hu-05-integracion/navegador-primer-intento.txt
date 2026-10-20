@@ -1,0 +1,59 @@
+
+Running 2 tests using 1 worker
+
+(node:29308) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [chromium] › frontend\e2e\catalogo.spec.ts:13:1 › catálogo real: login, carrera, validaciones, asignatura, eliminación restringida y logout (30.0s)
+(node:6836) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  2 [chromium] › frontend\e2e\catalogo.spec.ts:58:1 › catálogo real en móvil: navegación protegida, sin desbordamiento de página y recarga (6.6s)
+
+
+  1) [chromium] › frontend\e2e\catalogo.spec.ts:13:1 › catálogo real: login, carrera, validaciones, asignatura, eliminación restringida y logout
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.selectOption: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Carrera', { exact: true })
+
+
+      29 |   await page.screenshot({ path: testInfo.outputPath('carreras-escritorio.png'), fullPage: true });
+      30 |   await page.getByRole('button', { name: 'Asignaturas', exact: true }).click();
+    > 31 |   await page.getByLabel('Carrera', { exact: true }).selectOption({ label: `${nombre} · Facultad sintética de pruebas` });
+         |                                                     ^
+      32 |   await expect(page.getByText('No hay asignaturas registradas en esta carrera.')).toBeVisible();
+      33 |   await page.getByRole('button', { name: 'Nueva asignatura' }).click();
+      34 |   await page.getByLabel('Código', { exact: true }).fill('DEMO-NAVEGADOR');
+        at C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\frontend\e2e\catalogo.spec.ts:31:53
+
+    Error Context: docs\sprint-1\evidencias\hu-05-integracion\navegador\catalogo-catálogo-real-log-9696f-nación-restringida-y-logout-chromium\error-context.md
+
+  2) [chromium] › frontend\e2e\catalogo.spec.ts:58:1 › catálogo real en móvil: navegación protegida, sin desbordamiento de página y recarga
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Carrera', { exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Carrera', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('Carrera', { exact: true })
+
+
+      63 |   await page.screenshot({ path: testInfo.outputPath('carreras-movil.png'), fullPage: true });
+      64 |   await page.getByRole('button', { name: 'Asignaturas', exact: true }).click();
+    > 65 |   await expect(page.getByLabel('Carrera', { exact: true })).toBeVisible();
+         |                                                             ^
+      66 |   await page.getByLabel('Carrera', { exact: true }).selectOption({ index: 1 });
+      67 |   await expect(page.getByRole('table')).toBeVisible();
+      68 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        at C:\Users\ASUS\OneDrive\Documentos\ProyectoHomologacion\frontend\e2e\catalogo.spec.ts:65:61
+
+    Error Context: docs\sprint-1\evidencias\hu-05-integracion\navegador\catalogo-catálogo-real-en--ae727-amiento-de-página-y-recarga-chromium\error-context.md
+
+  2 failed
+    [chromium] › frontend\e2e\catalogo.spec.ts:13:1 › catálogo real: login, carrera, validaciones, asignatura, eliminación restringida y logout
+    [chromium] › frontend\e2e\catalogo.spec.ts:58:1 › catálogo real en móvil: navegación protegida, sin desbordamiento de página y recarga

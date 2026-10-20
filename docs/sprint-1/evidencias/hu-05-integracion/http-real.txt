@@ -1,0 +1,27 @@
+PASS: sin sesión no accede al catálogo (HTTP 401)
+PASS: credenciales incorrectas rechazadas (HTTP 401)
+PASS: login real por Gateway y Auth (HTTP 200)
+PASS: crear carrera Software de demostración (HTTP 201)
+PASS: consultar carrera individual por Gateway (HTTP 200)
+PASS: duplicado de carrera rechazado (HTTP 409)
+PASS: editar vigencia de carrera (HTTP 200)
+PASS: crear carrera sin asignaturas (HTTP 201)
+PASS: eliminar carrera sin asignaturas (HTTP 204)
+PASS: consultar carrera aún vacía (HTTP 200)
+PASS: registrar asignatura de nivel 2 (HTTP 201)
+PASS: nivel = 0 rechazado sin persistir (HTTP 400)
+PASS: nivel = -1 rechazado sin persistir (HTTP 400)
+PASS: creditos = 0 rechazado sin persistir (HTTP 400)
+PASS: creditos = -1 rechazado sin persistir (HTTP 400)
+PASS: horas = 0 rechazado sin persistir (HTTP 400)
+PASS: horas = -1 rechazado sin persistir (HTTP 400)
+PASS: carrera inexistente rechazada (HTTP 404)
+Álgebra Lineal registrada como demostración (código sintético DEMO). UUID: 855287ff-53c4-4d44-8031-ed7e9080abb3
+Álgebra Lineal ya estaba registrada; no se creó un duplicado. UUID: 855287ff-53c4-4d44-8031-ed7e9080abb3
+PASS: listar malla por nivel tras cargar demo dos veces (HTTP 200)
+PASS: T8 real repetible, sin duplicados; listado ordenado por nivel.
+PASS: consultar datos de asignatura (HTTP 200)
+PASS: código normalizado duplicado rechazado (HTTP 409)
+PASS: carrera relacionada no puede eliminarse (HTTP 409)
+PASS: solicitudes concurrentes, una creación y un rechazo de duplicado (201/409).
+VALIDACIÓN HTTP COMPLETA: Auth → Gateway → Catálogo → SQL Server, con datos sintéticos conservados para revisión.
