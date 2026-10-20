@@ -1,0 +1,24 @@
+PASS: varios orígenes no duplican cobertura ni suman horas/créditos
+PASS: login Auth + SQL Server → JWT → Gateway YARP → Homologación
+PASS: sin JWT 401; JWT inválido 401; datos inválidos 400
+{
+  "asignaturasOrigen": [
+    "origen-sintetico"
+  ],
+  "asignaturaReceptora": "receptora-sintetica",
+  "compatibilidadAcademicaPct": 80.0,
+  "compatibilidadHorariaPct": 80.0,
+  "compatibilidadCreditosPct": 80.0,
+  "umbralPct": 80,
+  "estado": "Homologable",
+  "homologable": true,
+  "justificacion": "Los tres criterios alcanzan individualmente el umbral de 80 %.",
+  "contenidosSinCobertura": [
+    "C9",
+    "C10"
+  ],
+  "resultadosAprendizajeSinCobertura": [
+    "R5"
+  ],
+  "informacionFaltante": []
+}

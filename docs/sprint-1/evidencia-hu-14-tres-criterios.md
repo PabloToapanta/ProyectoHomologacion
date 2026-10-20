@@ -136,3 +136,9 @@ La integración posterior con el catálogo necesita acordar identificadores, ver
 las constancias/evidencias, sin consultas directas a bases ajenas. Pendientes de entrega: revisión
 cruzada de Edwin, aceptación de Shirley, actualización coordinada del Issue remoto y CI remoto tras
 una futura autorización de publicación. Esta tarea no realiza commits, pushes ni merges.
+
+## Publicación autorizada posteriormente
+
+Después de esta entrega técnica, el usuario autorizó commits atómicos, push, PR y revisión de Leslie.
+La [verificación posterior a integrar develop](evidencia-hu-14-publicacion.md) registra la ejecución
+con HU-04/HU-05 incorporadas, sin reinterpretar los resultados históricos de esta evidencia.
