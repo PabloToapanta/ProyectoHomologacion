@@ -15,8 +15,8 @@
 | Historia | PR | Resultado pruebas | Evidencia API/UI | PO acepta | Observaciones |
 |---|---|---|---|---|---|
 | HU-01 | | Pendiente | | No evaluado | |
-| HU-04 | [PR #19](https://github.com/PabloToapanta/ProyectoHomologacion/pull/19), aprobado por Pablo y fusionado en develop | 28 backend y 59 frontend originales; regresiones incluidas en suite HU-05 | [T4/T5 y evidencia TDD](evidencia-hu-04-t4-t5.md) | No evaluado | Revisión/fusión verificadas el 19/10/2026; ruta protegida incorporada localmente en HU-05 con autorización de Leslie; pendientes SQL Server/Compose integrado y aceptación de Shirley |
-| HU-05 | Rama `feature/hu-05-asignaturas` desde develop con HU-04 integrada | 62 backend, 84 frontend y 6 de carga demo correctas (19/10/2026) | [T6/T7/T8 y TDD](evidencia-hu-05-t6-t7-t8.md) | No evaluado | Navegación protegida implementada; Leslie autorizó commits, push y PR con Pablo como revisor. Pendientes SQL Server/Compose integrado, navegador real, revisión, CI remoto y aceptación de Shirley |
+| HU-04 | [PR #19](https://github.com/PabloToapanta/ProyectoHomologacion/pull/19), aprobado y fusionado | Regresiones de carreras y comprobaciones reales SQL Server/HTTP correctas | [T4/T5](evidencia-hu-04-t4-t5.md) y [validación integrada](evidencia-hu-05-integracion.md) | Pendiente de Shirley | Seguimiento en feature/hu-05-validacion-integrada: GET individual de Gateway corregido, entorno real comprobado; revisar e integrar las correcciones de seguimiento |
+| HU-05 | [PR #20](https://github.com/PabloToapanta/ProyectoHomologacion/pull/20), aprobado por Pablo y fusionado | 62 backend, 84 frontend y 6 demo originales; seguimiento: 61 Gateway, 84 frontend, HTTP/SQL Server y 2 E2E reales correctos | [T6/T7/T8](evidencia-hu-05-t6-t7-t8.md) y [validación integrada](evidencia-hu-05-integracion.md) | Pendiente de Shirley | CI original correcto. SQL Server, Compose y navegador comprobados el 19–20/10/2026; falta aceptar el acta e integrar correcciones de seguimiento. Issue #3 permanece abierto |
 | HU-06 | | Pendiente | | No evaluado | |
 | HU-14 | | Pendiente | | No evaluado | |
 | HU-15 | | Pendiente | | No evaluado | |

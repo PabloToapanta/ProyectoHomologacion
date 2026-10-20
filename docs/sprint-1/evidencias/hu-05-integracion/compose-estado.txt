@@ -1,0 +1,6 @@
+auth-db: running healthy
+auth-service: running
+catalogo-api: running
+catalogo-db: running healthy
+frontend: running
+gateway: running

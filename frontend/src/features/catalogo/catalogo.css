@@ -9,7 +9,7 @@
 .catalogo-list-heading { justify-content: space-between; margin-bottom: 16px; }
 .catalogo-list-heading h2 { margin: 0; }
 .catalogo-table-scroll { overflow-x: auto; }
-.catalogo table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+.catalogo table { width: 100%; min-width: 640px; border-collapse: collapse; text-align: left; font-size: 13px; }
 .catalogo th { color: var(--muted); font-weight: 600; }
 .catalogo td, .catalogo th { padding: 16px 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
 .catalogo td:first-child { font-weight: 600; min-width: 150px; }
@@ -22,8 +22,11 @@
 .catalogo dialog::backdrop { background: #18333166; }
 .catalogo dialog p { line-height: 1.7; }
 .catalogo-header { flex-wrap: wrap; }
+.catalogo-link { text-decoration: none; }
 .catalogo-nav { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; max-width: 1200px; padding: 24px 5vw 0; margin: 0 auto; }
-.catalogo-nav [aria-pressed="true"] { background: var(--accent); color: white; }
+.catalogo-nav .app-button[aria-pressed="true"] { background: var(--accent); color: white; }
 .catalogo-select-label { display: block; max-width: 600px; }
 .catalogo-select-label select { margin-top: 10px; }
+.catalogo-scroll-hint { display: none; }
+@media (max-width: 650px) { .catalogo-scroll-hint { display: block; color: var(--muted); font-size: 12px; line-height: 1.6; } }
 @media (max-width: 650px) { .catalogo-fields { grid-template-columns: 1fr; } .catalogo-card { padding: 18px; } .catalogo .workspace-heading > button { margin-top: 20px; } }

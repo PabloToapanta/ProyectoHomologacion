@@ -1,0 +1,9 @@
+Changed database context to 'Catalogo'.
+PASS: ambas migraciones aplicadas en SQL Server.
+PASS: SQL Server impide duplicados aun al omitir la API (2601/2627).
+PASS: FK SQL Server impide eliminar carrera relacionada (547), sin cascada.
+PASS: CHECK de SQL Server impide horas cero aun al omitir la API.
+PASS: no existen asignaturas huerfanas; operaciones de comprobacion revertidas.
+SqlServerVersion
+----------------------------------------
+16.0.4305.5

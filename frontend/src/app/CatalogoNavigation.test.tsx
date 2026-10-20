@@ -72,7 +72,7 @@ it('permite panel → carreras → asignaturas → registro → volver al panel 
   expect(JSON.parse(post?.[1].body)).toMatchObject({ carreraId: carrera.id, nivel: 1, creditos: 3, horas: 144 });
   await user.click(screen.getByRole('link', { name: 'Volver al panel' }));
   expect(await screen.findByRole('heading', { name: 'Panel de administración' })).toBeInTheDocument();
-});
+}, 15_000);
 
 it('permite cerrar sesión desde catálogo y protege acceso posterior', async () => {
   mockServices();

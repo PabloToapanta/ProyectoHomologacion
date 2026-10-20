@@ -14,6 +14,7 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
     public static TheoryData<string, string, string> AcademicRoutes => new()
     {
         { "GET", "/api/carreras", "catalogo" }, { "POST", "/api/carreras", "catalogo" },
+        { "GET", "/api/carreras/carrera-prueba", "catalogo" },
         { "PUT", "/api/carreras/carrera-prueba", "catalogo" }, { "DELETE", "/api/carreras/carrera-prueba", "catalogo" },
         { "GET", "/api/carreras/carrera-prueba/asignaturas", "catalogo" },
         { "POST", "/api/asignaturas", "catalogo" }, { "GET", "/api/asignaturas/asignatura-prueba", "catalogo" },
