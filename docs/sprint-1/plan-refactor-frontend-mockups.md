@@ -82,3 +82,10 @@ Segundo bloque: estructura común en catálogo y validaciones, enlaces separados
 carreras/asignaturas mediante query string, navegación según rol y tablas compactas.
 No se modifican servicios ni reglas académicas. Build y 89 pruebas frontend correctas.
 La autorización para implementar no sustituye revisión cruzada ni aceptación de la PO.
+
+Tercer bloque (#2): búsqueda local por nombre y formularios de carrera en modal
+nativo; error de duplicado dentro del formulario y error de eliminación en ventana
+con botón Entendido. Componente compartido con Escape, bloqueo al guardar y retorno
+de foco. Primero se reprodujeron dos pruebas fallidas (búsqueda/modal); después,
+build correcto y 91 pruebas aprobadas. La verificación de foco real se realiza en
+Chromium al completar la malla, pues jsdom no implementa la modalidad nativa.

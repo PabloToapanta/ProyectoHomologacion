@@ -133,3 +133,29 @@ it('deshabilita guardado mientras la solicitud está pendiente', async () => {
   resolver(json(carrera, 201));
   expect(await screen.findByText(carrera.nombre)).toBeInTheDocument();
 });
+
+it('busca carreras sin modificar el listado y permite limpiar el filtro', async () => {
+  const user = userEvent.setup();
+  const request = vi.fn().mockResolvedValue(json([carrera, { ...carrera, id: '2', nombre: 'Electrónica' }]));
+  render(<CarrerasPage request={request} />);
+  await screen.findByText('Electrónica');
+  await user.type(screen.getByRole('searchbox', { name: 'Buscar carreras' }), ' ELECTRÓNICA ');
+  expect(screen.getByRole('cell', { name: 'Electrónica' })).toBeInTheDocument();
+  expect(screen.queryByRole('cell', { name: carrera.nombre })).not.toBeInTheDocument();
+  await user.clear(screen.getByRole('searchbox', { name: 'Buscar carreras' }));
+  expect(screen.getByRole('cell', { name: carrera.nombre })).toBeInTheDocument();
+  expect(request).toHaveBeenCalledTimes(1);
+});
+
+it('presenta duplicados dentro del modal sin perder los datos', async () => {
+  const user = userEvent.setup();
+  const request = vi.fn().mockResolvedValueOnce(json([])).mockResolvedValueOnce(json({ detail: 'Nombre duplicado.' }, 409));
+  render(<CarrerasPage request={request} />);
+  await screen.findByText('No hay carreras registradas.');
+  await user.click(screen.getByRole('button', { name: 'Nueva carrera' }));
+  const modal = within(screen.getByRole('dialog', { name: 'Nueva carrera' }));
+  await user.type(modal.getByLabelText('Nombre'), carrera.nombre);
+  await user.click(modal.getByRole('button', { name: 'Guardar carrera' }));
+  expect(await modal.findByRole('alert')).toHaveTextContent('Nombre duplicado.');
+  expect(modal.getByLabelText('Nombre')).toHaveValue(carrera.nombre);
+});
