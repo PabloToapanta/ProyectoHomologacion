@@ -23,3 +23,9 @@ Verificación local: pruebas de interacción con HTTP simulado para antigüedad,
 requisitos e información incompleta de equivalencia. TypeScript y Vite.
 La comprobación contra los servicios Docker y la aceptación de Shirley siguen pendientes.
 No se declara realizada revisión humana ni ejecutado CI remoto por estos cambios.
+
+Corrección solicitada durante prueba manual: fecha de evaluación no posterior a
+hoy en Ecuador continental (UTC-5). Pantalla limita calendario y valida al enviar;
+API responde 400 aunque se envíe por Swagger. Dominio conserva evaluación pura
+por fechas explícitas para pruebas y cálculos históricos. Hoy sigue permitido.
+Suite API: 85 pruebas aprobadas, incluidos hoy permitido y mañana rechazado.

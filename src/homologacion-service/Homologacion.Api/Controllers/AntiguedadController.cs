@@ -21,6 +21,10 @@ public sealed class AntiguedadController : ControllerBase
     public ActionResult<ValidarAntiguedadResponse> Validar([FromBody] ValidarAntiguedadRequest request,
         [FromServices] ValidarAntiguedad casoDeUso)
     {
+        var hoyEcuador = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-5)).DateTime);
+        if (request.FechaEvaluacion > hoyEcuador)
+            return Problem(statusCode: 400, title: "Datos de antigüedad inválidos",
+                detail: "La fecha de evaluación no puede ser posterior a la fecha actual de Ecuador.");
         try { return Ok(ValidarAntiguedadResponse.FromDomain(casoDeUso.Ejecutar(request.ToApplication()))); }
         catch (ArgumentException error)
         { return Problem(statusCode: 400, title: "Datos de antigüedad inválidos", detail: error.Message); }

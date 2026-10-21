@@ -7,6 +7,12 @@ import { evaluar } from './api';
 import { EquivalenciaForm } from './EquivalenciaForm';
 import '../catalogo/catalogo.css';
 
+const hoyEcuador = () => {
+  const partes = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Guayaquil', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  const valor = (tipo: string) => partes.find(p => p.type === tipo)!.value;
+  return `${valor('year')}-${valor('month')}-${valor('day')}`;
+};
+
 type Resultado = { estado?: string; motivo?: string; cumple?: boolean; incumplimientos?: string[] };
 export function ValidacionesPage() {
   const { request, logout, session } = useAuth();
@@ -30,6 +36,7 @@ function ReglasForm({ tipo, request }: { tipo: string; request: ReturnType<typeo
   async function enviar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault(); if (ocupado) return;
     const datos = new FormData(e.currentTarget);
+    if (antiguedad && String(datos.get('evaluacion')) > hoyEcuador()) { setResultado(null); setError('La fecha de evaluación no puede ser posterior a la fecha actual de Ecuador.'); return; }
     const input = antiguedad ? { estadoAsignatura: datos.get('estado'), fechaAprobacion: datos.get('aprobacion') || null, fechaEvaluacion: datos.get('evaluacion') }
       : { tipoCambio: datos.get('tipo'), periodosCursados: Number(datos.get('periodos')), asignaturasHomologables: Number(datos.get('asignaturas')), cambiosPrevios: Number(datos.get('cambios')) };
     const controller = new AbortController(); pendiente.current = controller; setOcupado(true); setResultado(null); setError('');
@@ -42,7 +49,7 @@ function ReglasForm({ tipo, request }: { tipo: string; request: ReturnType<typeo
     <form onSubmit={enviar} onChange={limpiar}><fieldset className="catalogo-fields" disabled={ocupado}>{antiguedad ? <>
       <label className="auth-label">Estado de asignatura<select className="auth-input" name="estado" required><option>Aprobada</option><option>Reprobada</option><option>NoCursada</option></select></label>
       <label className="auth-label">Fecha de aprobación<input className="auth-input" type="date" name="aprobacion" /></label>
-      <label className="auth-label">Fecha de evaluación<input className="auth-input" type="date" name="evaluacion" required /></label>
+      <label className="auth-label">Fecha de evaluación<input className="auth-input" type="date" name="evaluacion" max={hoyEcuador()} required /></label>
     </> : <>
       <label className="auth-label">Tipo de cambio<select className="auth-input" name="tipo" required><option>Interno</option><option>Externo</option></select></label>
       {[["periodos", "Períodos cursados"], ["asignaturas", "Asignaturas homologables"], ["cambios", "Cambios previos"]].map(([name, label]) => <label key={name} className="auth-label">{label}<input className="auth-input" name={name} type="number" min="0" max="2147483647" step="1" required /></label>)}

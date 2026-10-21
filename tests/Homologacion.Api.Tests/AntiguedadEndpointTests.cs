@@ -36,6 +36,18 @@ public class AntiguedadEndpointTests
     private const string Ruta = "/api/homologaciones/validar-antiguedad";
 
     [Theory]
+    [InlineData(0, HttpStatusCode.OK)]
+    [InlineData(1, HttpStatusCode.BadRequest)]
+    public async Task Fecha_evaluacion_no_supera_hoy_en_Ecuador(int dias, HttpStatusCode esperado)
+    {
+        var hoy = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-5)).DateTime);
+        using var factory = new AntiguedadFactory(); using var client = factory.Autenticado();
+        var response = await client.PostAsJsonAsync(Ruta, new { estadoAsignatura = "Aprobada",
+            fechaAprobacion = hoy.AddYears(-1).ToString("yyyy-MM-dd"), fechaEvaluacion = hoy.AddDays(dias).ToString("yyyy-MM-dd") });
+        Assert.Equal(esperado, response.StatusCode);
+    }
+
+    [Theory]
     [InlineData("Aprobada", "2017-10-20", "Elegible")]
     [InlineData("Aprobada", "2016-10-20", "Elegible")]
     [InlineData("Aprobada", "2016-10-19", "RequiereValidacionConocimientos")]
