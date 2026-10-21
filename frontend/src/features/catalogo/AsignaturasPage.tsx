@@ -5,6 +5,7 @@ import type { Carrera, CatalogoRequest } from './carreras-api';
 import { asignaturasApi } from './asignaturas-api';
 import type { Asignatura } from './asignaturas-api';
 import './catalogo.css';
+import { UnidadesPanel } from './UnidadesPanel';
 
 const vacio = { codigo: '', nombre: '', nivel: '', creditos: '', horas: '' };
 const mensaje = (e: unknown) => e instanceof Error ? e.message : 'No se pudo completar la operación.';
@@ -25,6 +26,7 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
   const [intento, setIntento] = useState(0);
   const [form, setForm] = useState<typeof vacio | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const [seleccionada, setSeleccionada] = useState<Asignatura | null>(null);
   const codigoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -39,7 +41,7 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    setAsignaturas([]); setErrorListado(''); setError(''); setAviso(''); setForm(null);
+    setSeleccionada(null); setAsignaturas([]); setErrorListado(''); setError(''); setAviso(''); setForm(null);
     if (!carreraId) { setCargando(false); return () => controller.abort(); }
     setCargando(true);
     api.listar(carreraId, controller.signal).then(items => {
@@ -97,8 +99,9 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
         <button className="app-button app-button--secondary" disabled={cargando || guardando || !!form} onClick={() => setIntento(i => i + 1)}>Actualizar asignaturas</button></div>
       {cargando ? <p role="status">Cargando asignaturas…</p> : errorListado ? <div><p role="alert" className="auth-error">{errorListado}</p><button className="app-button app-button--secondary" onClick={() => setIntento(i => i + 1)}>Reintentar asignaturas</button></div>
         : asignaturas.length === 0 ? <p className="catalogo-empty">No hay asignaturas registradas en esta carrera.</p>
-        : <><p className="catalogo-scroll-hint">Desliza la tabla horizontalmente para ver todos los datos.</p><div className="catalogo-table-scroll" tabIndex={0} role="region" aria-label="Tabla de asignaturas con desplazamiento horizontal"><table><caption className="sr-only">Asignaturas ordenadas por nivel y código</caption><thead><tr><th scope="col">Nivel</th><th scope="col">Código</th><th scope="col">Asignatura</th><th scope="col">Créditos</th><th scope="col">Horas</th></tr></thead>
-          <tbody>{[...asignaturas].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td></tr>)}</tbody></table></div></>}
+        : <><p className="catalogo-scroll-hint">Desliza la tabla horizontalmente para ver todos los datos.</p><div className="catalogo-table-scroll" tabIndex={0} role="region" aria-label="Tabla de asignaturas con desplazamiento horizontal"><table><caption className="sr-only">Asignaturas ordenadas por nivel y código</caption><thead><tr><th scope="col">Nivel</th><th scope="col">Código</th><th scope="col">Asignatura</th><th scope="col">Créditos</th><th scope="col">Horas</th><th scope="col">Contenidos</th></tr></thead>
+          <tbody>{[...asignaturas].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td><td><button className="app-button app-button--secondary" onClick={() => setSeleccionada(a)}>Ver unidades de {a.nombre}</button></td></tr>)}</tbody></table></div></>}
     </section>}
+    {seleccionada && <UnidadesPanel key={seleccionada.id} asignaturaId={seleccionada.id} nombre={seleccionada.nombre} request={request} cerrar={() => setSeleccionada(null)} />}
   </main>;
 }

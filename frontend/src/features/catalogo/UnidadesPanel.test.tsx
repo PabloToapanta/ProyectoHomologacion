@@ -1,0 +1,55 @@
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { expect, test, vi } from 'vitest';
+import { UnidadesPanel } from './UnidadesPanel';
+
+test('consulta unidades y registra contenido sin perder el resultado de aprendizaje', async () => {
+  const request = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ unidades: [] })))
+    .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'u', numero: 1, nombre: 'Unidad sintética', horas: 36, resultadoAprendizaje: 'Resultado sintético', contenidos: [{ id: 'c', orden: 1, tema: 'Tema sintético' }] }), { status: 201 }));
+  render(<UnidadesPanel asignaturaId="a" nombre="Asignatura" request={request} cerrar={() => {}} />);
+  await screen.findByText('No hay unidades registradas.');
+  const user = userEvent.setup();
+  expect(screen.queryByRole('form', { name: 'Registrar unidad' })).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: 'Nueva unidad' }));
+  await user.type(screen.getByLabelText('Número de unidad'), '1');
+  await user.type(screen.getByLabelText('Nombre de unidad'), 'Unidad sintética');
+  await user.type(screen.getByLabelText('Horas de unidad'), '36');
+  await user.type(screen.getByLabelText('Resultado de aprendizaje'), 'Resultado sintético');
+  await user.type(screen.getByLabelText('Contenidos (uno por línea)'), 'Tema sintético');
+  await user.click(screen.getByRole('button', { name: 'Guardar unidad' }));
+  await screen.findByText('Unidad registrada correctamente.');
+  expect(await screen.findByText('Tema sintético')).toBeVisible();
+  await waitFor(() => expect(request).toHaveBeenCalledTimes(2));
+  const body = JSON.parse(request.mock.calls[1]![1].body);
+  expect(body.contenidos).toEqual(['Tema sintético']);
+  expect(body.resultadoAprendizaje).toBe('Resultado sintético');
+  expect(screen.queryByRole('form', { name: 'Registrar unidad' })).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: 'Nueva unidad' }));
+  await user.click(screen.getByRole('button', { name: 'Cancelar registro' }));
+  expect(screen.queryByRole('form', { name: 'Registrar unidad' })).not.toBeInTheDocument();
+  expect(request).toHaveBeenCalledTimes(2);
+});
+
+test('edita dentro de la tarjeta seleccionada y cancelar conserva los datos guardados', async () => {
+  const unidad = { id: 'u', numero: 2, nombre: 'Unidad dos', horas: 36, resultadoAprendizaje: 'Resultado', contenidos: [{ id: 'c', orden: 1, tema: 'Tema original' }] };
+  const request = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ unidades: [unidad] })));
+  render(<UnidadesPanel asignaturaId="a" nombre="Asignatura" request={request} cerrar={() => {}} />);
+  const user = userEvent.setup();
+  await user.click(await screen.findByRole('button', { name: 'Editar unidad 2' }));
+  const tarjeta = screen.getByRole('article', { name: 'Unidad 2' });
+  expect(within(tarjeta).getByRole('form', { name: 'Editar unidad' })).toBeVisible();
+  expect(screen.queryByRole('form', { name: 'Registrar unidad' })).not.toBeInTheDocument();
+  await user.clear(within(tarjeta).getByLabelText('Nombre de unidad'));
+  await user.type(within(tarjeta).getByLabelText('Nombre de unidad'), 'Cambio sin guardar');
+  await user.click(within(tarjeta).getByRole('button', { name: 'Cancelar edición' }));
+  expect(within(tarjeta).getByText('U.2 · Unidad dos (36 horas)')).toBeVisible();
+  expect(request).toHaveBeenCalledTimes(1);
+  await user.click(within(tarjeta).getByRole('button', { name: 'Editar unidad 2' }));
+  await user.clear(within(tarjeta).getByLabelText('Contenidos (uno por línea)'));
+  await user.type(within(tarjeta).getByLabelText('Contenidos (uno por línea)'), 'Tema corregido');
+  request.mockResolvedValueOnce(new Response(JSON.stringify({ ...unidad, contenidos: [{ id: 'c', orden: 1, tema: 'Tema corregido' }] })));
+  await user.click(within(tarjeta).getByRole('button', { name: 'Guardar cambios' }));
+  await screen.findByText('Unidad actualizada correctamente.');
+  expect(within(tarjeta).getByText('Tema corregido')).toBeVisible();
+  expect(request.mock.calls[1]![1].method).toBe('PUT');
+});

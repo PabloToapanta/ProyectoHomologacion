@@ -19,6 +19,7 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         { "GET", "/api/carreras/carrera-prueba/asignaturas", "catalogo" },
         { "POST", "/api/asignaturas", "catalogo" }, { "GET", "/api/asignaturas/asignatura-prueba", "catalogo" },
         { "POST", "/api/asignaturas/asignatura-prueba/unidades", "catalogo" },
+        { "PUT", "/api/asignaturas/asignatura-prueba/unidades/unidad-prueba", "catalogo" },
         { "POST", "/api/homologaciones/evaluar", "homologacion" },
         { "POST", "/api/homologaciones/validar-antiguedad", "homologacion" },
         { "POST", "/api/homologaciones/validar-requisitos", "homologacion" }
@@ -162,7 +163,8 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        Assert.Equal(10, paths.EnumerateObject().Count());
+        Assert.Equal(11, paths.EnumerateObject().Count());
+        Assert.True(paths.GetProperty("/api/asignaturas/{id}/unidades/{unidadId}").TryGetProperty("put", out _));
         var login = paths.GetProperty("/api/auth/login").GetProperty("post");
         if (login.TryGetProperty("security", out var security)) Assert.Empty(security.EnumerateArray());
         var academic = paths.GetProperty("/api/carreras").GetProperty("get");
