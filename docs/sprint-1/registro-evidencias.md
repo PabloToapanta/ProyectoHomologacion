@@ -31,6 +31,17 @@ Compose integrado y demo conservando datos. Resultado final:
 real por Gateway para HU-01/04/05/14/15/16. Ver [informe y salidas](evidencia-integracion-pablo.md).
 Evidencia técnica local; no marca aceptación de la PO ni cierre del Sprint.
 
+## Verificación final disponible — 21/10/2026
+
+HU-06 y pantallas integradas en develop `34bcc67`. Corrección del smoke con TDD:
+3 fallos previos y 7 pruebas Python finales aprobadas. Verificación local:
+380 pruebas .NET, 89 frontend, 2 E2E de Auth y 2 comprobaciones adicionales de
+pantallas/unidades aprobadas; smoke por Gateway con 4 unidades registradas.
+Demo actualizada con respaldo SQL y datos anteriores conservados. Ver el
+[informe](evidencia-verificacion-final.md) y el [recorrido para Shirley](preparacion-aceptacion-sprint-1.md).
+Pendientes de publicación/revisión y aceptación humana; las casillas de la PO
+no se completan automáticamente.
+
 ## Evidencia XP
 
 - **TDD:** enlace a pruebas previas al cambio y evidencia de fallo previo/corrección.

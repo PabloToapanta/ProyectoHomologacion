@@ -1,0 +1,3 @@
+PASS: preparación repetible de carrera FISEI y Álgebra Lineal de demostración; cuatro unidades, 144 horas, ocho contenidos
+PASS: carreras, asignatura y unidades previas conservadas; sin sobrescritura de datos anteriores
+Fuente: transcripción ya publicada en src/catalogo-service/examples/hu-06; pendiente de validación de la PO frente al PDF

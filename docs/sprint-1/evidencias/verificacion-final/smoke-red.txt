@@ -1,0 +1,42 @@
+test_acepta_detalle_con_unidades_registradas (test_smoke.DetalleAsignaturaTests.test_acepta_detalle_con_unidades_registradas) ... FAIL
+test_acepta_detalle_con_unidades_vacias (test_smoke.DetalleAsignaturaTests.test_acepta_detalle_con_unidades_vacias) ... FAIL
+test_rechaza_cambio_en_datos_academicos (test_smoke.DetalleAsignaturaTests.test_rechaza_cambio_en_datos_academicos) ... ok
+test_rechaza_campo_preexistente_ausente (test_smoke.DetalleAsignaturaTests.test_rechaza_campo_preexistente_ausente) ... ok
+test_rechaza_detalle_sin_unidades (test_smoke.DetalleAsignaturaTests.test_rechaza_detalle_sin_unidades) ... FAIL
+test_rechaza_id_diferente (test_smoke.DetalleAsignaturaTests.test_rechaza_id_diferente) ... ok
+test_rechaza_unidades_con_tipo_incorrecto (test_smoke.DetalleAsignaturaTests.test_rechaza_unidades_con_tipo_incorrecto) ... ok
+
+======================================================================
+FAIL: test_acepta_detalle_con_unidades_registradas (test_smoke.DetalleAsignaturaTests.test_acepta_detalle_con_unidades_registradas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/tests/sprint-1/test_smoke.py", line 21, in test_acepta_detalle_con_unidades_registradas
+    smoke.comprobar_detalle_asignatura(self.listado,
+  File "/home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/tests/sprint-1/smoke.py", line 29, in comprobar_detalle_asignatura
+    assert detalle == listado
+           ^^^^^^^^^^^^^^^^^^
+AssertionError
+
+======================================================================
+FAIL: test_acepta_detalle_con_unidades_vacias (test_smoke.DetalleAsignaturaTests.test_acepta_detalle_con_unidades_vacias)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/tests/sprint-1/test_smoke.py", line 18, in test_acepta_detalle_con_unidades_vacias
+    smoke.comprobar_detalle_asignatura(self.listado, {**self.listado, "unidades": []})
+  File "/home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/tests/sprint-1/smoke.py", line 29, in comprobar_detalle_asignatura
+    assert detalle == listado
+           ^^^^^^^^^^^^^^^^^^
+AssertionError
+
+======================================================================
+FAIL: test_rechaza_detalle_sin_unidades (test_smoke.DetalleAsignaturaTests.test_rechaza_detalle_sin_unidades)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pablo/Documents/Ubuntu_y_Universidad/Universidad/Semestre4/Metodologias_Agiles/Proyectos/ProyectoFinal/Repo/ProyectoHomologacion/tests/sprint-1/test_smoke.py", line 39, in test_rechaza_detalle_sin_unidades
+    with self.assertRaises(AssertionError):
+AssertionError: AssertionError not raised
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+FAILED (failures=3)

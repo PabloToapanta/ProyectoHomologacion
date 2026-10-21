@@ -1,0 +1,1 @@
+PASS inventario antes : 2 carreras; 1 asignaturas; mismos datos y volumen
