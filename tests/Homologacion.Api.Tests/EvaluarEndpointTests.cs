@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting;
+using Homologacion.Infrastructure.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
 using Yarp.ReverseProxy.Forwarder;
@@ -197,8 +199,18 @@ public class EvaluarEndpointTests
     [InlineData(0)] [InlineData(-1)] [InlineData(101)]
     public void Configuracion_invalida_impide_arranque(decimal umbral)
     {
-        using var factory = new MotorFactory(umbral);
-        Assert.Throws<OptionsValidationException>(() => factory.CreateClient());
+        // Validar el arranque real de opciones sin el DeferredHost de WebApplicationFactory:
+        // al fallar el inicio, su limpieza puede ocultar la causa con ObjectDisposedException.
+        using var host = new HostBuilder()
+            .ConfigureAppConfiguration(cfg => cfg.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Equivalencia:UmbralPct"] = umbral.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            }))
+            .ConfigureServices(services => services.AddHomologacionInfrastructure())
+            .Build();
+        var error = Assert.Throws<OptionsValidationException>(() => host.Start());
+        Assert.Equal(typeof(EquivalenciaOptions), error.OptionsType);
+        Assert.Contains(error.Failures, failure => failure.Contains("Equivalencia:UmbralPct"));
     }
 
     [Fact]
