@@ -1,4 +1,4 @@
-"""Comprobación integrada local de HU-01/04/05/14/15/16, sin escribir datos académicos.
+"""Comprobación integrada local de HU-01/04/05/06/14/15/16, sin escribir datos académicos.
 
 Uso desde la raíz: python3 tests/sprint-1/smoke.py --env-file .env.sprint1
 Solo biblioteca estándar. No imprime credenciales ni tokens.
@@ -23,6 +23,13 @@ def load_settings(path):
         key, value = line.split("=", 1)
         settings[key.strip()] = value.strip().strip("\"").strip("'")
     return settings
+
+
+def comprobar_detalle_asignatura(listado, detalle):
+    assert isinstance(detalle, dict), "El detalle debe ser un objeto JSON"
+    for campo, esperado in listado.items():
+        assert campo in detalle and detalle[campo] == esperado, f"El detalle difiere del listado en {campo}"
+    assert isinstance(detalle.get("unidades"), list), "El detalle debe incluir una lista de unidades"
 
 
 def main():
@@ -69,6 +76,8 @@ def main():
 
     status, carreras = request("/api/carreras", token=token)
     assert status == 200 and isinstance(carreras, list)
+    asignaturas_consultadas = 0
+    unidades_consultadas = 0
     for carrera in carreras:
         status, detail = request("/api/carreras/" + carrera["id"], token=token)
         assert status == 200 and detail == carrera
@@ -77,10 +86,16 @@ def main():
         assert [s["nivel"] for s in subjects] == sorted(s["nivel"] for s in subjects)
         for subject in subjects:
             status, detail = request("/api/asignaturas/" + subject["id"], token=token)
-            assert status == 200 and detail == subject
+            assert status == 200
+            comprobar_detalle_asignatura(subject, detail)
+            asignaturas_consultadas += 1
+            unidades_consultadas += len(detail["unidades"])
     # La validación rechaza antes de escribir; no crea carreras de prueba.
     assert request("/api/carreras", {"nombre": "Prueba sintética rechazada", "facultad": "Otra facultad", "vigencia": True}, token)[0] == 400
     print(f"PASS HU-04/05: {len(carreras)} carreras consultadas; otra facultad rechazada con 400")
+    print(f"PASS HU-06 consulta: {asignaturas_consultadas} asignaturas, {unidades_consultadas} unidades; detalle compatible con el listado")
+    if asignaturas_consultadas == 0 or unidades_consultadas == 0:
+        print("PENDIENTE HU-06: este entorno no contiene datos suficientes para verificar unidades registradas")
 
     ruta = "/api/homologaciones/validar-antiguedad"
     for estado, fecha, esperado in [
@@ -130,7 +145,7 @@ def main():
     with urlopen(frontend, timeout=10) as response:
         assert response.status == 200 and b'<div id="root">' in response.read()
     print("PASS frontend: React publicado; las pruebas de navegador se ejecutan por separado")
-    print("HU-06 pendiente de integración; no se certifica aceptación de la PO")
+    print("El smoke verifica lecturas HU-06; registro/edición y transcripción requieren sus pruebas y aceptación de la PO")
 
 
 if __name__ == "__main__":
