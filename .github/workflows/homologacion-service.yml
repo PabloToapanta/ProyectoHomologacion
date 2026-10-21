@@ -6,6 +6,8 @@ on:
       - 'src/homologacion-service/**'
       - 'tests/Homologacion.*.Tests/**'
       - 'tests/homologacion-service/**'
+      - 'tests/sprint-1/**'
+      - 'compose.sprint1.yaml'
       - 'src/gateway/**'
       - 'Homologacion.sln'
       - '.github/workflows/homologacion-service.yml'
@@ -17,6 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m unittest discover -s tests/sprint-1 -p 'test_*.py' -v
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
