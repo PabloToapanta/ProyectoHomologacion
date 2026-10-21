@@ -24,9 +24,9 @@ El ZIP es un wireframe sin especificación de colores: se conserva la paleta exi
 | Etapa | Issue / criterios preservados | Cambios | Estado |
 |---|---|---|---|
 | 1. Login y panel | [#1 HU-01](https://github.com/PabloToapanta/ProyectoHomologacion/issues/1): login válido, error, rutas protegidas | Login centrado con símbolo académico, alerta antes del formulario; estructura reutilizable de cabecera, navegación lateral, sesión y contenido; adaptación móvil | Implementado localmente; ver verificación al final |
-| 2. Carreras | [#2 HU-04](https://github.com/PabloToapanta/ProyectoHomologacion/issues/2): crear/listar, FISEI fija, duplicados y eliminación restringida | Integrar estructura común, buscador, tabla compacta y formulario modal accesible; errores de duplicado y eliminación como en mockups | Propuesta para coordinar con Leslie |
-| 3. Malla y unidades | [#3 HU-05](https://github.com/PabloToapanta/ProyectoHomologacion/issues/3), [#4 HU-06](https://github.com/PabloToapanta/ProyectoHomologacion/issues/4): datos positivos, orden por nivel, contenidos y resultados | Navegación carrera → malla, filtro de nivel y alta contextual; mantener panel de unidades | Planificado; coordinar con Leslie y Edwin |
-| 4. Consistencia y cierre | [#5](https://github.com/PabloToapanta/ProyectoHomologacion/issues/5), [#6](https://github.com/PabloToapanta/ProyectoHomologacion/issues/6), [#7](https://github.com/PabloToapanta/ProyectoHomologacion/issues/7) y #1–4 | Aplicar estructura a validaciones, verificar regresión completa y recorrido integrado con Docker; revisión cruzada y aceptación de Shirley | Pendiente |
+| 2. Carreras | [#2 HU-04](https://github.com/PabloToapanta/ProyectoHomologacion/issues/2): crear/listar, FISEI fija, duplicados y eliminación restringida | Integrar estructura común, buscador, tabla compacta y formulario modal accesible; errores de duplicado y eliminación como en mockups | Implementado con continuación autorizada del usuario |
+| 3. Malla y unidades | [#3 HU-05](https://github.com/PabloToapanta/ProyectoHomologacion/issues/3), [#4 HU-06](https://github.com/PabloToapanta/ProyectoHomologacion/issues/4): datos positivos, orden por nivel, contenidos y resultados | Navegación carrera → malla, filtro de nivel y alta contextual; mantener panel de unidades | Implementado con continuación autorizada del usuario |
+| 4. Consistencia y cierre | [#5](https://github.com/PabloToapanta/ProyectoHomologacion/issues/5), [#6](https://github.com/PabloToapanta/ProyectoHomologacion/issues/6), [#7](https://github.com/PabloToapanta/ProyectoHomologacion/issues/7) y #1–4 | Aplicar estructura a validaciones, verificar regresión completa y recorrido integrado con Docker; revisión cruzada y aceptación de Shirley | Verificación técnica completada; revisión y aceptación humanas pendientes |
 
 ## Contrato de presentación propuesto para Leslie y Edwin
 
@@ -97,3 +97,19 @@ conservan. Al guardar se restablece el filtro para mostrar la nueva asignatura.
 TDD del filtro: un fallo inicial y luego 92 pruebas aprobadas; build correcto.
 Se ajusta el E2E existente para cerrar el aviso modal de eliminación antes de
 interactuar con la tabla, que queda inerte mientras la ventana está abierta.
+
+
+## Cierre técnico de esta intervención
+
+Las etapas 1–4 de presentación dentro del alcance Sprint 1 están implementadas.
+La estructura común también envuelve las validaciones existentes; HU-06 conserva
+sus formularios y operaciones y recibe los estilos comunes. No se afirma réplica
+pixel a pixel del wireframe ni implementación de funciones fuera de alcance.
+
+La suite `npm run test:mockups` añade seis recorridos con API simulada en Chromium
+(1365, 390 y 320 px). Detectó problemas de foco bajo StrictMode y recorrido Tab;
+se corrigieron con foco inicial explícito, restauración solo al desmontar y ciclo
+entre controles del modal. Los seis recorridos pasan. Se inspeccionaron capturas
+de carreras, duplicado y malla, y se ajustaron los anchos de nivel/código.
+
+Ver resultados integrados y evidencia final en `evidencia-refactor-mockups.md`.
