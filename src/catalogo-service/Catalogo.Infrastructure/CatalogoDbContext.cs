@@ -10,6 +10,22 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var perfil = modelBuilder.Entity<PerfilComparacion>();
+        perfil.ToTable("PerfilesComparacion");
+        perfil.HasKey(p => p.AsignaturaId);
+        perfil.Property(p => p.AsignaturaId).ValueGeneratedNever();
+        perfil.Property(p => p.PlanAnalitico).HasMaxLength(500).IsRequired();
+        perfil.Property(p => p.UnidadHoras).HasMaxLength(100).IsRequired();
+        perfil.Property(p => p.SistemaCreditos).HasMaxLength(100).IsRequired();
+        perfil.HasOne<Asignatura>().WithMany().HasForeignKey(p => p.AsignaturaId).OnDelete(DeleteBehavior.Restrict);
+        var revision = modelBuilder.Entity<RevisionComparacion>();
+        revision.ToTable("RevisionesComparacion");
+        revision.HasKey(r => new { r.OrigenId, r.ReceptoraId });
+        revision.Property(r => r.FirmaOrigen).HasMaxLength(64).IsRequired();
+        revision.Property(r => r.FirmaReceptora).HasMaxLength(64).IsRequired();
+        revision.Property(r => r.DatosJson).IsRequired();
+        revision.HasOne<Asignatura>().WithMany().HasForeignKey(r => r.OrigenId).OnDelete(DeleteBehavior.Restrict);
+        revision.HasOne<Asignatura>().WithMany().HasForeignKey(r => r.ReceptoraId).OnDelete(DeleteBehavior.Restrict);
         var carrera = modelBuilder.Entity<Carrera>();
         carrera.ToTable("Carreras");
         carrera.HasKey(c => c.Id);

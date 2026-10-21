@@ -1,0 +1,9 @@
+.catalogo .equivalencia-tabla { width: 100%; min-width: 0; border-collapse: collapse; margin: 1.25rem 0; }
+.catalogo .equivalencia-tabla th { white-space: normal; }
+.equivalencia-tabla th, .equivalencia-tabla td { text-align: left; padding: .8rem; border-bottom: 1px solid #c5ced6; }
+.equivalencia-tabla caption { text-align: left; font-weight: 600; padding-bottom: .75rem; }
+.equivalencia-tabla progress { width: 100%; height: 1.5rem; accent-color: #285b77; }
+.equivalencia-tabla td:nth-child(2) { width: 55%; }
+.equivalencia-tabla td:last-child { white-space: nowrap; }
+.equivalencia-simple summary { cursor: pointer; }
+@media (max-width: 480px) { .equivalencia-tabla th, .equivalencia-tabla td { padding: .5rem .25rem; } .equivalencia-tabla td:nth-child(2) { width: 35%; } }

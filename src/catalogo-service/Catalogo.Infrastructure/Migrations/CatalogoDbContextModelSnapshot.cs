@@ -142,6 +142,63 @@ namespace Catalogo.Infrastructure.Migrations
                     b.ToTable("Contenidos", (string)null);
                 });
 
+            modelBuilder.Entity("Catalogo.Domain.PerfilComparacion", b =>
+                {
+                    b.Property<Guid>("AsignaturaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("EsSintetico")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PlanAnalitico")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SistemaCreditos")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UnidadHoras")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("AsignaturaId");
+
+                    b.ToTable("PerfilesComparacion", (string)null);
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.RevisionComparacion", b =>
+                {
+                    b.Property<Guid>("OrigenId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReceptoraId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DatosJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirmaOrigen")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("FirmaReceptora")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("OrigenId", "ReceptoraId");
+
+                    b.HasIndex("ReceptoraId");
+
+                    b.ToTable("RevisionesComparacion", (string)null);
+                });
+
             modelBuilder.Entity("Catalogo.Domain.UnidadCurricular", b =>
                 {
                     b.Property<Guid>("Id")
@@ -224,6 +281,30 @@ namespace Catalogo.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("UnidadTematicaId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.PerfilComparacion", b =>
+                {
+                    b.HasOne("Catalogo.Domain.Asignatura", null)
+                        .WithMany()
+                        .HasForeignKey("AsignaturaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.RevisionComparacion", b =>
+                {
+                    b.HasOne("Catalogo.Domain.Asignatura", null)
+                        .WithMany()
+                        .HasForeignKey("OrigenId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalogo.Domain.Asignatura", null)
+                        .WithMany()
+                        .HasForeignKey("ReceptoraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Catalogo.Domain.UnidadCurricular", b =>
