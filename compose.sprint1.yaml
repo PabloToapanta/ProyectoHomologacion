@@ -1,4 +1,4 @@
-# Sprint 1 disponible: HU-01/04/05/14/15/16. HU-06 no implementada aquí.
+# Sprint 1 disponible: HU-01/04/05/06/14/15/16. Aceptación de la PO pendiente.
 # Una instancia física SQL Server, bases lógicas independientes por servicio.
 x-jwt: &jwt
   Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}

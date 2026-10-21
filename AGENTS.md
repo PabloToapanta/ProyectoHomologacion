@@ -9,7 +9,7 @@ Toda tarea debe estar vinculada a un Issue de GitHub y a sus criterios de acepta
 - HU-04: CRUD de carreras.
 - HU-05: registro y consulta de asignaturas.
 - HU-06: unidades curriculares, contenidos y resultados de aprendizaje.
-- HU-14: cálculo de equivalencia en cuatro dimensiones.
+- HU-14: equivalencia en tres criterios (académico combinado, horas y créditos), según aclaración del equipo del 19/10/2026.
 - HU-15: validación de aprobación y antigüedad.
 - HU-16: mínimos de cambio interno y externo.
 
@@ -23,7 +23,7 @@ No adelantar agentes de IA, informes PDF, asignación de docentes ni carga autom
 - Motor determinista independiente de LLM.
 
 ## Distribución de trabajo vigente — tres desarrolladores con Codex
-- **Pablo:** Scrum Master y desarrollo HU-01 (T1–T3) y HU-14 (T9–T10). Estimación técnica original: 15 h. T1 y T2 ya están codificadas en `feature/hu-01-autenticacion`; T3 pendiente de comprobar.
+- **Pablo:** Scrum Master y desarrollo HU-01 (T1–T3) y HU-14 (T9–T10). Estimación técnica original: 15 h. T1–T3 incorporadas en `develop` con pruebas; la aceptación funcional corresponde a Shirley.
 - **Leslie:** desarrollo HU-04 (T4–T5) y HU-05 (T6–T8). Estimación: 14 h.
 - **Edwin:** desarrollo HU-06 (T13–T15), HU-15 (T11) y HU-16 (T12). Estimación: 16 h. Comenzar por HU-15/HU-16 con reglas y TDD, sin editar archivos compartidos de Pablo; HU-06 depende de modelos del catálogo de Leslie.
 - **Shirley:** única Product Owner, Product Backlog, criterios de aceptación, pruebas manuales, evidencias Scrum/XP, Sprint Review y retrospectiva.
@@ -38,7 +38,7 @@ No adelantar agentes de IA, informes PDF, asignación de docentes ni carga autom
 3. Aplicar TDD a reglas y validaciones: primero prueba fallida, luego implementación, luego refactorización.
 4. Mantener el cálculo de horas y créditos acotado a 100 %.
 5. No inventar datos de sílabos ni normas. Si falta información, registrar 'información incompleta'.
-6. El umbral de 80 % en cuatro dimensiones es una **propuesta del equipo** pendiente de contrastación normativa; hacerlo configurable.
+6. La aclaración académica transmitida por el equipo el 19/10/2026 establece tres criterios que deben alcanzar individualmente un umbral configurable, inicialmente 80 %. No presentarla como normativa oficial no aportada ni inventar agregaciones o conversiones pendientes.
 7. No almacenar contraseñas en texto plano ni guardar credenciales/secretos en Git.
 8. Documentar endpoints en OpenAPI/Swagger e incluir mensajes de error apropiados.
 9. No declarar tests exitosos ni funcionalidad terminada sin haberlos ejecutado y verificado.

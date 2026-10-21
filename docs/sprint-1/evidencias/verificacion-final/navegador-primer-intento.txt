@@ -1,0 +1,34 @@
+
+Running 2 tests using 1 worker
+
+(node:30557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 ../../../../../../../../../../../../tmp/cierre-browser/auditoria.spec.ts:11:5 › HU-06: consultar las cuatro unidades y editar sin perder contenido (30.0s)
+(node:30876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 ../../../../../../../../../../../../tmp/cierre-browser/auditoria.spec.ts:26:5 › HU-14/15/16: resultados positivos desde las pantallas reales (1.1s)
+
+
+  1) ../../../../../../../../../../../../tmp/cierre-browser/auditoria.spec.ts:11:5 › HU-06: consultar las cuatro unidades y editar sin perder contenido
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('row').filter({ hasText: 'AUD-ALG-LIN-20261021' }).getByRole('button', { name: 'Ver unidades' })
+
+
+      14 |   await page.getByRole('button',{name:'Asignaturas',exact:true}).click();
+      15 |   await page.getByRole('combobox',{name:'Carrera',exact:true}).selectOption(datos.carrera.id);
+    > 16 |   await page.getByRole('row').filter({hasText:'AUD-ALG-LIN-20261021'}).getByRole('button',{name:'Ver unidades'}).click();
+         |                                                                                                                  ^
+      17 |   for(let n=1;n<=4;n++)await expect(page.getByRole('article',{name:`Unidad ${n}`,exact:true})).toBeVisible();
+      18 |   await page.screenshot({path:'/tmp/cierre-unidades.png',fullPage:true});
+      19 |   await page.getByRole('button',{name:'Editar unidad 1',exact:true}).click();
+        at /tmp/cierre-browser/auditoria.spec.ts:16:114
+
+    Error Context: ../../../../../../../../../../../../tmp/cierre-e2e-pantallas/auditoria-HU-06-consultar--15650-editar-sin-perder-contenido/error-context.md
+
+  1 failed
+    ../../../../../../../../../../../../tmp/cierre-browser/auditoria.spec.ts:11:5 › HU-06: consultar las cuatro unidades y editar sin perder contenido
+  1 passed (32.3s)

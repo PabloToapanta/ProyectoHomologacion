@@ -1,0 +1,12 @@
+test_acepta_detalle_con_unidades_registradas (test_smoke.DetalleAsignaturaTests.test_acepta_detalle_con_unidades_registradas) ... ok
+test_acepta_detalle_con_unidades_vacias (test_smoke.DetalleAsignaturaTests.test_acepta_detalle_con_unidades_vacias) ... ok
+test_rechaza_cambio_en_datos_academicos (test_smoke.DetalleAsignaturaTests.test_rechaza_cambio_en_datos_academicos) ... ok
+test_rechaza_campo_preexistente_ausente (test_smoke.DetalleAsignaturaTests.test_rechaza_campo_preexistente_ausente) ... ok
+test_rechaza_detalle_sin_unidades (test_smoke.DetalleAsignaturaTests.test_rechaza_detalle_sin_unidades) ... ok
+test_rechaza_id_diferente (test_smoke.DetalleAsignaturaTests.test_rechaza_id_diferente) ... ok
+test_rechaza_unidades_con_tipo_incorrecto (test_smoke.DetalleAsignaturaTests.test_rechaza_unidades_con_tipo_incorrecto) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.000s
+
+OK

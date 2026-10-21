@@ -1,8 +1,9 @@
 # Ejecutar el incremento disponible del Sprint 1
 
 Vinculado a INFRA-01 / Issue #14 y HU-01 / #1, HU-04 / #2, HU-05 / #3,
-HU-14 / #5, HU-15 / #6 y HU-16 / #7. Este arranque no declara terminado el Sprint:
-HU-06 todavía requiere su integración y Shirley debe registrar aceptación.
+HU-06 / #4, HU-14 / #5, HU-15 / #6 y HU-16 / #7. Las siete historias tienen
+implementación integrada. Este arranque no declara terminado el Sprint:
+Shirley debe registrar aceptación y el equipo las revisiones pendientes.
 
 ## Primera ejecución
 
@@ -48,7 +49,7 @@ No colocar contraseñas en argumentos ni versionar archivos con tokens.
 | frontend | http://127.0.0.1:5173 | React; `/api` se reenvía al Gateway |
 | gateway | http://127.0.0.1:5080 | YARP, login público y rutas académicas con JWT |
 | auth-service | http://127.0.0.1:5081/swagger | Login, roles, emisión JWT |
-| catalogo-api | http://127.0.0.1:5082/swagger | Carreras FISEI y asignaturas |
+| catalogo-api | http://127.0.0.1:5082/swagger | Carreras FISEI, asignaturas, unidades y contenidos |
 | homologacion-service | http://127.0.0.1:5083/swagger | Equivalencia HU-14, antigüedad HU-15 y mínimos de cambio HU-16 |
 | auth-db | Sin puerto publicado | SQL Server, bases separadas por servicio |
 
@@ -65,6 +66,13 @@ este entorno de desarrollo; no es una configuración de producción.
 El administrador se crea mediante el seeding existente de Auth. No se precargan
 carreras reales ni planes analíticos. Un catálogo vacío en una instalación nueva
 es válido; sus lecturas y la restricción FISEI siguen comprobándose por smoke.
+No basta un catálogo vacío para demostrar HU-06: el smoke informa cuántas
+asignaturas/unidades consultó y advierte cuando faltan datos de demostración.
+
+Las unidades se gestionan desde Catálogo → Asignaturas → Ver unidades.
+Las pantallas de HU-14/HU-15/HU-16 están en `/validaciones`. El formulario de
+equivalencia compara un par; múltiples orígenes siguen disponibles por API.
+Las correspondencias son explícitas, con evidencia humana, sin inferencia de IA.
 
 ## Actualizar o detener conservando datos
 
@@ -102,9 +110,24 @@ consulta de carreras y asignaturas existentes, rechazo de otra facultad, cinco
 escenarios HU-15, siete escenarios HU-16 y errores de datos, fixture sintético HU-14 con evidencia y estado
 incompleto para múltiples fuentes, y frontend HTTP 200. No escribe datos académicos.
 
+HU-06 amplía el detalle de asignatura con `unidades`, sin cambiar el listado.
+El smoke compara los campos del listado y comprueba la colección por separado;
+no exige igualdad completa de dos DTO distintos. La regresión tiene pruebas con
+colección vacía, poblada, ausente, tipo incorrecto y diferencias en datos comunes:
+
+```bash
+python3 -m unittest discover -s tests/sprint-1 -p 'test_*.py' -v
+```
+
+Estas pruebas se incluyen en el workflow de homologación. El smoke de lecturas
+no sustituye las pruebas de alta/edición, ni valida la exactitud de una transcripción
+académica. La plantilla de cuatro unidades de Álgebra Lineal y su cargador manual
+están en `src/catalogo-service/examples/hu-06`; revisar su fuente con el equipo.
+
 HU-14, HU-15 y HU-16 conservan endpoints y resultados independientes: `Elegible` no significa
 `Homologable`, y cumplir mínimos no representa una aprobación institucional. La cantidad
 de homologables de HU-16 es una entrada declarada y debe provenir de evaluaciones completas
 verificadas; no se calcula a partir del catálogo ni se infiere procedencia institucional.
-No se agrega un flujo
-combinado de solicitudes, una UI de homologación, IA, PDF ni nuevas normas.
+No se agrega un flujo combinado de solicitudes, IA, PDF ni nuevas normas.
+Ver [preparación de aceptación](preparacion-aceptacion-sprint-1.md) para el recorrido
+de comprobación humana; los resultados técnicos no marcan aceptación de la PO.

@@ -45,5 +45,9 @@ sqlserver-data/
 *.log
 logs/
 
+# Python / comprobaciones de integración
+__pycache__/
+*.py[cod]
+
 # Documentos originales de referencia almacenados solo en equipos locales
 docs/referencias/*.pdf

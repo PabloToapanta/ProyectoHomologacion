@@ -1,0 +1,29 @@
+Rama feature/hu-06-verificacion-final; base develop 34bcc67. Resultados ejecutados el 21/10/2026.
+
+cierre-root-build:
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+cierre-cat-build:
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+cierre-root-test:
+Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 94 ms - Auth.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    71, Skipped:     0, Total:    71, Duration: 143 ms - Homologacion.Domain.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    32, Skipped:     0, Total:    32, Duration: 141 ms - Homologacion.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    85, Skipped:     0, Total:    85, Duration: 3 s - Homologacion.Api.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    63, Skipped:     0, Total:    63, Duration: 4 s - Gateway.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    44, Skipped:     0, Total:    44, Duration: 4 s - AuthService.Tests.dll (net8.0)
+
+cierre-cat-test:
+Passed!  - Failed:     0, Passed:    72, Skipped:     0, Total:    72, Duration: 4 s - Catalogo.Tests.dll (net8.0)
+
+cierre-front-build:
+✓ built in 536ms
+
+cierre-front-test:
+ Test Files  11 passed (11)
+      Tests  89 passed (89)

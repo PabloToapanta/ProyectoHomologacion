@@ -2,7 +2,7 @@
 
 Proyecto académico de la asignatura **Metodologías Ágiles**. Se desarrolla con Scrum + XP para analizar la posible homologación de asignaturas en cambios de carrera internos y externos.
 
-> **Estado:** incremento del Sprint 1 en desarrollo. HU-01, HU-04, HU-05 y HU-14 tienen implementación; se integra el arranque de HU-15 y HU-16. HU-06 sigue pendiente de integración. La aceptación funcional corresponde a la Product Owner. Las decisiones académicas oficiales quedan fuera del sistema: la aplicación solo emite sugerencias.
+> **Estado:** las siete historias del Sprint 1 tienen implementación integrada: HU-01, HU-04, HU-05, HU-06, HU-14, HU-15 y HU-16. La aceptación funcional, las revisiones pendientes y el cierre del Sprint deben registrarse por el equipo; no se deducen del código. La aplicación solo emite sugerencias, no decisiones académicas oficiales.
 
 ## Ejecución local integrada
 
@@ -17,6 +17,11 @@ python3 tests/sprint-1/smoke.py --env-file .env.sprint1
 Frontend: <http://127.0.0.1:5173>. Una instancia SQL aloja bases separadas de Auth
 y Catálogo. Conservar proyecto y volumen al actualizar; la guía explica cómo
 reutilizar la demostración existente sin borrar sus datos.
+
+El catálogo permite registrar, consultar y editar unidades, contenidos y resultados
+de aprendizaje. Las pantallas de equivalencia, antigüedad y requisitos están en
+`/validaciones`. HU-14 conserva múltiples orígenes por API; su formulario presenta
+un par de asignaturas. Los tres casos de uso siguen siendo independientes.
 
 ## Equipo y roles
 
