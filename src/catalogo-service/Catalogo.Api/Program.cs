@@ -31,6 +31,8 @@ builder.Services.AddScoped<IAsignaturaRepository, AsignaturaRepository>();
 builder.Services.AddScoped<AsignaturaService>();
 builder.Services.AddScoped<IUnidadRepository, UnidadRepository>();
 builder.Services.AddScoped<UnidadService>();
+builder.Services.AddScoped<IComparacionCatalogoRepository, ComparacionCatalogoRepository>();
+builder.Services.AddScoped<ComparacionCatalogoService>();
 
 var issuer = builder.Configuration["Jwt:Issuer"];
 var audience = builder.Configuration["Jwt:Audience"];

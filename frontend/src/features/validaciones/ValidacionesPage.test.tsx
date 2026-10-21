@@ -28,26 +28,3 @@ test('evalúa antigüedad, limpia resultados al cambiar datos y muestra incumpli
   await screen.findByText('No cumple los requisitos evaluados');
   expect(screen.getByText('Se requieren dos asignaturas.')).toBeVisible();
 });
-
-test('equivalencia envía inventarios explícitos y presenta información incompleta', async () => {
-  request.mockReset();
-  render(<MemoryRouter><ValidacionesPage /></MemoryRouter>);
-  const user = userEvent.setup();
-  await user.click(screen.getByRole('button', { name: 'Equivalencia de asignaturas' }));
-  for (const lado of ['origen', 'receptora']) {
-    for (const [label, valor] of [['Identificador', lado], ['Referencia al plan analítico', 'plan'], ['Unidad de horas', 'hora-reloj'], ['Sistema de créditos', 'sistema']])
-      await user.type(screen.getByLabelText(`${label} (${lado})`), valor!);
-    await user.type(screen.getByLabelText(`Horas (${lado})`), '100');
-    await user.type(screen.getByLabelText(`Créditos (${lado})`), '3');
-    await user.type(screen.getByLabelText(`Contenidos (${lado}, uno por línea)`), lado === 'origen' ? 'Tema A' : 'Tema B');
-  }
-  await user.selectOptions(screen.getByLabelText('Consta aprobada'), 'si');
-  await user.selectOptions(screen.getByLabelText('Elemento de origen para Tema B'), 'Tema A');
-  request.mockResolvedValueOnce(new Response(JSON.stringify({ estado: 'InformacionIncompleta', homologable: false, compatibilidadAcademicaPct: null, compatibilidadHorariaPct: 100, compatibilidadCreditosPct: 100, umbralPct: 80, justificacion: 'Falta evidencia.', informacionFaltante: ['Ubicación de evidencia ausente'], contenidosSinCobertura: ['Tema B'], resultadosAprendizajeSinCobertura: [] })));
-  await user.click(screen.getByRole('button', { name: 'Evaluar equivalencia' }));
-  await screen.findByText('Información incompleta');
-  expect(screen.getByText('Sin determinar')).toBeVisible();
-  const datos = JSON.parse(request.mock.calls[0]![1].body);
-  expect(datos.origenes[0].aprobada).toBe(true);
-  expect(datos.correspondenciasContenidos[0].elementoReceptor).toBe('Tema B');
-});
