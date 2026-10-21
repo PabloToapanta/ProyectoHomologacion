@@ -110,3 +110,17 @@ docker compose --env-file /tmp/hu01-t3.env \
 `down` conserva los datos SQL del proyecto. Eliminar su volumen borra los usuarios de ese entorno de desarrollo.
 
 Evidencia real, capturas y pendientes: `docs/sprint-1/evidencia-hu-01-t3.md`.
+
+
+### Verificación visual de los mockups
+
+`npm run test:mockups` inicia Vite en 127.0.0.1:5179 y ejecuta seis recorridos
+Chromium en escritorio (1365 px), móvil (390 px) y compacto (320 px).
+Usa API simulada y datos sintéticos; no necesita credenciales ni reemplaza
+`npm run test:e2e`, que comprueba Gateway/Auth/Catálogo reales.
+Cubre búsqueda, duplicados en modal, Escape/Tab/retorno de foco, eliminación
+restringida, malla contextual, filtro por nivel, unidades y navegación de Docente.
+Las capturas se guardan en `test-results/mockups/` (excluido de Git).
+
+El catálogo conserva `/admin/carreras`; `?seccion=asignaturas&carrera=<UUID>` abre
+la malla de una carrera. La sesión continúa en memoria: recargar exige login.

@@ -40,6 +40,7 @@
 .academic-note p { margin: 5px 0; }
 .academic-footer { padding: 24px; font-size: 11px; color: var(--muted); text-align: center; }
 .skip-link { position: fixed; left: 16px; top: -100px; padding: 12px; background: white; z-index: 10; }
+.skip-link:not(:focus) { clip-path: inset(50%); }
 .skip-link:focus { top: 12px; }
 @media (max-width: 1000px) {
   .academic-workspace { grid-template-columns: 200px minmax(0, 1fr); }

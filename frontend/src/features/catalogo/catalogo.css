@@ -61,3 +61,7 @@
 .catalogo td .catalogo-actions button { white-space: nowrap; }
 .catalogo-card article.catalogo-card { border-left: 3px solid #b4c9c0; box-shadow: none; }
 .catalogo-card li { line-height: 1.8; overflow-wrap: anywhere; }
+
+.catalogo th { white-space: nowrap; }
+.catalogo .malla-table td:first-child { min-width: 64px; }
+.catalogo .malla-table td:nth-child(2) { min-width: 140px; white-space: nowrap; }
