@@ -129,7 +129,12 @@ namespace Catalogo.Infrastructure.Migrations
                     b.Property<Guid>("UnidadCurricularId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("UnidadTematicaId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UnidadTematicaId");
 
                     b.HasIndex("UnidadCurricularId", "Orden")
                         .IsUnique();
@@ -174,6 +179,30 @@ namespace Catalogo.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Catalogo.Domain.UnidadTematica", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UnidadCurricularId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UnidadCurricularId", "Orden")
+                        .IsUnique();
+
+                    b.ToTable("UnidadesTematicas", (string)null);
+                });
+
             modelBuilder.Entity("Catalogo.Domain.Asignatura", b =>
                 {
                     b.HasOne("Catalogo.Domain.Carrera", null)
@@ -190,6 +219,11 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasForeignKey("UnidadCurricularId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Catalogo.Domain.UnidadTematica", null)
+                        .WithMany()
+                        .HasForeignKey("UnidadTematicaId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Catalogo.Domain.UnidadCurricular", b =>
@@ -201,9 +235,20 @@ namespace Catalogo.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Catalogo.Domain.UnidadTematica", b =>
+                {
+                    b.HasOne("Catalogo.Domain.UnidadCurricular", null)
+                        .WithMany("Tematicas")
+                        .HasForeignKey("UnidadCurricularId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Catalogo.Domain.UnidadCurricular", b =>
                 {
                     b.Navigation("Contenidos");
+
+                    b.Navigation("Tematicas");
                 });
 #pragma warning restore 612, 618
         }

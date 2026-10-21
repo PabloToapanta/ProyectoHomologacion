@@ -13,10 +13,16 @@ $detalle = Invoke-RestMethod "$base/api/asignaturas/$AsignaturaId" -Headers $hea
 if ($detalle.nombre -notmatch '(?i)^[ÁA]lgebra Lineal$' -or $detalle.horas -ne 144 -or $detalle.creditos -ne 3) { throw 'Selecciona Álgebra Lineal de 3 créditos y 144 horas para esta carga de demostración.' }
 $unidades = @(Get-Content -LiteralPath $Archivo -Raw -Encoding utf8 | ConvertFrom-Json)
 foreach ($unidad in $unidades) {
+    $contenidosEsperados = if ($unidad.tematicas) { @($unidad.tematicas | ForEach-Object { $_.contenidos }) } else { @($unidad.contenidos) }
     $previa = @($detalle.unidades | Where-Object { $_.numero -eq $unidad.numero })
     if ($previa.Count) {
         $temasPrevios = @($previa[0].contenidos | Sort-Object orden | ForEach-Object { $_.tema })
-        if ($previa[0].nombre -ne $unidad.nombre -or $previa[0].horas -ne $unidad.horas -or $previa[0].resultadoAprendizaje -ne $unidad.resultadoAprendizaje -or (ConvertTo-Json -InputObject $temasPrevios -Compress) -cne (ConvertTo-Json -InputObject @($unidad.contenidos) -Compress)) { throw "La unidad $($unidad.numero) ya existe con datos distintos. No se sobrescribe." }
+        if ($previa[0].nombre -ne $unidad.nombre -or $previa[0].horas -ne $unidad.horas -or $previa[0].resultadoAprendizaje -ne $unidad.resultadoAprendizaje -or (ConvertTo-Json -InputObject $temasPrevios -Compress) -cne (ConvertTo-Json -InputObject $contenidosEsperados -Compress)) { throw "La unidad $($unidad.numero) ya existe con datos distintos. No se sobrescribe." }
+        if ($unidad.tematicas) {
+            $gruposPrevios = @($previa[0].tematicas | Sort-Object orden | ForEach-Object { @{ nombre = $_.nombre; contenidos = @($_.contenidos | Sort-Object orden | ForEach-Object { $_.tema }) } })
+            $gruposEsperados = @($unidad.tematicas | ForEach-Object { @{ nombre = $_.nombre; contenidos = @($_.contenidos) } })
+            if ((ConvertTo-Json -InputObject $gruposPrevios -Depth 5 -Compress) -cne (ConvertTo-Json -InputObject $gruposEsperados -Depth 5 -Compress)) { throw "La unidad $($unidad.numero) necesita revisión de sus temáticas. Usa Editar unidad; no se reclasifica automáticamente." }
+        }
         Write-Output "Unidad $($unidad.numero) ya registrada; se conserva."
         continue
     }

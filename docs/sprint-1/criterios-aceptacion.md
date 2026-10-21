@@ -21,6 +21,9 @@ Transcripción organizada de los criterios detallados para HU-01, HU-04, HU-05, 
 - [ ] Consultar malla de carrera y ordenar asignaturas por nivel.
 
 ## HU-06 — Unidades curriculares y contenidos
+- [ ] Aclaración docente 21/10/2026: unidad curricular → unidades temáticas → contenidos mínimos; horas y resultado de aprendizaje compartidos en la curricular.
+- [ ] Registrar, consultar y editar varias temáticas por unidad, conservando su asociación con los contenidos.
+- [ ] Contenidos anteriores sin clasificación se conservan y requieren asignación humana, sin inferencias automáticas.
 - [ ] Registrar unidad con contenido y resultados de aprendizaje asociados a una asignatura.
 - [ ] Unidad sin campos obligatorios: error.
 - [ ] Consulta de asignatura incluye unidades, contenidos y resultados.
