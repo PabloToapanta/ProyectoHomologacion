@@ -51,6 +51,17 @@ public sealed class AuthBehaviorTests : IDisposable
     }
 
     [Fact]
+    public async Task Correo_como_usuario_de_prueba_se_autentica_con_password_local()
+    {
+        var correo = "usuario.sintetico@uta.edu.ec";
+        await new AdminSeeder(db, hasher, Options.Create(new AdminSeedOptions {
+            Enabled = true, NombreUsuario = correo, Password = TestPassword
+        })).SeedAsync();
+        Assert.NotNull(await Service().LoginAsync(new LoginCommand(correo.ToUpperInvariant(), TestPassword)));
+        Assert.Null(await Service().LoginAsync(new LoginCommand(correo, "incorrecta")));
+    }
+
+    [Fact]
     public async Task CredencialesCorrectas_EmitenJwtFirmadoConRolYExpiracion()
     {
         var user = await AddUser();
