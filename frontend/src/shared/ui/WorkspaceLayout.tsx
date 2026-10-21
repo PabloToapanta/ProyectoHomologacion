@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { NavLink } from 'react-router';
+import { Link, NavLink, useLocation } from 'react-router';
 import { useAuth } from '../../features/auth';
 import { AcademicIcon } from './AcademicIcon';
 import '../mockups.css';
@@ -7,6 +7,9 @@ import '../mockups.css';
 /** Estructura reutilizable; solo enlaza módulos existentes. */
 export function WorkspaceLayout({ children }: { children: ReactNode }) {
   const { session, logout } = useAuth();
+  const location = useLocation();
+  const asignaturas = new URLSearchParams(location.search).get('seccion') === 'asignaturas';
+  const catalogo = location.pathname === '/admin/carreras';
   return <div className="academic-workspace">
     <a className="skip-link" href="#workspace-content">Saltar al contenido</a>
     <header className="academic-header">
@@ -18,8 +21,9 @@ export function WorkspaceLayout({ children }: { children: ReactNode }) {
     <aside className="academic-sidebar">
       <p className="eyebrow">ESPACIO ACADÉMICO</p>
       <nav aria-label="Navegación principal">
-        <NavLink to="/panel" end><span aria-hidden="true">⌂</span>Panel</NavLink>
-        <NavLink to="/admin/carreras"><span aria-hidden="true">▤</span>Carreras y asignaturas</NavLink>
+        {session?.role === 'Administrador' && <><NavLink to="/panel" end><span aria-hidden="true">⌂</span>Panel</NavLink>
+        <Link to="/admin/carreras" className={catalogo && !asignaturas ? 'active' : undefined} aria-current={catalogo && !asignaturas ? 'page' : undefined}><span aria-hidden="true">▤</span>Carreras</Link>
+        <Link to="/admin/carreras?seccion=asignaturas" className={catalogo && asignaturas ? 'active' : undefined} aria-current={catalogo && asignaturas ? 'page' : undefined}><span aria-hidden="true">▥</span>Asignaturas</Link></>}
         <NavLink to="/validaciones"><span aria-hidden="true">✓</span>Validaciones académicas</NavLink>
       </nav>
       <p className="sidebar-caption">Facultad de Ingeniería en Sistemas, Electrónica e Industrial</p>

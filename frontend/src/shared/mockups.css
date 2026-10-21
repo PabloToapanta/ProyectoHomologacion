@@ -52,7 +52,7 @@
   .academic-header { padding: 16px 20px; flex-wrap: wrap; gap: 16px; }
   .academic-account { width: 100%; justify-content: space-between; }
   .academic-sidebar { grid-row: auto; padding: 12px; border-right: 0; border-bottom: 1px solid var(--line); }
-  .academic-sidebar nav { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .academic-sidebar nav { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
   .academic-sidebar a { flex-direction: column; gap: 4px; padding: 10px 5px; font-size: 11px; text-align: center; }
   .academic-sidebar .eyebrow, .sidebar-caption { display: none; }
   .academic-content { padding: 26px 20px; }

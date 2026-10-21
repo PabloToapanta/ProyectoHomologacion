@@ -70,3 +70,15 @@ la hoja anterior sobre el centrado. Capturas temporales: `/tmp/fisei-*-login.png
 No se ejecutó el recorrido integrado contra Gateway/Auth reales ni Docker Compose
 en esta intervención. No se modificaron reglas de negocio ni validaciones de dominio.
 No implica aceptación funcional de la PO, revisión cruzada ni cumplimiento de toda la DoD.
+
+## Continuación autorizada — 21/10/2026
+
+El usuario indicó continuar con los demás módulos en la misma rama y realizar commits
+atómicos. Se aplica la propuesta anterior a la presentación del catálogo y las
+validaciones. Se consultaron los Issues #2–7; HU-14 remoto sigue mostrando el contrato
+histórico, por lo que se conserva la aclaración local vigente de tres criterios.
+
+Segundo bloque: estructura común en catálogo y validaciones, enlaces separados a
+carreras/asignaturas mediante query string, navegación según rol y tablas compactas.
+No se modifican servicios ni reglas académicas. Build y 89 pruebas frontend correctas.
+La autorización para implementar no sustituye revisión cruzada ni aceptación de la PO.

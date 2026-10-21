@@ -30,3 +30,17 @@
 .catalogo-scroll-hint { display: none; }
 @media (max-width: 650px) { .catalogo-scroll-hint { display: block; color: var(--muted); font-size: 12px; line-height: 1.6; } }
 @media (max-width: 650px) { .catalogo-fields { grid-template-columns: 1fr; } .catalogo-card { padding: 18px; } .catalogo .workspace-heading > button { margin-top: 20px; } }
+
+/* Estructura común: tablas y formularios dentro del área de trabajo. */
+.catalogo-back { display: inline-block; margin-bottom: 18px; color: var(--accent); font-size: 12px; }
+.catalogo-tabs { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 18px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+.catalogo-tabs [aria-pressed="true"] { background: var(--accent); color: white; }
+.catalogo { min-width: 0; }
+.catalogo table th { background: #f0f3f2; color: var(--ink); }
+.catalogo tbody tr:nth-child(even) { background: #fafbfb; }
+.catalogo tbody tr:hover { background: #f3f7f5; }
+.catalogo td, .catalogo th { padding: 14px 12px; }
+.catalogo table .app-button { min-height: 36px; padding: 8px 10px; }
+.catalogo-card { border-radius: 8px; }
+.catalogo textarea, .catalogo select { font: inherit; }
+.catalogo textarea { resize: vertical; }

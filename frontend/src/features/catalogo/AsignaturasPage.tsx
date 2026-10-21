@@ -73,7 +73,7 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
     finally { setGuardando(false); }
   }
 
-  return <main className="workspace-main catalogo">
+  return <div className="catalogo">
     <p className="eyebrow">ADMINISTRACIÓN / CATÁLOGO ACADÉMICO</p>
     <div className="workspace-heading"><div><h1>Gestión de asignaturas</h1><p>Consulta las asignaturas por carrera y registra sus datos académicos.</p></div>
       <button className="app-button app-button--primary" disabled={!carreraId || cargando || !!errorListado || guardando || !!form} onClick={() => { setForm({ ...vacio }); setError(''); setAviso(''); }}>Nueva asignatura</button></div>
@@ -103,5 +103,5 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
           <tbody>{[...asignaturas].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td><td><button className="app-button app-button--secondary" onClick={() => setSeleccionada(a)}>Ver unidades de {a.nombre}</button></td></tr>)}</tbody></table></div></>}
     </section>}
     {seleccionada && <UnidadesPanel key={seleccionada.id} asignaturaId={seleccionada.id} nombre={seleccionada.nombre} request={request} cerrar={() => setSeleccionada(null)} />}
-  </main>;
+  </div>;
 }

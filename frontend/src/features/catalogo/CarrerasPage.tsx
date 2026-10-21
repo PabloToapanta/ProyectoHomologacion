@@ -74,7 +74,7 @@ export function CarrerasPage({ request }: { request: CatalogoRequest }) {
     finally { setOcupado(false); }
   }
 
-  return <main className="workspace-main catalogo">
+  return <div className="catalogo">
     <p className="eyebrow">ADMINISTRACIÓN / CATÁLOGO ACADÉMICO</p>
     <div className="workspace-heading"><div><h1>Gestión de carreras</h1><p>Registra y actualiza las carreras de FISEI.</p></div>
       <button className="app-button app-button--primary" disabled={ocupado || cargando || !!errorCarga || !!form} onClick={() => abrir()}>Nueva carrera</button></div>
@@ -111,5 +111,5 @@ export function CarrerasPage({ request }: { request: CatalogoRequest }) {
       <div className="catalogo-actions"><button className="app-button catalogo-danger" disabled={ocupado} onClick={eliminar}>{ocupado ? 'Eliminando…' : 'Confirmar eliminación'}</button>
         <button className="app-button app-button--secondary" disabled={ocupado} onClick={() => setEliminando(null)}>Cancelar</button></div>
     </dialog>}
-  </main>;
+  </div>;
 }
