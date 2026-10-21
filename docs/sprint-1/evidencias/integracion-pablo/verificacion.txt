@@ -1,0 +1,29 @@
+Resultados finales en feature/hu-15-integracion-sprint-1; base develop e0caaa8.
+
+pablo-hu16-build:
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+pablo-hu16-catalogo-build:
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+pablo-hu16-tests:
+Passed!  - Failed:     0, Passed:    32, Skipped:     0, Total:    32, Duration: 250 ms - Homologacion.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    71, Skipped:     0, Total:    71, Duration: 134 ms - Homologacion.Domain.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 131 ms - Auth.Application.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    83, Skipped:     0, Total:    83, Duration: 5 s - Homologacion.Api.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    43, Skipped:     0, Total:    43, Duration: 6 s - AuthService.Tests.dll (net8.0)
+Passed!  - Failed:     0, Passed:    61, Skipped:     0, Total:    61, Duration: 6 s - Gateway.Tests.dll (net8.0)
+
+pablo-hu16-catalogo-tests:
+Passed!  - Failed:     0, Passed:    71, Skipped:     0, Total:    71, Duration: 6 s - Catalogo.Tests.dll (net8.0)
+
+pablo-hu16-frontend-build:
+✓ built in 632ms
+
+pablo-hu16-frontend-tests:
+ Test Files  9 passed (9)
+      Tests  85 passed (85)

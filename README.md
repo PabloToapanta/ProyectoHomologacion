@@ -2,7 +2,21 @@
 
 Proyecto académico de la asignatura **Metodologías Ágiles**. Se desarrolla con Scrum + XP para analizar la posible homologación de asignaturas en cambios de carrera internos y externos.
 
-> **Estado:** inicio del Sprint 1. El software aún no está implementado ni validado. Las decisiones académicas oficiales quedan fuera del sistema: la aplicación solo emite sugerencias.
+> **Estado:** incremento del Sprint 1 en desarrollo. HU-01, HU-04, HU-05 y HU-14 tienen implementación; se integra el arranque de HU-15 y HU-16. HU-06 sigue pendiente de integración. La aceptación funcional corresponde a la Product Owner. Las decisiones académicas oficiales quedan fuera del sistema: la aplicación solo emite sugerencias.
+
+## Ejecución local integrada
+
+Consultar la [guía de ejecución](docs/sprint-1/ejecucion-integrada.md): copiar `.env.example`
+a `.env.sprint1`, completar las credenciales privadas y ejecutar desde la raíz:
+
+```bash
+docker compose --env-file .env.sprint1 -p fisei-uta-sprint1 -f compose.sprint1.yaml up -d --build --wait --wait-timeout 180
+python3 tests/sprint-1/smoke.py --env-file .env.sprint1
+```
+
+Frontend: <http://127.0.0.1:5173>. Una instancia SQL aloja bases separadas de Auth
+y Catálogo. Conservar proyecto y volumen al actualizar; la guía explica cómo
+reutilizar la demostración existente sin borrar sus datos.
 
 ## Equipo y roles
 
@@ -49,4 +63,6 @@ Consultar `AGENTS.md` y `docs/contexto-proyecto.md` para alcance, reglas de nego
 
 ## Documentación
 
-La planificación del Sprint 1, las decisiones arquitectónicas, los criterios de aceptación y el registro de evidencias se agregarán en `docs/`. El repositorio se encuentra en preparación.
+La planificación, contratos, criterios y evidencias están en `docs/`. Consultar
+los resultados ejecutados de cada historia; código integrado no equivale a
+aceptación ni a finalización del Sprint.

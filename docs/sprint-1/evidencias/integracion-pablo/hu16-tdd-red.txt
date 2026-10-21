@@ -1,0 +1,22 @@
+TDD HU-16 / Issue #7: antes de registrar ValidarRequisitosCambio en Program.cs.
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Failed!  - Failed:    10, Passed:     1, Skipped:     0, Total:    11, Duration: 316 ms - Homologacion.Api.Tests.dll (net8.0)

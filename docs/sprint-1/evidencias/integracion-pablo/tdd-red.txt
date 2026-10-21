@@ -1,0 +1,18 @@
+TDD composición HU-15 / Issue #6, antes de registrar ValidarAntiguedad en Program.cs.
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Expected: OK
+Actual:   InternalServerError
+Failed!  - Failed:     8, Passed:     1, Skipped:     0, Total:     9, Duration: 241 ms - Homologacion.Api.Tests.dll (net8.0)

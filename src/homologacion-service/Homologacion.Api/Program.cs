@@ -1,6 +1,8 @@
 using System.Text;
 using Homologacion.Api.Security;
+using Homologacion.Application.Antiguedad;
 using Homologacion.Application.Equivalencias;
+using Homologacion.Application.RequisitosCambio;
 using Homologacion.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +20,8 @@ public partial class Program
         builder.Services.AddProblemDetails();
         builder.Services.AddHomologacionInfrastructure();
         builder.Services.AddScoped<EvaluarEquivalencia>();
+        builder.Services.AddScoped<ValidarAntiguedad>();
+        builder.Services.AddScoped<ValidarRequisitosCambio>();
         builder.Services.AddOptions<JwtOptions>().BindConfiguration("Jwt").ValidateDataAnnotations().ValidateOnStart();
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
         builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
@@ -48,8 +52,8 @@ public partial class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Homologación FISEI-UTA — HU-14 / Issue #5", Version = "v1",
-                Description = "Tres criterios confirmados por aclaración académica del equipo: contenidos y resultados combinados por elemento, horas y créditos. Contrato incompatible con la versión anterior. Múltiples orígenes no suman horas ni créditos sin regla aprobada." });
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Homologación FISEI-UTA — HU-14, HU-15 y HU-16 / Issues #5, #6 y #7", Version = "v1",
+                Description = "Equivalencia: tres criterios, contenidos y resultados combinados por elemento, horas y créditos. Múltiples orígenes no suman horas ni créditos sin regla aprobada. Antigüedad: aprobación y máximo diez años inclusive. Requisitos: mínimos de cambio interno y externo. Son evaluaciones independientes, no una resolución oficial." });
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             { Type = SecuritySchemeType.Http, Scheme = "bearer", BearerFormat = "JWT" });
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
