@@ -53,8 +53,16 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
         unidad.Property(u => u.ResultadoAprendizaje).HasMaxLength(4000).IsRequired();
         unidad.HasIndex(u => new { u.AsignaturaId, u.Numero }).IsUnique();
         unidad.HasOne<Asignatura>().WithMany().HasForeignKey(u => u.AsignaturaId).OnDelete(DeleteBehavior.Restrict);
+        var tematica = modelBuilder.Entity<UnidadTematica>();
+        tematica.ToTable("UnidadesTematicas");
+        tematica.HasKey(t => t.Id);
+        tematica.Property(t => t.Id).ValueGeneratedNever();
+        tematica.Property(t => t.Nombre).HasMaxLength(200).IsRequired();
+        tematica.HasIndex(t => new { t.UnidadCurricularId, t.Orden }).IsUnique();
+        unidad.HasMany(u => u.Tematicas).WithOne().HasForeignKey(t => t.UnidadCurricularId).OnDelete(DeleteBehavior.Cascade);
         var contenido = modelBuilder.Entity<Contenido>();
         contenido.ToTable("Contenidos");
+        contenido.HasOne<UnidadTematica>().WithMany().HasForeignKey(c => c.UnidadTematicaId).OnDelete(DeleteBehavior.Restrict);
         contenido.HasKey(c => c.Id);
         contenido.Property(c => c.Id).ValueGeneratedNever();
         contenido.Property(c => c.Tema).HasMaxLength(4000).IsRequired();

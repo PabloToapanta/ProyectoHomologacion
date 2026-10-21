@@ -4,9 +4,10 @@ import type { FormEvent } from 'react';
 
 import type { CatalogoRequest } from './carreras-api';
 
-interface Unidad { id: string; numero: number; nombre: string; horas: number; resultadoAprendizaje: string; contenidos: { id: string; orden: number; tema: string }[] }
+interface Tematica { id?: string; nombre: string; contenidos: { id: string; orden: number; tema: string }[] }
+interface Unidad { id: string; numero: number; nombre: string; horas: number; resultadoAprendizaje: string; contenidos: { id: string; orden: number; tema: string }[]; tematicas?: Tematica[]; contenidosSinClasificar?: { tema: string }[] }
 
-const inicial = { numero: '', nombre: '', horas: '', resultadoAprendizaje: '', contenidos: '' };
+const inicial = { numero: '', nombre: '', horas: '', resultadoAprendizaje: '', tematicas: [{ nombre: '', contenidos: '' }] };
 
 const mensaje = (e: unknown) => e instanceof Error ? e.message : 'No se pudo completar la operación.';
 
@@ -57,9 +58,10 @@ export function UnidadesPanel({ asignaturaId, nombre, request, cerrar }: { asign
 
     const numero = Number(form.numero), horas = Number(form.horas);
 
-    const contenidos = form.contenidos.split('\n').map(t => t.trim()).filter(Boolean);
+    const tematicas = form.tematicas.map(t => ({ nombre: t.nombre.trim(), contenidos: t.contenidos.split('\n').map(c => c.trim()).filter(Boolean) }));
+    const contenidos = tematicas.flatMap(t => t.contenidos);
 
-    if (!Number.isInteger(numero) || numero <= 0 || numero > 2147483647 || !Number.isInteger(horas) || horas <= 0 || horas > 2147483647 || !form.nombre.trim() || !form.resultadoAprendizaje.trim() || contenidos.length === 0 || contenidos.length > 200 || contenidos.some(c => c.length > 4000)) {
+    if (!Number.isInteger(numero) || numero <= 0 || numero > 2147483647 || !Number.isInteger(horas) || horas <= 0 || horas > 2147483647 || !form.nombre.trim() || !form.resultadoAprendizaje.trim() || contenidos.length === 0 || contenidos.length > 200 || contenidos.some(c => c.length > 4000) || tematicas.some(t => !t.nombre || t.contenidos.length === 0)) {
 
       setError('Completa nombre, resultado, número y horas positivos, y entre 1 y 200 contenidos (máximo 4000 caracteres por contenido).'); return;
 
@@ -69,7 +71,7 @@ export function UnidadesPanel({ asignaturaId, nombre, request, cerrar }: { asign
 
     try {
 
-      const response = await request(`/api/asignaturas/${encodeURIComponent(asignaturaId)}/unidades${editando ? `/${encodeURIComponent(editando)}` : ''}`, { method: editando ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, numero, horas, contenidos }) });
+      const response = await request(`/api/asignaturas/${encodeURIComponent(asignaturaId)}/unidades${editando ? `/${encodeURIComponent(editando)}` : ''}`, { method: editando ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, numero, horas, tematicas }) });
 
       if (!response.ok) {
 
@@ -100,7 +102,13 @@ export function UnidadesPanel({ asignaturaId, nombre, request, cerrar }: { asign
 
         <label className="auth-label">Resultado de aprendizaje<textarea className="auth-input" rows={4} maxLength={4000} required value={form.resultadoAprendizaje} onChange={e => setForm({ ...form, resultadoAprendizaje: e.target.value })} /></label>
 
-        <label className="auth-label">Contenidos (uno por línea)<textarea className="auth-input" required rows={8} value={form.contenidos} onChange={e => setForm({ ...form, contenidos: e.target.value })} /></label>
+        <section className="catalogo-tematicas"><h4>Unidades temáticas</h4><p>Las horas y el resultado anteriores corresponden a toda la unidad curricular.</p>
+          {form.tematicas.map((t, i) => <fieldset className="catalogo-card" key={i}><legend>Unidad temática {i + 1}</legend>
+            <label className="auth-label">Nombre de temática {i + 1}<input className="auth-input" required maxLength={200} value={t.nombre} onChange={e => setForm({ ...form, tematicas: form.tematicas.map((v, j) => j === i ? { ...v, nombre: e.target.value } : v) })} /></label>
+            <label className="auth-label">Contenidos de temática {i + 1} (uno por línea)<textarea className="auth-input" required rows={5} value={t.contenidos} onChange={e => setForm({ ...form, tematicas: form.tematicas.map((v, j) => j === i ? { ...v, contenidos: e.target.value } : v) })} /></label>
+            <button type="button" className="app-button app-button--secondary" disabled={form.tematicas.length === 1} onClick={() => setForm({ ...form, tematicas: form.tematicas.filter((_, j) => j !== i) })}>Quitar temática {i + 1}</button>
+          </fieldset>)}<button type="button" className="app-button app-button--secondary" disabled={form.tematicas.length >= 100} onClick={() => setForm({ ...form, tematicas: [...form.tematicas, { nombre: '', contenidos: '' }] })}>Añadir unidad temática</button>
+        </section>
 
       </fieldset><button className="app-button app-button--primary" disabled={guardando}>{guardando ? 'Guardando…' : editando ? 'Guardar cambios' : 'Guardar unidad'}</button><button type="button" className="app-button app-button--secondary" disabled={guardando} onClick={() => { setEditando(null); setRegistrando(false); setForm(inicial); setError(''); }}>{editando ? 'Cancelar edición' : 'Cancelar registro'}</button><p>Cada línea se guarda como un contenido. Une los saltos de línea que provengan del PDF antes de guardar.</p></form>
   </>;
@@ -116,7 +124,7 @@ export function UnidadesPanel({ asignaturaId, nombre, request, cerrar }: { asign
       <button className="app-button app-button--secondary" disabled={guardando || !!editando || registrando} onClick={() => setIntento(i => i + 1)}>Actualizar unidades</button>
 
       {registrando && !editando && <section className="catalogo-card" aria-label="Nueva unidad">{formulario}</section>}
-      {unidades.length === 0 ? <p>No hay unidades registradas.</p> : unidades.map(u => <article key={u.id} className="catalogo-card" aria-label={`Unidad ${u.numero}`}>{editando === u.id ? formulario : <><h3>U.{u.numero} · {u.nombre} ({u.horas} horas)</h3><p><strong>Resultado de aprendizaje:</strong> {u.resultadoAprendizaje}</p><ol>{u.contenidos.map(c => <li key={c.id}>{c.tema}</li>)}</ol><button className="app-button app-button--secondary" disabled={guardando || !!editando || registrando} onClick={() => { setEditando(u.id); setError(''); setAviso(''); setForm({ numero: String(u.numero), nombre: u.nombre, horas: String(u.horas), resultadoAprendizaje: u.resultadoAprendizaje, contenidos: u.contenidos.map(c => c.tema).join('\n') }); }}>Editar unidad {u.numero}</button></>}</article>)}
+      {unidades.length === 0 ? <p>No hay unidades registradas.</p> : unidades.map(u => <article key={u.id} className="catalogo-card" aria-label={`Unidad ${u.numero}`}>{editando === u.id ? formulario : <><h3>U.{u.numero} · {u.nombre} ({u.horas} horas)</h3><p><strong>Resultado de aprendizaje:</strong> {u.resultadoAprendizaje}</p>{u.tematicas?.map(t => <section key={t.id}><h4>{t.nombre}</h4><ol>{t.contenidos.map(c => <li key={c.id}>{c.tema}</li>)}</ol></section>)}{(u.contenidosSinClasificar?.length || !u.tematicas?.length) ? <section><p role="note">Contenidos anteriores pendientes de clasificar en unidades temáticas. Revisa el plan analítico al editar.</p><ol>{(u.contenidosSinClasificar ?? u.contenidos).map((c, i) => <li key={i}>{c.tema}</li>)}</ol></section> : null}<button className="app-button app-button--secondary" disabled={guardando || !!editando || registrando} onClick={() => { setEditando(u.id); setError(''); setAviso(''); setForm({ numero: String(u.numero), nombre: u.nombre, horas: String(u.horas), resultadoAprendizaje: u.resultadoAprendizaje, tematicas: u.tematicas?.length ? u.tematicas.map(t => ({ nombre: t.nombre, contenidos: t.contenidos.map(c => c.tema).join('\n') })) : [{ nombre: '', contenidos: u.contenidos.map(c => c.tema).join('\n') }] }); }}>Editar unidad {u.numero}</button></>}</article>)}
 
 
 

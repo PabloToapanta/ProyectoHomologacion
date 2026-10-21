@@ -1,4 +1,4 @@
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+﻿IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 BEGIN
     CREATE TABLE [__EFMigrationsHistory] (
         [MigrationId] nvarchar(150) NOT NULL,
@@ -263,6 +263,74 @@ IF NOT EXISTS (
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
     VALUES (N'20261021024938_UnidadesCurricularesHu06', N'8.0.30');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021155321_UnidadesTematicasHu06'
+)
+BEGIN
+    ALTER TABLE [Contenidos] ADD [UnidadTematicaId] uniqueidentifier NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021155321_UnidadesTematicasHu06'
+)
+BEGIN
+    CREATE TABLE [UnidadesTematicas] (
+        [Id] uniqueidentifier NOT NULL,
+        [UnidadCurricularId] uniqueidentifier NOT NULL,
+        [Orden] int NOT NULL,
+        [Nombre] nvarchar(200) NOT NULL,
+        CONSTRAINT [PK_UnidadesTematicas] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_UnidadesTematicas_UnidadesCurriculares_UnidadCurricularId] FOREIGN KEY ([UnidadCurricularId]) REFERENCES [UnidadesCurriculares] ([Id]) ON DELETE CASCADE
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021155321_UnidadesTematicasHu06'
+)
+BEGIN
+    CREATE INDEX [IX_Contenidos_UnidadTematicaId] ON [Contenidos] ([UnidadTematicaId]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021155321_UnidadesTematicasHu06'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_UnidadesTematicas_UnidadCurricularId_Orden] ON [UnidadesTematicas] ([UnidadCurricularId], [Orden]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021155321_UnidadesTematicasHu06'
+)
+BEGIN
+    ALTER TABLE [Contenidos] ADD CONSTRAINT [FK_Contenidos_UnidadesTematicas_UnidadTematicaId] FOREIGN KEY ([UnidadTematicaId]) REFERENCES [UnidadesTematicas] ([Id]) ON DELETE NO ACTION;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021155321_UnidadesTematicasHu06'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261021155321_UnidadesTematicasHu06', N'8.0.30');
 END;
 GO
 

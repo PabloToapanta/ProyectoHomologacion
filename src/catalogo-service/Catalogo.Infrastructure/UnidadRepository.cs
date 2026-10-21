@@ -8,14 +8,14 @@ namespace Catalogo.Infrastructure;
 public sealed class UnidadRepository(CatalogoDbContext db) : IUnidadRepository
 {
     public async Task<IReadOnlyList<UnidadCurricular>> ListarAsync(Guid asignaturaId, CancellationToken ct) =>
-        await db.Set<UnidadCurricular>().AsNoTracking().Include(u => u.Contenidos).Where(u => u.AsignaturaId == asignaturaId).OrderBy(u => u.Numero).ToListAsync(ct);
+        await db.Set<UnidadCurricular>().AsNoTracking().Include(u => u.Contenidos).Include(u => u.Tematicas).Where(u => u.AsignaturaId == asignaturaId).OrderBy(u => u.Numero).ToListAsync(ct);
     public async Task CrearAsync(UnidadCurricular unidad, CancellationToken ct)
     {
         db.Add(unidad);
         await GuardarAsync(ct);
     }
     public Task<UnidadCurricular?> BuscarAsync(Guid asignaturaId, Guid unidadId, CancellationToken ct) =>
-        db.Set<UnidadCurricular>().Include(u => u.Contenidos).SingleOrDefaultAsync(u => u.Id == unidadId && u.AsignaturaId == asignaturaId, ct);
+        db.Set<UnidadCurricular>().Include(u => u.Contenidos).Include(u => u.Tematicas).SingleOrDefaultAsync(u => u.Id == unidadId && u.AsignaturaId == asignaturaId, ct);
     public async Task GuardarAsync(CancellationToken ct)
     {
         try { await db.SaveChangesAsync(ct); }

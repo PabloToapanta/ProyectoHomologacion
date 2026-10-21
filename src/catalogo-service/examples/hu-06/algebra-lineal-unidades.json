@@ -1,14 +1,82 @@
 [
-  { "numero": 1, "nombre": "Introducción al estudio matricial y clases. Operaciones con matrices.", "horas": 36,
+  {
+    "numero": 1,
+    "nombre": "Introducción al estudio matricial y clases. Operaciones con matrices.",
+    "horas": 36,
     "resultadoAprendizaje": "Aplica la teoría de matrices y determinantes de orden n, sus relaciones, operaciones, y propiedades para la resolución de problemas de sistemas de ecuaciones lineales.",
-    "contenidos": ["Matrices, representación matricial, clases de matrices, Suma, resta, multiplicación, división y potencia de matrices.", "Sistemas de ecuaciones lineales y matrices. Calculo de la matriz inversa utilizando los métodos de Gauss y de cofactores. Determinantes."] },
-  { "numero": 2, "nombre": "Operación binaria.", "horas": 36,
+    "tematicas": [
+      {
+        "nombre": "Introducción al estudio matricial y clases. Operaciones con matrices.",
+        "contenidos": [
+          "Matrices, representación matricial, clases de matrices, Suma, resta, multiplicación, división y potencia de matrices."
+        ]
+      },
+      {
+        "nombre": "Matriz inversa. Determinantes. Sistemas de ecuaciones lineales.",
+        "contenidos": [
+          "Sistemas de ecuaciones lineales y matrices. Calculo de la matriz inversa utilizando los métodos de Gauss y de cofactores. Determinantes."
+        ]
+      }
+    ]
+  },
+  {
+    "numero": 2,
+    "nombre": "Operación binaria.",
+    "horas": 36,
     "resultadoAprendizaje": "Distingue el concepto, clasificación y teoremas de las Estructuras Algebraicas para su aplicación en diferentes operaciones matemáticas.",
-    "contenidos": ["Operación binaria de composición interna, Operación binaria de composición externa.", "Estructuras algebraicas: grupo, grupo abeliano, anillos y campos o cuerpos."] },
-  { "numero": 3, "nombre": "Vectores en el plano", "horas": 36,
+    "tematicas": [
+      {
+        "nombre": "Operación binaria.",
+        "contenidos": [
+          "Operación binaria de composición interna, Operación binaria de composición externa."
+        ]
+      },
+      {
+        "nombre": "Operaciones con estructuras Algebraicas",
+        "contenidos": [
+          "Estructuras algebraicas: grupo, grupo abeliano, anillos y campos o cuerpos."
+        ]
+      }
+    ]
+  },
+  {
+    "numero": 3,
+    "nombre": "Vectores en el plano",
+    "horas": 36,
     "resultadoAprendizaje": "Evalúa las operaciones con vectores en R2 y R3 para la solución de problemas.",
-    "contenidos": ["Vectores en R2, magnitud, dirección, ángulos, Producto escalar y las proyecciones en el plano.", "Vectores en R3, Producto cruz de dos vectores, Rectas y planos en el espacio."] },
-  { "numero": 4, "nombre": "Introducción a los espacios y subespacios vectoriales", "horas": 36,
+    "tematicas": [
+      {
+        "nombre": "Vectores en el plano",
+        "contenidos": [
+          "Vectores en R2, magnitud, dirección, ángulos, Producto escalar y las proyecciones en el plano."
+        ]
+      },
+      {
+        "nombre": "Vectores en el espacio",
+        "contenidos": [
+          "Vectores en R3, Producto cruz de dos vectores, Rectas y planos en el espacio."
+        ]
+      }
+    ]
+  },
+  {
+    "numero": 4,
+    "nombre": "Introducción a los espacios y subespacios vectoriales",
+    "horas": 36,
     "resultadoAprendizaje": "Interpreta los espacios vectoriales y su aplicación en operaciones definidas con vectores en el plano (R2), en el espacio (R3) y su generalización a Rn.",
-    "contenidos": ["Espacios vectoriales, subespacios vectoriales, Combinación lineal y espacio generado.", "Independencia lineal, Bases y dimensión, Cambio de base."] }
+    "tematicas": [
+      {
+        "nombre": "Introducción a los espacios y subespacios vectoriales",
+        "contenidos": [
+          "Espacios vectoriales, subespacios vectoriales, Combinación lineal y espacio generado."
+        ]
+      },
+      {
+        "nombre": "Independencia lineal y bases",
+        "contenidos": [
+          "Independencia lineal, Bases y dimensión, Cambio de base."
+        ]
+      }
+    ]
+  }
 ]
