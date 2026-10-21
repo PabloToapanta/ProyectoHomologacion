@@ -15,6 +15,7 @@ export function AdminPanel() {
         <dl className="session-details"><div><dt>Usuario</dt><dd>{session?.name}</dd></div><div><dt>Perfil</dt><dd>{session?.role}</dd></div></dl>
       </section>
       <p><Link to="/admin/carreras" className="app-button app-button--primary catalogo-link">Gestionar carreras y asignaturas</Link></p>
+      <p><Link to="/validaciones" className="app-button app-button--primary">Validaciones académicas</Link></p>
     </main>
     <footer className="workspace-footer">FISEI · Universidad Técnica de Ambato</footer>
   </div>;
