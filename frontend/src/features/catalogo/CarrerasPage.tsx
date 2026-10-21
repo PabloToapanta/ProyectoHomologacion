@@ -9,7 +9,7 @@ const FACULTAD_RECEPTORA = 'FISEI';
 const vacia: CarreraInput = { nombre: '', facultad: FACULTAD_RECEPTORA, vigencia: true, modalidad: null };
 const mensaje = (error: unknown) => error instanceof Error ? error.message : 'No se pudo completar la operación.';
 
-export function CarrerasPage({ request }: { request: CatalogoRequest }) {
+export function CarrerasPage({ request, onVerAsignaturas }: { request: CatalogoRequest; onVerAsignaturas?: (id: string) => void }) {
   const api = useMemo(() => carrerasApi(request), [request]);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -101,7 +101,7 @@ export function CarrerasPage({ request }: { request: CatalogoRequest }) {
         : <div className="catalogo-table-scroll" tabIndex={0} role="region" aria-label="Tabla de carreras con desplazamiento horizontal"><table><caption className="sr-only">Carreras FISEI y registros anteriores pendientes de revisión</caption><thead><tr><th scope="col">Carrera</th><th scope="col">Facultad</th><th scope="col">Modalidad</th><th scope="col">Vigencia</th><th scope="col">Acciones</th></tr></thead>
           <tbody>{[...visibles].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es') || a.facultad.localeCompare(b.facultad, 'es')).map(c => <tr key={c.id}>
             <td>{c.nombre}</td><td>{c.facultad}{c.facultad.trim().toUpperCase() !== FACULTAD_RECEPTORA && <small> · Pendiente de revisión</small>}</td><td>{c.modalidad || 'Sin especificar'}</td><td><span className={`catalogo-badge ${c.vigencia ? '' : 'catalogo-badge--inactive'}`}>{c.vigencia ? 'Vigente' : 'No vigente'}</span></td>
-            <td><div className="catalogo-actions"><button className="app-button app-button--secondary" aria-label={`Editar ${c.nombre}`} disabled={ocupado || !!form} onClick={() => abrir(c)}>Editar</button>
+            <td><div className="catalogo-actions">{onVerAsignaturas && <button className="app-button app-button--secondary" aria-label={`Ver malla de ${c.nombre}`} onClick={() => onVerAsignaturas(c.id)}>Ver malla</button>}<button className="app-button app-button--secondary" aria-label={`Editar ${c.nombre}`} disabled={ocupado || !!form} onClick={() => abrir(c)}>Editar</button>
               <button className="app-button catalogo-danger" aria-label={`Eliminar ${c.nombre}`} disabled={ocupado || !!form} onClick={() => { setEliminando(c); setErrorEliminacion(''); setError(''); }}>Eliminar</button></div></td>
           </tr>)}</tbody></table></div>}
     </section>

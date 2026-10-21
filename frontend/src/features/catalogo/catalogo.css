@@ -54,3 +54,10 @@
 .form-dialog .catalogo-fields { grid-template-columns: 1fr; gap: 16px; }
 .form-dialog .auth-error { margin: 16px 0; }
 .form-dialog .catalogo-actions { justify-content: flex-end; padding-top: 12px; }
+
+.catalogo-level { display: block; max-width: 220px; margin: 20px 0; }
+.catalogo-level select { margin-top: 8px; }
+.catalogo td .catalogo-actions { flex-wrap: nowrap; }
+.catalogo td .catalogo-actions button { white-space: nowrap; }
+.catalogo-card article.catalogo-card { border-left: 3px solid #b4c9c0; box-shadow: none; }
+.catalogo-card li { line-height: 1.8; overflow-wrap: anywhere; }

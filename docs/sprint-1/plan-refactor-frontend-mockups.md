@@ -89,3 +89,11 @@ con botón Entendido. Componente compartido con Escape, bloqueo al guardar y ret
 de foco. Primero se reprodujeron dos pruebas fallidas (búsqueda/modal); después,
 build correcto y 91 pruebas aprobadas. La verificación de foco real se realiza en
 Chromium al completar la malla, pues jsdom no implementa la modalidad nativa.
+
+Cuarto bloque (#3, #4): acceso «Ver malla» desde cada carrera con selección en URL,
+filtro por nivel, contexto de carrera/vigencia, alta de asignaturas en modal y
+presentación consistente de unidades. Los contenidos y validaciones de HU-06 se
+conservan. Al guardar se restablece el filtro para mostrar la nueva asignatura.
+TDD del filtro: un fallo inicial y luego 92 pruebas aprobadas; build correcto.
+Se ajusta el E2E existente para cerrar el aviso modal de eliminación antes de
+interactuar con la tabla, que queda inerte mientras la ventana está abierta.

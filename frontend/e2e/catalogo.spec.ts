@@ -53,6 +53,7 @@ test('catálogo real: login, carrera, validaciones, asignatura, eliminación res
   await page.getByRole('button', { name: `Eliminar ${nombre}`, exact: true }).click();
   await page.getByRole('button', { name: 'Confirmar eliminación' }).click();
   await expect(page.getByRole('alert')).toContainText('asignaturas relacionadas');
+  await page.getByRole('button', { name: 'Entendido' }).click();
   await expect(page.getByRole('cell', { name: nombre, exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Volver al panel' }).click();
   await expect(page.getByRole('heading', { name: 'Panel de administración' })).toBeVisible();

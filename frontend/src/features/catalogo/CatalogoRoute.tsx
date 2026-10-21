@@ -15,6 +15,6 @@ export function CatalogoRoute() {
       <button className="app-button app-button--secondary" aria-pressed={seccion === 'carreras'} onClick={() => setParams({})}>Carreras</button>
       <button className="app-button app-button--secondary" aria-pressed={seccion === 'asignaturas'} onClick={() => setParams({ seccion: 'asignaturas' })}>Asignaturas</button>
     </nav>
-    {seccion === 'carreras' ? <CarrerasPage request={request} /> : <AsignaturasPage request={request} />}
+    {seccion === 'carreras' ? <CarrerasPage request={request} onVerAsignaturas={id => setParams({ seccion: 'asignaturas', carrera: id })} /> : <AsignaturasPage request={request} carreraSeleccionada={params.get('carrera') ?? ''} onSeleccion={id => setParams(id ? { seccion: 'asignaturas', carrera: id } : { seccion: 'asignaturas' })} />}
   </WorkspaceLayout>;
 }

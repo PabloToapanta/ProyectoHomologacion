@@ -5,16 +5,22 @@ import type { Carrera, CatalogoRequest } from './carreras-api';
 import { asignaturasApi } from './asignaturas-api';
 import type { Asignatura } from './asignaturas-api';
 import './catalogo.css';
+import { FormDialog } from '../../shared/ui/FormDialog';
 import { UnidadesPanel } from './UnidadesPanel';
 
 const vacio = { codigo: '', nombre: '', nivel: '', creditos: '', horas: '' };
 const mensaje = (e: unknown) => e instanceof Error ? e.message : 'No se pudo completar la operación.';
 
-export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
+export function AsignaturasPage({ request, carreraSeleccionada, onSeleccion }: {
+  request: CatalogoRequest; carreraSeleccionada?: string; onSeleccion?: (id: string) => void;
+}) {
   const apiCarreras = useMemo(() => carrerasApi(request), [request]);
   const api = useMemo(() => asignaturasApi(request), [request]);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
-  const [carreraId, setCarreraId] = useState('');
+  const [seleccionLocal, setSeleccionLocal] = useState('');
+  const carreraId = carreraSeleccionada ?? seleccionLocal;
+  const setCarreraId = onSeleccion ?? setSeleccionLocal;
+  const [nivelFiltro, setNivelFiltro] = useState('');
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [cargandoCarreras, setCargandoCarreras] = useState(true);
   const [cargando, setCargando] = useState(false);
@@ -41,7 +47,7 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    setSeleccionada(null); setAsignaturas([]); setErrorListado(''); setError(''); setAviso(''); setForm(null);
+    setSeleccionada(null); setNivelFiltro(''); setAsignaturas([]); setErrorListado(''); setError(''); setAviso(''); setForm(null);
     if (!carreraId) { setCargando(false); return () => controller.abort(); }
     setCargando(true);
     api.listar(carreraId, controller.signal).then(items => {
@@ -68,14 +74,17 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
     try {
       const creada = await api.crear({ carreraId, codigo: form.codigo.trim(), nombre: form.nombre.trim(), nivel, creditos, horas });
       setAsignaturas(items => [...items, creada]);
-      setForm(null); setAviso('Asignatura registrada correctamente.');
+      setForm(null); setNivelFiltro(''); setAviso('Asignatura registrada correctamente.');
     } catch (e) { setError(mensaje(e)); }
     finally { setGuardando(false); }
   }
 
+  const carreraActual = carreras.find(c => c.id === carreraId);
+  const niveles = [...new Set(asignaturas.map(a => a.nivel))].sort((a, b) => a - b);
+  const visibles = asignaturas.filter(a => !nivelFiltro || a.nivel === Number(nivelFiltro));
   return <div className="catalogo">
     <p className="eyebrow">ADMINISTRACIÓN / CATÁLOGO ACADÉMICO</p>
-    <div className="workspace-heading"><div><h1>Gestión de asignaturas</h1><p>Consulta las asignaturas por carrera y registra sus datos académicos.</p></div>
+    <div className="workspace-heading"><div><h1>Gestión de asignaturas</h1><p>{carreraActual ? `${carreraActual.nombre} · ${carreraActual.vigencia ? 'Malla vigente' : 'Malla no vigente'}` : 'Consulta las asignaturas por carrera y registra sus datos académicos.'}</p></div>
       <button className="app-button app-button--primary" disabled={!carreraId || cargando || !!errorListado || guardando || !!form} onClick={() => { setForm({ ...vacio }); setError(''); setAviso(''); }}>Nueva asignatura</button></div>
     {cargandoCarreras ? <p role="status">Cargando carreras…</p> : errorCarreras ? <div><p role="alert" className="auth-error">{errorCarreras}</p><button className="app-button app-button--secondary" onClick={() => setIntentoCarreras(i => i + 1)}>Reintentar carreras</button></div>
       : carreras.length === 0 ? <p className="catalogo-empty">Registra una carrera antes de agregar asignaturas.</p>
@@ -83,8 +92,10 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
         <option value="">Selecciona una carrera</option>{carreras.map(c => <option key={c.id} value={c.id}>{c.nombre} · {c.facultad}{c.vigencia ? '' : ' (no vigente)'}</option>)}
       </select></label>}
     {aviso && <p role="status" className="catalogo-aviso">{aviso}</p>}
-    {error && <p role="alert" className="auth-error">{error}</p>}
-    {form && <section className="catalogo-card" aria-labelledby="asignatura-form-title"><h2 id="asignatura-form-title">Nueva asignatura</h2>
+    {error && !form && <p role="alert" className="auth-error">{error}</p>}
+    {form && <FormDialog title="Nueva asignatura" titleId="asignatura-form-title" busy={guardando} onDismiss={() => { setForm(null); setError(''); }}>
+      <p className="section-description">Carrera: {carreraActual?.nombre ?? 'Información incompleta'}</p>
+      {error && <p role="alert" className="auth-error">{error}</p>}
       <form onSubmit={guardar} noValidate><fieldset className="catalogo-fields" disabled={guardando}>
         <label className="auth-label">Código<input ref={codigoRef} className="auth-input" required maxLength={50} value={form.codigo} onChange={e => setForm({ ...form, codigo: e.target.value })} /></label>
         <label className="auth-label">Nombre<input className="auth-input" required maxLength={200} value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} /></label>
@@ -93,14 +104,17 @@ export function AsignaturasPage({ request }: { request: CatalogoRequest }) {
         <label className="auth-label">Horas<input className="auth-input" type="number" required min="1" max="2147483647" step="1" value={form.horas} onChange={e => setForm({ ...form, horas: e.target.value })} /></label>
       </fieldset><div className="catalogo-actions"><button className="app-button app-button--primary" disabled={guardando}>{guardando ? 'Guardando…' : 'Guardar asignatura'}</button>
         <button type="button" className="app-button app-button--secondary" disabled={guardando} onClick={() => { setForm(null); setError(''); }}>Cancelar</button></div></form>
-    </section>}
+    </FormDialog>}
     {carreraId && <section className="catalogo-card" aria-label="Asignaturas de la carrera" aria-busy={cargando}>
       <div className="catalogo-list-heading"><h2>Asignaturas por nivel <span>({asignaturas.length})</span></h2>
         <button className="app-button app-button--secondary" disabled={cargando || guardando || !!form} onClick={() => setIntento(i => i + 1)}>Actualizar asignaturas</button></div>
+      <label className="auth-label catalogo-level">Filtrar por nivel<select className="auth-input" value={nivelFiltro} disabled={cargando || !!errorListado} onChange={e => { setNivelFiltro(e.target.value); setSeleccionada(null); }}>
+        <option value="">Todos los niveles</option>{niveles.map(n => <option key={n} value={n}>Nivel {n}</option>)}
+      </select></label>
       {cargando ? <p role="status">Cargando asignaturas…</p> : errorListado ? <div><p role="alert" className="auth-error">{errorListado}</p><button className="app-button app-button--secondary" onClick={() => setIntento(i => i + 1)}>Reintentar asignaturas</button></div>
         : asignaturas.length === 0 ? <p className="catalogo-empty">No hay asignaturas registradas en esta carrera.</p>
         : <><p className="catalogo-scroll-hint">Desliza la tabla horizontalmente para ver todos los datos.</p><div className="catalogo-table-scroll" tabIndex={0} role="region" aria-label="Tabla de asignaturas con desplazamiento horizontal"><table><caption className="sr-only">Asignaturas ordenadas por nivel y código</caption><thead><tr><th scope="col">Nivel</th><th scope="col">Código</th><th scope="col">Asignatura</th><th scope="col">Créditos</th><th scope="col">Horas</th><th scope="col">Contenidos</th></tr></thead>
-          <tbody>{[...asignaturas].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td><td><button className="app-button app-button--secondary" onClick={() => setSeleccionada(a)}>Ver unidades de {a.nombre}</button></td></tr>)}</tbody></table></div></>}
+          <tbody>{[...visibles].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td><td><button className="app-button app-button--secondary" onClick={() => setSeleccionada(a)}>Ver unidades de {a.nombre}</button></td></tr>)}</tbody></table></div></>}
     </section>}
     {seleccionada && <UnidadesPanel key={seleccionada.id} asignaturaId={seleccionada.id} nombre={seleccionada.nombre} request={request} cerrar={() => setSeleccionada(null)} />}
   </div>;
