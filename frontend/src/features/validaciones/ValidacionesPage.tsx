@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router';
-import { Brand } from '../../shared/ui/Brand';
+import { WorkspaceLayout } from '../../shared/ui/WorkspaceLayout';
 import { useAuth } from '../auth';
 import { evaluar } from './api';
 import { EquivalenciaForm } from './EquivalenciaForm';
@@ -15,15 +15,15 @@ const hoyEcuador = () => {
 
 type Resultado = { estado?: string; motivo?: string; cumple?: boolean; incumplimientos?: string[] };
 export function ValidacionesPage() {
-  const { request, logout, session } = useAuth();
+  const { request, session } = useAuth();
   const [seccion, setSeccion] = useState('antiguedad');
-  return <div className="workspace"><header className="workspace-header"><Brand /><button className="app-button app-button--secondary" onClick={logout}>Cerrar sesión</button></header>
-    <main className="workspace-main catalogo"><p className="eyebrow">HOMOLOGACIÓN / VALIDACIONES</p><h1>Validaciones académicas</h1>
+  return <WorkspaceLayout>
+    <div className="catalogo"><p className="eyebrow">HOMOLOGACIÓN / VALIDACIONES</p><h1>Validaciones académicas</h1>
       <p>Estos resultados son sugerencias. La decisión oficial corresponde al Consejo Directivo.</p>
       {session?.role === 'Administrador' && <p><Link to="/panel">Volver al panel</Link></p>}
-      <nav className="catalogo-nav" aria-label="Tipo de validación">{[['antiguedad', 'Aprobación y antigüedad'], ['requisitos', 'Requisitos de cambio'], ['equivalencia', 'Equivalencia de asignaturas']].map(([id, label]) => <button key={id} className="app-button app-button--secondary" aria-pressed={seccion === id} onClick={() => setSeccion(id!)}>{label}</button>)}</nav>
+      <nav className="catalogo-tabs" aria-label="Tipo de validación">{[['antiguedad', 'Aprobación y antigüedad'], ['requisitos', 'Requisitos de cambio'], ['equivalencia', 'Equivalencia de asignaturas']].map(([id, label]) => <button key={id} className="app-button app-button--secondary" aria-pressed={seccion === id} onClick={() => setSeccion(id!)}>{label}</button>)}</nav>
       {seccion === 'equivalencia' ? <EquivalenciaForm request={request} /> : <ReglasForm key={seccion} tipo={seccion} request={request} />}
-    </main></div>;
+    </div></WorkspaceLayout>;
 }
 
 function ReglasForm({ tipo, request }: { tipo: string; request: ReturnType<typeof useAuth>['request'] }) {

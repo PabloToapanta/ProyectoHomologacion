@@ -1,0 +1,61 @@
+/* Primera etapa HU-01. Estilos aislados para no alterar el catálogo en paralelo. */
+.login-page.mockup-login { display: flex; justify-content: center; background: #f7f8fa; border-top: 5px solid var(--accent); }
+.mockup-login .login-side { width: 100%; background: transparent; padding: 48px 24px 76px; }
+.mockup-login .auth-card { max-width: 420px; padding: 32px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: 0 8px 32px #18333108; }
+.login-identity { text-align: center; color: var(--ink); margin-bottom: 28px; }
+.login-identity svg { color: var(--accent); }
+.login-identity p { font-size: 20px; line-height: 1.5; margin: 12px 0 0; }
+.login-identity strong { display: block; font-size: 18px; }
+.mockup-login h1 { font-size: 22px; text-align: center; margin: 0 0 10px; }
+.mockup-login .auth-intro { text-align: center; margin-bottom: 26px; }
+.mockup-login .auth-error { margin: 0 0 20px; }
+.mockup-login .auth-input[aria-invalid="true"] { border-color: #b33d32; }
+.mockup-login .login-submit { justify-content: center; }
+.mockup-login .auth-help { margin-top: 24px; }
+.academic-workspace { min-height: 100dvh; display: grid; grid-template-columns: 240px minmax(0, 1fr); grid-template-rows: auto 1fr auto; background: #f7f8fa; }
+.academic-header { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 18px 28px; background: white; border-bottom: 1px solid var(--line); }
+.academic-brand { display: flex; align-items: center; gap: 12px; font-size: 14px; line-height: 1.5; }
+.academic-brand svg { width: 40px; height: 40px; color: var(--accent); flex-shrink: 0; }
+.academic-brand strong { display: block; font-size: 12px; letter-spacing: .05em; }
+.academic-account { display: flex; align-items: center; gap: 24px; font-size: 12px; overflow-wrap: anywhere; }
+.academic-sidebar { grid-row: 2 / 4; padding: 32px 16px; background: white; border-right: 1px solid var(--line); }
+.academic-sidebar .eyebrow { margin: 0 12px 20px; font-size: 9px; }
+.academic-sidebar nav { display: grid; gap: 8px; }
+.academic-sidebar a { display: flex; align-items: center; gap: 12px; padding: 14px 12px; border-radius: 6px; text-decoration: none; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.academic-sidebar a.active { color: var(--accent); background: #eaf1ee; font-weight: 650; box-shadow: inset 3px 0 var(--accent); }
+.academic-sidebar a:hover { background: #f0f4f2; }
+.academic-sidebar a > span { font-size: 20px; }
+.sidebar-caption { margin: 44px 12px 0; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; line-height: 1.8; }
+.academic-content { width: 100%; max-width: 1300px; padding: 40px clamp(20px, 4vw, 64px); margin-inline: auto; }
+.academic-content .workspace-heading h1 { font-size: clamp(24px, 3vw, 32px); }
+.academic-content h2 { font-size: 19px; margin: 0 0 10px; }
+.section-description { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.module-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 24px; }
+.module-card { display: flex; flex-direction: column; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 28px; background: white; }
+.module-icon { display: grid; place-items: center; width: 42px; height: 42px; background: #eaf1ee; color: var(--accent); border-radius: 8px; font-size: 24px; }
+.module-card h3 { font-size: 17px; margin: 22px 0 0; }
+.module-card p { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 28px; }
+.module-card .app-button { margin-top: auto; text-decoration: none; text-align: center; }
+.academic-note { border-left: 3px solid #9baea5; padding: 4px 20px; margin-top: 36px; font-size: 12px; line-height: 1.8; color: var(--muted); }
+.academic-note p { margin: 5px 0; }
+.academic-footer { padding: 24px; font-size: 11px; color: var(--muted); text-align: center; }
+.skip-link { position: fixed; left: 16px; top: -100px; padding: 12px; background: white; z-index: 10; }
+.skip-link:not(:focus) { clip-path: inset(50%); }
+.skip-link:focus { top: 12px; }
+@media (max-width: 1000px) {
+  .academic-workspace { grid-template-columns: 200px minmax(0, 1fr); }
+  .module-grid { grid-template-columns: 1fr; }
+  .academic-account { gap: 12px; }
+}
+@media (max-width: 650px) {
+  .mockup-login .auth-card { padding: 24px; }
+  .academic-workspace { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr auto; }
+  .academic-header { padding: 16px 20px; flex-wrap: wrap; gap: 16px; }
+  .academic-account { width: 100%; justify-content: space-between; }
+  .academic-sidebar { grid-row: auto; padding: 12px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .academic-sidebar nav { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+  .academic-sidebar a { flex-direction: column; gap: 4px; padding: 10px 5px; font-size: 11px; text-align: center; }
+  .academic-sidebar .eyebrow, .sidebar-caption { display: none; }
+  .academic-content { padding: 26px 20px; }
+  .module-card { padding: 24px; }
+}

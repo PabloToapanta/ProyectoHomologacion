@@ -113,3 +113,19 @@ it('ignora la respuesta tardía de una carrera al seleccionar otra', async () =>
   await act(async () => { resolver(json([algebra])); });
   expect(screen.queryByText(algebra.nombre)).not.toBeInTheDocument();
 });
+
+it('filtra por nivel y restablece todos los niveles sin volver a consultar', async () => {
+  const u = user();
+  const request = vi.fn().mockResolvedValueOnce(json(carreras)).mockResolvedValueOnce(json([
+    algebra, { ...algebra, id: 'a2', nombre: 'Segundo nivel', codigo: 'DEMO-2', nivel: 2 },
+  ]));
+  render(<AsignaturasPage request={request} />);
+  await u.selectOptions(await screen.findByLabelText('Carrera'), 'c1');
+  await screen.findByText(algebra.nombre);
+  await u.selectOptions(screen.getByLabelText('Filtrar por nivel'), '2');
+  expect(screen.queryByRole('cell', { name: algebra.nombre })).not.toBeInTheDocument();
+  expect(screen.getByRole('cell', { name: 'Segundo nivel' })).toBeInTheDocument();
+  await u.selectOptions(screen.getByLabelText('Filtrar por nivel'), '');
+  expect(screen.getByRole('cell', { name: algebra.nombre })).toBeInTheDocument();
+  expect(request).toHaveBeenCalledTimes(2);
+});

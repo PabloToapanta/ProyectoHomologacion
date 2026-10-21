@@ -3,12 +3,13 @@ import type { FormEvent } from 'react';
 import { carrerasApi } from './carreras-api';
 import type { Carrera, CarreraInput, CatalogoRequest } from './carreras-api';
 import './catalogo.css';
+import { FormDialog } from '../../shared/ui/FormDialog';
 
 const FACULTAD_RECEPTORA = 'FISEI';
 const vacia: CarreraInput = { nombre: '', facultad: FACULTAD_RECEPTORA, vigencia: true, modalidad: null };
 const mensaje = (error: unknown) => error instanceof Error ? error.message : 'No se pudo completar la operación.';
 
-export function CarrerasPage({ request }: { request: CatalogoRequest }) {
+export function CarrerasPage({ request, onVerAsignaturas }: { request: CatalogoRequest; onVerAsignaturas?: (id: string) => void }) {
   const api = useMemo(() => carrerasApi(request), [request]);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -20,7 +21,9 @@ export function CarrerasPage({ request }: { request: CatalogoRequest }) {
   const [editando, setEditando] = useState<string | null>(null);
   const [eliminando, setEliminando] = useState<Carrera | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  const dialog = useRef<HTMLDialogElement>(null);
+  const [busqueda, setBusqueda] = useState('');
+  const [errorEliminacion, setErrorEliminacion] = useState('');
+  const visibles = carreras.filter(c => c.nombre.toLocaleLowerCase('es').includes(busqueda.trim().toLocaleLowerCase('es')));
   const nombre = useRef<HTMLInputElement>(null);
   const requiereRevision = !!form && form.facultad.trim().toUpperCase() !== FACULTAD_RECEPTORA;
 
@@ -35,13 +38,7 @@ export function CarrerasPage({ request }: { request: CatalogoRequest }) {
   }, [api, intento]);
 
   useEffect(() => { if (form) nombre.current?.focus(); }, [editando, form !== null]);
-  useEffect(() => {
-    if (eliminando && dialog.current) {
-      if (dialog.current.showModal) dialog.current.showModal();
-      else dialog.current.setAttribute('open', '');
-    }
-    else dialog.current?.close?.();
-  }, [eliminando]);
+
 
   function abrir(carrera?: Carrera) {
     setEditando(carrera?.id ?? null);
@@ -70,18 +67,18 @@ export function CarrerasPage({ request }: { request: CatalogoRequest }) {
       await api.eliminar(eliminando.id);
       setCarreras(items => items.filter(c => c.id !== eliminando.id));
       setEliminando(null); setAviso('Carrera eliminada correctamente.');
-    } catch (e) { setEliminando(null); setError(mensaje(e)); }
+    } catch (e) { setErrorEliminacion(mensaje(e)); }
     finally { setOcupado(false); }
   }
 
-  return <main className="workspace-main catalogo">
+  return <div className="catalogo">
     <p className="eyebrow">ADMINISTRACIÓN / CATÁLOGO ACADÉMICO</p>
     <div className="workspace-heading"><div><h1>Gestión de carreras</h1><p>Registra y actualiza las carreras de FISEI.</p></div>
       <button className="app-button app-button--primary" disabled={ocupado || cargando || !!errorCarga || !!form} onClick={() => abrir()}>Nueva carrera</button></div>
     {aviso && <p role="status" className="catalogo-aviso">{aviso}</p>}
-    {error && <p role="alert" className="auth-error">{error}</p>}
-    {form && <section className="catalogo-card" aria-labelledby="form-title">
-      <h2 id="form-title">{editando ? 'Editar carrera' : 'Nueva carrera'}</h2>
+    {error && !form && <p role="alert" className="auth-error">{error}</p>}
+    {form && <FormDialog title={editando ? 'Editar carrera' : 'Nueva carrera'} titleId="form-title" busy={ocupado} onDismiss={() => { setForm(null); setError(''); }}>
+      {error && <p role="alert" className="auth-error">{error}</p>}
       {requiereRevision && <p role="alert" className="auth-error">Este registro anterior requiere revisión antes de editar: su facultad no es FISEI. Se conservan sus datos y asignaturas; coordina su corrección con el equipo.</p>}
       <form onSubmit={guardar}>
         <fieldset disabled={ocupado} className="catalogo-fields">
@@ -93,23 +90,28 @@ export function CarrerasPage({ request }: { request: CatalogoRequest }) {
         <div className="catalogo-actions"><button className="app-button app-button--primary" disabled={ocupado || requiereRevision}>{ocupado ? 'Guardando…' : 'Guardar carrera'}</button>
           <button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={() => { setForm(null); setError(''); }}>Cancelar</button></div>
       </form>
-    </section>}
+    </FormDialog>}
     <section className="catalogo-card" aria-label="Listado de carreras" aria-busy={cargando}>
       <div className="catalogo-list-heading"><h2>Carreras registradas <span>({carreras.length})</span></h2>
         <button className="app-button app-button--secondary" disabled={cargando || ocupado || !!form} onClick={() => setIntento(i => i + 1)}>Actualizar listado</button></div>
+      <label className="auth-label catalogo-search">Buscar carreras<input className="auth-input" type="search" placeholder="Buscar por nombre de carrera" value={busqueda} onChange={e => setBusqueda(e.target.value)} /></label>
       {cargando ? <p role="status">Cargando carreras…</p> : errorCarga ? <div><p role="alert" className="auth-error">{errorCarga}</p><button className="app-button app-button--secondary" onClick={() => setIntento(i => i + 1)}>Reintentar</button></div>
         : carreras.length === 0 ? <p className="catalogo-empty">No hay carreras registradas.</p>
-        : <div className="catalogo-table-scroll"><table><caption className="sr-only">Carreras FISEI y registros anteriores pendientes de revisión</caption><thead><tr><th scope="col">Carrera</th><th scope="col">Facultad</th><th scope="col">Modalidad</th><th scope="col">Vigencia</th><th scope="col">Acciones</th></tr></thead>
-          <tbody>{[...carreras].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es') || a.facultad.localeCompare(b.facultad, 'es')).map(c => <tr key={c.id}>
+        : visibles.length === 0 ? <p className="catalogo-empty">No hay carreras que coincidan con la búsqueda.</p>
+        : <div className="catalogo-table-scroll" tabIndex={0} role="region" aria-label="Tabla de carreras con desplazamiento horizontal"><table><caption className="sr-only">Carreras FISEI y registros anteriores pendientes de revisión</caption><thead><tr><th scope="col">Carrera</th><th scope="col">Facultad</th><th scope="col">Modalidad</th><th scope="col">Vigencia</th><th scope="col">Acciones</th></tr></thead>
+          <tbody>{[...visibles].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es') || a.facultad.localeCompare(b.facultad, 'es')).map(c => <tr key={c.id}>
             <td>{c.nombre}</td><td>{c.facultad}{c.facultad.trim().toUpperCase() !== FACULTAD_RECEPTORA && <small> · Pendiente de revisión</small>}</td><td>{c.modalidad || 'Sin especificar'}</td><td><span className={`catalogo-badge ${c.vigencia ? '' : 'catalogo-badge--inactive'}`}>{c.vigencia ? 'Vigente' : 'No vigente'}</span></td>
-            <td><div className="catalogo-actions"><button className="app-button app-button--secondary" aria-label={`Editar ${c.nombre}`} disabled={ocupado || !!form} onClick={() => abrir(c)}>Editar</button>
-              <button className="app-button catalogo-danger" aria-label={`Eliminar ${c.nombre}`} disabled={ocupado || !!form} onClick={() => { setEliminando(c); setError(''); }}>Eliminar</button></div></td>
+            <td><div className="catalogo-actions">{onVerAsignaturas && <button className="app-button app-button--secondary" aria-label={`Ver malla de ${c.nombre}`} onClick={() => onVerAsignaturas(c.id)}>Ver malla</button>}<button className="app-button app-button--secondary" aria-label={`Editar ${c.nombre}`} disabled={ocupado || !!form} onClick={() => abrir(c)}>Editar</button>
+              <button className="app-button catalogo-danger" aria-label={`Eliminar ${c.nombre}`} disabled={ocupado || !!form} onClick={() => { setEliminando(c); setErrorEliminacion(''); setError(''); }}>Eliminar</button></div></td>
           </tr>)}</tbody></table></div>}
     </section>
-    {eliminando && <dialog ref={dialog} aria-labelledby="delete-title" onCancel={e => { if (ocupado) e.preventDefault(); else setEliminando(null); }}>
-      <h2 id="delete-title">Eliminar carrera</h2><p>¿Deseas eliminar «{eliminando.nombre}»?</p><p>Solo se permite eliminar carreras sin asignaturas relacionadas.</p>
-      <div className="catalogo-actions"><button className="app-button catalogo-danger" disabled={ocupado} onClick={eliminar}>{ocupado ? 'Eliminando…' : 'Confirmar eliminación'}</button>
-        <button className="app-button app-button--secondary" disabled={ocupado} onClick={() => setEliminando(null)}>Cancelar</button></div>
-    </dialog>}
-  </main>;
+    {eliminando && <FormDialog title={errorEliminacion ? 'No se pudo eliminar' : 'Eliminar carrera'} titleId="delete-title" busy={ocupado} onDismiss={() => setEliminando(null)}>
+      {errorEliminacion ? <><p role="alert" className="auth-error">{errorEliminacion}</p>
+        <button className="app-button app-button--primary" onClick={() => setEliminando(null)}>Entendido</button></> : <>
+        <p>¿Deseas eliminar «{eliminando.nombre}»?</p><p>Solo se permite eliminar carreras sin asignaturas relacionadas.</p>
+        <div className="catalogo-actions"><button className="app-button catalogo-danger" disabled={ocupado} onClick={eliminar}>{ocupado ? 'Eliminando…' : 'Confirmar eliminación'}</button>
+          <button className="app-button app-button--secondary" disabled={ocupado} onClick={() => setEliminando(null)}>Cancelar</button></div>
+      </>}
+    </FormDialog>}
+  </div>;
 }

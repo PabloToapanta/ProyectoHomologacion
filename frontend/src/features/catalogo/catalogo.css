@@ -30,3 +30,38 @@
 .catalogo-scroll-hint { display: none; }
 @media (max-width: 650px) { .catalogo-scroll-hint { display: block; color: var(--muted); font-size: 12px; line-height: 1.6; } }
 @media (max-width: 650px) { .catalogo-fields { grid-template-columns: 1fr; } .catalogo-card { padding: 18px; } .catalogo .workspace-heading > button { margin-top: 20px; } }
+
+/* Estructura común: tablas y formularios dentro del área de trabajo. */
+.catalogo-back { display: inline-block; margin-bottom: 18px; color: var(--accent); font-size: 12px; }
+.catalogo-tabs { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 18px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+.catalogo-tabs [aria-pressed="true"] { background: var(--accent); color: white; }
+.catalogo { min-width: 0; }
+.catalogo table th { background: #f0f3f2; color: var(--ink); }
+.catalogo tbody tr:nth-child(even) { background: #fafbfb; }
+.catalogo tbody tr:hover { background: #f3f7f5; }
+.catalogo td, .catalogo th { padding: 14px 12px; }
+.catalogo table .app-button { min-height: 36px; padding: 8px 10px; }
+.catalogo-card { border-radius: 8px; }
+.catalogo textarea, .catalogo select { font: inherit; }
+.catalogo textarea { resize: vertical; }
+
+.catalogo-search { display: block; max-width: 360px; margin: 22px 0; }
+.catalogo-search .auth-input { margin-top: 8px; }
+.catalogo .form-dialog { width: min(540px, calc(100vw - 32px)); max-width: 540px; max-height: calc(100dvh - 40px); overflow-y: auto; padding: 28px; border-radius: 8px; }
+.dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.dialog-heading h2 { margin: 0; font-size: 20px; }
+.dialog-close { display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border: 1px solid var(--line); background: white; border-radius: 5px; color: var(--ink); font-size: 24px; }
+.form-dialog .catalogo-fields { grid-template-columns: 1fr; gap: 16px; }
+.form-dialog .auth-error { margin: 16px 0; }
+.form-dialog .catalogo-actions { justify-content: flex-end; padding-top: 12px; }
+
+.catalogo-level { display: block; max-width: 220px; margin: 20px 0; }
+.catalogo-level select { margin-top: 8px; }
+.catalogo td .catalogo-actions { flex-wrap: nowrap; }
+.catalogo td .catalogo-actions button { white-space: nowrap; }
+.catalogo-card article.catalogo-card { border-left: 3px solid #b4c9c0; box-shadow: none; }
+.catalogo-card li { line-height: 1.8; overflow-wrap: anywhere; }
+
+.catalogo th { white-space: nowrap; }
+.catalogo .malla-table td:first-child { min-width: 64px; }
+.catalogo .malla-table td:nth-child(2) { min-width: 140px; white-space: nowrap; }

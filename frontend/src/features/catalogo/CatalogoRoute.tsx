@@ -1,23 +1,20 @@
 import { useAuth } from '../auth';
 import { CarrerasPage } from './CarrerasPage';
 import { AsignaturasPage } from './AsignaturasPage';
-import { useState } from 'react';
-import { Link } from 'react-router';
-import { Brand } from '../../shared/ui/Brand';
+import { Link, useSearchParams } from 'react-router';
+import { WorkspaceLayout } from '../../shared/ui/WorkspaceLayout';
 
-/** Catálogo bajo ProtectedRoute Administrador; reutiliza la sesión pública de HU-01. */
+/** La URL conserva la sección del catálogo al avanzar o retroceder. */
 export function CatalogoRoute() {
-  const { request, logout } = useAuth();
-  const [seccion, setSeccion] = useState<'carreras' | 'asignaturas'>('carreras');
-  return <div className="workspace">
-    <header className="workspace-header catalogo-header"><Brand /><div className="catalogo-actions">
-      <Link to="/panel" className="app-button app-button--secondary catalogo-link">Volver al panel</Link>
-      <button className="app-button app-button--secondary" onClick={logout}>Cerrar sesión</button>
-    </div></header>
-    <nav className="catalogo-nav" aria-label="Catálogo académico">
-    <button className="app-button app-button--secondary" aria-pressed={seccion === 'carreras'} onClick={() => setSeccion('carreras')}>Carreras</button>
-    <button className="app-button app-button--secondary" aria-pressed={seccion === 'asignaturas'} onClick={() => setSeccion('asignaturas')}>Asignaturas</button>
-    </nav>{seccion === 'carreras' ? <CarrerasPage request={request} /> : <AsignaturasPage request={request} />}
-    <footer className="workspace-footer">FISEI · Universidad Técnica de Ambato</footer>
-  </div>;
+  const { request } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const seccion = params.get('seccion') === 'asignaturas' ? 'asignaturas' : 'carreras';
+  return <WorkspaceLayout>
+    <Link to="/panel" className="catalogo-back">Volver al panel</Link>
+    <nav className="catalogo-tabs" aria-label="Catálogo académico">
+      <button className="app-button app-button--secondary" aria-pressed={seccion === 'carreras'} onClick={() => setParams({})}>Carreras</button>
+      <button className="app-button app-button--secondary" aria-pressed={seccion === 'asignaturas'} onClick={() => setParams({ seccion: 'asignaturas' })}>Asignaturas</button>
+    </nav>
+    {seccion === 'carreras' ? <CarrerasPage request={request} onVerAsignaturas={id => setParams({ seccion: 'asignaturas', carrera: id })} /> : <AsignaturasPage request={request} carreraSeleccionada={params.get('carrera') ?? ''} onSeleccion={id => setParams(id ? { seccion: 'asignaturas', carrera: id } : { seccion: 'asignaturas' })} />}
+  </WorkspaceLayout>;
 }

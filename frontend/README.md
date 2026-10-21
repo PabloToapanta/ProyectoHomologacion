@@ -31,7 +31,7 @@ La API pública de autenticación está en `features/auth/index.ts`: `AuthProvid
 - `/login`: usuario, contraseña, alternancia para mostrar/ocultar, validación de campos obligatorios, carga y bloqueo de envíos duplicados.
 - `POST /api/auth/login`: JSON `{ nombreUsuario, password }`, con el contrato de respuesta `{ accessToken, tokenType, expiresAtUtc }`. La contraseña se envía tal como se ingresó; el usuario se recorta como también hace Auth.
 - Errores 400, 401, 5xx, respuesta inválida, conexión y timeout de 15 segundos: mensajes propios en español, sin mostrar cuerpos internos del servidor. Después de un fallo se limpia la contraseña y se permite reintentar.
-- `/panel`: requiere sesión vigente y rol `Administrador`; muestra usuario, perfil y estado de sesión. No contiene funciones de catálogo ni otras historias.
+- `/panel`: requiere sesión vigente y rol `Administrador`; muestra usuario, perfil y estado de sesión. Incluye navegación hacia catálogo y validaciones existentes. La adaptación visual del login y del panel se describe en `../docs/sprint-1/plan-refactor-frontend-mockups.md`.
 - Docente/Coordinador son roles reconocidos, pero no pueden abrir este panel de administrador. Se muestra acceso restringido con opción de cerrar sesión.
 - Rutas desconocidas se redirigen al flujo protegido. Sin sesión, el panel redirige a login.
 - Logout, caducidad y una respuesta autenticada 401 eliminan la sesión. Un 403 conserva la sesión y corresponde al consumidor tratar el permiso de la operación.
@@ -110,3 +110,17 @@ docker compose --env-file /tmp/hu01-t3.env \
 `down` conserva los datos SQL del proyecto. Eliminar su volumen borra los usuarios de ese entorno de desarrollo.
 
 Evidencia real, capturas y pendientes: `docs/sprint-1/evidencia-hu-01-t3.md`.
+
+
+### Verificación visual de los mockups
+
+`npm run test:mockups` inicia Vite en 127.0.0.1:5179 y ejecuta seis recorridos
+Chromium en escritorio (1365 px), móvil (390 px) y compacto (320 px).
+Usa API simulada y datos sintéticos; no necesita credenciales ni reemplaza
+`npm run test:e2e`, que comprueba Gateway/Auth/Catálogo reales.
+Cubre búsqueda, duplicados en modal, Escape/Tab/retorno de foco, eliminación
+restringida, malla contextual, filtro por nivel, unidades y navegación de Docente.
+Las capturas se guardan en `test-results/mockups/` (excluido de Git).
+
+El catálogo conserva `/admin/carreras`; `?seccion=asignaturas&carrera=<UUID>` abre
+la malla de una carrera. La sesión continúa en memoria: recargar exige login.

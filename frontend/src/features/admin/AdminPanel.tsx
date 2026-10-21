@@ -1,22 +1,27 @@
-import { Brand } from '../../shared/ui/Brand';
-import { useAuth } from '../auth';
 import { Link } from 'react-router';
+import { WorkspaceLayout } from '../../shared/ui/WorkspaceLayout';
 
 export function AdminPanel() {
-  const { session, logout } = useAuth();
-  return <div className="workspace">
-    <header className="workspace-header"><Brand /><button className="app-button app-button--secondary" onClick={logout}>Cerrar sesión <span aria-hidden="true">↗</span></button></header>
-    <main className="workspace-main">
-      <p className="eyebrow">INICIO / ADMINISTRACIÓN</p>
-      <div className="workspace-heading"><div><h1>Panel de administración</h1><p>Bienvenido al Sistema de Homologación FISEI-UTA.</p></div><span className="session-badge"><span />Sesión activa</span></div>
-      <section className="welcome-card" aria-labelledby="welcome-title">
-        <div className="welcome-icon" aria-hidden="true">✓</div>
-        <div><p className="eyebrow">ACCESO CONFIRMADO</p><h2 id="welcome-title">Sesión iniciada correctamente</h2><p>Has ingresado con tu cuenta de administrador.</p></div>
-        <dl className="session-details"><div><dt>Usuario</dt><dd>{session?.name}</dd></div><div><dt>Perfil</dt><dd>{session?.role}</dd></div></dl>
-      </section>
-      <p><Link to="/admin/carreras" className="app-button app-button--primary catalogo-link">Gestionar carreras y asignaturas</Link></p>
-      <p><Link to="/validaciones" className="app-button app-button--primary">Validaciones académicas</Link></p>
-    </main>
-    <footer className="workspace-footer">FISEI · Universidad Técnica de Ambato</footer>
-  </div>;
+  return <WorkspaceLayout>
+    <p className="eyebrow">INICIO / PANEL</p>
+    <div className="workspace-heading"><div>
+      <h1>Panel de administración</h1>
+      <p>Bienvenido al Sistema de Homologación FISEI-UTA.</p>
+    </div><span className="session-badge"><span />Sesión activa</span></div>
+    <section aria-labelledby="catalog-summary">
+      <h2 id="catalog-summary">Catálogo académico</h2>
+      <p className="section-description">Organiza la información académica y consulta las herramientas de homologación.</p>
+      <div className="module-grid">
+        <article className="module-card"><span className="module-icon" aria-hidden="true">▤</span>
+          <h3>Carreras y asignaturas</h3><p>Consulta las carreras de la FISEI, su malla y los programas de sus asignaturas.</p>
+          <Link to="/admin/carreras" className="app-button app-button--primary">Gestionar carreras y asignaturas</Link>
+        </article>
+        <article className="module-card"><span className="module-icon" aria-hidden="true">✓</span>
+          <h3>Validaciones académicas</h3><p>Evalúa equivalencias, aprobación, antigüedad y requisitos de cambio de carrera.</p>
+          <Link to="/validaciones" className="app-button app-button--secondary">Abrir validaciones</Link>
+        </article>
+      </div>
+    </section>
+    <aside className="academic-note"><strong>Apoyo al análisis académico</strong><p>Los resultados orientan la revisión. La decisión académica final corresponde a las autoridades competentes.</p></aside>
+  </WorkspaceLayout>;
 }
