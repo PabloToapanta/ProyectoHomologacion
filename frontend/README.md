@@ -31,7 +31,7 @@ La API pública de autenticación está en `features/auth/index.ts`: `AuthProvid
 - `/login`: usuario, contraseña, alternancia para mostrar/ocultar, validación de campos obligatorios, carga y bloqueo de envíos duplicados.
 - `POST /api/auth/login`: JSON `{ nombreUsuario, password }`, con el contrato de respuesta `{ accessToken, tokenType, expiresAtUtc }`. La contraseña se envía tal como se ingresó; el usuario se recorta como también hace Auth.
 - Errores 400, 401, 5xx, respuesta inválida, conexión y timeout de 15 segundos: mensajes propios en español, sin mostrar cuerpos internos del servidor. Después de un fallo se limpia la contraseña y se permite reintentar.
-- `/panel`: requiere sesión vigente y rol `Administrador`; muestra usuario, perfil y estado de sesión. No contiene funciones de catálogo ni otras historias.
+- `/panel`: requiere sesión vigente y rol `Administrador`; muestra usuario, perfil y estado de sesión. Incluye navegación hacia catálogo y validaciones existentes. La adaptación visual del login y del panel se describe en `../docs/sprint-1/plan-refactor-frontend-mockups.md`.
 - Docente/Coordinador son roles reconocidos, pero no pueden abrir este panel de administrador. Se muestra acceso restringido con opción de cerrar sesión.
 - Rutas desconocidas se redirigen al flujo protegido. Sin sesión, el panel redirige a login.
 - Logout, caducidad y una respuesta autenticada 401 eliminan la sesión. Un 403 conserva la sesión y corresponde al consumidor tratar el permiso de la operación.
