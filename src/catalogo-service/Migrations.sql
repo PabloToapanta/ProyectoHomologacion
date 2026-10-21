@@ -198,3 +198,73 @@ GO
 
 COMMIT;
 GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021024938_UnidadesCurricularesHu06'
+)
+BEGIN
+    CREATE TABLE [UnidadesCurriculares] (
+        [Id] uniqueidentifier NOT NULL,
+        [AsignaturaId] uniqueidentifier NOT NULL,
+        [Numero] int NOT NULL,
+        [Nombre] nvarchar(200) NOT NULL,
+        [Horas] int NOT NULL,
+        [ResultadoAprendizaje] nvarchar(4000) NOT NULL,
+        CONSTRAINT [PK_UnidadesCurriculares] PRIMARY KEY ([Id]),
+        CONSTRAINT [CK_Unidades_Horas] CHECK ([Horas] > 0),
+        CONSTRAINT [CK_Unidades_Numero] CHECK ([Numero] > 0),
+        CONSTRAINT [FK_UnidadesCurriculares_Asignaturas_AsignaturaId] FOREIGN KEY ([AsignaturaId]) REFERENCES [Asignaturas] ([Id]) ON DELETE NO ACTION
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021024938_UnidadesCurricularesHu06'
+)
+BEGIN
+    CREATE TABLE [Contenidos] (
+        [Id] uniqueidentifier NOT NULL,
+        [UnidadCurricularId] uniqueidentifier NOT NULL,
+        [Orden] int NOT NULL,
+        [Tema] nvarchar(4000) NOT NULL,
+        CONSTRAINT [PK_Contenidos] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Contenidos_UnidadesCurriculares_UnidadCurricularId] FOREIGN KEY ([UnidadCurricularId]) REFERENCES [UnidadesCurriculares] ([Id]) ON DELETE CASCADE
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021024938_UnidadesCurricularesHu06'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Contenidos_UnidadCurricularId_Orden] ON [Contenidos] ([UnidadCurricularId], [Orden]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021024938_UnidadesCurricularesHu06'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_UnidadesCurriculares_AsignaturaId_Numero] ON [UnidadesCurriculares] ([AsignaturaId], [Numero]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261021024938_UnidadesCurricularesHu06'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261021024938_UnidadesCurricularesHu06', N'8.0.30');
+END;
+GO
+
+COMMIT;
+GO

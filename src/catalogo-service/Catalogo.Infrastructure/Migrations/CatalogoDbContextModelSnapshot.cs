@@ -113,6 +113,67 @@ namespace Catalogo.Infrastructure.Migrations
                     b.ToTable("Carreras", (string)null);
                 });
 
+            modelBuilder.Entity("Catalogo.Domain.Contenido", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tema")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<Guid>("UnidadCurricularId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UnidadCurricularId", "Orden")
+                        .IsUnique();
+
+                    b.ToTable("Contenidos", (string)null);
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.UnidadCurricular", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AsignaturaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Horas")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Numero")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResultadoAprendizaje")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AsignaturaId", "Numero")
+                        .IsUnique();
+
+                    b.ToTable("UnidadesCurriculares", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Unidades_Horas", "[Horas] > 0");
+
+                            t.HasCheckConstraint("CK_Unidades_Numero", "[Numero] > 0");
+                        });
+                });
+
             modelBuilder.Entity("Catalogo.Domain.Asignatura", b =>
                 {
                     b.HasOne("Catalogo.Domain.Carrera", null)
@@ -120,6 +181,29 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasForeignKey("CarreraId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.Contenido", b =>
+                {
+                    b.HasOne("Catalogo.Domain.UnidadCurricular", null)
+                        .WithMany("Contenidos")
+                        .HasForeignKey("UnidadCurricularId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.UnidadCurricular", b =>
+                {
+                    b.HasOne("Catalogo.Domain.Asignatura", null)
+                        .WithMany()
+                        .HasForeignKey("AsignaturaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.UnidadCurricular", b =>
+                {
+                    b.Navigation("Contenidos");
                 });
 #pragma warning restore 612, 618
         }

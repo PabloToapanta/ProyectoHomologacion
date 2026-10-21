@@ -14,7 +14,7 @@ builder.Services.AddExceptionHandler<CatalogoExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o =>
 {
-    o.SwaggerDoc("v1", new OpenApiInfo { Title = "Catálogo FISEI-UTA — HU-04/HU-05", Version = "v1" });
+    o.SwaggerDoc("v1", new OpenApiInfo { Title = "Catálogo FISEI-UTA — HU-04/HU-05/HU-06", Version = "v1" });
     o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Catalogo.Api.xml"));
     o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { Type = SecuritySchemeType.Http, Scheme = "bearer", BearerFormat = "JWT" });
     o.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -29,6 +29,8 @@ builder.Services.AddScoped<ICarreraRepository, CarreraRepository>();
 builder.Services.AddScoped<CarreraService>();
 builder.Services.AddScoped<IAsignaturaRepository, AsignaturaRepository>();
 builder.Services.AddScoped<AsignaturaService>();
+builder.Services.AddScoped<IUnidadRepository, UnidadRepository>();
+builder.Services.AddScoped<UnidadService>();
 
 var issuer = builder.Configuration["Jwt:Issuer"];
 var audience = builder.Configuration["Jwt:Audience"];

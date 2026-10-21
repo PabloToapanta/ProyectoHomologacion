@@ -20,7 +20,7 @@ public sealed record AsignaturaRequest(
 [Authorize(Roles = "Administrador")]
 [ProducesResponseType(typeof(ProblemDetails), 401)]
 [ProducesResponseType(typeof(ProblemDetails), 403)]
-public sealed class AsignaturasController(AsignaturaService service) : ControllerBase
+public sealed class AsignaturasController(AsignaturaService service, IUnidadRepository unidades) : ControllerBase
 {
     /// <summary>Registra una asignatura vinculada a una carrera existente.</summary>
     /// <remarks>Nivel y horas: enteros positivos. Créditos: decimal positivo (hasta dos decimales). Código único por carrera, ignorando caso/espacios y normalizando Unicode.</remarks>
@@ -37,9 +37,15 @@ public sealed class AsignaturasController(AsignaturaService service) : Controlle
 
     /// <summary>Consulta los datos académicos de una asignatura por UUID.</summary>
     [HttpGet("api/asignaturas/{id:guid}")]
-    [ProducesResponseType(typeof(AsignaturaDto), 200)]
+    [ProducesResponseType(typeof(AsignaturaDetalleDto), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 404)]
-    public async Task<ActionResult<AsignaturaDto>> Obtener(Guid id, CancellationToken ct) => Ok(await service.ObtenerAsync(id, ct));
+    public async Task<IActionResult> Obtener(Guid id, CancellationToken ct)
+    {
+        var a = await service.ObtenerAsync(id, ct);
+        var detalle = new AsignaturaDetalleDto(a.Id, a.CarreraId, a.Codigo, a.Nombre, a.Nivel, a.Creditos, a.Horas,
+            (await unidades.ListarAsync(id, ct)).Select(UnidadDto.From).ToList());
+        return Ok(detalle);
+    }
 
     /// <summary>Lista las asignaturas de una carrera, ordenadas por nivel y código.</summary>
     /// <remarks>Devuelve [] para una carrera sin asignaturas y 404 cuando la carrera no existe.</remarks>
@@ -48,3 +54,5 @@ public sealed class AsignaturasController(AsignaturaService service) : Controlle
     [ProducesResponseType(typeof(ProblemDetails), 404)]
     public async Task<ActionResult<IReadOnlyList<AsignaturaDto>>> Listar(Guid id, CancellationToken ct) => Ok(await service.ListarAsync(id, ct));
 }
+
+public record AsignaturaDetalleDto(Guid Id, Guid CarreraId, string Codigo, string Nombre, int Nivel, decimal Creditos, int Horas, IReadOnlyList<UnidadDto> Unidades);

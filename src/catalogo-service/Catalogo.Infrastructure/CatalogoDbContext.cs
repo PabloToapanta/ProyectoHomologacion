@@ -42,5 +42,23 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
         asignatura.Property(a => a.Creditos).HasPrecision(9, 2);
         asignatura.HasIndex(a => new { a.CarreraId, a.CodigoNormalizado }).IsUnique();
         asignatura.HasOne<Carrera>().WithMany().HasForeignKey(a => a.CarreraId).OnDelete(DeleteBehavior.Restrict);
+        var unidad = modelBuilder.Entity<UnidadCurricular>();
+        unidad.ToTable("UnidadesCurriculares", t => {
+            t.HasCheckConstraint("CK_Unidades_Numero", "[Numero] > 0");
+            t.HasCheckConstraint("CK_Unidades_Horas", "[Horas] > 0");
+        });
+        unidad.HasKey(u => u.Id);
+        unidad.Property(u => u.Id).ValueGeneratedNever();
+        unidad.Property(u => u.Nombre).HasMaxLength(200).IsRequired();
+        unidad.Property(u => u.ResultadoAprendizaje).HasMaxLength(4000).IsRequired();
+        unidad.HasIndex(u => new { u.AsignaturaId, u.Numero }).IsUnique();
+        unidad.HasOne<Asignatura>().WithMany().HasForeignKey(u => u.AsignaturaId).OnDelete(DeleteBehavior.Restrict);
+        var contenido = modelBuilder.Entity<Contenido>();
+        contenido.ToTable("Contenidos");
+        contenido.HasKey(c => c.Id);
+        contenido.Property(c => c.Id).ValueGeneratedNever();
+        contenido.Property(c => c.Tema).HasMaxLength(4000).IsRequired();
+        contenido.HasIndex(c => new { c.UnidadCurricularId, c.Orden }).IsUnique();
+        unidad.HasMany(u => u.Contenidos).WithOne().HasForeignKey(c => c.UnidadCurricularId).OnDelete(DeleteBehavior.Cascade);
     }
 }
