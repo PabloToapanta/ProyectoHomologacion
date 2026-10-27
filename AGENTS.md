@@ -13,7 +13,17 @@ Toda tarea debe estar vinculada a un Issue de GitHub y a sus criterios de acepta
 - HU-15: validación de aprobación y antigüedad.
 - HU-16: mínimos de cambio interno y externo.
 
-No adelantar agentes de IA, informes PDF, asignación de docentes ni carga automática de PDF del Sprint 2/3.
+El Sprint 1 fue entregado según confirmación de Edwin. Conservar sus reglas y pruebas. El alcance activo es Sprint 2 según la sección siguiente; los informes y la carga automática de PDF siguen fuera del compromiso.
+
+## Sprint 2 activo — planificación ajustada
+- Consultar `docs/sprint-2/planificacion-detallada.md` y su Word de referencia. Issue de planificación #8; vincular cada implementación a un Issue específico de su HU.
+- Calendario: 22–30 de octubre y 4 de noviembre de 2026; no contar fines de semana ni 2/3 de noviembre. Desarrollo principal hasta el 30; 4 de noviembre para integración y Review. Capacidad supuesta: 4 × 3 h × 8 × 0,8 = 76,8 h; compromiso 40 PH/69 h. Confirmar disponibilidad real, no inventar avance de días pasados.
+- Pablo/Leslie: HU-34 HTTPS, HU-35 JWT firmado/cifrado, HU-36 clave interna y HU-18 agente interno. Edwin/Shirley: HU-10 solicitudes, HU-11 aprobadas, HU-29 dos docentes, HU-30 vista docente, HU-19 externo y HU-20 persistencia. El apoyo de 2 h en T37 es propuesta pendiente de acuerdo.
+- Shirley conserva Product Owner y aceptación; ayudar al desarrollo no autoriza aceptar cambios propios sin revisión cruzada.
+- Fuera: HU-08 carga masiva, HU-31 revisión docente, informes/remisión/finalización. No implementar HU adicionales por inferencia.
+- Motor determinista conserva las tres dimensiones y el veredicto; agente con JSON validado, sin inventar evidencia. Los agentes sí están autorizados dentro de HU-18/19.
+- Seguridad: contraseñas con hash; HTTPS; token firmado y cifrado; claves solo en servidores. La clave interna cubre Auth/Catálogo/Homologación/Solicitudes y complementa JWT y autorización. Contratos y algoritmos se precisan por HU antes de codificar.
+- Conservar el flujo de rama feature/hu-XX-descripcion, Conventional Commits en español y PR a develop. No realizar merge ni release sin autorización.
 
 ## Stack fijado por el proyecto
 - React, TypeScript, Vite; ASP.NET Core 8 Web API.
@@ -22,7 +32,7 @@ No adelantar agentes de IA, informes PDF, asignación de docentes ni carga autom
 - Separación por microservicios; cada servicio es dueño de sus datos.
 - Motor determinista independiente de LLM.
 
-## Distribución de trabajo vigente — tres desarrolladores con Codex
+## Distribución histórica del Sprint 1 — tres desarrolladores con Codex
 - **Pablo:** Scrum Master y desarrollo HU-01 (T1–T3) y HU-14 (T9–T10). Estimación técnica original: 15 h. T1–T3 incorporadas en `develop` con pruebas; la aceptación funcional corresponde a Shirley.
 - **Leslie:** desarrollo HU-04 (T4–T5) y HU-05 (T6–T8). Estimación: 14 h.
 - **Edwin:** desarrollo HU-06 (T13–T15), HU-15 (T11) y HU-16 (T12). Estimación: 16 h. Comenzar por HU-15/HU-16 con reglas y TDD, sin editar archivos compartidos de Pablo; HU-06 depende de modelos del catálogo de Leslie.
