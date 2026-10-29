@@ -12,7 +12,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  if (session && session.expiresAt > Date.now()) return <Navigate to="/panel" replace />;
+  if (session && session.expiresAt > Date.now()) return <Navigate to={session.role === 'Coordinador' ? '/solicitudes' : '/panel'} replace />;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
