@@ -4,6 +4,16 @@ Proyecto académico de la asignatura **Metodologías Ágiles**. Se desarrolla co
 
 > **Estado:** las siete historias del Sprint 1 tienen implementación integrada: HU-01, HU-04, HU-05, HU-06, HU-14, HU-15 y HU-16. La aceptación funcional, las revisiones pendientes y el cierre del Sprint deben registrarse por el equipo; no se deducen del código. La aplicación solo emite sugerencias, no decisiones académicas oficiales.
 
+## Sprint 2 — planificación activa
+
+El equipo confirma la entrega del Sprint 1. El trabajo principal del Sprint 2 se
+planifica del **22 al 30 de octubre**, con integración y Review el **4 de noviembre**.
+Compromiso: **40 PH y 69 h**, capacidad efectiva supuesta **76,8 h** en ocho jornadas.
+Se priorizan HTTPS, JWT cifrado, clave interna y flujo base de solicitudes con análisis
+asistido. Ver [planificación y coordinación](docs/sprint-2/planificacion-detallada.md)
+y [registro de ejecución](docs/sprint-2/registro-evidencias.md). Son elementos
+planificados; no se declaran implementados por esta actualización documental.
+
 ## Ejecución local integrada
 
 Consultar la [guía de ejecución](docs/sprint-1/ejecucion-integrada.md): copiar `.env.example`
