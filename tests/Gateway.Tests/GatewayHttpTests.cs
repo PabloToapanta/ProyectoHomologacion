@@ -13,6 +13,8 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
 {
     public static TheoryData<string, string, string> AcademicRoutes => new()
     {
+        { "GET", "/api/solicitudes", "solicitudes" }, { "POST", "/api/solicitudes", "solicitudes" },
+        { "GET", "/api/solicitudes/solicitud-prueba", "solicitudes" }, { "GET", "/api/solicitudes/carreras", "solicitudes" },
         { "GET", "/api/carreras", "catalogo" }, { "POST", "/api/carreras", "catalogo" },
         { "GET", "/api/carreras/carrera-prueba", "catalogo" },
         { "PUT", "/api/carreras/carrera-prueba", "catalogo" }, { "DELETE", "/api/carreras/carrera-prueba", "catalogo" },
@@ -121,7 +123,7 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
     }
 
     [Theory]
-    [InlineData("/api/solicitudes")]
+    [InlineData("/api/solicitudes/solicitud-prueba/revisiones")]
     [InlineData("/api/informes")]
     [InlineData("/api/auth/register")]
     public async Task RutasNoPlanificadas_NoSeReenvian(string path)
@@ -163,7 +165,8 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        Assert.Equal(13, paths.EnumerateObject().Count());
+        Assert.Equal(16, paths.EnumerateObject().Count());
+        Assert.True(paths.GetProperty("/api/solicitudes").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/asignaturas/{id}/perfil-comparacion").TryGetProperty("put", out _));
         Assert.True(paths.GetProperty("/api/asignaturas/{id}/correspondencias/{receptoraId}").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/asignaturas/{id}/unidades/{unidadId}").TryGetProperty("put", out _));
