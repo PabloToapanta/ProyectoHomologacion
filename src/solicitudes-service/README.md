@@ -8,7 +8,7 @@ Todas las rutas exigen JWT válido con rol `Coordinador` tanto para crear como p
 
 | Método | Ruta | Resultado |
 | --- | --- | --- |
-| POST | `/api/solicitudes` | 201 y Location al detalle |
+| POST | `/api/solicitudes` | 201 y Location relativa al detalle |
 | GET | `/api/solicitudes?pagina=1` | Hasta 50 solicitudes, más recientes primero |
 | GET | `/api/solicitudes/{id}` | Detalle o 404 |
 | GET | `/api/solicitudes/carreras` | Referencias id/nombre de carreras FISEI vigentes |

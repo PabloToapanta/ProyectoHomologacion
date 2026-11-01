@@ -8,7 +8,7 @@ using Solicitudes.Application;
 using Solicitudes.Infrastructure;
 using Solicitudes.Api;
 var builder=WebApplication.CreateBuilder(args);
-builder.Services.AddControllers().AddJsonOptions(o=>o.JsonSerializerOptions.UnmappedMemberHandling=System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow);
+builder.Services.AddControllers(o=>o.Filters.Add<SolicitudesExceptionFilter>()).AddJsonOptions(o=>o.JsonSerializerOptions.UnmappedMemberHandling=System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow);
 builder.Services.AddProblemDetails();builder.Services.AddExceptionHandler<SolicitudesExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();builder.Services.AddSwaggerGen(o=>{
  o.SwaggerDoc("v1",new OpenApiInfo {Title="Solicitudes FISEI-UTA — HU-10 / Issue #38",Version="v1"});

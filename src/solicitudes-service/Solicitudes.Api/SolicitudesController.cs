@@ -22,7 +22,8 @@ public sealed class SolicitudesController(SolicitudService service,ICatalogoCarr
  [HttpPost,ProducesResponseType(typeof(Solicitud),201),ProducesResponseType(typeof(ProblemDetails),400),ProducesResponseType(typeof(ProblemDetails),409),ProducesResponseType(typeof(ProblemDetails),503)]
  public async Task<ActionResult<Solicitud>> Crear(SolicitudRequest input,CancellationToken ct) {
   var s=await service.Crear(new(input.NumeroQuipux,input.IdentificacionEstudiante,input.NombreEstudiante,input.TipoCambio,input.CarreraOrigenId,input.InstitucionOrigen,input.CarreraOrigenExterna,input.CarreraReceptoraId),ct);
-  return CreatedAtAction(nameof(Obtener),new{id=s.Id},s);
+  // Relativa: tras el Gateway el host de la petición es el nombre interno del servicio.
+  return Created($"/api/solicitudes/{s.Id}",s);
  }
  /// <summary>Lista solicitudes en páginas de 50 registros, recientes primero. Solo Coordinador.</summary>
  [HttpGet,ProducesResponseType(typeof(IReadOnlyList<Solicitud>),200),ProducesResponseType(typeof(ProblemDetails),400)]
