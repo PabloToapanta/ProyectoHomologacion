@@ -1,0 +1,74 @@
+{
+  "url_inicial_final": "https://localhost/login",
+  "titulo": "Homologación · FISEI-UTA",
+  "url_tras_login": "https://localhost/panel",
+  "seguridad_visible": [
+    "neutral",
+    "secure",
+    "secure",
+    "secure",
+    "secure"
+  ],
+  "peticiones_locales": [
+    [
+      "GET",
+      "http://localhost/login"
+    ],
+    [
+      "GET",
+      "https://localhost/login"
+    ],
+    [
+      "GET",
+      "https://localhost/assets/index-9GyUVab8.js"
+    ],
+    [
+      "GET",
+      "https://localhost/assets/index-23qAqXzf.css"
+    ],
+    [
+      "GET",
+      "https://localhost/favicon.ico"
+    ],
+    [
+      "POST",
+      "https://localhost/api/auth/login"
+    ],
+    [
+      "GET",
+      "https://localhost/favicon.ico"
+    ],
+    [
+      "GET",
+      "https://localhost/api/carreras"
+    ],
+    [
+      "GET",
+      "https://localhost/favicon.ico"
+    ]
+  ],
+  "login_respuestas": [
+    [
+      "https://localhost/api/auth/login",
+      200,
+      "secure"
+    ]
+  ],
+  "carreras_respuestas": [
+    [
+      "https://localhost/api/carreras",
+      200,
+      "secure"
+    ]
+  ],
+  "hsts": [
+    "max-age=60"
+  ],
+  "fallos_red": [],
+  "contenido_mixto": 0,
+  "peticiones_http_inseguras": [],
+  "capturas": [
+    "docs/sprint-2/evidencias/hu-34-login-chrome.png",
+    "docs/sprint-2/evidencias/hu-34-panel-chrome.png"
+  ]
+}

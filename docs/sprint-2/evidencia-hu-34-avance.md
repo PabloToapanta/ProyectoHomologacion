@@ -28,6 +28,8 @@
 | Puertos públicos reales | `http://localhost/login` respondió 308 con `Location: https://localhost/login`; POST HTTP a `/api/auth/login` respondió 403; `https://localhost/login` respondió 200 con HSTS. Todas las peticiones HTTPS verificaron la CA mkcert mediante `curl --cacert` o el contexto TLS de Python. |
 | Flujo integrado autenticado | POST HTTPS a `/api/auth/login` con usuario sintético devolvió 200 y un token; GET HTTPS a `/api/carreras` con ese token devolvió 200 JSON. No se imprimieron credenciales ni token. |
 | Recursos de la SPA | `/login` y los recursos JavaScript y CSS bajo `/assets/` respondieron 200 por HTTPS. El HTML no incluyó referencias `http://`; esta inspección no sustituye una prueba de contenido mixto en navegador. |
+| Chrome real con CA confiable | Chrome 153 headless con perfil temporal y CA mkcert importada en su base NSS; no se usó ninguna opción para ignorar errores de certificado. Desde `http://localhost/login` llegó a `https://localhost/login` con estado de seguridad `secure`. La interfaz inició sesión y pasó a `https://localhost/panel`; al abrir Carreras, el navegador envió `GET https://localhost/api/carreras` y recibió 200. El POST de login también recibió 200 por HTTPS. La respuesta del documento incluyó HSTS `max-age=60`; Chrome no reportó fallos de red ni incidencias de contenido mixto. [Registro sanitizado](hu-34-navegador-chrome.json) y capturas sin credenciales: [login](evidencias/hu-34-login-chrome.png), [panel](evidencias/hu-34-panel-chrome.png). |
+| GitHub Actions del PR de código | Flujos `Gateway YARP — HU-01 T2` y `Motor de equivalencia — HU-14 T9 y T10` completados correctamente para el commit publicado del PR #47. La aceptación de HU-34 permanece separada. |
 
 ## Certificado y configuración privada
 
@@ -40,9 +42,9 @@ docker compose --env-file .env.sprint1 -p fisei-uta-hu34 \
   -f compose.sprint1.yaml -f compose.hu34.yaml up -d --build --wait
 ```
 
-La CA local **no quedó instalada** en el almacén de confianza de esta máquina: `mkcert -install` solicitó una contraseña de `sudo` que esta sesión no posee. Para pruebas HTTP se usó `curl --cacert /tmp/hu34-certs/ca/rootCA.pem` y se verificó el certificado. La prueba de navegador con confianza normal sigue pendiente.
+La CA local **no quedó instalada globalmente** en el almacén de confianza de esta máquina: `mkcert -install` solicitó una contraseña de `sudo` que esta sesión no posee. Para las pruebas HTTP se usó `curl --cacert /tmp/hu34-certs/ca/rootCA.pem`. Para la prueba de navegador se importó la CA con `certutil` en la base NSS de un perfil temporal aislado de Chrome; el navegador validó el certificado normalmente, sin omitir errores TLS. El perfil habitual del usuario no fue modificado.
 
 ## Pendiente antes de cerrar HU-34
 
-- Instalar la CA mkcert en el entorno de prueba con autorización del propietario del equipo y ejecutar el recorrido de navegador sin omitir errores TLS, incluido login real y ausencia de contenido mixto.
-- Ejecutar y registrar las pruebas de aceptación PA1/PA2 con Shirley, revisar el PR de código y comprobar CI. Las pruebas técnicas integradas no sustituyen esa aceptación.
+- Si se requiere repetir la demostración en el perfil habitual del usuario, instalar allí la CA mkcert con su autorización. La comprobación técnica con perfil temporal ya cubre el recorrido de navegador sin omitir errores TLS.
+- Ejecutar y registrar las pruebas de aceptación PA1/PA2 con Shirley y obtener revisión cruzada del PR de código. Las pruebas técnicas integradas no sustituyen esa aceptación.
