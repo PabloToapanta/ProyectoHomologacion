@@ -14,6 +14,8 @@ La combinación inicial propuesta `A256KW` + `A256GCM` no fue compatible con Ide
 | Comando desde la raíz | Resultado | Criterios |
 | --- | --- | --- |
 | `dotnet test tests/AuthService.Tests/AuthService.Tests.csproj --no-restore -m:1 -p:UseSharedCompilation=false --nologo` | 52 correctas | CA1–CA4; arranque inválido, descifrado y firma, login y roles |
+| `dotnet build Homologacion.sln --configuration Release --no-restore --nologo -m:1 -p:UseSharedCompilation=false` | Compilación correcta, 0 advertencias | Contrato de `LoginResult` y solución completa |
+| `dotnet test Homologacion.sln --configuration Release --no-build --nologo -m:1` | 326 correctas | Auth, Gateway y Homologación en la configuración de CI |
 | `dotnet test tests/Gateway.Tests/Gateway.Tests.csproj --no-restore -m:1 -p:UseSharedCompilation=false --nologo` | 68 correctas | CA2–CA4; rechazos 401, roles y proxy |
 | `dotnet test tests/Catalogo.Tests/Catalogo.Tests.csproj --no-restore -m:1 -p:UseSharedCompilation=false --nologo` | 80 correctas | CA2–CA3; token inválido y arranque |
 | `dotnet test tests/Homologacion.Api.Tests/Homologacion.Api.Tests.csproj --no-restore -m:1 -p:UseSharedCompilation=false --nologo` | 90 correctas | CA2–CA4; token inválido, arranque y roles |
