@@ -24,6 +24,10 @@
 | Kestrel real con mkcert | En puertos temporales `18080/18443`: GET HTTP 308 con `Location` HTTPS; POST de login HTTP 403 tras la corrección; GET HTTPS 401 con `Strict-Transport-Security: max-age=60`. `curl --cacert rootCA.pem` validó la cadena; no se usó `-k`. |
 | Interfaz por Gateway HTTPS | Con frontend Vite Preview temporal: `/login` 200 HTML, recurso `/assets/...js` 200 JavaScript; `/api/desconocida` 401. Gateway y Vite Preview quedaron detenidos después de la comprobación. |
 | Publicación .NET | `dotnet publish` Release correcto; `appsettings.Hu34.json` presente en el artefacto. La comprobación del 403 se ejecutó desde el directorio publicado para cargar esa configuración. |
+| Docker Compose integrado | Proyecto aislado `hu34-test` levantado con `compose.sprint1.yaml` y `compose.hu34.yaml`; seis contenedores activos y sanos al concluir `up --wait`. `docker compose ps` mostró solo Gateway publicado en `127.0.0.1:80` y `127.0.0.1:443`. |
+| Puertos públicos reales | `http://localhost/login` respondió 308 con `Location: https://localhost/login`; POST HTTP a `/api/auth/login` respondió 403; `https://localhost/login` respondió 200 con HSTS. Todas las peticiones HTTPS verificaron la CA mkcert mediante `curl --cacert` o el contexto TLS de Python. |
+| Flujo integrado autenticado | POST HTTPS a `/api/auth/login` con usuario sintético devolvió 200 y un token; GET HTTPS a `/api/carreras` con ese token devolvió 200 JSON. No se imprimieron credenciales ni token. |
+| Recursos de la SPA | `/login` y los recursos JavaScript y CSS bajo `/assets/` respondieron 200 por HTTPS. El HTML no incluyó referencias `http://`; esta inspección no sustituye una prueba de contenido mixto en navegador. |
 
 ## Certificado y configuración privada
 
@@ -40,6 +44,5 @@ La CA local **no quedó instalada** en el almacén de confianza de esta máquina
 
 ## Pendiente antes de cerrar HU-34
 
-- Docker Desktop no estaba iniciado; no se pudo ejecutar el stack completo ni verificar las publicaciones reales 80/443 con Compose.
 - Instalar la CA mkcert en el entorno de prueba con autorización del propietario del equipo y ejecutar el recorrido de navegador sin omitir errores TLS, incluido login real y ausencia de contenido mixto.
-- Ejecutar y registrar las pruebas de aceptación PA1/PA2 con Shirley, revisar el PR y comprobar CI. Los resultados de Kestrel con puertos temporales no sustituyen esa aceptación.
+- Ejecutar y registrar las pruebas de aceptación PA1/PA2 con Shirley, revisar el PR de código y comprobar CI. Las pruebas técnicas integradas no sustituyen esa aceptación.
