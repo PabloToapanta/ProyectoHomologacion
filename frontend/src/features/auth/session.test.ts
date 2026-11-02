@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { loginResponse } from '../../test/fixtures';
 import { readSession } from './session';
 
-describe('sesión de UI basada en la respuesta de Auth', () => {
-  it('extrae nombre, rol y caducidad sin almacenar el JWT', () => {
+describe('sesión de UI basada en los metadatos de Auth', () => {
+  it('usa nombre, rol y caducidad sin decodificar ni almacenar el JWT', () => {
     const response = loginResponse();
     const session = readSession(response);
     expect(session.name).toBe('admin-prueba');
@@ -17,24 +17,20 @@ describe('sesión de UI basada en la respuesta de Auth', () => {
     expect(readSession(loginResponse({ role })).role).toBe(role);
   });
 
-  it.each([
-    { role: 'Estudiante' }, { role: 'administrador' }, { role: ['Administrador'] }, { name: '' }, { sub: '' },
-    { exp: 0 }, { exp: '9999999999' }, { nbf: 9999999999 },
-  ])('rechaza claims incompletos o vencidos: %j', (claims) => {
-    expect(() => readSession(loginResponse(claims))).toThrow();
+  it.each([{ role: 'Estudiante' }, { role: 'administrador' }, { role: ['Administrador'] },
+    { name: '' }, { name: null }, { accessToken: '' }, { tokenType: 'Basic' },
+    { expiresAtUtc: 'no-es-fecha' }, { expiresAtUtc: new Date(0).toISOString() }])
+  ('rechaza metadatos inválidos: %j', (value) => {
+    expect(() => readSession(loginResponse(value))).toThrow();
   });
 
-  it('respeta la menor fecha entre el JWT y expiresAtUtc', () => {
+  it('respeta la fecha de expiración de la respuesta, sin interpretar el token', () => {
     const now = Date.now();
-    const response = loginResponse({ exp: Math.floor((now + 30_000) / 1000) }, now + 900_000);
+    const response = loginResponse({}, now + 30_000);
     expect(readSession(response, now).expiresAt).toBeLessThanOrEqual(now + 30_000);
   });
 
-  it.each(['invalido', 'a.b.', 'a.b.c.extra'])('rechaza tokens malformados %s', (accessToken) => {
-    expect(() => readSession({ ...loginResponse(), accessToken })).toThrow();
-  });
-
-  it.each(['no-es-fecha', new Date(0).toISOString()])('rechaza una fecha de respuesta inválida: %s', (expiresAtUtc) => {
-    expect(() => readSession({ ...loginResponse(), expiresAtUtc })).toThrow();
+  it('acepta el token como valor opaco', () => {
+    expect(readSession(loginResponse({ accessToken: 'opaco' })).accessToken).toBe('opaco');
   });
 });

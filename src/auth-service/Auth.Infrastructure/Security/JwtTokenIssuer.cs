@@ -16,21 +16,26 @@ public sealed class JwtTokenIssuer(IOptions<JwtOptions> options, TimeProvider cl
         var settings = options.Value;
         var now = clock.GetUtcNow();
         var expires = now.AddMinutes(settings.ExpirationMinutes);
-        var token = new JwtSecurityToken(
-            issuer: settings.Issuer,
-            audience: settings.Audience,
-            claims:
-            [
-                new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new(JwtRegisteredClaimNames.Iat, now.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture), ClaimValueTypes.Integer64),
-                new("name", usuario.NombreUsuario),
-                new("role", usuario.Rol.Nombre)
-            ],
-            notBefore: now.UtcDateTime,
-            expires: expires.UtcDateTime,
-            signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey)), SecurityAlgorithms.HmacSha256));
-        return new LoginResult(new JwtSecurityTokenHandler().WriteToken(token), "Bearer", expires);
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Issuer = settings.Issuer,
+            Audience = settings.Audience,
+            Subject = new ClaimsIdentity([
+                new Claim(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("name", usuario.NombreUsuario),
+                new Claim("role", usuario.Rol.Nombre)
+            ]),
+            NotBefore = now.UtcDateTime,
+            Expires = expires.UtcDateTime,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey)), SecurityAlgorithms.HmacSha256),
+            EncryptingCredentials = new EncryptingCredentials(
+                new SymmetricSecurityKey(Convert.FromBase64String(settings.EncryptionKey)),
+                SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512)
+        };
+        var token = new JwtSecurityTokenHandler().CreateToken(descriptor);
+        return new LoginResult(new JwtSecurityTokenHandler().WriteToken(token), "Bearer", expires,
+            usuario.NombreUsuario, usuario.Rol.Nombre);
     }
 }

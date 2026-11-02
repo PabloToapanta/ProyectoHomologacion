@@ -21,7 +21,8 @@ export async function loginRequest(credentials: Credentials, signal?: AbortSigna
     try { data = await response.json() as Partial<LoginResponse> | null; }
     catch { throw new LoginError('El servicio devolvió una respuesta no válida.'); }
     if (!data || typeof data.accessToken !== 'string' || !data.accessToken
-      || data.tokenType !== 'Bearer' || typeof data.expiresAtUtc !== 'string') {
+      || data.tokenType !== 'Bearer' || typeof data.expiresAtUtc !== 'string'
+      || typeof data.name !== 'string' || typeof data.role !== 'string') {
       throw new LoginError('El servicio devolvió una respuesta no válida.');
     }
     return data as LoginResponse;

@@ -85,8 +85,8 @@ describe('HU-01 / T3 — acceso al panel', () => {
     expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
   });
 
-  it('rechaza una respuesta con JWT vencido sin abrir el panel', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(loginResponse({ exp: 0 })), { status: 200 })));
+  it('rechaza una respuesta con expiración vencida sin abrir el panel', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(loginResponse({ expiresAtUtc: new Date(0).toISOString() })), { status: 200 })));
     mount();
     const user = await fillLogin();
     await user.click(screen.getByRole('button', { name: 'Ingresar' }));

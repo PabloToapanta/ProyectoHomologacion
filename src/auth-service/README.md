@@ -40,7 +40,7 @@ La migración `20261019123906_InitialAuth` conserva identificador y operaciones 
 - EF Core 8 con migración versionada; `Usuarios` y `Roles` pertenecen únicamente a Auth.
 - Cada usuario tiene un rol: `Administrador`, `Docente` o `Coordinador`. Se normaliza el nombre con `Trim().ToUpperInvariant()` y se exige unicidad en SQL. La contraseña se conserva exactamente al verificarla.
 - `PasswordHasher<Usuario>` de ASP.NET Core protege las contraseñas con PBKDF2 y salt aleatorio. Se actualiza el hash después de un login válido si el hasher lo solicita. No se implementa criptografía propia.
-- JWT HS256, vida predeterminada de 15 minutos (configurable entre 1 y 60); sin refresh token. Se validan firma, algoritmo, emisor, audiencia y expiración, sin tolerancia adicional. Referencia: [validación JWT de ASP.NET Core](https://learn.microsoft.com/es-es/aspnet/core/security/authentication/configure-jwt-bearer-authentication?view=aspnetcore-8.0).
+- HU-35: JWT firmado con HS256 dentro de un JWE `A256KW` + `A256CBC-HS512`; claves de firma y cifrado independientes. Vida predeterminada de 15 minutos (configurable entre 1 y 60), sin refresh token. Se validan cifrado, firma, algoritmo, emisor, audiencia y expiración, sin tolerancia adicional.
 - Administrador semilla optativo y sin credenciales predeterminadas. La contraseña inicial necesita 12–1024 caracteres como medida técnica; no representa una norma académica. La semilla es idempotente en arranques secuenciales: nunca cambia el hash, rol o estado de una cuenta existente. Si el nombre corresponde a una cuenta inactiva o no administradora, el arranque falla.
 - No hay registro público ni endpoints de administración de usuarios en T1. El modelo admite los tres roles, pero solo se aprovisiona el administrador inicial.
 - Credenciales inválidas, usuario inexistente e inactivo reciben el mismo error. Para un usuario inexistente también se verifica un hash sintético. Login válido envía `Cache-Control: no-store`.
@@ -59,8 +59,10 @@ Respuesta 200:
 
 ```json
 {
-  "accessToken": "<JWT>",
+  "accessToken": "<JWE>",
   "tokenType": "Bearer",
+  "name": "<nombre de usuario>",
+  "role": "Administrador",
   "expiresAtUtc": "<fecha ISO 8601 en UTC>"
 }
 ```
@@ -72,7 +74,7 @@ Errores: 400 (`ValidationProblemDetails`) para campos obligatorios, longitudes i
 
 ## Configuración externa
 
-La API requiere `ConnectionStrings__Auth`, `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey` (al menos 32 bytes UTF-8, generados aleatoriamente). No se incluyen valores predeterminados para estos campos. La aplicación falla al arrancar si falta la conexión o la configuración JWT no es válida.
+La API requiere `ConnectionStrings__Auth`, `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey` (al menos 32 bytes UTF-8) y `Jwt__EncryptionKey` (32 bytes aleatorios codificados en Base64). No se incluyen valores predeterminados para estos campos. La aplicación falla al arrancar si falta la conexión o la configuración JWT no es válida.
 
 Opcionales:
 
@@ -88,7 +90,7 @@ Desactivar la semilla y retirar su contraseña de la configuración después de 
 
 ## Ejecutar en desarrollo con Docker Compose
 
-Desde la raíz del repositorio, copiar `src/auth-service/.env.example` a un archivo privado, p. ej. `/tmp/auth-local.env`, restringirlo con `chmod 600` y rellenarlo. Para la contraseña SQL usar un valor aleatorio con mayúsculas, minúsculas, números y símbolos; para `AUTH_JWT_KEY`, generar al menos 32 bytes aleatorios (p. ej. `openssl rand -hex 32`). Rellenar también usuario/contraseña semilla, emisor y audiencia. El ejemplo no contiene secretos funcionales.
+Desde la raíz del repositorio, copiar `src/auth-service/.env.example` a un archivo privado, p. ej. `/tmp/auth-local.env`, restringirlo con `chmod 600` y rellenarlo. Para la contraseña SQL usar un valor aleatorio con mayúsculas, minúsculas, números y símbolos; para `AUTH_JWT_KEY`, generar al menos 32 bytes aleatorios (p. ej. `openssl rand -hex 32`), y para `AUTH_JWT_ENCRYPTION_KEY`, usar `openssl rand -base64 32`. Rellenar también usuario/contraseña semilla, emisor y audiencia. El ejemplo no contiene secretos funcionales.
 
 ```bash
 docker compose --env-file /tmp/auth-local.env -f src/auth-service/compose.yaml -p hu01-local up -d --build --wait
@@ -96,7 +98,7 @@ python3 tests/auth-service/smoke.py /tmp/auth-local.env hu01-local
 docker compose --env-file /tmp/auth-local.env -f src/auth-service/compose.yaml -p hu01-local down
 ```
 
-Compose es exclusivo del desarrollo de T1. SQL no publica puertos al host; la API solo publica `127.0.0.1:5081` (configurable mediante `AUTH_HTTP_PORT`). Conserva datos en un volumen nombrado del proyecto Compose. `down` conserva ese volumen; eliminarlo borra los usuarios locales y debe hacerse solo si se desea reiniciar ese entorno. El smoke verifica la firma JWT y reinicia únicamente auth-service para verificar semilla y persistencia.
+Compose es exclusivo del desarrollo de T1. SQL no publica puertos al host; la API solo publica `127.0.0.1:5081` (configurable mediante `AUTH_HTTP_PORT`). Conserva datos en un volumen nombrado del proyecto Compose. `down` conserva ese volumen; eliminarlo borra los usuarios locales y debe hacerse solo si se desea reiniciar ese entorno. El smoke comprueba formato JWE y metadatos; xUnit verifica el descifrado y la firma. Después reinicia únicamente auth-service para verificar semilla y persistencia.
 
 El entorno usa SQL Server Developer con `sa`, certificado autofirmado aceptado y Swagger activo; estas opciones son para desarrollo local. Mantener contraseñas hexadecimales con un sufijo de complejidad evita problemas de interpolación de `$` y delimitadores `;` en el archivo de configuración. El lector del smoke acepta el formato simple `VARIABLE=valor`, sin comillas ni interpolación.
 

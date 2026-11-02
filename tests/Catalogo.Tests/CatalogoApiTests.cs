@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Xunit;
 
 namespace Catalogo.Tests;
@@ -173,6 +174,29 @@ public class CatalogoApiTests
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/carreras")).StatusCode);
     }
 
+    [Theory]
+    [InlineData("plain")]
+    [InlineData("other-key")]
+    [InlineData("tampered")]
+    public async Task Token_sin_cifrado_o_alterado_se_rechaza(string scenario)
+    {
+        using var factory = new CatalogoFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", factory.Token("Administrador", scenario: scenario));
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/carreras")).StatusCode);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("corta")]
+    public void ClaveDeCifradoInvalida_ImpideArranque(string value)
+    {
+        using var factory = new CatalogoFactory();
+        using var configured = factory.WithWebHostBuilder(builder => builder.UseSetting("Jwt:EncryptionKey", value));
+        var error = Assert.Throws<InvalidOperationException>(() => configured.CreateClient());
+        if (value.Length > 0) Assert.DoesNotContain(value, error.Message);
+    }
+
     [Fact]
     public async Task Swagger_documenta_rutas_respuestas_y_Bearer()
     {
@@ -198,6 +222,7 @@ internal sealed class CatalogoFactory : WebApplicationFactory<Program>
 {
     // Clave sintética exclusiva de pruebas, nunca utilizada en despliegues.
     private const string Key = "catalogo-test-only-signing-key-32-bytes-minimum";
+    private static readonly string EncryptionKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
     private readonly SqliteConnection connection = new("Data Source=:memory:;Foreign Keys=True");
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -209,6 +234,7 @@ internal sealed class CatalogoFactory : WebApplicationFactory<Program>
         builder.UseSetting("Jwt:Issuer", "catalogo-tests");
         builder.UseSetting("Jwt:Audience", "catalogo-tests");
         builder.UseSetting("Jwt:SigningKey", Key);
+        builder.UseSetting("Jwt:EncryptionKey", EncryptionKey);
         builder.UseSetting("Database:ApplyMigrations", "false");
         builder.ConfigureServices(services =>
         {
@@ -220,10 +246,30 @@ internal sealed class CatalogoFactory : WebApplicationFactory<Program>
         });
     }
 
-    public string Token(string role, bool expired = false) => new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
-        "catalogo-tests", "catalogo-tests", [new Claim("role", role)],
-        expires: expired ? DateTime.UtcNow.AddMinutes(-1) : DateTime.UtcNow.AddMinutes(5),
-        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)), SecurityAlgorithms.HmacSha256)));
+    public string Token(string role, bool expired = false, string scenario = "valid")
+    {
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Issuer = "catalogo-tests", Audience = "catalogo-tests",
+            Subject = new ClaimsIdentity([new Claim("role", role)]),
+            NotBefore = DateTime.UtcNow.AddMinutes(-10),
+            Expires = expired ? DateTime.UtcNow.AddMinutes(-1) : DateTime.UtcNow.AddMinutes(5),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)), SecurityAlgorithms.HmacSha256),
+            EncryptingCredentials = scenario == "plain" ? null : new EncryptingCredentials(
+                new SymmetricSecurityKey(scenario == "other-key"
+                    ? System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)
+                    : Convert.FromBase64String(EncryptionKey)),
+                SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512)
+        };
+        var encrypted = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityTokenHandler().CreateToken(descriptor));
+        if (scenario == "tampered")
+        {
+            var parts = encrypted.Split('.');
+            parts[3] = (parts[3][0] == 'A' ? 'B' : 'A') + parts[3][1..];
+            return string.Join('.', parts);
+        }
+        return encrypted;
+    }
 
     public HttpClient Admin()
     {

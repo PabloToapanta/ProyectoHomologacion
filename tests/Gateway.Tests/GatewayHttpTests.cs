@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Auth.Api.Contracts;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Xunit;
 
 namespace Gateway.Tests;
@@ -95,6 +96,9 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
     [InlineData("no-expiration")]
     [InlineData("unsigned")]
     [InlineData("algorithm")]
+    [InlineData("plain")]
+    [InlineData("other-key")]
+    [InlineData("tampered")]
     public async Task JwtInvalido_Devuelve401SinContactarDestino(string scenario)
     {
         using var client = factory.CreateClient();
@@ -188,6 +192,32 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
             expires: scenario == "no-expiration" ? null : scenario == "expired" ? now.AddSeconds(-1) : now.AddMinutes(15),
             signingCredentials: scenario == "unsigned" ? null : new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), scenario == "algorithm" ? SecurityAlgorithms.HmacSha384 : SecurityAlgorithms.HmacSha256));
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var signed = new JwtSecurityTokenHandler().WriteToken(token);
+        if (scenario == "plain") return signed;
+        var encryptionKey = scenario == "other-key"
+            ? System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)
+            : Convert.FromBase64String(factory.EncryptionKey);
+        var handler = new JwtSecurityTokenHandler { SetDefaultTimesOnTokenCreation = false };
+        var encrypted = handler.WriteToken(handler.CreateToken(
+            new SecurityTokenDescriptor
+            {
+                Issuer = scenario == "issuer" ? "otro-emisor" : GatewayFactory.Issuer,
+                Audience = scenario == "audience" ? "otra-api" : GatewayFactory.Audience,
+                Subject = new ClaimsIdentity(claims),
+                NotBefore = scenario == "future" ? now.AddMinutes(1) : now.AddMinutes(-10),
+                Expires = scenario == "no-expiration" ? null : scenario == "expired" ? now.AddSeconds(-1) : now.AddMinutes(15),
+                SigningCredentials = scenario == "unsigned" ? null : new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    scenario == "algorithm" ? SecurityAlgorithms.HmacSha384 : SecurityAlgorithms.HmacSha256),
+                EncryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptionKey),
+                    SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512)
+            }));
+        if (scenario == "tampered")
+        {
+            var parts = encrypted.Split('.');
+            parts[3] = (parts[3][0] == 'A' ? 'B' : 'A') + parts[3][1..];
+            return string.Join('.', parts);
+        }
+        return encrypted;
     }
 }

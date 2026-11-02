@@ -23,6 +23,9 @@ public sealed class JwtSecurityTests(AuthApiFactory factory) : IClassFixture<Aut
     [InlineData("expired")]
     [InlineData("issuer")]
     [InlineData("audience")]
+    [InlineData("plain")]
+    [InlineData("other-key")]
+    [InlineData("tampered")]
     public async Task Middleware_RechazaTokensInvalidos(string scenario)
     {
         using var client = factory.CreateClient();
@@ -43,7 +46,8 @@ public sealed class JwtSecurityTests(AuthApiFactory factory) : IClassFixture<Aut
     {
         using var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new("Bearer", Token("valid", role));
-        Assert.Equal(expected, (await client.GetAsync("/_test/admin")).StatusCode);
+        var response = await client.GetAsync("/_test/admin");
+        Assert.Equal(expected, response.StatusCode);
     }
 
     private string Token(string scenario, string role = "Administrador")
@@ -57,7 +61,31 @@ public sealed class JwtSecurityTests(AuthApiFactory factory) : IClassFixture<Aut
             claims: [new Claim("sub", Guid.NewGuid().ToString()), new Claim("role", role)],
             notBefore: now.AddMinutes(-20), expires: scenario == "expired" ? now.AddMinutes(-1) : now.AddMinutes(5),
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), SecurityAlgorithms.HmacSha256));
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var signed = new JwtSecurityTokenHandler().WriteToken(token);
+        if (scenario == "plain") return signed;
+        var encryptionKey = scenario == "other-key"
+            ? System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)
+            : Convert.FromBase64String(jwt.EncryptionKey);
+        var encrypted = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityTokenHandler().CreateToken(
+            new SecurityTokenDescriptor
+            {
+                Issuer = scenario == "issuer" ? "otro-emisor" : jwt.Issuer,
+                Audience = scenario == "audience" ? "otra-api" : jwt.Audience,
+                Subject = new ClaimsIdentity([new Claim("sub", Guid.NewGuid().ToString()), new Claim("role", role)]),
+                NotBefore = now.AddMinutes(-20),
+                Expires = scenario == "expired" ? now.AddMinutes(-1) : now.AddMinutes(5),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    SecurityAlgorithms.HmacSha256),
+                EncryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptionKey),
+                    SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512)
+            }));
+        if (scenario == "tampered")
+        {
+            var parts = encrypted.Split('.');
+            parts[3] = (parts[3][0] == 'A' ? 'B' : 'A') + parts[3][1..];
+            return string.Join('.', parts);
+        }
+        return encrypted;
     }
 
     [Theory]
@@ -68,8 +96,24 @@ public sealed class JwtSecurityTests(AuthApiFactory factory) : IClassFixture<Aut
     [InlineData("auth", "api", "suficientemente-larga-para-validacion-32", 61)]
     public void ConfiguracionInsegura_SeRechaza(string issuer, string audience, string key, int minutes)
     {
-        var options = new JwtOptions { Issuer = issuer, Audience = audience, SigningKey = key, ExpirationMinutes = minutes };
+        var options = new JwtOptions { Issuer = issuer, Audience = audience, SigningKey = key,
+            EncryptionKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)),
+            ExpirationMinutes = minutes };
         Assert.False(Validator.TryValidateObject(options, new ValidationContext(options), [], validateAllProperties: true));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("corta")]
+    [InlineData("YWFh")]
+    public void ClaveDeCifradoInvalida_SeRechazaSinExponerla(string encryptionKey)
+    {
+        var options = new JwtOptions { Issuer = "auth", Audience = "api", SigningKey = new string('s', 32),
+            EncryptionKey = encryptionKey };
+        var errors = new List<ValidationResult>();
+        Assert.False(Validator.TryValidateObject(options, new ValidationContext(options), errors, true));
+        if (encryptionKey.Length > 0)
+            Assert.DoesNotContain(encryptionKey, string.Join(' ', errors.Select(x => x.ErrorMessage)));
     }
 }
 
