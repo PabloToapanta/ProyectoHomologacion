@@ -7,7 +7,7 @@ namespace Solicitudes.Api;
 // Resuelve errores esperados antes de ExceptionHandlerMiddleware, que registra como fallo todo lo que recibe.
 public sealed class SolicitudesExceptionFilter : IExceptionFilter {
  public void OnException(ExceptionContext context) {
-  int? status=context.Exception switch {SolicitudException=>400,QuipuxDuplicadoException=>409,_=>null};
+  int? status=context.Exception switch {SolicitudException=>400,SolicitudNoEncontradaException=>404,QuipuxDuplicadoException=>409,_=>null};
   if(status is null) return;
   context.Result=new ObjectResult(new ProblemDetails {Status=status,Title=context.Exception.Message}) {StatusCode=status,ContentTypes={"application/problem+json"}};
   context.ExceptionHandled=true;

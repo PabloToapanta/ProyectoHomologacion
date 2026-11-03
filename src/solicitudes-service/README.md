@@ -10,7 +10,9 @@ Todas las rutas exigen JWT válido con rol `Coordinador` tanto para crear como p
 | --- | --- | --- |
 | POST | `/api/solicitudes` | 201 y Location relativa al detalle |
 | GET | `/api/solicitudes?pagina=1` | Hasta 50 solicitudes, más recientes primero |
-| GET | `/api/solicitudes/{id}` | Detalle o 404 |
+| GET | `/api/solicitudes/{id}` | Detalle con `asignaturasAprobadas` o 404 |
+| POST | `/api/solicitudes/{id}/asignaturas-aprobadas` | HU-11: 201, Location al detalle; 400, 404 o 503. Ver `docs/sprint-2/evidencia-hu-11.md` |
+| GET | `/api/solicitudes/{id}/asignaturas-origen` | HU-11: asignaturas del catálogo de la carrera de origen; vacío si es externo |
 | GET | `/api/solicitudes/carreras` | Referencias id/nombre de carreras FISEI vigentes |
 
 Cuerpo de ejemplo **sintético**; sustituir los UUID por dos carreras distintas del catálogo:
