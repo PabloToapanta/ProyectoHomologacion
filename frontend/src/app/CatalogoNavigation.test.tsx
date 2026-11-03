@@ -91,7 +91,7 @@ it.each(['Docente', 'Coordinador'])('rechaza acceso directo al catálogo para %s
   const request = mockServices(role);
   mount();
   const user = await login();
-  await screen.findByRole('heading', { name: role === 'Coordinador' ? 'Solicitudes de homologación' : 'Acceso restringido' });
+  await screen.findByRole('heading', { name: role === 'Coordinador' ? 'Solicitudes de homologación' : 'Mis solicitudes asignadas' });
   await user.click(screen.getByRole('link', { name: 'Abrir catálogo de prueba' }));
   expect(screen.getByLabelText('Ubicación de prueba')).toHaveTextContent('/admin/carreras');
   expect(screen.getByRole('heading', { name: 'Acceso restringido' })).toBeInTheDocument();

@@ -59,6 +59,12 @@ public class SqlServerTests {
    await using var lectura=new SolicitudesDbContext(options);
    Assert.Equal([docentes[0].Id,docentes[1].Id],await lectura.DocentesAsignados.AsNoTracking().OrderBy(x=>x.Orden).Select(x=>x.DocenteId).ToListAsync());
    Assert.Equal("Docentes asignados",(await lectura.Solicitudes.AsNoTracking().SingleAsync()).Estado);
+   // HU-30: la consulta por docente se traduce en SQL Server y no expone la asignación rechazada.
+   var consulta=new SolicitudRepository(lectura);
+   Assert.Equal([solicitud.Id],(await consulta.ListarAsignadasA(docentes[1].Id,default)).Select(s=>s.Id));
+   Assert.Empty(await consulta.ListarAsignadasA(docentes[2].Id,default));
+   Assert.True(await consulta.EstaAsignada(solicitud.Id,docentes[0].Id,default));
+   Assert.False(await consulta.EstaAsignada(solicitud.Id,docentes[2].Id,default));
   } finally {if(connection.InitialCatalog.StartsWith("Hu10Tests_",StringComparison.Ordinal)) await admin.Database.EnsureDeletedAsync();}
  }
 }
