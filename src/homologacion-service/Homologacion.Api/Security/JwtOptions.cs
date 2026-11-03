@@ -8,6 +8,7 @@ public sealed class JwtOptions : IValidatableObject
     [Required] public string Issuer { get; set; } = "";
     [Required] public string Audience { get; set; } = "";
     [Required] public string SigningKey { get; set; } = "";
+    [Required] public string EncryptionKey { get; set; } = "";
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -15,5 +16,9 @@ public sealed class JwtOptions : IValidatableObject
             yield return new ValidationResult("Jwt:Issuer y Jwt:Audience son obligatorios.");
         if (string.IsNullOrWhiteSpace(SigningKey) || Encoding.UTF8.GetByteCount(SigningKey) < 32)
             yield return new ValidationResult("Jwt:SigningKey requiere al menos 32 bytes UTF-8.");
+        byte[] bytes = new byte[32];
+        if (string.IsNullOrWhiteSpace(EncryptionKey)
+            || !Convert.TryFromBase64String(EncryptionKey, bytes, out var count) || count != 32)
+            yield return new ValidationResult("Jwt:EncryptionKey debe contener 32 bytes codificados en Base64.");
     }
 }

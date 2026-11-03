@@ -24,7 +24,7 @@ El Gateway conserva método, ruta, query, cuerpo y respuesta del destino. Reenv�
 
 ## JWT y roles
 
-Usar los mismos valores externos de `Jwt__Issuer`, `Jwt__Audience` y `Jwt__SigningKey` que auth-service. La clave requiere al menos 32 bytes UTF-8 y no tiene valor predeterminado. Validación: firma obligatoria, emisor, audiencia, algoritmo exclusivamente HS256, expiración obligatoria y `nbf`, con `ClockSkew=0`. `MapInboundClaims=false`, `NameClaimType=name` y `RoleClaimType=role`, compatibles con los claims de T1.
+Usar los mismos valores externos de `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey` y `Jwt__EncryptionKey` que auth-service. La clave de firma requiere al menos 32 bytes UTF-8; la de cifrado, 32 bytes aleatorios en Base64. No tienen valor predeterminado. El Gateway exige JWE `A256KW` + `A256CBC-HS512` con firma interna HS256, emisor, audiencia, expiración y `nbf` válidos, con `ClockSkew=0`. `MapInboundClaims=false`, `NameClaimType=name` y `RoleClaimType=role`.
 
 La política `AcademicAccess` exige autenticación y uno de los roles `Administrador`, `Docente` o `Coordinador`, respetando mayúsculas. Los tres roles superan esta barrera de acceso; la documentación vigente no define una matriz de permisos por operación para Docente/Coordinador. Los servicios conservan la responsabilidad de sus autorizaciones funcionales. No se introdujeron reglas de administración de usuarios o de catálogo.
 
@@ -46,6 +46,7 @@ El Gateway no emite tokens ni decide su duración; respeta `exp` de auth-service
 | `Jwt__Issuer` | Mismo emisor que Auth |
 | `Jwt__Audience` | Misma audiencia que Auth |
 | `Jwt__SigningKey` | Mismo secreto HS256 que Auth |
+| `Jwt__EncryptionKey` | Misma clave JWE de 32 bytes Base64 que Auth |
 | `ReverseProxy__Clusters__auth__Destinations__primary__Address` | URL de auth-service |
 | `ReverseProxy__Clusters__catalogo__Destinations__primary__Address` | URL de catalogo-service |
 | `ReverseProxy__Clusters__homologacion__Destinations__primary__Address` | URL de homologacion-service |
@@ -64,7 +65,7 @@ En Development hay Swagger UI en `/swagger` y OpenAPI en `/swagger/v1/swagger.js
 
 `compose.t2.yaml` añade Gateway al Compose existente de T1 sin editar archivos de auth-service ni crear servicios académicos. Las rutas relativas del overlay se resuelven desde el primer archivo Compose, por eso su contexto de compilación es `../gateway`.
 
-Copiar `.env.example` a un archivo privado, por ejemplo `/tmp/hu01-t2.env`, aplicar `chmod 600` y rellenar secretos, usuario inicial, emisor y audiencia. La clave JWT debe ser aleatoria (p. ej. `openssl rand -hex 32`); las contraseñas SQL deben cumplir complejidad. Los campos `AUTH_*` alimentan la configuración existente de Auth y la configuración compatible de Gateway.
+Copiar `.env.example` a un archivo privado, por ejemplo `/tmp/hu01-t2.env`, aplicar `chmod 600` y rellenar secretos, usuario inicial, emisor y audiencia. Generar una clave de firma aleatoria (p. ej. `openssl rand -hex 32`) y una clave de cifrado independiente (`openssl rand -base64 32`); las contraseñas SQL deben cumplir complejidad. Los campos `AUTH_*` alimentan la configuración existente de Auth y la configuración compatible de Gateway.
 
 ```bash
 docker compose --env-file /tmp/hu01-t2.env \

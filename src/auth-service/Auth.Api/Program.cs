@@ -5,6 +5,7 @@ using Auth.Infrastructure.Security;
 using Auth.Application.Login;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -29,14 +30,28 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
     {
         var jwt = configured.Value;
         bearer.MapInboundClaims = false;
+        bearer.IncludeErrorDetails = false;
+        bearer.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                if (context.SecurityToken is not JsonWebToken { IsEncrypted: true,
+                    Alg: SecurityAlgorithms.Aes256KW, Enc: SecurityAlgorithms.Aes256CbcHmacSha512 })
+                    context.Fail("Se requiere un token cifrado.");
+                return Task.CompletedTask;
+            }
+        };
         bearer.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true, ValidIssuer = jwt.Issuer,
             ValidateAudience = true, ValidAudience = jwt.Audience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SigningKey)),
+            TokenDecryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(jwt.EncryptionKey)),
             ValidateLifetime = true, RequireExpirationTime = true, RequireSignedTokens = true,
-            ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
+            AlgorithmValidator = (algorithm, _, _, _) =>
+                algorithm is SecurityAlgorithms.HmacSha256 or SecurityAlgorithms.Aes256KW
+                    or SecurityAlgorithms.Aes256CbcHmacSha512,
             ClockSkew = TimeSpan.Zero, NameClaimType = "name", RoleClaimType = "role"
         };
     });

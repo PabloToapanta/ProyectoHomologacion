@@ -11,6 +11,8 @@ public sealed class GatewayConfigurationTests
     [InlineData("Jwt:Issuer", "")]
     [InlineData("Jwt:Audience", " ")]
     [InlineData("Jwt:SigningKey", "corta")]
+    [InlineData("Jwt:EncryptionKey", "")]
+    [InlineData("Jwt:EncryptionKey", "corta")]
     public void ConfiguracionJwtInsegura_ImpideArranque(string key, string value)
     {
         using var factory = new GatewayFactory();

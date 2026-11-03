@@ -10,6 +10,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'La configuración privada no está excluida de Git; no se generaron secretos.' }
         $sqlKey = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(20)) + 'aA1!'
         $jwtKey = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+        $encryptionKey = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
         $adminKey = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(18)) + 'aA1!'
         @(
             'AUTH_SQL_PASSWORD=' + $sqlKey
@@ -17,9 +18,11 @@ try {
             'AUTH_JWT_ISSUER=homologacion-validacion'
             'AUTH_JWT_AUDIENCE=homologacion-validacion'
             'AUTH_JWT_KEY=' + $jwtKey
+            'AUTH_JWT_ENCRYPTION_KEY=' + $encryptionKey
             'JWT_ISSUER=homologacion-validacion'
             'JWT_AUDIENCE=homologacion-validacion'
             'JWT_SIGNING_KEY=' + $jwtKey
+            'JWT_ENCRYPTION_KEY=' + $encryptionKey
             'AUTH_ADMIN_USERNAME=admin-validacion-hu05'
             'AUTH_ADMIN_PASSWORD=' + $adminKey
             'CATALOGO_SERVICE_URL=http://catalogo-api:8080/'

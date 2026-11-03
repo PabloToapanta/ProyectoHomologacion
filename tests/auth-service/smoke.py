@@ -4,8 +4,6 @@ Uso: python3 tests/auth-service/smoke.py /ruta/privada/auth.env [proyecto-compos
 No imprime contraseñas, hashes ni JWT. Requiere el daemon Docker.
 """
 import base64
-import hashlib
-import hmac
 import json
 from pathlib import Path
 import subprocess
@@ -55,16 +53,14 @@ credentials = {"nombreUsuario": settings["AUTH_ADMIN_USERNAME"], "password": set
 status, result, headers = request("/api/auth/login", credentials)
 assert status == 200 and headers.get("Cache-Control") == "no-store"
 assert result["tokenType"] == "Bearer"
-header, payload, signature = result["accessToken"].split(".")
+parts = result["accessToken"].split(".")
+assert len(parts) == 5
 decode = lambda part: base64.urlsafe_b64decode(part + "=" * (-len(part) % 4))
-assert json.loads(decode(header))["alg"] == "HS256"
-claims = json.loads(decode(payload))
-expected = hmac.new(settings["AUTH_JWT_KEY"].encode(), (header + "." + payload).encode(), hashlib.sha256).digest()
-assert hmac.compare_digest(expected, decode(signature))
-assert claims["iss"] == settings["AUTH_JWT_ISSUER"] and claims["aud"] == settings["AUTH_JWT_AUDIENCE"]
-assert claims["role"] == "Administrador" and claims["sub"] and claims["jti"]
-assert claims["exp"] > time.time() and claims["exp"] - claims["iat"] == 900
-print("PASS: login SQL Server emite JWT HS256 válido con rol y expiración de 15 minutos")
+header = json.loads(decode(parts[0]))
+assert header["alg"] == "A256KW" and header["enc"] == "A256CBC-HS512"
+assert result["name"] == settings["AUTH_ADMIN_USERNAME"] and result["role"] == "Administrador"
+assert result["expiresAtUtc"]
+print("PASS: login SQL Server emite JWE y metadatos de sesión; la validación criptográfica se cubre en xUnit")
 for name in (credentials["nombreUsuario"], "usuario-inexistente"):
     status, body, _ = request("/api/auth/login", {"nombreUsuario": name, "password": "incorrecta"})
     assert status == 401 and "accessToken" not in body and body["title"] == "Credenciales incorrectas"
