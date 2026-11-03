@@ -22,6 +22,76 @@ namespace Solicitudes.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Solicitudes.Domain.AsignaturaAprobada", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AsignaturaOrigenId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodigoAsignatura")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Creditos")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<DateOnly>("FechaAprobacion")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Horas")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IntentoMatricula")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NombreAsignatura")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("Nota")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("NotaMaximaEscala")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("NotaMinimaAprobacion")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("NumeroMatricula")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ReferenciaPrograma")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("SistemaCreditos")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("SolicitudId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UnidadHoras")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolicitudId");
+
+                    b.ToTable("AsignaturasAprobadas");
+                });
+
             modelBuilder.Entity("Solicitudes.Domain.Solicitud", b =>
                 {
                     b.Property<Guid>("Id")
@@ -83,6 +153,15 @@ namespace Solicitudes.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Solicitudes");
+                });
+
+            modelBuilder.Entity("Solicitudes.Domain.AsignaturaAprobada", b =>
+                {
+                    b.HasOne("Solicitudes.Domain.Solicitud", null)
+                        .WithMany()
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

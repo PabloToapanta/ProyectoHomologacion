@@ -36,7 +36,7 @@ public sealed class Solicitud
   }
   TipoCambio=tipo;CarreraReceptoraId=receptoraId;Id=Guid.NewGuid();FechaRegistro=DateTime.UtcNow;
  }
- private static string Limpiar(string? value,string campo,int max) {
+ internal static string Limpiar(string? value,string campo,int max) {
   if(string.IsNullOrWhiteSpace(value)) throw new SolicitudException($"{campo} es obligatorio.");
   string text;
   try {text=value.Normalize(NormalizationForm.FormKC).Trim();} catch(ArgumentException) {throw new SolicitudException($"{campo} contiene caracteres inválidos.");}

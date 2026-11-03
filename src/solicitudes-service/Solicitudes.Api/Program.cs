@@ -17,7 +17,7 @@ builder.Services.AddEndpointsApiExplorer();builder.Services.AddSwaggerGen(o=>{
  o.AddSecurityRequirement(new OpenApiSecurityRequirement { [new OpenApiSecurityScheme {Reference=new OpenApiReference {Type=ReferenceType.SecurityScheme,Id="Bearer"}}]=[] });
 });
 builder.Services.AddDbContext<SolicitudesDbContext>(o=>o.UseSqlServer(builder.Configuration.GetConnectionString("Solicitudes")??throw new InvalidOperationException("Configure ConnectionStrings:Solicitudes.")));
-builder.Services.AddScoped<ISolicitudRepository,SolicitudRepository>();builder.Services.AddScoped<SolicitudService>();
+builder.Services.AddSingleton(TimeProvider.System);builder.Services.AddScoped<ISolicitudRepository,SolicitudRepository>();builder.Services.AddScoped<SolicitudService>();
 builder.Services.AddHttpContextAccessor();builder.Services.AddTransient<CatalogoAuthorizationHandler>();
 var catalogoUrl=builder.Configuration["Catalogo:BaseUrl"];
 if(!Uri.TryCreate(catalogoUrl,UriKind.Absolute,out var catalogoUri) || catalogoUri.Scheme is not ("http" or "https")) throw new InvalidOperationException("Configure Catalogo:BaseUrl con la dirección interna del catálogo.");
