@@ -1,6 +1,6 @@
 # HU-30 — consulta docente de solicitudes y análisis / Issue #41
 
-Cambios locales desde `origin/develop` (`afacebc`, con HU-10, HU-11, HU-29, HU-34 y HU-35 integradas), sin commit. Sin revisión cruzada ni aceptación de la PO.
+Rama `feature/hu-30-vista-docente` desde `origin/develop` (`afacebc`, con HU-10, HU-11, HU-29, HU-34 y HU-35 integradas). Commits locales `1e573c3` (integración JWT cifrado) y `2d271cd` (consulta docente). Sin revisión cruzada ni aceptación de la PO.
 
 ## Prerrequisito: Solicitudes no aceptaba el token cifrado de HU-35
 
@@ -10,7 +10,7 @@ HU-35 (#49) adaptó Auth, Catálogo, Homologación y el Gateway al JWT firmado y
 - `compose.hu10.yaml`: `Jwt__EncryptionKey` desde `AUTH_JWT_ENCRYPTION_KEY`. README del servicio actualizado.
 - Pruebas: la fábrica emite tokens cifrados como Auth; nuevos casos para token sin cifrar, con otra clave o alterado (401) y clave inválida (no arranca). Antes de corregir fallaron 36 pruebas de la API.
 
-Conviene integrarlo en un PR propio antes que HU-30 (`fix/solicitudes-token-cifrado`).
+La corrección se conserva en el commit independiente `1e573c3`, para revisarla como prerrequisito técnico de HU-30 o publicarla por separado antes de la vista docente.
 
 ## Contrato HU-30
 
@@ -47,5 +47,15 @@ Entorno: SDK 8.0 en contenedor (el equipo no tiene runtime .NET 8), stack desech
 ## Pendientes y observaciones
 
 - El docente no ve nombres de carreras: `/api/solicitudes/carreras` es solo para Coordinador. Decidir si el detalle debe incluirlos.
-- `src/gateway/appsettings.Hu34.json` (HTTPS) no publica `/solicitudes` ni `/docente/solicitudes` como rutas del frontend: recargar esas páginas por HTTPS probablemente falle. Afecta también a HU-10; no se modificó (archivo de HU-34).
+- Integración propuesta para revisión con Pablo: publicar en `src/gateway/appsettings.Hu34.json` las rutas exactas `/solicitudes` y `/docente/solicitudes` hacia el cluster frontend, con GET/HEAD y política anonymous, igual que `/panel`. La SPA y las API conservan sus controles de sesión y rol. Se añaden pruebas de transporte HTTPS antes del ajuste.
 - Se editaron archivos compartidos (`App.tsx`, `WorkspaceLayout.tsx`, `LoginPage.tsx`, Gateway): coordinar con Pablo en la revisión.
+
+## Preparación para PR — 03/11/2026
+
+- Revisión frente a #41 y `origin/develop` (`afacebc`): CA1, CA2 y CA5 implementados; CA3 y los estados reales fallido/incompleto de CA4 permanecen pendientes de HU-18/HU-20. Preparar como PR de avance, sin cerrar la historia.
+- Suite de Solicitudes: 105 aprobadas y ninguna omitida con SQL Server temporal real, SDK .NET 8 y copia del código. Base y red eliminadas al finalizar sin tocar las existentes. TRX: `tmp/hu30-review-20261101/hu30-review.trx` (nombre histórico del script, no fecha de ejecución).
+- HTTPS: dos pruebas nuevas fallaron con 401 en `/solicitudes` y `/docente/solicitudes`; tras declarar las rutas GET/HEAD del frontend, la suite del Gateway pasó 105 pruebas. La autorización de las API se conserva.
+- Frontend: la primera ejecución detectó una aserción que comprobaba la consulta antes del efecto asíncrono. Se corrigió con `waitFor` sobre esa petición; después pasaron las 120 pruebas, TypeScript y compilación Vite.
+- Compose: se corrigió la sangría del puerto local en `compose.hu05.yaml`; ambas configuraciones (`compose.hu05.yaml` y Sprint 1 + HU-10) validan con `config --no-interpolate --quiet`. Los cambios de puertos siguen siendo locales y no se incluyen en HU-30.
+- Herramientas HU-18: el evaluador sin seguimiento pasó sus 8 casos en modo simulado. Se excluyen los resultados generados mediante su `.gitignore`; no se evaluaron modelos reales ni se incluye este banco en HU-30.
+- Total de suites actuales de producto: 330 pruebas aprobadas. No se repitió un recorrido de navegador con todo el stack ni se ejecutó CI en GitHub. La descripción local está preparada en `docs/sprint-2/pr-hu-30.md`; su existencia no implica que se haya publicado un PR.

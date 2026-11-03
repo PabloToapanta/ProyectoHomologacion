@@ -84,7 +84,7 @@ describe('HU-01 / T3 — acceso al panel', () => {
     expect(screen.queryByRole('heading', { name: 'Panel de administración' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Mis solicitudes/ })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Panel/ })).not.toBeInTheDocument();
-    expect(fetchMock.mock.calls.map(c => c[0])).toContain('/api/solicitudes/asignadas');
+    await waitFor(() => expect(fetchMock.mock.calls.map(c => c[0])).toContain('/api/solicitudes/asignadas'));
     await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
     expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
   });
