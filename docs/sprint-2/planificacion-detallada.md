@@ -2,11 +2,13 @@
 
 Relacionado con [Issue #8 — planificación general](https://github.com/PabloToapanta/ProyectoHomologacion/issues/8). Versión de coordinación del 27/10/2026. El usuario confirma la entrega del Sprint 1; las evidencias y decisiones históricas se conservan. No acredita implementación del Sprint 2.
 
-Fuente editable: [documento Word ajustado](Planificacion_Sprint2_Ajustada.docx). Esta versión Markdown mantiene el mismo calendario y estimaciones.
+Fuente editable: [documento Word ajustado](Planificacion_Sprint2_Ajustada.docx). Esta versión Markdown mantiene el mismo calendario. Desde el 01/11/2026 incluye HU-08, que aún no figura en el Word.
+
+**Cambio del 01/11/2026:** el usuario indica mantener HU-08 en Sprint 2. Confirmación de la PO y horas pendientes; ver [propuesta de contrato](propuesta-contrato-hu-08.md).
 
 Sistema de Homologación de Materias (FISEI-UTA) · 22 de octubre al 4 de noviembre de 2026 · Desarrollo principal: 22–30 de octubre · Cierre y Review: miércoles 4 de noviembre
 
-Ajuste de calendario preparado el 27 de octubre. Se conserva el compromiso de 40 PH y 69 h; fechas, capacidad y riesgos se sincronizan con las ocho jornadas solicitadas. Las propuestas de coordinación quedan sujetas al Planning del equipo.
+Ajuste de calendario preparado el 27 de octubre, con compromiso original de 40 PH y 69 h; fechas, capacidad y riesgos se sincronizan con las ocho jornadas solicitadas. Las propuestas de coordinación quedan sujetas al Planning del equipo.
 
 ## 1. Punto de partida (Sprint 1)
 
@@ -28,7 +30,8 @@ Se planifican 8 jornadas: jueves 22, viernes 23, lunes 26, martes 27, miércoles
 | --- | --- | --- |
 | 4 integrantes × 3 h × 8 jornadas × 0,8 | 76,8 h | Capacidad efectiva; 96 h brutas |
 | 26 PH ÷ 5 días × 8 jornadas | 41,6 PH | Proyección orientativa de una sola iteración |
-| Compromiso del sprint | 40 PH · 69 h | Margen: 7,8 h efectivas |
+| Compromiso original del sprint | 40 PH · 69 h | Margen: 7,8 h efectivas |
+| Compromiso con HU-08 (propuesto) | 45 PH · 81 h | Excede en 4,2 h la capacidad efectiva; la PO debe ajustar alcance o disponibilidad |
 
 Distribución por parejas: Pablo–Leslie tienen 40 h estimadas frente a 38,4 h efectivas; Edwin–Shirley, 29 h frente a 38,4 h. Se propone que Edwin–Shirley apoyen 2 h de T37 (pruebas de integración del agente), conservando el responsable de HU-18. Con esa coordinación, la carga queda en 38 h y 31 h. Es una propuesta para Planning, no una reasignación ya acordada. Shirley conserva la aceptación como PO y su tiempo no se contabiliza dos veces.
 
@@ -58,7 +61,8 @@ Calendario de ejecución previsto
 | HU-30 | Docente: ver solicitudes asignadas y resultado del agente | Alta | 3 | Edwin Caraguay y Shirley Amaguaña |
 | HU-19 | Agente de IA: análisis de homologación externa | Alta | 3 | Edwin Caraguay y Shirley Amaguaña |
 | HU-20 | Guardar el resultado del análisis en la base de datos | Alta | 2 | Edwin Caraguay y Shirley Amaguaña |
-|  | TOTAL: 10 historias |  | 40 |  |
+| HU-08 | Carga masiva de programas analíticos (PDF) | Media | 5 | Por asignar |
+|  | TOTAL: 11 historias |  | 45 |  |
 
 HU-31 (revisión propia del docente, 5 PH) queda fuera del compromiso. Solo podrá incorporarse si las historias comprometidas cumplen sus criterios y existe capacidad real confirmada por la Product Owner.
 
@@ -90,7 +94,11 @@ HU-31 (revisión propia del docente, 5 PH) queda fuera del compromiso. Solo podr
 | T37 | HU-18 | Pruebas con agente simulado y una prueba con modelo real | 3 |
 | T38 | HU-19 | Reglas del análisis externo (RN-05 y RN-06) sobre el mismo agente | 3 |
 | T39 | HU-20 | Guardar el resultado en la base de homologación (migración) | 3 |
-|  |  | TOTAL | 69 h |
+| T40 | HU-08 | Carga, validación de archivos, extracción de texto y analizador (propuesta) | 5 |
+| T41 | HU-08 | Borradores, corrección y confirmación hacia el catálogo (propuesta) | 3 |
+| T42 | HU-08 | Interfaz de carga y revisión (propuesta) | 3 |
+| T43 | HU-08 | Gateway, pruebas de integración y evidencia (propuesta) | 1 |
+|  |  | TOTAL | 81 h (69 h originales + 12 h propuestas) |
 
 Los diagramas, los modelos de pantalla y las ceremonias siguen fuera del Sprint Backlog, como se acordó con el ingeniero.
 
@@ -180,7 +188,7 @@ La clave no aparece en el repositorio, en los registros ni en las respuestas.
 
 ## 7. Cambios al Product Backlog
 
-Pasan al Sprint 3: HU-08 (carga masiva de programas analíticos), HU-31, HU-23, HU-32 y HU-33 (revisión docente, informe y finalización).
+Pasan al Sprint 3: HU-31, HU-23, HU-32 y HU-33 (revisión docente, informe y finalización). HU-08 se mantiene en Sprint 2 por indicación del 01/11/2026, pendiente de confirmación de la PO.
 
 La planificación base estima el Sprint 3 en 68 PH frente a una capacidad orientativa de 52–56 PH. Debe reconciliarse el total con el Product Backlog vigente antes de comprometerlo. HU-07, HU-09, HU-12, HU-17 y HU-24 suman 15 PH y son candidatas a revisión de prioridad, no recortes aprobados. El Sprint 3 mantiene inicio el jueves 5 y cierre el miércoles 18 de noviembre: terminar el desarrollo principal del Sprint 2 el 30 deja margen de estabilización hasta el 4, pero no adelanta formalmente el Sprint 3.
 
@@ -194,6 +202,7 @@ La planificación base estima el Sprint 3 en 68 PH frente a una capacidad orient
 | HU-30 depende del resultado de HU-18. | Empezar HU-30 con resultados simulados y conectarla al agente al final. |
 | Disponibilidad y cierre del 4 de noviembre. | No contar el 2 y 3 de noviembre. Confirmar las 3 h del día 4; si se pierden, la capacidad baja a 67,2 h y las 69 h planificadas exceden el límite por 1,8 h. La PO debe ajustar alcance o disponibilidad. |
 | Pull requests sin revisar a tiempo (en el Sprint 1 quedaron #27 y #29). | Revisar los pull requests el mismo día y dejar la evidencia en el registro. |
+| HU-08 (Issue #50) entra con una sola jornada planificada, sin responsable ni contrato acordado. | Acordar la [propuesta](propuesta-contrato-hu-08.md), iniciar sin agente obligatorio y que la PO ajuste alcance o disponibilidad: el 4 de noviembre no se programaban historias nuevas. |
 | HU-29 necesita docentes y coordinador con cuentas y roles disponibles. | Preparar cuentas de prueba mediante una carga controlada antes de la integración. La administración completa de usuarios HU-02 sigue fuera de este compromiso. |
 
 ## 9. Para confirmar con el ingeniero
@@ -214,7 +223,8 @@ Confirmar 3 h por integrante el miércoles 4 de noviembre, el horario de Review 
 - HU-20 prepara base propia del servicio de homologación, sin reutilizar DbContext del catálogo o solicitudes.
 - El LLM aporta análisis/justificación estructurada; el motor determinista conserva el veredicto. Sin evidencia o JSON válido, informar revisión manual/información incompleta y no inventar resultados.
 - HTTPS, token cifrado y clave interna deben probarse juntos, incluyendo login y los tres roles. No colocar secretos en frontend ni logs.
-- Sin carga de PDF HU-08, revisión docente HU-31, informes ni finalización en este compromiso.
+- HU-08 solo cubre programas FISEI con revisión humana antes de guardar; los PDF externos, OCR y comparación quedan fuera. Implementar únicamente tras acordar su contrato.
+- Sin revisión docente HU-31, informes ni finalización en este compromiso.
 
 ## Definición de hecho y estado
 

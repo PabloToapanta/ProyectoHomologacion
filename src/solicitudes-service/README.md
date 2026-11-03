@@ -13,6 +13,8 @@ Todas las rutas exigen JWT válido con rol `Coordinador` tanto para crear como p
 | GET | `/api/solicitudes/{id}` | Detalle con `asignaturasAprobadas` o 404 |
 | POST | `/api/solicitudes/{id}/asignaturas-aprobadas` | HU-11: 201, Location al detalle; 400, 404 o 503. Ver `docs/sprint-2/evidencia-hu-11.md` |
 | GET | `/api/solicitudes/{id}/asignaturas-origen` | HU-11: asignaturas del catálogo de la carrera de origen; vacío si es externo |
+| POST | `/api/solicitudes/{id}/docentes` | HU-29: dos docentes activos distintos; 200 con detalle, 400, 404, 409 si ya tiene docentes, 503 si Auth no responde. Ver `docs/sprint-2/evidencia-hu-29.md` |
+| GET | `/api/solicitudes/{id}/docentes-disponibles` | HU-29: docentes activos según Auth (`Auth:BaseUrl`) |
 | GET | `/api/solicitudes/carreras` | Referencias id/nombre de carreras FISEI vigentes |
 
 Cuerpo de ejemplo **sintético**; sustituir los UUID por dos carreras distintas del catálogo:

@@ -41,4 +41,24 @@ public class SqlServerTests {
    await Assert.ThrowsAsync<DbUpdateException>(()=>huerfana.SaveChangesAsync());
   } finally {if(connection.InitialCatalog.StartsWith("Hu10Tests_",StringComparison.Ordinal)) await admin.Database.EnsureDeletedAsync();}
  }
+ [SqlServerFact] public async Task AsignacionConcurrenteSoloAdmiteUnPar() {
+  var connection=new SqlConnectionStringBuilder(Environment.GetEnvironmentVariable("HU10_TEST_SQL")) {InitialCatalog="Hu10Tests_"+Guid.NewGuid().ToString("N")};
+  var options=new DbContextOptionsBuilder<SolicitudesDbContext>().UseSqlServer(connection.ConnectionString).Options;
+  await using var admin=new SolicitudesDbContext(options);
+  try {
+   await admin.Database.MigrateAsync();
+   var solicitud=new Solicitud("Q-HU29","EST-SINTETICO","Estudiante sintético","Interno",Guid.NewGuid(),null,null,Guid.NewGuid());
+   await using(var db=new SolicitudesDbContext(options)) {db.Solicitudes.Add(solicitud);await db.SaveChangesAsync();}
+   DocenteDisponible[] docentes=[new(Guid.NewGuid(),"docente.ana"),new(Guid.NewGuid(),"docente.luis"),new(Guid.NewGuid(),"docente.rosa")];
+   await using var a=new SolicitudesDbContext(options);await using var b=new SolicitudesDbContext(options);
+   var repoA=new SolicitudRepository(a);var repoB=new SolicitudRepository(b);
+   var sa=(await repoA.ObtenerParaActualizar(solicitud.Id,default))!;var sb=(await repoB.ObtenerParaActualizar(solicitud.Id,default))!;
+   var pa=DocenteAsignado.Asignar(sa,[docentes[0].Id,docentes[1].Id],docentes);var pb=DocenteAsignado.Asignar(sb,[docentes[2].Id,docentes[1].Id],docentes);
+   await repoA.GuardarAsignacion(pa,default);
+   await Assert.ThrowsAsync<AsignacionNoPermitidaException>(()=>repoB.GuardarAsignacion(pb,default));
+   await using var lectura=new SolicitudesDbContext(options);
+   Assert.Equal([docentes[0].Id,docentes[1].Id],await lectura.DocentesAsignados.AsNoTracking().OrderBy(x=>x.Orden).Select(x=>x.DocenteId).ToListAsync());
+   Assert.Equal("Docentes asignados",(await lectura.Solicitudes.AsNoTracking().SingleAsync()).Estado);
+  } finally {if(connection.InitialCatalog.StartsWith("Hu10Tests_",StringComparison.Ordinal)) await admin.Database.EnsureDeletedAsync();}
+ }
 }

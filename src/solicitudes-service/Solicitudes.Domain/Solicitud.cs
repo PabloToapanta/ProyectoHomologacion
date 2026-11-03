@@ -36,6 +36,7 @@ public sealed class Solicitud
   }
   TipoCambio=tipo;CarreraReceptoraId=receptoraId;Id=Guid.NewGuid();FechaRegistro=DateTime.UtcNow;
  }
+ internal void MarcarDocentesAsignados() {Estado=DocenteAsignado.EstadoAsignada;}
  internal static string Limpiar(string? value,string campo,int max) {
   if(string.IsNullOrWhiteSpace(value)) throw new SolicitudException($"{campo} es obligatorio.");
   string text;

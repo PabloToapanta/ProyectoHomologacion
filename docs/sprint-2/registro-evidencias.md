@@ -15,6 +15,7 @@ Este registro no acredita implementación, pruebas ni aceptación. Completar sol
 | HU-30 Vista docente | Edwin / Shirley | Por crear o enlazar | Pendiente | Pendiente | Pendiente |
 | HU-19 Agente externo | Edwin / Shirley | Por crear o enlazar | Pendiente | Pendiente | Pendiente |
 | HU-20 Persistencia | Edwin / Shirley | Por crear o enlazar | Pendiente | Pendiente | Pendiente |
+| HU-08 Carga masiva | Por asignar | [#50](https://github.com/PabloToapanta/ProyectoHomologacion/issues/50) | Pendiente | [Propuesta de contrato](propuesta-contrato-hu-08.md), sin implementación | Pendiente |
 
 ## Seguimiento de jornadas
 

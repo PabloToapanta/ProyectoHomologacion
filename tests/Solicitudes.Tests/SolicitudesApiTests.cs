@@ -95,18 +95,24 @@ public sealed class FakeCatalogo : ICatalogoCarreras {
  public Task<IReadOnlyList<CarreraReferencia>> Listar(CancellationToken ct)=>Falla?throw new CatalogoNoDisponibleException():Task.FromResult<IReadOnlyList<CarreraReferencia>>([new(Origen,"TI sintética"),new(Receptora,"Software sintética")]);
  public Task<IReadOnlyList<AsignaturaCatalogo>> AsignaturasDe(Guid carreraId,CancellationToken ct)=>Falla?throw new CatalogoNoDisponibleException():Task.FromResult<IReadOnlyList<AsignaturaCatalogo>>(carreraId==Origen?[Algebra]:[]);
 }
+public sealed class FakeDirectorio : IDirectorioDocentes {
+ public (DocenteDisponible Ana,DocenteDisponible Luis,DocenteDisponible Rosa) Docentes {get;}=(new(Guid.NewGuid(),"docente.ana"),new(Guid.NewGuid(),"docente.luis"),new(Guid.NewGuid(),"docente.rosa"));
+ public bool Falla {get;set;}
+ public Task<IReadOnlyList<DocenteDisponible>> Listar(CancellationToken ct)=>Falla?throw new DirectorioNoDisponibleException():Task.FromResult<IReadOnlyList<DocenteDisponible>>([Docentes.Ana,Docentes.Luis,Docentes.Rosa]);
+}
 public sealed class SolicitudesFactory : WebApplicationFactory<Program> {
  const string Key="clave-sintetica-pruebas-hu10-32-bytes-minimo";
  readonly SqliteConnection db=new("Data Source=:memory:");
  public FakeCatalogo Catalogo {get;}=new();
+ public FakeDirectorio Directorio {get;}=new();
  public LogsCapturados Logs {get;}=new();
  public RelojFijo Reloj {get;}=new(new DateTimeOffset(2026,6,15,17,0,0,TimeSpan.Zero));
  public SolicitudesFactory(){db.Open();}
  protected override void ConfigureWebHost(IWebHostBuilder b) {
   b.UseEnvironment("Testing");b.ConfigureLogging(l=>l.AddProvider(Logs));foreach(var setting in new Dictionary<string,string?> {
-   ["ConnectionStrings:Solicitudes"]="Server=unused;Database=unused",["Catalogo:BaseUrl"]="http://catalogo.test/",["Jwt:Issuer"]="test",["Jwt:Audience"]="test",["Jwt:SigningKey"]=Key
+   ["ConnectionStrings:Solicitudes"]="Server=unused;Database=unused",["Catalogo:BaseUrl"]="http://catalogo.test/",["Auth:BaseUrl"]="http://auth.test/",["Jwt:Issuer"]="test",["Jwt:Audience"]="test",["Jwt:SigningKey"]=Key
   }) b.UseSetting(setting.Key,setting.Value);
-  b.ConfigureServices(s=>{s.RemoveAll<DbContextOptions<SolicitudesDbContext>>();s.AddDbContext<SolicitudesDbContext>(o=>o.UseSqlite(db));s.RemoveAll<ICatalogoCarreras>();s.AddSingleton<ICatalogoCarreras>(Catalogo);s.RemoveAll<TimeProvider>();s.AddSingleton<TimeProvider>(Reloj);});
+  b.ConfigureServices(s=>{s.RemoveAll<DbContextOptions<SolicitudesDbContext>>();s.AddDbContext<SolicitudesDbContext>(o=>o.UseSqlite(db));s.RemoveAll<ICatalogoCarreras>();s.AddSingleton<ICatalogoCarreras>(Catalogo);s.RemoveAll<IDirectorioDocentes>();s.AddSingleton<IDirectorioDocentes>(Directorio);s.RemoveAll<TimeProvider>();s.AddSingleton<TimeProvider>(Reloj);});
  }
  public HttpClient Client(string? role="Coordinador") {
   var client=CreateClient();using var scope=Services.CreateScope();scope.ServiceProvider.GetRequiredService<SolicitudesDbContext>().Database.EnsureCreated();
