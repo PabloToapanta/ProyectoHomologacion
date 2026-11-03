@@ -100,6 +100,8 @@ public sealed class LoginServiceTests
             QueryToken = cancellationToken;
             return Task.FromResult(User);
         }
+        public Task<IReadOnlyList<Usuario>> ListActiveByRoleAsync(string roleName, CancellationToken cancellationToken = default)
+            => throw new NotSupportedException("El inicio de sesión no lista usuarios por rol.");
         public Task UpdatePasswordHashAsync(Usuario user, string passwordHash, CancellationToken cancellationToken = default)
         {
             user.PasswordHash = passwordHash;

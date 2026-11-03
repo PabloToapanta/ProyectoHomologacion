@@ -92,6 +92,37 @@ namespace Solicitudes.Infrastructure.Migrations
                     b.ToTable("AsignaturasAprobadas");
                 });
 
+            modelBuilder.Entity("Solicitudes.Domain.DocenteAsignado", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DocenteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NombreUsuario")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SolicitudId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SolicitudId", "DocenteId")
+                        .IsUnique();
+
+                    b.HasIndex("SolicitudId", "Orden")
+                        .IsUnique();
+
+                    b.ToTable("DocentesAsignados");
+                });
+
             modelBuilder.Entity("Solicitudes.Domain.Solicitud", b =>
                 {
                     b.Property<Guid>("Id")
@@ -156,6 +187,15 @@ namespace Solicitudes.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("Solicitudes.Domain.AsignaturaAprobada", b =>
+                {
+                    b.HasOne("Solicitudes.Domain.Solicitud", null)
+                        .WithMany()
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Solicitudes.Domain.DocenteAsignado", b =>
                 {
                     b.HasOne("Solicitudes.Domain.Solicitud", null)
                         .WithMany()

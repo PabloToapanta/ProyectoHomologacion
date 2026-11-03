@@ -27,6 +27,7 @@ public sealed record AsignaturaAprobadaRequest(
  [Required] DateOnly? FechaAprobacion,
  [Required,StringLength(50)] string NumeroMatricula,
  [Required] int? IntentoMatricula);
+public sealed record AsignacionDocentesRequest([Required] Guid[]? DocenteIds);
 [ApiController,Route("api/solicitudes"),Authorize(Roles="Coordinador")]
 [ProducesResponseType(typeof(ProblemDetails),401)]
 [ProducesResponseType(typeof(ProblemDetails),403)]
@@ -52,7 +53,14 @@ public sealed class SolicitudesController(SolicitudService service,ICatalogoCarr
  /// <summary>Lista las asignaturas del catálogo que pueden seleccionarse como origen. Vacía en cambios externos.</summary>
  [HttpGet("{id:guid}/asignaturas-origen"),ProducesResponseType(typeof(IReadOnlyList<AsignaturaCatalogo>),200),ProducesResponseType(typeof(ProblemDetails),404),ProducesResponseType(typeof(ProblemDetails),503)]
  public async Task<IActionResult> AsignaturasOrigen(Guid id,CancellationToken ct)=>Ok(await service.AsignaturasOrigen(id,ct));
- /// <summary>Consulta el detalle de una solicitud registrada con sus asignaturas aprobadas.</summary>
+ /// <summary>Asigna exactamente dos docentes distintos con rol Docente activo (HU-29).</summary>
+ /// <remarks>El rol se comprueba en Auth en cada asignación; si Auth no responde, 503 sin cambios. La solicitud pasa a «Docentes asignados». La reasignación no está definida: una segunda asignación devuelve 409.</remarks>
+ [HttpPost("{id:guid}/docentes"),ProducesResponseType(typeof(SolicitudDetalle),200),ProducesResponseType(typeof(ProblemDetails),400),ProducesResponseType(typeof(ProblemDetails),404),ProducesResponseType(typeof(ProblemDetails),409),ProducesResponseType(typeof(ProblemDetails),503)]
+ public async Task<ActionResult<SolicitudDetalle>> AsignarDocentes(Guid id,AsignacionDocentesRequest input,CancellationToken ct)=>Ok(await service.AsignarDocentes(id,input.DocenteIds!,ct));
+ /// <summary>Lista los usuarios activos con rol Docente que pueden asignarse, según Auth.</summary>
+ [HttpGet("{id:guid}/docentes-disponibles"),ProducesResponseType(typeof(IReadOnlyList<DocenteDisponible>),200),ProducesResponseType(typeof(ProblemDetails),404),ProducesResponseType(typeof(ProblemDetails),503)]
+ public async Task<IActionResult> DocentesDisponibles(Guid id,CancellationToken ct)=>Ok(await service.DocentesDisponibles(id,ct));
+ /// <summary>Consulta el detalle de una solicitud registrada con sus asignaturas aprobadas y docentes asignados.</summary>
  [HttpGet("{id:guid}"),ProducesResponseType(typeof(SolicitudDetalle),200),ProducesResponseType(typeof(ProblemDetails),404)]
  public async Task<IActionResult> Obtener(Guid id,CancellationToken ct) {var s=await service.Obtener(id,ct);return s is null?NotFound(new ProblemDetails {Title="Solicitud no encontrada.",Status=404}):Ok(s);}
  /// <summary>Consulta carreras FISEI vigentes para el registro, mediante el servicio de catálogo.</summary>

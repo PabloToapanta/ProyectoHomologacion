@@ -8,16 +8,21 @@ public interface ICatalogoCarreras {
  Task<IReadOnlyList<AsignaturaCatalogo>> AsignaturasDe(Guid carreraId,CancellationToken ct);
 }
 public sealed class CatalogoNoDisponibleException() : Exception("No se pudo comprobar el catálogo. Intente nuevamente; la solicitud no fue guardada.");
+public interface IDirectorioDocentes { Task<IReadOnlyList<DocenteDisponible>> Listar(CancellationToken ct); }
+public sealed class DirectorioNoDisponibleException() : Exception("No se pudo comprobar los docentes en el servicio de autenticación. Intente nuevamente; no se asignó a nadie.");
 public interface ISolicitudRepository {
  Task Agregar(Solicitud solicitud,CancellationToken ct);
  Task<Solicitud?> Obtener(Guid id,CancellationToken ct);
  Task<IReadOnlyList<Solicitud>> Listar(int pagina,CancellationToken ct);
  Task AgregarAsignatura(AsignaturaAprobada asignatura,CancellationToken ct);
  Task<IReadOnlyList<AsignaturaAprobada>> AsignaturasDe(Guid solicitudId,CancellationToken ct);
+ Task<Solicitud?> ObtenerParaActualizar(Guid id,CancellationToken ct);
+ Task GuardarAsignacion(IReadOnlyList<DocenteAsignado> docentes,CancellationToken ct);
+ Task<IReadOnlyList<DocenteAsignado>> DocentesDe(Guid solicitudId,CancellationToken ct);
 }
 public sealed record AsignaturaAprobadaInput(Guid? AsignaturaOrigenId,string? NombreAsignatura,decimal? Creditos,string? SistemaCreditos,int? Horas,string? UnidadHoras,string? ReferenciaPrograma,decimal Nota,decimal? NotaMaximaEscala,decimal? NotaMinimaAprobacion,DateOnly FechaAprobacion,string NumeroMatricula,int IntentoMatricula);
-public sealed record SolicitudDetalle(Guid Id,string NumeroQuipux,string IdentificacionEstudiante,string NombreEstudiante,string TipoCambio,Guid? CarreraOrigenId,string? InstitucionOrigen,string? CarreraOrigenExterna,Guid CarreraReceptoraId,string Estado,DateTime FechaRegistro,IReadOnlyList<AsignaturaAprobada> AsignaturasAprobadas);
-public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCarreras catalogo,TimeProvider reloj) {
+public sealed record SolicitudDetalle(Guid Id,string NumeroQuipux,string IdentificacionEstudiante,string NombreEstudiante,string TipoCambio,Guid? CarreraOrigenId,string? InstitucionOrigen,string? CarreraOrigenExterna,Guid CarreraReceptoraId,string Estado,DateTime FechaRegistro,IReadOnlyList<AsignaturaAprobada> AsignaturasAprobadas,IReadOnlyList<DocenteAsignado> DocentesAsignados);
+public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCarreras catalogo,IDirectorioDocentes directorio,TimeProvider reloj) {
  // Ecuador continental no aplica horario de verano; la fecha académica no depende de UTC ni del contenedor.
  static readonly TimeSpan OffsetEcuador=TimeSpan.FromHours(-5);
  public async Task<Solicitud> Crear(SolicitudInput input,CancellationToken ct) {
@@ -32,7 +37,7 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
  }
  public async Task<SolicitudDetalle?> Obtener(Guid id,CancellationToken ct) {
   if(await repository.Obtener(id,ct) is not {} s) return null;
-  return new(s.Id,s.NumeroQuipux,s.IdentificacionEstudiante,s.NombreEstudiante,s.TipoCambio,s.CarreraOrigenId,s.InstitucionOrigen,s.CarreraOrigenExterna,s.CarreraReceptoraId,s.Estado,s.FechaRegistro,await repository.AsignaturasDe(id,ct));
+  return new(s.Id,s.NumeroQuipux,s.IdentificacionEstudiante,s.NombreEstudiante,s.TipoCambio,s.CarreraOrigenId,s.InstitucionOrigen,s.CarreraOrigenExterna,s.CarreraReceptoraId,s.Estado,s.FechaRegistro,await repository.AsignaturasDe(id,ct),await repository.DocentesDe(id,ct));
  }
  public async Task<AsignaturaAprobada> RegistrarAsignatura(Guid solicitudId,AsignaturaAprobadaInput input,CancellationToken ct) {
   var solicitud=await repository.Obtener(solicitudId,ct)??throw new SolicitudNoEncontradaException();
@@ -54,5 +59,16 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   if(i.AsignaturaOrigenId is not null) throw new SolicitudException("El cambio externo no utiliza asignaturas del catálogo FISEI.");
   if(i.Creditos is not decimal creditos||i.Horas is not int horas||i.NotaMaximaEscala is not decimal maxima||i.NotaMinimaAprobacion is not decimal minima) throw new SolicitudException("Complete créditos, horas y la escala de notas de la universidad de origen.");
   return AsignaturaAprobada.Externa(solicitudId,i.NombreAsignatura??"",creditos,i.SistemaCreditos??"",horas,i.UnidadHoras??"",i.ReferenciaPrograma??"",i.Nota,maxima,minima,i.FechaAprobacion,i.NumeroMatricula,i.IntentoMatricula,hoy);
+ }
+ public async Task<SolicitudDetalle> AsignarDocentes(Guid solicitudId,IReadOnlyList<Guid> docenteIds,CancellationToken ct) {
+  var solicitud=await repository.ObtenerParaActualizar(solicitudId,ct)??throw new SolicitudNoEncontradaException();
+  // Sin respuesta del directorio no se presume que los usuarios tengan rol Docente.
+  var asignados=DocenteAsignado.Asignar(solicitud,docenteIds,await directorio.Listar(ct));
+  await repository.GuardarAsignacion(asignados,ct);
+  return (await Obtener(solicitudId,ct))!;
+ }
+ public async Task<IReadOnlyList<DocenteDisponible>> DocentesDisponibles(Guid solicitudId,CancellationToken ct) {
+  if(await repository.Obtener(solicitudId,ct) is null) throw new SolicitudNoEncontradaException();
+  return await directorio.Listar(ct);
  }
 }

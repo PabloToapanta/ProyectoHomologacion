@@ -12,10 +12,13 @@ services:
       ConnectionStrings__Solicitudes: "Server=auth-db;Database=HomologacionSolicitudes;User Id=sa;Password=${AUTH_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True"
       Database__ApplyMigrations: "true"
       Catalogo__BaseUrl: http://catalogo-api:8080/
+      Auth__BaseUrl: http://auth-service:8080/
     depends_on:
       auth-db:
         condition: service_healthy
       catalogo-api:
+        condition: service_started
+      auth-service:
         condition: service_started
   gateway:
     environment:

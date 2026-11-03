@@ -22,6 +22,9 @@ builder.Services.AddHttpContextAccessor();builder.Services.AddTransient<Catalogo
 var catalogoUrl=builder.Configuration["Catalogo:BaseUrl"];
 if(!Uri.TryCreate(catalogoUrl,UriKind.Absolute,out var catalogoUri) || catalogoUri.Scheme is not ("http" or "https")) throw new InvalidOperationException("Configure Catalogo:BaseUrl con la dirección interna del catálogo.");
 builder.Services.AddHttpClient<ICatalogoCarreras,CatalogoCarreras>(h=>{h.BaseAddress=catalogoUri;h.Timeout=TimeSpan.FromSeconds(10);}).ConfigurePrimaryHttpMessageHandler(()=>new HttpClientHandler {AllowAutoRedirect=false}).AddHttpMessageHandler<CatalogoAuthorizationHandler>();
+var authUrl=builder.Configuration["Auth:BaseUrl"];
+if(!Uri.TryCreate(authUrl,UriKind.Absolute,out var authUri) || authUri.Scheme is not ("http" or "https")) throw new InvalidOperationException("Configure Auth:BaseUrl con la dirección interna del servicio de autenticación.");
+builder.Services.AddHttpClient<IDirectorioDocentes,DirectorioDocentes>(h=>{h.BaseAddress=authUri;h.Timeout=TimeSpan.FromSeconds(10);}).ConfigurePrimaryHttpMessageHandler(()=>new HttpClientHandler {AllowAutoRedirect=false}).AddHttpMessageHandler<CatalogoAuthorizationHandler>();
 var issuer=builder.Configuration["Jwt:Issuer"];var audience=builder.Configuration["Jwt:Audience"];var key=builder.Configuration["Jwt:SigningKey"];
 if(string.IsNullOrWhiteSpace(issuer)||string.IsNullOrWhiteSpace(audience)||string.IsNullOrWhiteSpace(key)||Encoding.UTF8.GetByteCount(key)<32) throw new InvalidOperationException("Configure Jwt:Issuer, Jwt:Audience y Jwt:SigningKey de al menos 32 bytes.");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o=>{o.MapInboundClaims=false;o.IncludeErrorDetails=false;o.TokenValidationParameters=new TokenValidationParameters {

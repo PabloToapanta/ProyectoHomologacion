@@ -3,11 +3,13 @@ import type {FormEvent} from 'react';
 import {FormDialog} from '../../shared/ui/FormDialog';
 import {AsignaturasAprobadas} from './AsignaturasAprobadas';
 import type {AsignaturaAprobada,AsignaturaAprobadaInput,AsignaturaCatalogo} from './AsignaturasAprobadas';
+import {DocentesAsignados} from './DocentesAsignados';
+import type {DocenteAsignado,DocenteDisponible} from './DocentesAsignados';
 import '../catalogo/catalogo.css';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Carrera={id:string;nombre:string};
 type Input={numeroQuipux:string;identificacionEstudiante:string;nombreEstudiante:string;tipoCambio:'Interno'|'Externo';carreraOrigenId:string|null;institucionOrigen:string|null;carreraOrigenExterna:string|null;carreraReceptoraId:string};
-type Solicitud=Input&{id:string;estado:string;fechaRegistro:string;asignaturasAprobadas?:AsignaturaAprobada[]};
+type Solicitud=Input&{id:string;estado:string;fechaRegistro:string;asignaturasAprobadas?:AsignaturaAprobada[];docentesAsignados?:DocenteAsignado[]};
 const vacia:Input={numeroQuipux:'',identificacionEstudiante:'',nombreEstudiante:'',tipoCambio:'Interno',carreraOrigenId:null,institucionOrigen:null,carreraOrigenExterna:null,carreraReceptoraId:''};
 const mensaje=(e:unknown)=>e instanceof Error?e.message:'No se pudo completar la operación.';
 export function SolicitudesPage({request}:{request:Request}) {
@@ -43,6 +45,13 @@ export function SolicitudesPage({request}:{request:Request}) {
    setDetalle(actual=>actual&&{...actual,asignaturasAprobadas:[...(actual.asignaturasAprobadas??[]),saved]});
   }finally{setOcupado(false);}
  }
+ async function asignarDocentes(docenteIds:string[]) {
+  if(!detalle)return;setOcupado(true);
+  try {
+   const saved=await leer<Solicitud>(`/api/solicitudes/${detalle.id}/docentes`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({docenteIds})});
+   setDetalle(saved);setItems(old=>old.map(s=>s.id===saved.id?{...s,estado:saved.estado}:s));
+  }finally{setOcupado(false);}
+ }
  const nombreCarrera=(id:string|null)=>carreras.find(c=>c.id===id)?.nombre??id??'Sin referencia';
  return <section className="catalogo-section" aria-labelledby="solicitudes-title">
   <p className="eyebrow">COORDINACIÓN / SOLICITUDES</p><h1 id="solicitudes-title">Solicitudes de homologación</h1>
@@ -66,6 +75,6 @@ export function SolicitudesPage({request}:{request:Request}) {
   </form></FormDialog>}
   {detalle&&<FormDialog title={`Solicitud ${detalle.numeroQuipux}`} titleId="detalle-solicitud" busy={ocupado} onDismiss={()=>setDetalle(null)}><dl>
    <dt>Estudiante</dt><dd>{detalle.nombreEstudiante} · {detalle.identificacionEstudiante}</dd><dt>Tipo de cambio</dt><dd>{detalle.tipoCambio}</dd><dt>Origen</dt><dd>{detalle.tipoCambio==='Interno'?nombreCarrera(detalle.carreraOrigenId):`${detalle.institucionOrigen} · ${detalle.carreraOrigenExterna}`}</dd><dt>Carrera receptora</dt><dd>{nombreCarrera(detalle.carreraReceptoraId)}</dd><dt>Estado</dt><dd>{detalle.estado}</dd><dt>Fecha de registro</dt><dd>{new Date(detalle.fechaRegistro).toLocaleString('es-EC')}</dd>
-  </dl><AsignaturasAprobadas tipoCambio={detalle.tipoCambio} asignaturas={detalle.asignaturasAprobadas??[]} ocupado={ocupado} cargarOrigen={()=>leer<AsignaturaCatalogo[]>(`/api/solicitudes/${detalle.id}/asignaturas-origen`)} registrar={registrarAsignatura}/><button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>setDetalle(null)}>Cerrar detalle</button></FormDialog>}
+  </dl><DocentesAsignados estado={detalle.estado} docentes={detalle.docentesAsignados??[]} ocupado={ocupado} cargarDisponibles={()=>leer<DocenteDisponible[]>(`/api/solicitudes/${detalle.id}/docentes-disponibles`)} asignar={asignarDocentes}/><AsignaturasAprobadas tipoCambio={detalle.tipoCambio} asignaturas={detalle.asignaturasAprobadas??[]} ocupado={ocupado} cargarOrigen={()=>leer<AsignaturaCatalogo[]>(`/api/solicitudes/${detalle.id}/asignaturas-origen`)} registrar={registrarAsignatura}/><button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>setDetalle(null)}>Cerrar detalle</button></FormDialog>}
  </section>;
 }
