@@ -91,11 +91,11 @@ it.each(['Docente', 'Coordinador'])('rechaza acceso directo al catálogo para %s
   const request = mockServices(role);
   mount();
   const user = await login();
-  await screen.findByRole('heading', { name: 'Acceso restringido' });
+  await screen.findByRole('heading', { name: role === 'Coordinador' ? 'Solicitudes de homologación' : 'Acceso restringido' });
   await user.click(screen.getByRole('link', { name: 'Abrir catálogo de prueba' }));
   expect(screen.getByLabelText('Ubicación de prueba')).toHaveTextContent('/admin/carreras');
   expect(screen.getByRole('heading', { name: 'Acceso restringido' })).toBeInTheDocument();
-  expect(request).toHaveBeenCalledTimes(1);
+  expect(request.mock.calls.some(call => String(call[0]).startsWith('/api/carreras'))).toBe(false);
 });
 
 it('un 401 al abrir catálogo devuelve al login', async () => {

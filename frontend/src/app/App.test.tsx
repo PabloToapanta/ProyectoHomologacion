@@ -74,7 +74,7 @@ describe('HU-01 / T3 — acceso al panel', () => {
     expect(await screen.findByRole('heading', { name: 'Panel de administración' })).toBeInTheDocument();
   });
 
-  it.each(['Docente', 'Coordinador'])('el rol %s no accede al panel de administrador', async (role) => {
+  it.each(['Docente'])('el rol %s no accede al panel de administrador', async (role) => {
     mockLogin(role);
     mount();
     const user = await fillLogin();
@@ -83,6 +83,16 @@ describe('HU-01 / T3 — acceso al panel', () => {
     expect(screen.queryByRole('heading', { name: 'Panel de administración' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
     expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
+  });
+
+  it('coordinador entra a solicitudes y conserva acceso restringido al panel administrador', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal('fetch', vi.fn(async (path: string) => new Response(JSON.stringify(path === '/api/auth/login' ? loginResponse({ role: 'Coordinador' }) : []), {status:200})));
+    mount();await user.type(screen.getByLabelText('Usuario'), 'coordinador-sintetico');await user.type(screen.getByLabelText('Contraseña', {exact:true}), 'clave-sintetica');
+    await user.click(screen.getByRole('button', {name:'Ingresar'}));
+    expect(await screen.findByRole('heading', {name:'Solicitudes de homologación'})).toBeInTheDocument();
+    expect(screen.queryByRole('heading', {name:'Panel de administración'})).not.toBeInTheDocument();
+    expect(screen.getByRole('link', {name:/Solicitudes/})).toBeInTheDocument();
   });
 
   it('rechaza una respuesta con JWT vencido sin abrir el panel', async () => {
