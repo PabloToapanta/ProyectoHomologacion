@@ -18,6 +18,13 @@ public partial class Program
         builder.Services.AddProblemDetails();
         builder.Services.AddOptions<GatewayJwtOptions>().BindConfiguration(GatewayJwtOptions.Section)
             .ValidateDataAnnotations().ValidateOnStart();
+        builder.Services.AddOptions<GatewayHttpsOptions>().BindConfiguration(GatewayHttpsOptions.Section)
+            .ValidateDataAnnotations().ValidateOnStart();
+        builder.Services.AddHsts(options =>
+        {
+            options.ExcludedHosts.Clear();
+            options.MaxAge = TimeSpan.FromMinutes(1);
+        });
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
         builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
             .Configure<IOptions<GatewayJwtOptions>>((bearer, configured) =>
@@ -68,9 +75,32 @@ public partial class Program
         });
         var app = builder.Build();
         _ = app.Services.GetRequiredService<IOptions<GatewayJwtOptions>>().Value;
+        var https = app.Services.GetRequiredService<IOptions<GatewayHttpsOptions>>().Value;
         GatewayConfiguration.ValidateDestinations(builder.Configuration);
         app.UseExceptionHandler();
         app.UseStatusCodePages();
+        if (https.Enabled)
+        {
+            app.UseHsts();
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.IsHttps)
+                {
+                    await next();
+                    return;
+                }
+
+                if (HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method))
+                {
+                    context.Response.StatusCode = StatusCodes.Status308PermanentRedirect;
+                    context.Response.Headers.Location = https.PublicOrigin.TrimEnd('/')
+                        + context.Request.PathBase + context.Request.Path + context.Request.QueryString;
+                    return;
+                }
+
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            });
+        }
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();

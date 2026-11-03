@@ -1,3 +1,4 @@
+import { SolicitudesRoute } from '../features/solicitudes/SolicitudesRoute';
 import { Navigate, Route, Routes } from 'react-router';
 import { AdminPanel } from '../features/admin/AdminPanel';
 import { AuthProvider, ProtectedRoute } from '../features/auth';
@@ -13,6 +14,7 @@ export function App() {
       <Route path="/admin/carreras" element={<CatalogoRoute />} />
     </Route>
     <Route element={<ProtectedRoute />}><Route path="/validaciones" element={<ValidacionesPage />} /></Route>
+    <Route element={<ProtectedRoute role="Coordinador" />}><Route path="/solicitudes" element={<SolicitudesRoute />} /></Route>
     <Route path="*" element={<Navigate to="/panel" replace />} />
   </Routes></AuthProvider>;
 }

@@ -1,0 +1,25 @@
+# Complemento HU-10: usar junto a compose.sprint1.yaml. No modifica sus puertos locales.
+services:
+  solicitudes-service:
+    build:
+      context: ./src/solicitudes-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
+      Jwt__Audience: ${AUTH_JWT_AUDIENCE:?Configure AUTH_JWT_AUDIENCE}
+      Jwt__SigningKey: ${AUTH_JWT_KEY:?Configure AUTH_JWT_KEY}
+      ConnectionStrings__Solicitudes: "Server=auth-db;Database=HomologacionSolicitudes;User Id=sa;Password=${AUTH_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Database__ApplyMigrations: "true"
+      Catalogo__BaseUrl: http://catalogo-api:8080/
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      catalogo-api:
+        condition: service_started
+  gateway:
+    environment:
+      ReverseProxy__Clusters__solicitudes__Destinations__primary__Address: http://solicitudes-service:8080/
+    depends_on:
+      solicitudes-service:
+        condition: service_started
