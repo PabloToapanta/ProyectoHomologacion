@@ -107,3 +107,25 @@ ante fallo de guardado. Proyecto temporal eliminado con sus volúmenes. Transpor
 HTTP local: no acredita HTTPS. No se repitió la extracción sobre los 40 planes reales
 ni la prueba manual en navegador. La aprobación reportada del alcance sin agente y
 del contrato aplicado debe registrarse en #50 antes de aceptar la historia.
+
+## Prueba en navegador del 04/11/2026
+
+Sobre `785b42f`, con un stack aislado de Docker Compose (HTTP local, credenciales aleatorias),
+en el navegador integrado de la aplicación de escritorio:
+
+1. Inicio de sesión como Administrador y paso de Catálogo a la pestaña **Programas analíticos**.
+2. Carrera sintética y un lote de dos archivos: el plan sintético y un texto con nombre `.pdf`.
+   El navegador integrado no tiene herramienta de subida, así que los archivos se asignaron al
+   campo de archivo con `DataTransfer` desde JavaScript. Los demás pasos fueron clics y escritura reales.
+3. Resultado por archivo: `plan-sintetico.pdf · Borrador` y `disfrazado.pdf · Invalido · El archivo no es un PDF.`
+4. La revisión muestra la advertencia del nombre de unidad propuesto y precarga código, nombre, nivel 2,
+   3 créditos, 144 h y dos unidades de 72 h con sus temáticas y contenidos.
+5. Se corrigió el nombre de la unidad 1 y se confirmó: aparece «plan-sintetico.pdf guardado en el catálogo.»
+   y el archivo pasa a «Confirmado».
+6. Por la API: la asignatura `DEMO-SINT-01` tiene la unidad 1 con el nombre corregido y sus dos temáticas.
+   El PDF descargado es idéntico al cargado, la cabecera SHA-256 coincide y figura como cargado por `admin.demo`.
+
+No se probó un plan real en el navegador: superaba el tamaño práctico de la inyección por JavaScript y la CSP
+de la página impide descargarlo de otro origen. Los 40 planes reales pasaron por el stack en el smoke.
+Pasa a verificado «prueba en navegador real de la pantalla de carga» con plan sintético; siguen pendientes
+CI, revisión cruzada y aceptación de Shirley. Stack y copia temporal eliminados.
