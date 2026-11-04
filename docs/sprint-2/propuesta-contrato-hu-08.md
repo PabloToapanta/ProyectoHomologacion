@@ -1,6 +1,6 @@
 # Propuesta de contrato HU-08 — carga masiva de programas analíticos
 
-Estado: propuesta para acordar antes de codificar. Issue [#50](https://github.com/PabloToapanta/ProyectoHomologacion/issues/50), sin implementación y sin aceptación de la PO. Decisión de mantener HU-08 en Sprint 2 transmitida por el usuario el 01/11/2026; falta confirmación de Shirley.
+Estado: **implementada** en la rama `feature/hu-08-carga-programas` (04/11/2026). Según Edwin, Shirley confirmó la versión sin agente obligatorio. Issue [#50](https://github.com/PabloToapanta/ProyectoHomologacion/issues/50); la aceptación de la PO sigue pendiente. El contrato implementado y sus diferencias con esta propuesta están en [evidencia-hu-08.md](evidencia-hu-08.md).
 
 Historia del Sprint 0: "Como administrador, quiero cargar de forma masiva los programas analíticos (PDF) de las carreras de la FISEI." Prioridad media, 5 PH. Los programas "siguen el mismo formato, por lo que se importan con extracción de texto y revisión por el agente".
 
