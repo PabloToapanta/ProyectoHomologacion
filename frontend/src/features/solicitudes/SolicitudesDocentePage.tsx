@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react';
 import {FormDialog} from '../../shared/ui/FormDialog';
+import {AnalisisInternoPanel} from './AnalisisInternoPanel';
 import type {DocenteAsignado} from './DocentesAsignados';
 import '../catalogo/catalogo.css';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
@@ -25,7 +26,7 @@ export function AnalisisSolicitud({analisis}:{analisis:Analisis}) {
  const titulo=estado==='Pendiente'?'Análisis pendiente':estado==='Fallido'?'El análisis falló':'Información incompleta';
  return <section aria-labelledby="analisis-titulo" role="status"><h3 id="analisis-titulo">{titulo}</h3><p>{texto||'No hay un resultado de análisis disponible para esta solicitud.'}</p></section>;
 }
-/** HU-30: el docente consulta en modo lectura las solicitudes que tiene asignadas. La revisión propia es HU-31. */
+/** HU-30 consulta solicitudes; HU-18 permite analizar parejas sin aprobar ni remitir (HU-31). */
 export function SolicitudesDocentePage({request}:{request:Request}) {
  const [items,setItems]=useState<Solicitud[]>([]),[cargando,setCargando]=useState(true),[errorCarga,setErrorCarga]=useState(''),[intento,setIntento]=useState(0);
  const [detalle,setDetalle]=useState<SolicitudAsignada|null>(null),[error,setError]=useState(''),[ocupado,setOcupado]=useState(false);
@@ -57,7 +58,7 @@ export function SolicitudesDocentePage({request}:{request:Request}) {
    <dl><dt>Estudiante</dt><dd>{s.nombreEstudiante} · {s.identificacionEstudiante}</dd><dt>Tipo de cambio</dt><dd>{s.tipoCambio}{s.tipoCambio==='Externo'&&` · ${s.institucionOrigen} · ${s.carreraOrigenExterna}`}</dd><dt>Estado</dt><dd>{s.estado}</dd><dt>Fecha de registro</dt><dd>{new Date(s.fechaRegistro).toLocaleString('es-EC')}</dd></dl>
    <h3>Docentes asignados</h3><ul aria-label="Docentes asignados">{s.docentesAsignados.map(d=><li key={d.id}>{d.nombreUsuario}</li>)}</ul>
    <h3>Asignaturas aprobadas</h3>{s.asignaturasAprobadas.length?<ul>{s.asignaturasAprobadas.map(a=><li key={a.id}>{a.nombreAsignatura} · {a.creditos} créditos · {a.horas} horas · nota {a.nota} ({a.estado})</li>)}</ul>:<p>Sin asignaturas aprobadas registradas.</p>}
-   <AnalisisSolicitud analisis={detalle.analisis}/>
+   {s.tipoCambio==='Interno'?<AnalisisInternoPanel key={s.id} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas} inicial={detalle.analisis}/>:<AnalisisSolicitud analisis={detalle.analisis}/>}
    <button className="app-button app-button--secondary" onClick={()=>setDetalle(null)}>Cerrar detalle</button>
   </FormDialog>}
  </section>;
