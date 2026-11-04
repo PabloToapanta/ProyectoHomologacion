@@ -93,6 +93,16 @@ public class ImportacionProgramasServiceTests
     }
 
     [Fact]
+    public async Task Acepta_en_un_lote_la_malla_completa_de_cincuenta_programas()
+    {
+        var (service, repo, _) = Crear();
+        var malla = Enumerable.Range(0, 50).Select(i => new ArchivoPrograma($"{i}.pdf", Pdf)).ToArray();
+        var lote = await service.AnalizarAsync(repo.Carrera.Id, malla, default);
+        Assert.Equal(50, lote.Archivos.Count);
+        Assert.All(lote.Archivos, a => Assert.Equal("Borrador", a.Estado));
+    }
+
+    [Fact]
     public async Task Carrera_inexistente_es_404_y_codigo_existente_se_advierte()
     {
         var (service, repo, _) = Crear();

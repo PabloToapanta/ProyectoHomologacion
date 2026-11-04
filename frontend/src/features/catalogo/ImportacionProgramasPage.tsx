@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import type {FormEvent} from 'react';
 import type {Carrera,CatalogoRequest} from './carreras-api';
 
@@ -12,10 +12,18 @@ type TematicaEditable={nombre:string;contenidos:string};
 type UnidadEditable={numero:string;nombre:string;horas:string;resultadoAprendizaje:string;tematicas:TematicaEditable[]};
 type Edicion={codigo:string;nombre:string;nivel:string;creditos:string;horas:string;unidades:UnidadEditable[]};
 
+/** Coincide con ImportacionProgramasService.MaxArchivos: la malla completa de una carrera cabe en un lote. */
+const MAX_ARCHIVOS=50;
+const CODIGO_EXISTENTE='El código ya existe en la carrera';
 const texto=(v:string|number|null)=>v===null?'':String(v);
+const subir=()=>{try{window.scrollTo({top:0});}catch{/* jsdom */}};
 const numero=(v:string)=>v.trim()===''?null:Number(v);
-async function problema(response:Response,defecto:string) {
+async function problema(response:Response,defecto:string):Promise<string> {
  if(response.status===401)return 'Tu sesión ha finalizado. Inicia sesión de nuevo.';
+ if(response.status===409){
+  const detalle:string=await problema(new Response(await response.text(),{status:400}),defecto);
+  return `${detalle} Si la asignatura ya está en el catálogo, no se sobrescribe; si el código existente es incorrecto, corrígelo en «Gestión de asignaturas» o cambia el código aquí.`;
+ }
  if(response.status===403)return 'Solo el Administrador puede cargar programas analíticos.';
  try{const p=await response.json() as {detail?:string;title?:string;errors?:Record<string,string[]>};return p.detail??(p.errors?Object.values(p.errors).flat().join(' '):undefined)??p.title??defecto;}catch{return defecto;}
 }
@@ -31,6 +39,10 @@ export function ImportacionProgramasPage({request}:{request:CatalogoRequest}) {
  const [lote,setLote]=useState<Lote|null>(null),[archivosLote,setArchivosLote]=useState<File[]>([]),[confirmados,setConfirmados]=useState<number[]>([]);
  const [revisando,setRevisando]=useState<number|null>(null),[edicion,setEdicion]=useState<Edicion|null>(null);
  const [ocupado,setOcupado]=useState(false),[error,setError]=useState(''),[aviso,setAviso]=useState('');
+ const tituloRevision=useRef<HTMLHeadingElement>(null),alertaRevision=useRef<HTMLParagraphElement>(null);
+ // La revisión es una pantalla propia: al abrirla, el foco va a su título; un error de confirmación se muestra y enfoca dentro de ella.
+ useEffect(()=>{if(revisando!==null){subir();tituloRevision.current?.focus();}},[revisando]);
+ useEffect(()=>{if(revisando!==null&&error)alertaRevision.current?.focus();},[error,revisando]);
  useEffect(()=>{
   const controller=new AbortController();
   request('/api/carreras',{signal:controller.signal}).then(async r=>{if(!r.ok)throw new Error(await problema(r,'No se pudieron cargar las carreras.'));return r.json() as Promise<Carrera[]>;})
@@ -40,6 +52,7 @@ export function ImportacionProgramasPage({request}:{request:CatalogoRequest}) {
 
  async function analizar(event:FormEvent) {
   event.preventDefault();if(ocupado||!carrera||archivos.length===0)return;
+  if(archivos.length>MAX_ARCHIVOS){setError(`Selecciona como máximo ${MAX_ARCHIVOS} archivos por lote.`);return;}
   setOcupado(true);setError('');setAviso('');setLote(null);setRevisando(null);setEdicion(null);setConfirmados([]);
   const form=new FormData();form.append('carreraId',carrera);archivos.forEach(a=>form.append('archivos',a,a.name));
   try{
@@ -49,6 +62,7 @@ export function ImportacionProgramasPage({request}:{request:CatalogoRequest}) {
   }catch(e){setError(e instanceof Error?e.message:'No se pudieron analizar los programas.');}finally{setOcupado(false);}
  }
  function revisar(i:number){const b=lote?.archivos[i].borrador;if(!b)return;setRevisando(i);setEdicion(editable(b));setError('');setAviso('');}
+ function volver(){setRevisando(null);setEdicion(null);setError('');subir();}
  async function confirmar(event:FormEvent) {
   event.preventDefault();if(ocupado||revisando===null||!edicion||!lote)return;
   const resultado=lote.archivos[revisando];const archivo=archivosLote[revisando];
@@ -60,7 +74,7 @@ export function ImportacionProgramasPage({request}:{request:CatalogoRequest}) {
   try{
    const r=await request('/api/importaciones-programas/confirmacion',{method:'POST',body:form});
    if(!r.ok)throw new Error(await problema(r,'No se pudo guardar el programa.'));
-   setConfirmados(c=>[...c,revisando]);setRevisando(null);setEdicion(null);setAviso(`${resultado.archivo} guardado en el catálogo.`);
+   setConfirmados(c=>[...c,revisando]);setRevisando(null);setEdicion(null);setAviso(`${resultado.archivo} guardado en el catálogo.`);subir();
   }catch(e){setError(e instanceof Error?e.message:'No se pudo guardar el programa.');}finally{setOcupado(false);}
  }
  const actualizarUnidad=(i:number,cambio:Partial<UnidadEditable>)=>setEdicion(e=>e&&{...e,unidades:e.unidades.map((u,j)=>j===i?{...u,...cambio}:u)});
@@ -72,17 +86,26 @@ export function ImportacionProgramasPage({request}:{request:CatalogoRequest}) {
  return <section className="catalogo-section" aria-labelledby="importacion-title">
   <p className="eyebrow">CATÁLOGO / PROGRAMAS ANALÍTICOS</p><h1 id="importacion-title">Carga de programas analíticos</h1>
   <p>Carga los PDF del plan analítico FISEI. El sistema extrae un borrador de cada archivo sin guardarlo; revísalo, corrígelo y confírmalo. El PDF se conserva junto a la asignatura confirmada. No se aplica OCR ni se completan datos por suposición.</p>
-  {error&&<p role="alert">{error}</p>}{aviso&&<p role="status">{aviso}</p>}
-  <form onSubmit={analizar}><fieldset disabled={ocupado} className="solicitud-fields"><legend>Archivos del lote</legend>
+  {!edicion&&error&&<p role="alert" className="auth-error">{error}</p>}{aviso&&<p role="status">{aviso}</p>}
+  {!edicion&&<><form onSubmit={analizar}><fieldset disabled={ocupado} className="solicitud-fields"><legend>Archivos del lote</legend>
    <label>Carrera<select required value={carrera} onChange={e=>setCarrera(e.target.value)}><option value="">Seleccione una carrera</option>{carreras.map(c=><option key={c.id} value={c.id}>{c.nombre}</option>)}</select></label>
    <label>Programas analíticos (PDF)<input type="file" multiple accept="application/pdf,.pdf" onChange={e=>setArchivos(Array.from(e.target.files??[]))}/></label>
-   <p>Hasta 20 archivos de 5 MB cada uno y 25 MB por lote.</p>
+   <p>{`Hasta ${MAX_ARCHIVOS} archivos de 5 MB cada uno y 25 MB por lote.`}</p>
   </fieldset><button className="app-button app-button--primary" disabled={ocupado||!carrera||archivos.length===0}>{ocupado&&!edicion?'Analizando…':'Analizar programas'}</button></form>
-  {lote&&<ul aria-label="Resultado por archivo">{lote.archivos.map((a,i)=><li key={`${i}-${a.archivo}`}>
-   <span>{a.archivo} · {confirmados.includes(i)?'Confirmado':a.estado} · {a.mensaje}</span>
-   {a.borrador&&!confirmados.includes(i)&&<button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>revisar(i)}>Revisar {a.archivo}</button>}
-  </li>)}</ul>}
-  {borrador&&edicion&&<section aria-label={`Revisión de ${borrador.archivo}`}><h2>Revisión de {borrador.archivo}</h2>
+  {lote&&<><p>{`${confirmados.length} de ${lote.archivos.filter(a=>a.borrador).length} borradores confirmados.`}</p>
+   <ul aria-label="Resultado por archivo">{lote.archivos.map((a,i)=>{
+    const conflicto=a.borrador?.advertencias.find(x=>x.startsWith(CODIGO_EXISTENTE));
+    return <li key={`${i}-${a.archivo}`}>
+     <span>{a.archivo} · {confirmados.includes(i)?'Confirmado':a.estado} · {a.mensaje}</span>
+     {a.borrador&&<span>{` ${a.borrador.codigo??'Código no encontrado'} — ${a.borrador.nombre??'Nombre no encontrado'}`}</span>}
+     {conflicto&&!confirmados.includes(i)&&<strong>{` ${conflicto}`}</strong>}
+     {a.borrador&&!confirmados.includes(i)&&<button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>revisar(i)}>Revisar {a.archivo}</button>}
+    </li>;})}</ul></>}</>}
+  {borrador&&edicion&&revisando!==null&&lote&&<section aria-label={`Revisión de ${borrador.archivo}`}>
+   <div className="catalogo-actions"><button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={volver}>Volver al lote</button>
+    <span>{`Archivo ${revisando+1} de ${lote.archivos.length}`}</span></div>
+   <h2 ref={tituloRevision} tabIndex={-1}>Revisión de {borrador.archivo}</h2>
+   {error&&<p role="alert" className="auth-error" ref={alertaRevision} tabIndex={-1}>{error}</p>}
    {borrador.borrador!.faltantes.length>0&&<><h3>Datos no encontrados</h3><ul aria-label="Datos no encontrados">{borrador.borrador!.faltantes.map(f=><li key={f}>{f}</li>)}</ul></>}
    {borrador.borrador!.advertencias.length>0&&<ul aria-label="Advertencias">{borrador.borrador!.advertencias.map(a=><li key={a}>{a}</li>)}</ul>}
    <form onSubmit={confirmar}><fieldset disabled={ocupado} className="solicitud-fields"><legend>Asignatura</legend>
@@ -107,7 +130,8 @@ export function ImportacionProgramasPage({request}:{request:CatalogoRequest}) {
    </fieldset>)}
    <button type="button" className="app-button app-button--secondary" disabled={ocupado||edicion.unidades.length>=50} onClick={agregarUnidad}>Añadir unidad</button>
    <div className="catalogo-actions"><button className="app-button app-button--primary" disabled={ocupado||edicion.unidades.length===0||edicion.unidades.some(u=>u.tematicas.length===0)}>{ocupado?'Guardando…':'Confirmar en el catálogo'}</button>
-    <button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={()=>{setRevisando(null);setEdicion(null);}}>Cancelar revisión</button></div>
+    <button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={volver}>Cancelar revisión</button></div>
+   {error&&<p className="auth-error">{error}</p>}
    </form>
   </section>}
  </section>;

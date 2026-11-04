@@ -14,7 +14,7 @@ Fecha: 04/11/2026. Catálogo es el módulo de Leslie, que debe hacer la revisió
   y usuario, para trazabilidad (decisión de Edwin del 04/11/2026). Los PDF que no se confirman no se guardan.
 - **Biblioteca:** PdfPig 0.1.11 (licencia Apache-2.0), solo en `Catalogo.Infrastructure`, detrás del puerto
   `IExtractorTextoPdf`.
-- **Límites técnicos:** 20 archivos por lote, 5 MB por archivo, 25 MB por lote, 30 páginas y 50 000 palabras
+- **Límites técnicos:** 50 archivos por lote (ampliado de 20 el 04/11/2026 para cargar la malla completa), 5 MB por archivo, 25 MB por lote, 30 páginas y 50 000 palabras
   por PDF. nginx sube su límite de cuerpo de 1 MB a 26 MB solo para `/api/`.
 - **Código existente:** se rechaza con 409 y no se sobrescribe (punto 6 de la propuesta).
 
@@ -129,3 +129,20 @@ No se probó un plan real en el navegador: superaba el tamaño práctico de la i
 de la página impide descargarlo de otro origen. Los 40 planes reales pasaron por el stack en el smoke.
 Pasa a verificado «prueba en navegador real de la pantalla de carga» con plan sintético; siguen pendientes
 CI, revisión cruzada y aceptación de Shirley. Stack y copia temporal eliminados.
+
+## Ajustes tras la prueba con la base principal (04/11/2026)
+
+En la prueba de Edwin con los planes reales, la carga «se bloqueó» tras confirmar seis programas. No era un límite:
+la confirmación de CÁLCULO DIFERENCIAL (`UTA-FISEI-SF-MP-UB-01-03`) recibía 409 porque ese código ya existía,
+registrado a mano para ALGEBRA LINEAL. El mensaje aparecía al inicio de la página, lejos del formulario de revisión,
+y no se veía. La extracción de los 40 planes es correcta: 40 borradores sin faltantes y códigos distintos.
+
+- **Límite:** 50 archivos por lote, la malla completa. Se mantienen 5 MB por archivo y 25 MB por lote; un plan pesa unos 40 KB.
+- **Revisión en pantalla propia:** «Revisar» reemplaza el lote por la revisión del archivo, con «Volver al lote» y «Archivo N de M». El foco va al título.
+- **Errores visibles:** el error de confirmación se muestra y enfoca dentro de la revisión, y se repite junto al botón.
+  Un 409 explica que no se sobrescribe y cómo corregir el código.
+- **Lote:** cada archivo muestra el código y el nombre extraídos y avisa, antes de revisar, si el código ya existe.
+  Muestra cuántos borradores van confirmados.
+
+TDD: 4 pruebas de interfaz y 1 de aplicación fallaron antes de implementar. Frontend 145/145, `tsc` y build;
+Catálogo 127/127; Gateway 124/124.
