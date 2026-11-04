@@ -80,7 +80,8 @@ public class AnalisisExternoInfraestructuraTests
     {
         using var db = new ResultadosDbContext(new DbContextOptionsBuilder<ResultadosDbContext>()
             .UseSqlServer("Server=unused;Database=design_only;Integrated Security=true").Options);
-        Assert.Equal(["20261104000100_AnalisisInternosHu20", "20261104000200_AnalisisExternosHu19"], db.Database.GetMigrations());
+        // Migraciones posteriores (HU-31) se añaden después sin alterar el orden de HU-20 y HU-19.
+        Assert.Equal(["20261104000100_AnalisisInternosHu20", "20261104000200_AnalisisExternosHu19"], db.Database.GetMigrations().Take(2));
         Assert.False(db.Database.HasPendingModelChanges());
     }
 

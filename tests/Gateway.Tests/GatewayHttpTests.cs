@@ -174,7 +174,10 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        Assert.Equal(28, paths.EnumerateObject().Count());
+        Assert.Equal(29, paths.EnumerateObject().Count());
+        // HU-31: análisis propio de los docentes asignados.
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/revisiones-docentes").TryGetProperty("put", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/revisiones-docentes").TryGetProperty("get", out _));
         // HU-19: análisis externo, RN-05 externo y datos declarados por el Coordinador; el contexto interno no se publica.
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-externo").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-externo/opciones").TryGetProperty("get", out _));

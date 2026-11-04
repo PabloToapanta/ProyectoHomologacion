@@ -32,7 +32,7 @@ el análisis queda `Incompleto`, sin sugerencia ni invocación del agente.
 
 ## Validación
 
-- Nueva revisión: 755 pruebas backend aprobadas y 1 omitida (Ollama real),
+- Nueva revisión: 655 pruebas backend aprobadas y 1 omitida (Ollama real),
   incluyendo Solicitudes e infraestructura con SQL Server 2022 aislado.
 - Frontend: 128/128, comprobación TypeScript y compilación Vite aprobadas.
 - `git diff --check` sin errores.

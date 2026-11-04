@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react';
 import {AnalisisSolicitud,type Analisis} from './SolicitudesDocentePage';
+import {RevisionDocentePanel} from './RevisionDocentePanel';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Aprobada={id:string;nombreAsignatura:string};
 type Receptora={id:string;codigo:string;nombre:string;nivel:number};
@@ -70,12 +71,15 @@ export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo
    <label>Asignatura receptora<select value={receptora} disabled={ocupado} onChange={e=>cambiar(setReceptora,e.target.value)}><option value="">Seleccione</option>{receptoras.map(a=><option key={a.id} value={a.id}>Nivel {a.nivel} · {a.codigo} · {a.nombre}</option>)}</select></label>
    <button className="app-button" disabled={ocupado||!aprobada||!receptora} onClick={ejecutar}>Ejecutar análisis y guardar</button>
    {guardados.length>0&&<ul aria-label="Análisis guardados por pareja">{guardados.map(x=><li key={`${x.analisis.asignaturaAprobadaId}/${x.analisis.asignaturaReceptoraId}`}>
-    <button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>{setResultado(x.analisis);setConfirmado(false);}}>Ver {aprobadas.find(a=>a.id===x.analisis.asignaturaAprobadaId)?.nombreAsignatura??'Asignatura histórica'} → {receptoras.find(a=>a.id===x.analisis.asignaturaReceptoraId)?.nombre??'Receptora histórica'} ({x.analisis.estado})</button>
+    <button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>{setResultado(x.analisis);setAprobada(x.analisis.asignaturaAprobadaId);setReceptora(x.analisis.asignaturaReceptoraId);setConfirmado(false);}}>Ver {aprobadas.find(a=>a.id===x.analisis.asignaturaAprobadaId)?.nombreAsignatura??'Asignatura histórica'} → {receptoras.find(a=>a.id===x.analisis.asignaturaReceptoraId)?.nombre??'Receptora histórica'} ({x.analisis.estado})</button>
    </li>)}</ul>}
   </>}
   {confirmado&&<p role="status">Análisis guardado.</p>}
   <AnalisisSolicitud analisis={resultado??(abierto?pendiente:inicial)}/>
   {resultado?.advertencias?.map(a=><p key={a}>{a}</p>)}
+  {/* HU-31: el docente registra su análisis sobre la pareja seleccionada, haya o no sugerencia del agente. */}
+  {abierto&&aprobada&&receptora&&<RevisionDocentePanel request={request} solicitudId={solicitudId} aprobadaId={aprobada} receptoraId={receptora}
+   sugerenciaAgente={resultado?.estado==='Completo'&&resultado.asignaturaAprobadaId===aprobada&&resultado.asignaturaReceptoraId===receptora?resultado.resultado?.sugerencia??null:null}/>}
   {externo&&abierto&&requisitos&&<RequisitosExternos requisitos={requisitos}/>}
  </section>;
 }
