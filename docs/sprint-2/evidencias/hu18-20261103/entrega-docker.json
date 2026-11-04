@@ -1,0 +1,247 @@
+{
+  "proyecto": "hu18-check-b7205a1c4e",
+  "casos": [
+    {
+      "caso": "modelo deshabilitado",
+      "resultado": "false"
+    },
+    {
+      "caso": "login JWE real",
+      "resultado": 5
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/carreras",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas/f1cbce77-ba8b-4ab8-87c4-ad03110ab463/unidades",
+      "resultado": 201
+    },
+    {
+      "caso": "perfil sintetico",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/carreras",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas/9bf573ac-0f04-42de-986d-c54d2996bf9d/unidades",
+      "resultado": 201
+    },
+    {
+      "caso": "perfil sintetico",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/solicitudes",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/solicitudes/bdbc1f2d-256c-42be-81e3-524dc1a58c6e/asignaturas-aprobadas",
+      "resultado": 201
+    },
+    {
+      "caso": "directorio docente real",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/solicitudes/bdbc1f2d-256c-42be-81e3-524dc1a58c6e/docentes",
+      "resultado": 200
+    },
+    {
+      "caso": "sin JWT",
+      "resultado": 401
+    },
+    {
+      "caso": "coordinador no suplanta docente",
+      "resultado": 403
+    },
+    {
+      "caso": "docente ajeno",
+      "resultado": 404
+    },
+    {
+      "caso": "no acepta cantidades del cliente",
+      "resultado": 400
+    },
+    {
+      "caso": "sin revision HTTP",
+      "resultado": 200
+    },
+    {
+      "caso": "sin revision no inventa equivalencia",
+      "resultado": "Incompleto"
+    },
+    {
+      "caso": "revision explicita",
+      "resultado": 200
+    },
+    {
+      "caso": "orquestacion HTTP real",
+      "resultado": 200
+    },
+    {
+      "caso": "sin modelo no declara exito",
+      "resultado": "Fallido"
+    },
+    {
+      "caso": "sin modelo resultado nulo",
+      "resultado": null
+    },
+    {
+      "caso": "motor conserva porcentaje academico",
+      "resultado": 100
+    },
+    {
+      "caso": "motor conserva porcentaje horas",
+      "resultado": 100
+    },
+    {
+      "caso": "datos sinteticos identificados",
+      "resultado": true
+    },
+    {
+      "caso": "no expone datos personales",
+      "resultado": false
+    },
+    {
+      "caso": "contexto Solicitudes no publicado",
+      "resultado": 404
+    },
+    {
+      "caso": "contexto Catalogo no publicado",
+      "resultado": 404
+    },
+    {
+      "caso": "lectura guardada autorizada",
+      "resultado": 200
+    },
+    {
+      "caso": "lectura guardada ajena denegada",
+      "resultado": 404
+    },
+    {
+      "caso": "opciones receptoras autorizadas",
+      "resultado": 200
+    },
+    {
+      "caso": "opciones solo carrera receptora",
+      "resultado": [
+        "9bf573ac-0f04-42de-986d-c54d2996bf9d"
+      ]
+    },
+    {
+      "caso": "Fallido conservado al recrear servicio",
+      "resultado": "Fallido"
+    },
+    {
+      "caso": "resultado nulo conservado al recrear servicio",
+      "resultado": null
+    },
+    {
+      "caso": "/api/homologaciones/solicitudes/bdbc1f2d-256c-42be-81e3-524dc1a58c6e/analisis-interno",
+      "resultado": 200
+    },
+    {
+      "caso": "asistencia HTTP simulada completa",
+      "resultado": "Completo"
+    },
+    {
+      "caso": "tres criterios motor: creditos",
+      "resultado": 100
+    },
+    {
+      "caso": "evidencia simulada validada",
+      "resultado": 2
+    },
+    {
+      "caso": "reanálisis no duplica pareja",
+      "resultado": 1
+    },
+    {
+      "caso": "Completo conservado tras reinicio",
+      "resultado": "Completo"
+    },
+    {
+      "caso": "justificacion persistida",
+      "resultado": "Los tres criterios alcanzan individualmente el umbral de 80 %. Asistencia: Explicación sintética de prueba HTTP, sin inferencia real."
+    },
+    {
+      "caso": "fallo de almacenamiento controlado",
+      "resultado": 503
+    },
+    {
+      "caso": "fallo no reemplaza resultado persistido",
+      "resultado": {
+        "solicitudId": "bdbc1f2d-256c-42be-81e3-524dc1a58c6e",
+        "asignaturaAprobadaId": "a937cebe-ebb9-447d-8c37-8b287526523e",
+        "asignaturaReceptoraId": "9bf573ac-0f04-42de-986d-c54d2996bf9d",
+        "estado": "Completo",
+        "mensaje": "Evaluación de la pareja completada con asistencia; requiere revisión académica humana.",
+        "resultado": {
+          "porcentajeAcademico": 100,
+          "porcentajeHoras": 100,
+          "porcentajeCreditos": 100,
+          "sugerencia": "Homologable",
+          "justificacion": "Los tres criterios alcanzan individualmente el umbral de 80 %. Asistencia: Explicación sintética de prueba HTTP, sin inferencia real.",
+          "evidencias": [
+            "C1: f1cbce77-ba8b-4ab8-87c4-ad03110ab463/bfece744-cb2b-455d-9937-f7b9f6733018 [plan-O/U1] → 0bcb08cc-3ee3-4f04-9b49-b555c8880d3f [plan-R/U1]",
+            "R1: f1cbce77-ba8b-4ab8-87c4-ad03110ab463/f14189eb-ada0-42b2-bf67-5abaf48b4f5f [plan-O/U1] → 0d6f0590-97e3-458f-bbb2-1986d018d709 [plan-R/U1]"
+          ]
+        },
+        "evaluacion": {
+          "asignaturasOrigen": [
+            "f1cbce77-ba8b-4ab8-87c4-ad03110ab463"
+          ],
+          "asignaturaReceptora": "9bf573ac-0f04-42de-986d-c54d2996bf9d",
+          "compatibilidadAcademicaPct": 100,
+          "compatibilidadHorariaPct": 100,
+          "compatibilidadCreditosPct": 100,
+          "umbralPct": 80,
+          "estado": "Homologable",
+          "homologable": true,
+          "justificacion": "Los tres criterios alcanzan individualmente el umbral de 80 %.",
+          "contenidosSinCobertura": [],
+          "resultadosAprendizajeSinCobertura": [],
+          "informacionFaltante": []
+        },
+        "antiguedad": {
+          "estado": "Elegible",
+          "motivo": "Asignatura aprobada con antigüedad de hasta diez años inclusive."
+        },
+        "datosSinteticos": true,
+        "advertencias": [
+          "Los mínimos globales del cambio interno no están evaluados: faltan períodos cursados y el cómputo completo de la solicitud. No es una aprobación oficial.",
+          "Se consultó el catálogo actual; su versión histórica debe confirmarse durante la revisión académica."
+        ]
+      }
+    }
+  ],
+  "transporte": "HTTP local aislado; no acredita HTTPS",
+  "modelo": "deshabilitado y doble HTTP qwen3:4b, sin inferencia real por decisión de Leslie"
+}

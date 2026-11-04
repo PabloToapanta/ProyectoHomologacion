@@ -1,5 +1,24 @@
 # HU-18 — Análisis interno asistido
 
+Estado vigente de entrega: [configuración, persistencia/vista y pruebas](evidencia-hu-18-entrega.md).
+Leslie eligió qwen3:4b, autorizó completar HU-20/conexión HU-30 y publicar la PR.
+Ollama real y revisión/aceptación de Shirley se omiten por indicación expresa;
+no se registran como verificadas. Los apartados siguientes conservan las etapas
+anteriores y deben leerse con esta actualización y el contrato vigente.
+
+Para ejecución local: disponer de Ollama y qwen3:4b en el servidor configurado.
+Este incremento no los instala ni descarga automáticamente. En API local se usa
+`http://127.0.0.1:11434/`; en Docker Desktop `http://host.docker.internal:11434/`.
+El servidor debe ser accesible desde Homologación. Puede sobrescribirse OLLAMA_URL
+y ANALISIS_INTERNO_TIMEOUT_SEGUNDOS (1–300). Si el servidor/modelo no está disponible,
+se guarda Fallido con resultado nulo; no existe reemplazo automático por un mock.
+La URL y el modelo son de backend, sin claves VITE. En Compose Homologación aplica
+su migración sobre su propia base cuando Database:ApplyMigrations=true.
+
+La prueba real opcional permanece en el código para futuras verificaciones
+autorizadas, pero no se ejecuta en esta entrega. La forma del envío qwen3:4b y
+think=false se comprueba con HTTP simulado según la [API de Ollama](https://docs.ollama.com/api/chat).
+
 Issue #42. Leslie. Base actual develop `fb40d0a`, con HU-36, HTTPS/JWE y HU-29.
 Rama `feature/hu-18-analisis-interno`; cambios locales sin commits ni publicación.
 La base inicial e01767b se conserva como registro histórico separado. Contrato de

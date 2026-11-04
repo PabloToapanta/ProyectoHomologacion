@@ -1,5 +1,9 @@
 # HU-18: verificación de integración
 
+Etapa histórica sobre fb40d0a. El estado vigente con persistencia, vista, modelo y
+decisiones expresas de Leslie se encuentra en [la entrega](evidencia-hu-18-entrega.md).
+Los contadores y pendientes siguientes corresponden a aquella etapa; no se suman.
+
 03/11/2026, Leslie, Issue [#42](https://github.com/PabloToapanta/ProyectoHomologacion/issues/42).
 Rama feature/hu-18-analisis-interno sobre develop fb40d0a. Sin commit, push, merge
 ni comunicación externa. La base anterior e01767b está preservada; ningún cambio

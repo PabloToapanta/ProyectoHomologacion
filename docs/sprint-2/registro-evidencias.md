@@ -118,3 +118,22 @@ Ver [evidencia de integración y límites](evidencia-hu-18-integracion.md) y
 persistencia/vista de Edwin, revisión cruzada/CI y aceptación de Shirley. No se
 acredita HTTPS o navegador con esta prueba ni HU-18 terminada. Sin nuevos commits,
 push, merge ni comunicaciones externas.
+
+### HU-18: entrega autorizada con persistencia y vista
+
+Leslie autorizó modelo qwen3:4b, elección e implementación de persistencia/vista,
+omisión de Ollama real, commits atómicos, push y PR. Indicó que Shirley no hará
+revisión/aceptación en esta entrega; no se registra ninguna aceptación realizada.
+Se actualizó la rama desde develop 95e604d conservando HU-30 y sus pruebas. Base
+anterior preservada; conflictos de factorías/contador de rutas resueltos conservando
+los controles de seguridad. Homologación guarda el último intento por pareja en
+su base SQL propia y la vista docente recupera los resultados al abrir el detalle.
+
+Regresión final: 682 xUnit correctas, 4 omitidas (una de modelo real y tres SQL
+existentes); frontend 123 correctas, TypeScript y Vite correctos. SQL Server/Gateway
+reales con modelo deshabilitado y doble HTTP: 49 comprobaciones correctas, incluida
+durabilidad tras reinicio y error de guardado sin reemplazar datos previos. Los
+fallos intermedios de herramientas, expectativas y saturación se documentan en
+[evidencia de entrega](evidencia-hu-18-entrega.md). No se alteraron timeouts ni se
+acredita inferencia real, HTTPS/navegador nuevo o aceptación humana. No cerrar #42
+automáticamente. Publicación de PR autorizada; sin autorización para merge.
