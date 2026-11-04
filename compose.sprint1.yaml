@@ -62,6 +62,15 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
       Equivalencia__UmbralPct: ${EQUIVALENCIA_UMBRAL_PCT:-80}
+      AnalisisInterno__Habilitado: ${ANALISIS_INTERNO_HABILITADO:-true}
+      AnalisisInterno__OllamaUrl: ${OLLAMA_URL:-http://host.docker.internal:11434/}
+      AnalisisInterno__Modelo: ${OLLAMA_MODELO:-qwen3:4b}
+      AnalisisInterno__TimeoutSegundos: ${ANALISIS_INTERNO_TIMEOUT_SEGUNDOS:-90}
+      ConnectionStrings__Homologacion: "Server=auth-db;Database=HomologacionAnalisis;User Id=sa;Password=${AUTH_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Database__ApplyMigrations: "true"
+    depends_on:
+      auth-db:
+        condition: service_healthy
 
   gateway:
     build:

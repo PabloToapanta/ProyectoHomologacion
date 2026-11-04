@@ -1,0 +1,27 @@
+{
+  "fechaLocal": "2026-11-03",
+  "base": "95e604d",
+  "modelo": "qwen3:4b",
+  "backend": {
+    "correctas": 682,
+    "omitidas": 4,
+    "fallidas": 0
+  },
+  "frontend": {
+    "correctas": 123,
+    "concurrencia": 2,
+    "fallidas": 0,
+    "archivos": 17
+  },
+  "typecheck": "correcto",
+  "vite": "correcto",
+  "dockerSql": {
+    "modelo": "deshabilitado y doble HTTP",
+    "comprobaciones": 49,
+    "proyecto": "hu18-check-b7205a1c4e",
+    "limpieza": "verificada"
+  },
+  "ollamaReal": "omitido por indicación expresa de Leslie",
+  "aceptacionShirley": "no realizada por indicación expresa de Leslie",
+  "merge": "no autorizado"
+}

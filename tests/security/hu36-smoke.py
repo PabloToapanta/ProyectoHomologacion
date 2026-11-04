@@ -8,6 +8,7 @@ y escribe un resultado sin secretos en TestResults/hu36-integration/resultado.js
 import json
 import base64
 from datetime import datetime, timedelta, timezone
+from http.client import RemoteDisconnected
 import os
 from pathlib import Path
 import re
@@ -106,7 +107,7 @@ def main():
                 status, login = request(base, "/api/auth/login", credentials)
                 if status == 200:
                     break
-            except (URLError, TimeoutError):
+            except (URLError, TimeoutError, RemoteDisconnected, ConnectionResetError):
                 pass
             if time.monotonic() >= deadline:
                 raise RuntimeError("El login aislado no estuvo disponible en 120 segundos")

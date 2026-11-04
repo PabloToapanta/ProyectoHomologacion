@@ -1,4 +1,4 @@
-import {render,screen,within} from '@testing-library/react';
+import {render,screen,within,waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {it,expect,vi} from 'vitest';
 import {SolicitudesDocentePage} from './SolicitudesDocentePage';
@@ -8,7 +8,8 @@ const detalle={...solicitud,asignaturasAprobadas:[{id:'asig-1',nombreAsignatura:
 const pendiente={estado:'Pendiente',mensaje:'El análisis automatizado aún no se ha ejecutado para esta solicitud.',resultado:null};
 const resultado={porcentajeAcademico:85.5,porcentajeHoras:90,porcentajeCreditos:null,sugerencia:'Homologable',justificacion:'Los contenidos sintéticos coinciden.',evidencias:['R1 ↔ O1: Matrices']};
 function servidor(analisis:unknown=pendiente,detalleStatus=200) {
- return vi.fn(async(path:string,_init?:RequestInit)=>path==='/api/solicitudes/asignadas'?json([solicitud]):path==='/api/solicitudes/asignadas/sol-a'?(detalleStatus===200?json({solicitud:detalle,analisis}):json({title:'Solicitud no encontrada entre sus asignaciones.'},detalleStatus)):json({title:'Ruta no esperada'},500));
+ return vi.fn(async(path:string,_init?:RequestInit)=>path==='/api/solicitudes/asignadas'?json([solicitud]):path==='/api/solicitudes/asignadas/sol-a'?(detalleStatus===200?json({solicitud:detalle,analisis}):json({title:'Solicitud no encontrada entre sus asignaciones.'},detalleStatus)):
+  path==='/api/homologaciones/solicitudes/sol-a/analisis-interno'?json([{fecha:'2026-11-03T12:00:00Z',analisis}]):json({title:'Ruta no esperada'},500));
 }
 async function abrir(user:ReturnType<typeof userEvent.setup>) {
  await user.click(await screen.findByRole('button',{name:'Ver UTA-030'}));
@@ -21,7 +22,7 @@ it('lista solo lo que devuelve la API de asignadas y consulta el detalle con su 
  expect(within(dialogo).getByText('docente.ana')).toBeInTheDocument();expect(within(dialogo).getByText(/Álgebra sintética/)).toBeInTheDocument();
  expect(within(dialogo).getByRole('heading',{name:'Análisis pendiente'})).toBeInTheDocument();
  expect(within(dialogo).queryByText(/Sugerencia/)).not.toBeInTheDocument();
- expect(request.mock.calls.map(c=>c[0])).toEqual(['/api/solicitudes/asignadas','/api/solicitudes/asignadas/sol-a']);
+ await waitFor(()=>expect(request.mock.calls.map(c=>c[0])).toEqual(['/api/solicitudes/asignadas','/api/solicitudes/asignadas/sol-a','/api/homologaciones/solicitudes/sol-a/analisis-interno']));
 });
 it.each([
  ['Fallido',{estado:'Fallido',mensaje:'El agente no respondió.',resultado:null},'El análisis falló'],
@@ -42,7 +43,7 @@ it('análisis completo muestra porcentajes, sugerencia, justificación y evidenc
 });
 it('la consulta es de solo lectura: sin acciones de revisión, informe ni remisión',async()=>{
  const user=userEvent.setup();const request=servidor({estado:'Completo',mensaje:'',resultado});render(<SolicitudesDocentePage request={request}/>);const dialogo=await abrir(user);
- expect(within(dialogo).getAllByRole('button').map(b=>b.getAttribute('aria-label')??b.textContent)).toEqual(['Cerrar ventana','Cerrar detalle']);
+ expect(within(dialogo).getAllByRole('button').map(b=>b.getAttribute('aria-label')??b.textContent)).toEqual(['Cerrar ventana','Consultar análisis interno','Cerrar detalle']);
  expect(request.mock.calls.every(c=>!c[1]?.method||c[1].method==='GET')).toBe(true);
 });
 it('detalle rechazado por la API muestra el error sin datos de otra solicitud',async()=>{
