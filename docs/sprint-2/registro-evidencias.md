@@ -45,3 +45,33 @@ Este registro no acredita implementación, pruebas ni aceptación. Completar sol
 4. PR a develop, revisión cruzada, CI y prueba integrada antes de aceptación.
 
 No convertir propuestas de recorte del Sprint 3 ni apoyo en T37 en decisiones ya aceptadas.
+
+## HU-36 — avance local del 03/11/2026
+
+Leslie inició Issue #37 en `feature/hu-36-clave-interna`, desde develop `e44b939`,
+en un worktree separado para preservar la documentación local anterior. Se abrió
+la propuesta de contrato antes de editar los puntos compartidos. Auth, Catálogo y
+Homologación validan la clave; Gateway la incorpora; Compose cierra puertos internos.
+TDD registrado: 28 fallos iniciales; resultado final Release: 411 pruebas correctas.
+Build de ambas soluciones sin errores/advertencias. Ver
+[evidencia y pendientes](evidencia-hu-36.md) y
+[contrato de integración](hu-36-clave-interna.md).
+
+Solicitudes (PR #45), combinación con HTTPS/JWE (PR #47/#49), CI, revisión cruzada
+y aceptación de Shirley siguen pendientes. Sin commits, push ni merge. No se declara
+HU-36 terminada ni se inicia HU-18 en este incremento.
+
+### Ampliación HU-36 con HU-10 integrada
+
+Tras actualizar la base a develop `e01767b`, se añadió la guarda a Solicitudes y
+la clave privada a su cliente HTTP hacia Catálogo, conservando Bearer/roles.
+Otras 11 pruebas fallidas registradas antes de implementar. Regresión final:
+449 correctas y una prueba SQL opcional de HU-10 omitida por ausencia de conexión
+aislada HU10_TEST_SQL. La comprobación Docker con SQL Server real sí pasó 52 casos,
+incluidos Coordinador, creación/consulta de solicitud sintética, llamada entre
+servicios, guardas y arranque de las cuatro API y Gateway. Ver evidencia HU-36.
+Se conserva el registro anterior de 411 pruebas como resultado histórico de la
+primera base. Leslie autorizó posteriormente los commits y push de HU-36 para
+revisión. La base verificada sigue siendo e01767b; al preparar la publicación,
+develop remoto avanzó a afacebc. Su combinación no está acreditada por esas pruebas.
+HTTPS/JWE, CI, revisión cruzada y aceptación humana siguen pendientes. Sin merge.
