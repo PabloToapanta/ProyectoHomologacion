@@ -31,7 +31,7 @@ builder.Services.AddHttpClient<IDirectorioDocentes,DirectorioDocentes>(h=>{h.Bas
 var issuer=builder.Configuration["Jwt:Issuer"];var audience=builder.Configuration["Jwt:Audience"];var key=builder.Configuration["Jwt:SigningKey"];var encryptionKey=builder.Configuration["Jwt:EncryptionKey"];
 if(string.IsNullOrWhiteSpace(issuer)||string.IsNullOrWhiteSpace(audience)||string.IsNullOrWhiteSpace(key)||Encoding.UTF8.GetByteCount(key)<32) throw new InvalidOperationException("Configure Jwt:Issuer, Jwt:Audience y Jwt:SigningKey de al menos 32 bytes.");
 // HU-35: el token de Auth llega firmado (HS256) y cifrado (A256KW + A256CBC-HS512); se rechaza el que no venga cifrado.
-var encryptionKey=builder.Configuration["Jwt:EncryptionKey"];var encryptionBytes=new byte[32];
+var encryptionBytes=new byte[32];
 if(string.IsNullOrWhiteSpace(encryptionKey)||!Convert.TryFromBase64String(encryptionKey,encryptionBytes,out var encryptionCount)||encryptionCount!=32) throw new InvalidOperationException("Configure Jwt:EncryptionKey con 32 bytes codificados en Base64.");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o=>{o.MapInboundClaims=false;o.IncludeErrorDetails=false;
  o.Events=new JwtBearerEvents {OnTokenValidated=context=>{
