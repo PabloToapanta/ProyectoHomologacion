@@ -34,6 +34,30 @@ public sealed class InformesHomologacionSql(ResultadosDbContext db) : IInformesH
         catch (JsonException) { throw new AlmacenAnalisisNoDisponibleException(); }
     }
 
+    /// <summary>Transacción con un bloqueo exclusivo de aplicación por solicitud (sp_getapplock en SQL Server). Lo usan la
+    /// generación del informe y el guardado de análisis docentes con el mismo DbContext, así que sus escrituras van en la transacción.</summary>
+    public async Task<T> ConCierreAsync<T>(Guid solicitudId, Func<Task<T>> accion, CancellationToken ct)
+    {
+        if (db.Database.CurrentTransaction is not null) return await accion();
+        Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaccion;
+        try
+        {
+            transaccion = await db.Database.BeginTransactionAsync(ct);
+            if (db.Database.IsSqlServer())
+                await db.Database.ExecuteSqlInterpolatedAsync($@"DECLARE @r int;
+EXEC @r = sp_getapplock @Resource = {"homologacion-informe:" + solicitudId.ToString("N")}, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 15000;
+IF @r < 0 THROW 50023, 'No se obtuvo el cierre del informe.', 1;", ct);
+        }
+        catch (DbException) { throw new AlmacenAnalisisNoDisponibleException(); }
+        await using (transaccion)
+        {
+            var resultado = await accion();
+            try { await transaccion.CommitAsync(ct); }
+            catch (DbException) { throw new AlmacenAnalisisNoDisponibleException(); }
+            return resultado;
+        }
+    }
+
     public async Task GuardarAsync(InformeHomologacion informe, CancellationToken ct)
     {
         try

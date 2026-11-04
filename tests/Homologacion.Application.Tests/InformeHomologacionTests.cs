@@ -27,6 +27,16 @@ public class InformeHomologacionTests
         public List<RevisionDocenteRegistrada> Revisiones { get; } = [];
         public InformeHomologacion? Informe { get; set; }
         public bool AlmacenCaido { get; set; }
+        /// <summary>Pausa la escritura indicada dentro del cierre para fijar el orden de dos peticiones simultáneas.</summary>
+        public TaskCompletionSource? PausaRevision { get; set; }
+        public TaskCompletionSource? PausaInforme { get; set; }
+        public TaskCompletionSource EnEscritura { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly SemaphoreSlim cierre = new(1, 1);
+        public async Task<T> ConCierreAsync<T>(Guid solicitudId, Func<Task<T>> accion, CancellationToken ct)
+        {
+            await cierre.WaitAsync(ct);
+            try { return await accion(); } finally { cierre.Release(); }
+        }
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Solicitud && Asignada
             ? new SolicitudParaAnalisis(Solicitud, Tipo, null, Carrera, new[] { A1, A2, A3 }.Select(a =>new AprobadaParaAnalisis(a, null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1))).ToArray())
             : null);
@@ -35,14 +45,20 @@ public class InformeHomologacionTests
         public Task GuardarAsync(AnalisisGuardado resultado, CancellationToken ct) => Task.CompletedTask;
         Task<IReadOnlyList<AnalisisGuardado>> IResultadosAnalisisInterno.ListarAsync(Guid solicitudId, CancellationToken ct) => Task.FromResult<IReadOnlyList<AnalisisGuardado>>(Tipo == "Interno" ? Agente : []);
         Task<IReadOnlyList<AnalisisGuardado>> IResultadosAnalisisExterno.ListarAsync(Guid solicitudId, CancellationToken ct) => Task.FromResult<IReadOnlyList<AnalisisGuardado>>(Tipo == "Externo" ? Agente : []);
-        public Task GuardarAsync(RevisionDocenteRegistrada r, CancellationToken ct) { Revisiones.Add(r); return Task.CompletedTask; }
+        public async Task GuardarAsync(RevisionDocenteRegistrada r, CancellationToken ct)
+        {
+            if (PausaRevision is not null) { EnEscritura.TrySetResult(); await PausaRevision.Task; }
+            Revisiones.RemoveAll(x => (x.AsignaturaAprobadaId, x.AsignaturaReceptoraId, x.DocenteId) == (r.AsignaturaAprobadaId, r.AsignaturaReceptoraId, r.DocenteId));
+            Revisiones.Add(r);
+        }
         Task<IReadOnlyList<RevisionDocenteRegistrada>> IRevisionesDocentes.ListarAsync(Guid solicitudId, CancellationToken ct) => Task.FromResult<IReadOnlyList<RevisionDocenteRegistrada>>(Revisiones);
         public Task<InformeHomologacion?> ObtenerAsync(Guid solicitudId, CancellationToken ct) => Task.FromResult(Informe);
-        public Task GuardarAsync(InformeHomologacion informe, CancellationToken ct)
+        public async Task GuardarAsync(InformeHomologacion informe, CancellationToken ct)
         {
+            if (PausaInforme is not null) { EnEscritura.TrySetResult(); await PausaInforme.Task; }
             if (AlmacenCaido) throw new AlmacenAnalisisNoDisponibleException();
             if (Informe is not null) throw new InformeYaGeneradoException();
-            Informe = informe; return Task.CompletedTask;
+            Informe = informe;
         }
         public void Revision(Guid docente, Guid aprobada, Guid receptora, string decision, string postura = "Ajuste") =>
             Revisiones.Add(new(Solicitud, aprobada, receptora, docente, docente == Ana ? "docente.ana" : "docente.luis", postura, decision, "Observación sintética.",
@@ -133,6 +149,44 @@ public class InformeHomologacionTests
         var registrar = new RegistrarRevisionDocente(f, new CatalogoFijo(), f, f, f, new Reloj(), f);
         await Assert.ThrowsAsync<InformeYaGeneradoException>(() => registrar.RegistrarAsync(Solicitud, Ana, "ana",
             new(A1, R1, "Ajuste", "Homologable", "Cambio tardío."), default));
+    }
+
+    [Fact]
+    public async Task Una_correccion_en_curso_se_incluye_en_el_informe_que_se_genera_a_la_vez()
+    {
+        var (caso, f) = Caso();
+        f.Revision(Ana, A1, R1, "Homologable"); f.Revision(Luis, A1, R1, "Homologable");
+        var registrar = new RegistrarRevisionDocente(f, new CatalogoFijo(), f, f, f, new Reloj(), f);
+        f.PausaRevision = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        var correccion = Task.Run(() => registrar.RegistrarAsync(Solicitud, Ana, "docente.ana", new(A1, R1, "Ajuste", "NoHomologable", "Corrección."), default));
+        await f.EnEscritura.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        var generacion = Task.Run(() => caso.GenerarAsync(Solicitud, Luis, "docente.luis", default));
+        await Task.Delay(200);
+        Assert.False(generacion.IsCompleted, "El informe no debe leer los análisis mientras se guarda una corrección.");
+        f.PausaRevision.SetResult();
+        await correccion;
+        var informe = await generacion.WaitAsync(TimeSpan.FromSeconds(5));
+        var pareja = Assert.Single(informe.Parejas);
+        Assert.Equal("NoHomologable", pareja.Docentes.Single(d => d.DocenteId == Ana).Decision);
+        Assert.Equal("SinAcuerdo", pareja.SugerenciaFinal);
+    }
+
+    [Fact]
+    public async Task Una_correccion_que_llega_mientras_se_guarda_el_informe_recibe_conflicto()
+    {
+        var (caso, f) = Caso();
+        f.Revision(Ana, A1, R1, "Homologable"); f.Revision(Luis, A1, R1, "Homologable");
+        var registrar = new RegistrarRevisionDocente(f, new CatalogoFijo(), f, f, f, new Reloj(), f);
+        f.PausaInforme = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        var generacion = Task.Run(() => caso.GenerarAsync(Solicitud, Luis, "docente.luis", default));
+        await f.EnEscritura.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        var correccion = Task.Run(() => registrar.RegistrarAsync(Solicitud, Ana, "docente.ana", new(A1, R1, "Ajuste", "NoHomologable", "Tarde."), default));
+        await Task.Delay(200);
+        f.PausaInforme.SetResult();
+        var informe = await generacion.WaitAsync(TimeSpan.FromSeconds(5));
+        await Assert.ThrowsAsync<InformeYaGeneradoException>(() => correccion.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.Equal("Homologable", f.Revisiones.Single(r => r.DocenteId == Ana).Decision);
+        Assert.Equal("Convalidar", informe.Parejas[0].SugerenciaFinal);
     }
 
     private sealed class CatalogoFijo : ICatalogoAnalisisInterno

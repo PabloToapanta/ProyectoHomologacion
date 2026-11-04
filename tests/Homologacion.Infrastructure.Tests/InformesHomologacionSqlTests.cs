@@ -84,4 +84,56 @@ public class InformesHomologacionSqlTests
             if (connection.InitialCatalog.StartsWith("Hu23Tests_", StringComparison.Ordinal)) await admin.Database.EnsureDeletedAsync();
         }
     }
+
+    [Fact]
+    public async Task El_cierre_confirma_lo_escrito_dentro_y_descarta_si_falla()
+    {
+        using var connection = new SqliteConnection("Data Source=:memory:"); await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ResultadosDbContext>().UseSqlite(connection).Options;
+        await using (var init = new ResultadosDbContext(options)) await init.Database.EnsureCreatedAsync();
+        var bien = Informe(Guid.NewGuid()); var mal = Informe(Guid.NewGuid());
+        await using (var db = new ResultadosDbContext(options))
+        {
+            var almacen = new InformesHomologacionSql(db);
+            Assert.Equal(1, await almacen.ConCierreAsync(bien.SolicitudId, async () => { await almacen.GuardarAsync(bien, default); return 1; }, default));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => almacen.ConCierreAsync<int>(mal.SolicitudId, async () =>
+            { await almacen.GuardarAsync(mal, default); throw new InvalidOperationException("fallo posterior"); }, default));
+        }
+        await using var lectura = new ResultadosDbContext(options);
+        Assert.NotNull(await new InformesHomologacionSql(lectura).ObtenerAsync(bien.SolicitudId, default));
+        Assert.Null(await new InformesHomologacionSql(lectura).ObtenerAsync(mal.SolicitudId, default));
+    }
+
+    [SqlServerExternoFact]
+    public async Task SQL_Server_real_serializa_el_cierre_por_solicitud()
+    {
+        var connection = new SqlConnectionStringBuilder(Environment.GetEnvironmentVariable("HU20_TEST_SQL"))
+            { InitialCatalog = "Hu23Tests_" + Guid.NewGuid().ToString("N") };
+        var options = new DbContextOptionsBuilder<ResultadosDbContext>().UseSqlServer(connection.ConnectionString).Options;
+        await using var admin = new ResultadosDbContext(options);
+        try
+        {
+            await admin.Database.MigrateAsync();
+            var solicitud = Guid.NewGuid();
+            var dentro = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var soltar = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            await using var dbA = new ResultadosDbContext(options);
+            await using var dbB = new ResultadosDbContext(options);
+            await using var dbC = new ResultadosDbContext(options);
+            var primero = new InformesHomologacionSql(dbA).ConCierreAsync(solicitud, async () => { dentro.SetResult(); await soltar.Task; return 1; }, default);
+            await dentro.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            var mismaSolicitud = new InformesHomologacionSql(dbB).ConCierreAsync(solicitud, () => Task.FromResult(2), default);
+            var otraSolicitud = new InformesHomologacionSql(dbC).ConCierreAsync(Guid.NewGuid(), () => Task.FromResult(3), default);
+            Assert.Equal(3, await otraSolicitud.WaitAsync(TimeSpan.FromSeconds(10)));
+            await Task.Delay(500);
+            Assert.False(mismaSolicitud.IsCompleted, "La misma solicitud debe esperar a que termine el cierre en curso.");
+            soltar.SetResult();
+            Assert.Equal(1, await primero);
+            Assert.Equal(2, await mismaSolicitud.WaitAsync(TimeSpan.FromSeconds(10)));
+        }
+        finally
+        {
+            if (connection.InitialCatalog.StartsWith("Hu23Tests_", StringComparison.Ordinal)) await admin.Database.EnsureDeletedAsync();
+        }
+    }
 }

@@ -18,6 +18,9 @@ public interface IInformesHomologacion
     Task<InformeHomologacion?> ObtenerAsync(Guid solicitudId, CancellationToken ct);
     /// <summary>Solo inserta: si ya existe un informe lanza <see cref="InformeYaGeneradoException"/>.</summary>
     Task GuardarAsync(InformeHomologacion informe, CancellationToken ct);
+    /// <summary>Ejecuta la acción con el cierre de la solicitud bloqueado: generar el informe y guardar un análisis docente
+    /// no se intercalan, de modo que el informe incluye toda corrección confirmada y ninguna se confirma después de él.</summary>
+    Task<T> ConCierreAsync<T>(Guid solicitudId, Func<Task<T>> accion, CancellationToken ct) => accion();
 }
 
 /// <summary>HU-23: cualquiera de los dos docentes asignados genera el informe cuando cada pareja analizada tiene el análisis de ambos.</summary>
@@ -31,6 +34,15 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
         var solicitud = await Asignada(solicitudId, docenteId, ct);
         if (await informes.ObtenerAsync(solicitudId, ct) is not null) throw new InformeYaGeneradoException();
         var catalogo = (await receptoras.ListarAsync(solicitud.CarreraReceptoraId, ct)).ToDictionary(r => r.Id);
+        // Las fuentes HTTP se consultan fuera del cierre; la lectura de análisis y el guardado van dentro.
+        return await informes.ConCierreAsync(solicitudId, () => Generar(solicitud, catalogo, docenteId, docente, ct), ct);
+    }
+
+    private async Task<InformeHomologacion> Generar(SolicitudParaAnalisis solicitud, Dictionary<Guid, ReceptoraAnalisis> catalogo,
+        Guid docenteId, string docente, CancellationToken ct)
+    {
+        var solicitudId = solicitud.Id;
+        if (await informes.ObtenerAsync(solicitudId, ct) is not null) throw new InformeYaGeneradoException();
         string Etiqueta(Guid id) => catalogo.TryGetValue(id, out var r) ? r.Codigo : id.ToString();
         var parejas = (await revisiones.ListarAsync(solicitudId, ct)).Where(r => r.SolicitudId == solicitudId)
             .GroupBy(r => (r.AsignaturaAprobadaId, r.AsignaturaReceptoraId)).ToArray();

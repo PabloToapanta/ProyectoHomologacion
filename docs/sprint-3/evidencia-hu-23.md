@@ -30,7 +30,7 @@ están sujetos a la consulta de Edwin con su docente.** Seguimiento: [Issue #61]
 | CA1 — generar con agente, docentes y sugerencia final | Application, API y smoke | Verificado |
 | CA2 — Convalidar / No convalidar / Sin acuerdo | Application, API, frontend y smoke (una pareja en acuerdo y otra sin acuerdo) | Verificado |
 | CA3 — sin parejas o con un docente faltante no se genera | Application, API y smoke (400) | Verificado |
-| CA4 — único y fijo; análisis cerrados | Application, API, SQL Server real y smoke (409); falta el intercalado corrección/cierre | Parcial: el cierre no es atómico |
+| CA4 — único y fijo; análisis cerrados | Application (intercalado en ambos órdenes), API, SQL Server real (generaciones simultáneas y bloqueo por solicitud) y smoke (409) | Verificado |
 | CA5 — solo docentes asignados | API y smoke (401/403/404) | Verificado |
 | CA6 — persistencia y fallo controlado | SQLite y SQL Server real; smoke con reinicio | Ver ejecuciones |
 
@@ -49,9 +49,8 @@ TDD: la fase roja se observó en Application, Infrastructure, API (5 pruebas nue
    - Un primer intento falló por una expectativa mal escrita en el propio smoke: suponía que el agente había analizado ambas parejas. Se corrigió la expectativa, no el código, y se repitió completo.
    - Proyecto aleatorio con volúmenes eliminados. HTTP local: no acredita HTTPS.
 
-**Limitación conocida:** entre la comprobación de «informe existente» y el guardado de un análisis docente no hay
-transacción común. Una corrección enviada en el mismo instante en que se genera el informe podría guardarse
-después del informe, sin cambiar el contenido del informe ya fijado.
+**Limitación resuelta el mismo día** (ver «Cierre atómico»): la comprobación del informe y el guardado de un
+análisis docente ya comparten una transacción con bloqueo por solicitud.
 
 **No verificado:** prueba en navegador, CI en GitHub, revisión cruzada y aceptación de Shirley.
 
@@ -81,3 +80,27 @@ proyecto y volúmenes eliminados. HTTP local: no acredita HTTPS. `git diff --che
 sin errores. Se conserva el bloqueo de CA4: estos resultados no incluyen su
 intercalado concurrente pendiente. Descripción local de PR en `pr-hu-23.md`, sin
 publicar ni subir la rama mientras no se declare lista.
+
+## Cierre atómico e integración con `develop` (04/11/2026)
+
+Se resolvió el bloqueo de CA4 antes de integrar la rama.
+
+- **Cierre compartido:** `IInformesHomologacion.ConCierreAsync` ejecuta una acción dentro de una transacción con
+  `sp_getapplock` exclusivo por solicitud (SQL Server). La generación del informe y el guardado de un análisis
+  docente usan ese cierre y el mismo `DbContext`, así que no se intercalan:
+  - una corrección en curso termina antes de que el informe lea los análisis, y el informe la incluye;
+  - una corrección que llega mientras se guarda el informe vuelve a comprobarlo dentro del cierre y recibe 409.
+- Las consultas HTTP a Solicitudes y Catálogo quedan fuera del cierre, para no retener el bloqueo.
+- **Integración:** se fusionó `develop` (HU-08, HU-19, HU-20 y HU-31 integradas) sin conflictos.
+- **Gateway:** la prueba de OpenAPI esperaba 29 rutas y `develop` ya publicaba 32 (HU-31 y HU-08 se integraron
+  por separado). Con HU-23 son 33; se corrigió la cifra.
+
+TDD: las dos pruebas nuevas de intercalado (PA4, en ambos órdenes) fallaron antes de implementar el cierre.
+
+1. `Homologacion.sln`: Domain 71, Application 109, API 133, Auth Application 13, AuthService 64, Gateway 124.
+2. `Homologacion.Infrastructure.Tests` con SQL Server 2022 temporal, 3 ejecuciones: 56 aprobadas y 1 omitida
+   (Ollama real) en cada una. Incluye la prueba de bloqueo real: la misma solicitud espera; otra no.
+3. Frontend: 141/141 y `npm run build`.
+4. `tests/security/hu23-smoke.py` sobre una copia limpia de la rama integrada: **47/47**. HTTP local: no acredita HTTPS.
+
+**No verificado:** prueba en navegador, CI en GitHub, revisión cruzada y aceptación de Shirley.
