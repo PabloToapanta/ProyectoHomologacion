@@ -73,7 +73,8 @@ TDD: el analizador, el servicio y la interfaz se escribieron primero como prueba
    Imperfecciones que corrige la revisión humana: un contenido que cruza de página puede quedar partido en dos
    bloques, y dos bloques muy próximos pueden quedar unidos.
 5. `tests/security/hu08-smoke.py` con Docker Compose, Gateway, JWT cifrado y SQL Server real, sobre una
-   copia limpia de la rama: **19/19**.
+   copia limpia de la rama: **17/17** en la revisión independiente (conteo corregido;
+   antes constaba 19/19).
    - Comprueba 401/403, el lote de 4 archivos, que el análisis no guarda, la confirmación con unidades y temáticas, el 409 y el PDF idéntico tras reiniciar Catálogo, con su SHA-256 y usuario.
    - Un trigger que hace fallar el guardado del PDF deja la base sin asignatura huérfana: la transacción se deshace.
    - Con `HU08_REAL_DIR` apuntando a una copia local de los 40 planes reales (solo se registran conteos): 40 borradores completos, 0 con faltantes, 0 sin texto y 0 inválidos.
@@ -81,3 +82,28 @@ TDD: el analizador, el servicio y la interfaz se escribieron primero como prueba
 
 **No verificado:** CI en GitHub, revisión cruzada de Leslie (Catálogo) y de Pablo (Gateway), aceptación de
 Shirley y la prueba en navegador real de la pantalla de carga.
+
+## Revisión independiente para PR del 04/11/2026
+
+Sobre `9aa159e` se reprodujeron y corrigieron tres casos:
+
+- Unidades nulas en el JSON: una prueba de servicio falló con `NullReferenceException`;
+  ahora se rechazan como validación antes de escribir.
+- Dos archivos con el mismo nombre: una prueba de interfaz falló porque confirmar uno
+  ocultaba ambos. La confirmación ahora identifica la posición del archivo en el lote.
+- Borrador sin unidades: la prueba falló porque no existía un control para completarlo.
+  La revisión ahora permite añadir/eliminar unidades y temáticas y editar sus números.
+  Horas, nombres, resultados y contenidos nuevos quedan vacíos; no se inventan datos.
+
+Nueva ejecución: Catálogo **126/126**, Gateway **113/113**, frontend **129/129**,
+TypeScript y compilación Vite aprobados. Backend con SDK .NET 8 en contenedor.
+`git diff --check` sin errores.
+
+Smoke integrado sobre copia aislada de los archivos versionados más las correcciones,
+excluyendo los ajustes locales de puertos: **17/17** comprobaciones, Gateway/JWE y SQL
+Server 2022 reales. Se verificaron permisos, no guardar al analizar, confirmación,
+duplicados, PDF idéntico tras reinicio, SHA-256, usuario y reversión de la transacción
+ante fallo de guardado. Proyecto temporal eliminado con sus volúmenes. Transporte
+HTTP local: no acredita HTTPS. No se repitió la extracción sobre los 40 planes reales
+ni la prueba manual en navegador. La aprobación reportada del alcance sin agente y
+del contrato aplicado debe registrarse en #50 antes de aceptar la historia.

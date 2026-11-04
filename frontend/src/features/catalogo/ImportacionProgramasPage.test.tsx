@@ -77,3 +77,32 @@ it('los datos no encontrados quedan vacíos y marcados, sin completarse',async()
  expect(within(revision).getByLabelText('Créditos')).toHaveValue(null);
  expect(within(revision).getByRole('list',{name:'Datos no encontrados'})).toHaveTextContent('nivel');
 });
+
+it('confirmar un archivo no oculta otro del mismo nombre',async()=>{
+ const duplicados={carreraId:'car-1',archivos:[lote.archivos[0],{...lote.archivos[0],borrador:{...borrador,codigo:'OTRO-02'}}]};
+ const user=userEvent.setup();render(<ImportacionProgramasPage request={servidor(undefined,duplicados)}/>);
+ await user.selectOptions(await screen.findByLabelText('Carrera'),'car-1');
+ await user.upload(screen.getByLabelText('Programas analíticos (PDF)'),[pdf(),new File(['%PDF-1.4 otro'],'plan.pdf',{type:'application/pdf'})]);
+ await user.click(screen.getByRole('button',{name:'Analizar programas'}));
+ await user.click((await screen.findAllByRole('button',{name:'Revisar plan.pdf'}))[0]);
+ await user.click(screen.getByRole('button',{name:'Confirmar en el catálogo'}));
+ expect(await screen.findByText('plan.pdf guardado en el catálogo.')).toBeInTheDocument();
+ expect(screen.getAllByRole('button',{name:'Revisar plan.pdf'})).toHaveLength(1);
+});
+
+it('permite reconstruir una unidad y su temática no detectadas antes de confirmar',async()=>{
+ const incompleto={carreraId:'car-1',archivos:[{...lote.archivos[0],borrador:{...borrador,unidades:[],faltantes:['unidades']}}]};
+ const user=userEvent.setup();const request=servidor(undefined,incompleto);render(<ImportacionProgramasPage request={request}/>);
+ await analizar(user);await user.click(await screen.findByRole('button',{name:'Revisar plan.pdf'}));
+ await user.click(screen.getByRole('button',{name:'Añadir unidad'}));
+ await user.type(screen.getByLabelText('Nombre de la unidad 1'),'Unidad revisada');
+ await user.type(screen.getByLabelText('Horas de la unidad 1'),'144');
+ await user.type(screen.getByLabelText('Resultado de aprendizaje de la unidad 1'),'Resultado revisado');
+ await user.type(screen.getByLabelText('Temática 1.1'),'Tema revisado');
+ await user.type(screen.getByLabelText('Contenidos de 1.1 (uno por línea)'),'Contenido revisado');
+ await user.click(screen.getByRole('button',{name:'Confirmar en el catálogo'}));
+ expect(await screen.findByText('plan.pdf guardado en el catálogo.')).toBeInTheDocument();
+ const envio=request.mock.calls.find(c=>c[0].endsWith('/confirmacion'))!;
+ const programa=JSON.parse(String((envio[1]!.body as FormData).get('programa')));
+ expect(programa.unidades).toEqual([{numero:1,nombre:'Unidad revisada',horas:144,resultadoAprendizaje:'Resultado revisado',tematicas:[{nombre:'Tema revisado',contenidos:['Contenido revisado']}]}]);
+});

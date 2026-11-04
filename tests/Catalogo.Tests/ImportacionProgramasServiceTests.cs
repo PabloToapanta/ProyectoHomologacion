@@ -141,6 +141,7 @@ public class ImportacionProgramasServiceTests
         var c = Confirmado(repo.Carrera.Id);
         foreach (var invalido in new[]
         {
+            c with { Unidades = [null!] },
             c with { Nivel = 0 },
             c with { Unidades = [] },
             c with { Unidades = [c.Unidades[0], c.Unidades[0]] },

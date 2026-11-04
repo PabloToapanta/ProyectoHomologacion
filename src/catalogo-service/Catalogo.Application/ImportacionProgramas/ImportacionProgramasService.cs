@@ -68,6 +68,8 @@ public sealed class ImportacionProgramasService(IExtractorTextoPdf extractor, IC
         var asignatura = new Asignatura(programa.CarreraId, programa.Codigo, programa.Nombre, programa.Nivel, programa.Creditos, programa.Horas);
         if (programa.Unidades is null || programa.Unidades.Count is 0 or > MaxUnidades)
             throw new CatalogoException("validacion", $"Registra entre 1 y {MaxUnidades} unidades.");
+        if (programa.Unidades.Any(u => u is null))
+            throw new CatalogoException("validacion", "Las unidades no pueden ser nulas.");
         if (programa.Unidades.Select(u => u.Numero).Distinct().Count() != programa.Unidades.Count)
             throw new CatalogoException("validacion", "No repitas números de unidad.");
         var unidades = programa.Unidades.Select(u =>
