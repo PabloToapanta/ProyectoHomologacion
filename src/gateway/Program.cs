@@ -64,7 +64,7 @@ public partial class Program
             options.DefaultPolicy = academic;
             options.FallbackPolicy = academic;
         });
-        builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+        builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy")).AddInternalGateway();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
@@ -74,6 +74,7 @@ public partial class Program
             options.DocumentFilter<ProxyDocumentFilter>();
         });
         var app = builder.Build();
+        _ = app.Services.GetRequiredService<InternalGatewayKey>();
         _ = app.Services.GetRequiredService<IOptions<GatewayJwtOptions>>().Value;
         var https = app.Services.GetRequiredService<IOptions<GatewayHttpsOptions>>().Value;
         GatewayConfiguration.ValidateDestinations(builder.Configuration);
