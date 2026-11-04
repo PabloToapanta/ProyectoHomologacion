@@ -126,4 +126,3 @@ public sealed class OllamaAgenteInterno : IAgenteAnalisisInterno
 
     private static FalloAgenteException Invalida() => new(TipoFalloAgente.RespuestaInvalida);
 }
-

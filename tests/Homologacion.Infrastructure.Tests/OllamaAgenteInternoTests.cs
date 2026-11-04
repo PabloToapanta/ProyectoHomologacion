@@ -151,4 +151,3 @@ public class OllamaAgenteInternoTests
         Assert.Equal(TipoFalloAgente.RespuestaInvalida, (await Assert.ThrowsAsync<FalloAgenteException>(() => Crear(client).JustificarAsync(Contexto(), default))).Tipo);
     }
 }
-

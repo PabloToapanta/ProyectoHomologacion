@@ -14,4 +14,3 @@ public sealed record OllamaAnalisisOptions(Uri BaseUrl, string Modelo, TimeSpan 
             throw new InvalidOperationException("Configure un timeout del agente positivo y de hasta cinco minutos.");
     }
 }
-

@@ -19,4 +19,3 @@ public sealed class FalloAgenteException(TipoFalloAgente tipo) : Exception("No s
 public enum EstadoAsistencia { Completada, InformacionIncompleta, RevisionManual }
 public sealed record AnalisisAsistido(EvaluacionEquivalencia Evaluacion, EstadoAsistencia Estado,
     ExplicacionAgente? Asistencia, TipoFalloAgente? Fallo, IReadOnlyList<ReferenciaAnalisis>? Referencias = null);
-
