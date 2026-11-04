@@ -1,4 +1,8 @@
+using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
+using Homologacion.Infrastructure.AnalisisExterno;
+using Homologacion.Application.RevisionDocente;
+using Homologacion.Infrastructure.RevisionDocente;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -40,6 +44,14 @@ public static class RegistroAnalisisInterno
         services.AddScoped<IResultadosAnalisisInterno, ResultadosAnalisisSql>();
         services.AddScoped<GestionarAnalisisInterno>();
         services.AddScoped<IReceptorasAnalisisInterno>(p => p.GetRequiredService<FuentesAnalisisHttp>());
+        // HU-19: mismas fuentes autorizadas y base; el análisis externo no usa el agente (D2).
+        services.AddScoped<ISolicitudesAnalisisExterno>(p => p.GetRequiredService<FuentesAnalisisHttp>());
+        services.AddScoped<IResultadosAnalisisExterno, ResultadosAnalisisExternoSql>();
+        services.AddScoped<AnalizarSolicitudExterna>();
+        services.AddScoped<GestionarAnalisisExterno>();
+        // HU-31: análisis propio de los docentes asignados junto al del agente.
+        services.AddScoped<IRevisionesDocentes, RevisionesDocentesSql>();
+        services.AddScoped<RegistrarRevisionDocente>();
         return services;
     }
 

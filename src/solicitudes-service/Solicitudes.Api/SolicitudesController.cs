@@ -12,7 +12,11 @@ public sealed record SolicitudRequest(
  Guid? CarreraOrigenId,
  [StringLength(200)] string? InstitucionOrigen,
  [StringLength(200)] string? CarreraOrigenExterna,
- Guid CarreraReceptoraId);
+ Guid CarreraReceptoraId,
+ int? PeriodosCursados=null,
+ int? CambiosPreviosCarrera=null);
+/// <summary>HU-19 (D4): datos declarados desde el expediente. null = sin dato; el análisis lo informa como información incompleta.</summary>
+public sealed record DatosCambioExternoRequest(int? PeriodosCursados,int? CambiosPreviosCarrera);
 public sealed record AsignaturaAprobadaRequest(
  Guid? AsignaturaOrigenId,
  [StringLength(200)] string? NombreAsignatura,
@@ -33,10 +37,10 @@ public sealed record AsignacionDocentesRequest([Required] Guid[]? DocenteIds);
 [ProducesResponseType(typeof(ProblemDetails),403)]
 public sealed class SolicitudesController(SolicitudService service,ICatalogoCarreras catalogo) : ControllerBase {
  /// <summary>Registra manualmente una solicitud recibida por Quipux. Número de trámite único.</summary>
- /// <remarks>Interno: carreras FISEI distintas. Externo: universidad ecuatoriana y carrera de origen separadas del catálogo receptor. No integra la API de Quipux.</remarks>
+ /// <remarks>Interno: carreras FISEI distintas. Externo: universidad ecuatoriana y carrera de origen separadas del catálogo receptor; opcionalmente períodos cursados y cambios previos de carrera (HU-19, RN-05), entre 0 y 100. No integra la API de Quipux.</remarks>
  [HttpPost,ProducesResponseType(typeof(Solicitud),201),ProducesResponseType(typeof(ProblemDetails),400),ProducesResponseType(typeof(ProblemDetails),409),ProducesResponseType(typeof(ProblemDetails),503)]
  public async Task<ActionResult<Solicitud>> Crear(SolicitudRequest input,CancellationToken ct) {
-  var s=await service.Crear(new(input.NumeroQuipux,input.IdentificacionEstudiante,input.NombreEstudiante,input.TipoCambio,input.CarreraOrigenId,input.InstitucionOrigen,input.CarreraOrigenExterna,input.CarreraReceptoraId),ct);
+  var s=await service.Crear(new(input.NumeroQuipux,input.IdentificacionEstudiante,input.NombreEstudiante,input.TipoCambio,input.CarreraOrigenId,input.InstitucionOrigen,input.CarreraOrigenExterna,input.CarreraReceptoraId,input.PeriodosCursados,input.CambiosPreviosCarrera),ct);
   // Relativa: tras el Gateway el host de la petición es el nombre interno del servicio.
   return Created($"/api/solicitudes/{s.Id}",s);
  }
@@ -57,6 +61,10 @@ public sealed class SolicitudesController(SolicitudService service,ICatalogoCarr
  /// <remarks>El rol se comprueba en Auth en cada asignación; si Auth no responde, 503 sin cambios. La solicitud pasa a «Docentes asignados». La reasignación no está definida: una segunda asignación devuelve 409.</remarks>
  [HttpPost("{id:guid}/docentes"),ProducesResponseType(typeof(SolicitudDetalle),200),ProducesResponseType(typeof(ProblemDetails),400),ProducesResponseType(typeof(ProblemDetails),404),ProducesResponseType(typeof(ProblemDetails),409),ProducesResponseType(typeof(ProblemDetails),503)]
  public async Task<ActionResult<SolicitudDetalle>> AsignarDocentes(Guid id,AsignacionDocentesRequest input,CancellationToken ct)=>Ok(await service.AsignarDocentes(id,input.DocenteIds!,ct));
+ /// <summary>Corrige períodos cursados y cambios previos de carrera de una solicitud externa (HU-19, RN-05).</summary>
+ /// <remarks>Solo cambios externos (400 en internos) y antes de asignar docentes (409 después), para que ningún análisis use datos distintos. null deja el dato sin declarar.</remarks>
+ [HttpPut("{id:guid}/datos-cambio-externo"),ProducesResponseType(typeof(SolicitudDetalle),200),ProducesResponseType(typeof(ProblemDetails),400),ProducesResponseType(typeof(ProblemDetails),404),ProducesResponseType(typeof(ProblemDetails),409)]
+ public async Task<ActionResult<SolicitudDetalle>> DeclararDatosCambioExterno(Guid id,DatosCambioExternoRequest input,CancellationToken ct)=>Ok(await service.DeclararDatosCambioExterno(id,input.PeriodosCursados,input.CambiosPreviosCarrera,ct));
  /// <summary>Lista los usuarios activos con rol Docente que pueden asignarse, según Auth.</summary>
  [HttpGet("{id:guid}/docentes-disponibles"),ProducesResponseType(typeof(IReadOnlyList<DocenteDisponible>),200),ProducesResponseType(typeof(ProblemDetails),404),ProducesResponseType(typeof(ProblemDetails),503)]
  public async Task<IActionResult> DocentesDisponibles(Guid id,CancellationToken ct)=>Ok(await service.DocentesDisponibles(id,ct));

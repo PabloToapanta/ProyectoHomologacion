@@ -57,3 +57,15 @@ it('sin asignaciones lo indica y un fallo de carga permite reintentar',async()=>
  render(<SolicitudesDocentePage request={request}/>);expect(await screen.findByRole('alert')).toHaveTextContent('Servicio no disponible.');
  falla=false;await user.click(screen.getByRole('button',{name:'Reintentar'}));expect(await screen.findByText('No tiene solicitudes asignadas.')).toBeInTheDocument();
 });
+it('solicitud externa muestra datos de RN-05 y abre el panel externo',async()=>{
+ const externa={...detalle,tipoCambio:'Externo',carreraOrigenId:null,institucionOrigen:'Universidad sintética Ecuador',carreraOrigenExterna:'Carrera externa sintética',periodosCursados:3,cambiosPreviosCarrera:null};
+ const request=vi.fn(async(path:string,_init?:RequestInit)=>path==='/api/solicitudes/asignadas'?json([{...solicitud,tipoCambio:'Externo'}]):path==='/api/solicitudes/asignadas/sol-a'?json({solicitud:externa,analisis:pendiente}):
+  path==='/api/homologaciones/solicitudes/sol-a/analisis-externo'?json([]):json({title:'Ruta no esperada'},500));
+ const user=userEvent.setup();render(<SolicitudesDocentePage request={request}/>);
+ const dialogo=await abrir(user);
+ expect(within(dialogo).getByText('3')).toBeInTheDocument();
+ expect(within(dialogo).getByText('Sin dato')).toBeInTheDocument();
+ expect(within(dialogo).getByRole('button',{name:'Consultar análisis externo'})).toBeInTheDocument();
+ await waitFor(()=>expect(request.mock.calls.map(c=>c[0])).toContain('/api/homologaciones/solicitudes/sol-a/analisis-externo'));
+ expect(request.mock.calls.some(c=>String(c[0]).includes('analisis-interno'))).toBe(false);
+});
