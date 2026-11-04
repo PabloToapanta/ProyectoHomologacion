@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -196,6 +197,11 @@ public class CatalogoApiTests
 
 internal sealed class CatalogoFactory : WebApplicationFactory<Program>
 {
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add("X-Internal-Key", "hu36-test-only-internal-key-64-characters-for-isolated-tests");
+    }
     // Clave sintética exclusiva de pruebas, nunca utilizada en despliegues.
     private const string Key = "catalogo-test-only-signing-key-32-bytes-minimum";
     private readonly SqliteConnection connection = new("Data Source=:memory:;Foreign Keys=True");
@@ -210,6 +216,10 @@ internal sealed class CatalogoFactory : WebApplicationFactory<Program>
         builder.UseSetting("Jwt:Audience", "catalogo-tests");
         builder.UseSetting("Jwt:SigningKey", Key);
         builder.UseSetting("Database:ApplyMigrations", "false");
+        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["InternalAccess:Key"] = "hu36-test-only-internal-key-64-characters-for-isolated-tests"
+        }));
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<DbContextOptions<CatalogoDbContext>>();

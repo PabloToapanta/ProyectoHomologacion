@@ -94,12 +94,19 @@ public sealed class FakeCatalogo : ICatalogoCarreras {
  public Task<IReadOnlyList<CarreraReferencia>> Listar(CancellationToken ct)=>Falla?throw new CatalogoNoDisponibleException():Task.FromResult<IReadOnlyList<CarreraReferencia>>([new(Origen,"TI sintética"),new(Receptora,"Software sintética")]);
 }
 public sealed class SolicitudesFactory : WebApplicationFactory<Program> {
+ protected override void ConfigureClient(HttpClient client) {
+  base.ConfigureClient(client);
+  client.DefaultRequestHeaders.Add("X-Internal-Key", "hu36-test-only-internal-key-64-characters-for-isolated-tests");
+ }
  const string Key="clave-sintetica-pruebas-hu10-32-bytes-minimo";
  readonly SqliteConnection db=new("Data Source=:memory:");
  public FakeCatalogo Catalogo {get;}=new();
  public LogsCapturados Logs {get;}=new();
  public SolicitudesFactory(){db.Open();}
  protected override void ConfigureWebHost(IWebHostBuilder b) {
+  b.ConfigureAppConfiguration((_,config)=>config.AddInMemoryCollection(new Dictionary<string,string?> {
+   ["InternalAccess:Key"]="hu36-test-only-internal-key-64-characters-for-isolated-tests"
+  }));
   b.UseEnvironment("Testing");b.ConfigureLogging(l=>l.AddProvider(Logs));foreach(var setting in new Dictionary<string,string?> {
    ["ConnectionStrings:Solicitudes"]="Server=unused;Database=unused",["Catalogo:BaseUrl"]="http://catalogo.test/",["Jwt:Issuer"]="test",["Jwt:Audience"]="test",["Jwt:SigningKey"]=Key
   }) b.UseSetting(setting.Key,setting.Value);

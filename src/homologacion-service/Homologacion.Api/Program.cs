@@ -17,6 +17,7 @@ public partial class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddInternalAccess();
         builder.Services.AddProblemDetails();
         builder.Services.AddHomologacionInfrastructure();
         builder.Services.AddScoped<EvaluarEquivalencia>();
@@ -62,6 +63,7 @@ public partial class Program
             });
         });
         var app = builder.Build();
+        app.UseInternalAccess();
         app.UseExceptionHandler();
         app.UseStatusCodePages();
         if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }

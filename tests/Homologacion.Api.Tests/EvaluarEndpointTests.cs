@@ -21,6 +21,11 @@ namespace Homologacion.Api.Tests;
 
 public sealed class MotorFactory(decimal umbral = 80) : WebApplicationFactory<Homologacion.Api.Program>
 {
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add("X-Internal-Key", "hu36-test-only-internal-key-64-characters-for-isolated-tests");
+    }
     public const string Issuer = "hu14-tests";
     public const string Audience = "hu14-api";
     public string Key { get; } = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64));
@@ -30,6 +35,7 @@ public sealed class MotorFactory(decimal umbral = 80) : WebApplicationFactory<Ho
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = Key,
+            ["InternalAccess:Key"] = "hu36-test-only-internal-key-64-characters-for-isolated-tests",
             ["Equivalencia:UmbralPct"] = umbral.ToString(System.Globalization.CultureInfo.InvariantCulture)
         }));
     }
@@ -233,6 +239,7 @@ public class IntegracionGatewayTests
             builder.ConfigureAppConfiguration((_, cfg) => cfg.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Jwt:Issuer"] = MotorFactory.Issuer, ["Jwt:Audience"] = MotorFactory.Audience, ["Jwt:SigningKey"] = motor.Key,
+                ["InternalAccess:Key"] = "hu36-test-only-internal-key-64-characters-for-isolated-tests",
                 ["ReverseProxy:Clusters:auth:Destinations:primary:Address"] = "http://auth.test/",
                 ["ReverseProxy:Clusters:catalogo:Destinations:primary:Address"] = "http://catalogo.test/",
                 ["ReverseProxy:Clusters:homologacion:Destinations:primary:Address"] = "http://motor.test/"

@@ -21,6 +21,7 @@ services:
       target: runtime
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      InternalAccess__Key: ${APP_SECRET_KEY:?Configure APP_SECRET_KEY fuera de Git}
       ASPNETCORE_HTTP_PORTS: "8080"
       ConnectionStrings__Auth: "Server=auth-db;Database=HomologacionAuth;User Id=sa;Password=${AUTH_SQL_PASSWORD:?Configure AUTH_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True"
       Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
@@ -30,8 +31,6 @@ services:
       SeedAdmin__Enabled: "true"
       SeedAdmin__NombreUsuario: ${AUTH_ADMIN_USERNAME:?Configure AUTH_ADMIN_USERNAME}
       SeedAdmin__Password: ${AUTH_ADMIN_PASSWORD:?Configure AUTH_ADMIN_PASSWORD}
-    ports:
-      - "127.0.0.1:${AUTH_HTTP_PORT:-5081}:8080"
     depends_on:
       auth-db:
         condition: service_healthy

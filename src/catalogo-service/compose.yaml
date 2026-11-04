@@ -16,10 +16,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "127.0.0.1:5082:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      InternalAccess__Key: ${APP_SECRET_KEY:?Configure APP_SECRET_KEY fuera de Git}
       ConnectionStrings__Catalogo: Server=catalogo-db;Database=Catalogo;User Id=sa;Password=${CATALOGO_SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True
       Jwt__Issuer: ${JWT_ISSUER:?Configura JWT_ISSUER}
       Jwt__Audience: ${JWT_AUDIENCE:?Configura JWT_AUDIENCE}

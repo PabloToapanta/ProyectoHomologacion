@@ -8,6 +8,7 @@ services:
       target: runtime
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      InternalAccess__Key: ${APP_SECRET_KEY:?Configure APP_SECRET_KEY fuera de Git}
       ASPNETCORE_HTTP_PORTS: "8080"
       Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
       Jwt__Audience: ${AUTH_JWT_AUDIENCE:?Configure AUTH_JWT_AUDIENCE}

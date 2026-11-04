@@ -7,7 +7,9 @@ using Microsoft.OpenApi.Models;
 using Solicitudes.Application;
 using Solicitudes.Infrastructure;
 using Solicitudes.Api;
+using Solicitudes.Api.Security;
 var builder=WebApplication.CreateBuilder(args);
+builder.Services.AddInternalAccess();
 builder.Services.AddControllers(o=>o.Filters.Add<SolicitudesExceptionFilter>()).AddJsonOptions(o=>o.JsonSerializerOptions.UnmappedMemberHandling=System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow);
 builder.Services.AddProblemDetails();builder.Services.AddExceptionHandler<SolicitudesExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();builder.Services.AddSwaggerGen(o=>{
@@ -28,16 +30,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
  ValidateIssuer=true,ValidIssuer=issuer,ValidateAudience=true,ValidAudience=audience,ValidateIssuerSigningKey=true,IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),ValidateLifetime=true,RequireExpirationTime=true,RequireSignedTokens=true,ValidAlgorithms=[SecurityAlgorithms.HmacSha256],ClockSkew=TimeSpan.Zero,NameClaimType="name",RoleClaimType="role"
 };});
 builder.Services.AddAuthorization();
-var app=builder.Build();app.UseExceptionHandler();app.UseStatusCodePages();
+var app=builder.Build();app.UseInternalAccess();app.UseExceptionHandler();app.UseStatusCodePages();
 if(app.Environment.IsDevelopment()){app.UseSwagger();app.UseSwaggerUI();}
 app.UseAuthentication();app.UseAuthorization();app.MapControllers();
 if(app.Configuration.GetValue<bool>("Database:ApplyMigrations")){using var scope=app.Services.CreateScope();await scope.ServiceProvider.GetRequiredService<SolicitudesDbContext>().Database.MigrateAsync();}
 app.Run();
 public partial class Program;
 namespace Solicitudes.Api {
- public sealed class CatalogoAuthorizationHandler(IHttpContextAccessor context) : DelegatingHandler {
+ public sealed class CatalogoAuthorizationHandler(IHttpContextAccessor context, IConfiguration configuration) : DelegatingHandler {
   protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct) {
    if(AuthenticationHeaderValue.TryParse(context.HttpContext?.Request.Headers.Authorization.ToString(),out var value)) request.Headers.Authorization=value;
+   request.Headers.Remove(InternalAccess.Header);
+   request.Headers.TryAddWithoutValidation(InternalAccess.Header, configuration["InternalAccess:Key"]);
    return base.SendAsync(request,ct);
   }
  }

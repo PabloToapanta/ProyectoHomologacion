@@ -75,6 +75,11 @@ public sealed class LoginApiTests : IClassFixture<AuthApiFactory>
 
 public sealed class AuthApiFactory : WebApplicationFactory<Program>
 {
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add("X-Internal-Key", "hu36-test-only-internal-key-64-characters-for-isolated-tests");
+    }
     public const string Password = "Prueba-Api-123!";
     private readonly SqliteConnection connection = new("Data Source=:memory:");
 
@@ -85,6 +90,7 @@ public sealed class AuthApiFactory : WebApplicationFactory<Program>
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["ConnectionStrings:Auth"] = "Server=unused;Database=AuthTests;Integrated Security=true;TrustServerCertificate=true",
+            ["InternalAccess:Key"] = "hu36-test-only-internal-key-64-characters-for-isolated-tests",
             ["Jwt:Issuer"] = "auth-api-test", ["Jwt:Audience"] = "api-test",
             ["Jwt:SigningKey"] = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)),
             ["SeedAdmin:Enabled"] = "false", ["Database:ApplyMigrations"] = "false"
