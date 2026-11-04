@@ -51,6 +51,8 @@ public sealed class DocentesApiFactory : WebApplicationFactory<Program>
 {
     private const string Issuer = "auth-docentes-test", Audience = "api-test";
     private readonly string key = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+    // HU-35: Auth exige un token cifrado; clave sintética por ejecución.
+    private readonly string encryptionKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
     private readonly SqliteConnection connection = new("Data Source=:memory:");
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -60,7 +62,7 @@ public sealed class DocentesApiFactory : WebApplicationFactory<Program>
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["ConnectionStrings:Auth"] = "Server=unused;Database=AuthTests;Integrated Security=true;TrustServerCertificate=true",
-            ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = key,
+            ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = key, ["Jwt:EncryptionKey"] = encryptionKey,
             ["SeedAdmin:Enabled"] = "false", ["Database:ApplyMigrations"] = "false"
         }));
         builder.ConfigureServices(services =>
@@ -87,10 +89,17 @@ public sealed class DocentesApiFactory : WebApplicationFactory<Program>
     {
         var client = CreateClient();
         if (role is null) return client;
-        var token = new JwtSecurityToken(Issuer, Audience, [new Claim("sub", Guid.NewGuid().ToString()), new Claim("role", role)],
-            DateTime.UtcNow.AddMinutes(-1), DateTime.UtcNow.AddMinutes(5),
-            new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), SecurityAlgorithms.HmacSha256));
-        client.DefaultRequestHeaders.Authorization = new("Bearer", new JwtSecurityTokenHandler().WriteToken(token));
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.CreateToken(new SecurityTokenDescriptor
+        {
+            Issuer = Issuer, Audience = Audience,
+            Subject = new ClaimsIdentity([new Claim("sub", Guid.NewGuid().ToString()), new Claim("role", role)]),
+            NotBefore = DateTime.UtcNow.AddMinutes(-1), Expires = DateTime.UtcNow.AddMinutes(5),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), SecurityAlgorithms.HmacSha256),
+            EncryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(Convert.FromBase64String(encryptionKey)),
+                SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512)
+        });
+        client.DefaultRequestHeaders.Authorization = new("Bearer", handler.WriteToken(token));
         return client;
     }
 
