@@ -1,10 +1,11 @@
-# Complemento HU-10: usar junto a compose.sprint1.yaml. No modifica sus puertos locales.
+# Complemento HU-10: usar junto a compose.sprint1.yaml. Solo Gateway expone las API.
 services:
   solicitudes-service:
     build:
       context: ./src/solicitudes-service
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      InternalAccess__Key: ${APP_SECRET_KEY:?Configure APP_SECRET_KEY fuera de Git}
       ASPNETCORE_HTTP_PORTS: "8080"
       Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
       Jwt__Audience: ${AUTH_JWT_AUDIENCE:?Configure AUTH_JWT_AUDIENCE}

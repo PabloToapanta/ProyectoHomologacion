@@ -8,7 +8,9 @@ using Microsoft.OpenApi.Models;
 using Solicitudes.Application;
 using Solicitudes.Infrastructure;
 using Solicitudes.Api;
+using Solicitudes.Api.Security;
 var builder=WebApplication.CreateBuilder(args);
+builder.Services.AddInternalAccess();
 builder.Services.AddControllers(o=>o.Filters.Add<SolicitudesExceptionFilter>()).AddJsonOptions(o=>o.JsonSerializerOptions.UnmappedMemberHandling=System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow);
 builder.Services.AddProblemDetails();builder.Services.AddExceptionHandler<SolicitudesExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();builder.Services.AddSwaggerGen(o=>{
@@ -26,7 +28,7 @@ builder.Services.AddHttpClient<ICatalogoCarreras,CatalogoCarreras>(h=>{h.BaseAdd
 var authUrl=builder.Configuration["Auth:BaseUrl"];
 if(!Uri.TryCreate(authUrl,UriKind.Absolute,out var authUri) || authUri.Scheme is not ("http" or "https")) throw new InvalidOperationException("Configure Auth:BaseUrl con la dirección interna del servicio de autenticación.");
 builder.Services.AddHttpClient<IDirectorioDocentes,DirectorioDocentes>(h=>{h.BaseAddress=authUri;h.Timeout=TimeSpan.FromSeconds(10);}).ConfigurePrimaryHttpMessageHandler(()=>new HttpClientHandler {AllowAutoRedirect=false}).AddHttpMessageHandler<CatalogoAuthorizationHandler>();
-var issuer=builder.Configuration["Jwt:Issuer"];var audience=builder.Configuration["Jwt:Audience"];var key=builder.Configuration["Jwt:SigningKey"];
+var issuer=builder.Configuration["Jwt:Issuer"];var audience=builder.Configuration["Jwt:Audience"];var key=builder.Configuration["Jwt:SigningKey"];var encryptionKey=builder.Configuration["Jwt:EncryptionKey"];
 if(string.IsNullOrWhiteSpace(issuer)||string.IsNullOrWhiteSpace(audience)||string.IsNullOrWhiteSpace(key)||Encoding.UTF8.GetByteCount(key)<32) throw new InvalidOperationException("Configure Jwt:Issuer, Jwt:Audience y Jwt:SigningKey de al menos 32 bytes.");
 // HU-35: el token de Auth llega firmado (HS256) y cifrado (A256KW + A256CBC-HS512); se rechaza el que no venga cifrado.
 var encryptionKey=builder.Configuration["Jwt:EncryptionKey"];var encryptionBytes=new byte[32];
@@ -40,16 +42,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
  AlgorithmValidator=(algorithm,_,_,_)=>algorithm is SecurityAlgorithms.HmacSha256 or SecurityAlgorithms.Aes256KW or SecurityAlgorithms.Aes256CbcHmacSha512,ClockSkew=TimeSpan.Zero,NameClaimType="name",RoleClaimType="role"
 };});
 builder.Services.AddAuthorization();
-var app=builder.Build();app.UseExceptionHandler();app.UseStatusCodePages();
+var app=builder.Build();app.UseInternalAccess();app.UseExceptionHandler();app.UseStatusCodePages();
 if(app.Environment.IsDevelopment()){app.UseSwagger();app.UseSwaggerUI();}
 app.UseAuthentication();app.UseAuthorization();app.MapControllers();
 if(app.Configuration.GetValue<bool>("Database:ApplyMigrations")){using var scope=app.Services.CreateScope();await scope.ServiceProvider.GetRequiredService<SolicitudesDbContext>().Database.MigrateAsync();}
 app.Run();
 public partial class Program;
 namespace Solicitudes.Api {
- public sealed class CatalogoAuthorizationHandler(IHttpContextAccessor context) : DelegatingHandler {
+ public sealed class CatalogoAuthorizationHandler(IHttpContextAccessor context, IConfiguration configuration) : DelegatingHandler {
   protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct) {
    if(AuthenticationHeaderValue.TryParse(context.HttpContext?.Request.Headers.Authorization.ToString(),out var value)) request.Headers.Authorization=value;
+   request.Headers.Remove(InternalAccess.Header);
+   request.Headers.TryAddWithoutValidation(InternalAccess.Header, configuration["InternalAccess:Key"]);
    return base.SendAsync(request,ct);
   }
  }

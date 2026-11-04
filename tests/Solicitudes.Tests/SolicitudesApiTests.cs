@@ -18,6 +18,12 @@ using Solicitudes.Infrastructure;
 using Xunit;
 namespace Solicitudes.Tests;
 public sealed class SolicitudesApiTests {
+ [Fact] public async Task JwtFirmadoSinCifrarNoPermiteAcceso() {
+  using var f=new SolicitudesFactory();using var c=f.Client();
+  var jwt=new JwtSecurityToken("test","test",[new Claim("sub","usuario-sintetico"),new Claim("role","Coordinador")],DateTime.UtcNow.AddMinutes(-1),DateTime.UtcNow.AddMinutes(5),new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SolicitudesFactory.Key)),SecurityAlgorithms.HmacSha256));
+  c.DefaultRequestHeaders.Authorization=new("Bearer",new JwtSecurityTokenHandler().WriteToken(jwt));
+  Assert.Equal(HttpStatusCode.Unauthorized,(await c.GetAsync("/api/solicitudes")).StatusCode);
+ }
  [Fact] public async Task RegistraConsultaYRechazaQuipuxDuplicado() {
   using var f=new SolicitudesFactory();using var c=f.Client();
   var response=await c.PostAsJsonAsync("/api/solicitudes",f.Input());Assert.Equal(HttpStatusCode.Created,response.StatusCode);
@@ -122,6 +128,9 @@ public sealed class SolicitudesFactory : WebApplicationFactory<Program> {
  public RelojFijo Reloj {get;}=new(new DateTimeOffset(2026,6,15,17,0,0,TimeSpan.Zero));
  public SolicitudesFactory(){db.Open();}
  protected override void ConfigureWebHost(IWebHostBuilder b) {
+  b.ConfigureAppConfiguration((_,config)=>config.AddInMemoryCollection(new Dictionary<string,string?> {
+   ["InternalAccess:Key"]="hu36-test-only-internal-key-64-characters-for-isolated-tests"
+  }));
   b.UseEnvironment("Testing");b.ConfigureLogging(l=>l.AddProvider(Logs));foreach(var setting in new Dictionary<string,string?> {
    ["ConnectionStrings:Solicitudes"]="Server=unused;Database=unused",["Catalogo:BaseUrl"]="http://catalogo.test/",["Auth:BaseUrl"]="http://auth.test/",["Jwt:Issuer"]="test",["Jwt:Audience"]="test",["Jwt:SigningKey"]=Key,["Jwt:EncryptionKey"]=EncryptionKey
   }) b.UseSetting(setting.Key,setting.Value);
@@ -129,7 +138,7 @@ public sealed class SolicitudesFactory : WebApplicationFactory<Program> {
  }
  public HttpClient Client(string? role="Coordinador",string sub="usuario-sintetico",string scenario="valid") {
   var client=CreateClient();using var scope=Services.CreateScope();scope.ServiceProvider.GetRequiredService<SolicitudesDbContext>().Database.EnsureCreated();
-  if(role is not null) client.DefaultRequestHeaders.Authorization=new("Bearer",Token(role,sub,scenario));
+  if(role is not null) {var handler=new JwtSecurityTokenHandler();var jwt=handler.CreateToken(new SecurityTokenDescriptor {Issuer="test",Audience="test",Subject=new ClaimsIdentity([new Claim("sub","usuario-sintetico"),new Claim("role",role)]),NotBefore=DateTime.UtcNow.AddMinutes(-1),Expires=DateTime.UtcNow.AddMinutes(5),SigningCredentials=new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)),SecurityAlgorithms.HmacSha256),EncryptingCredentials=new EncryptingCredentials(new SymmetricSecurityKey(Convert.FromBase64String(encryptionKey)),SecurityAlgorithms.Aes256KW,SecurityAlgorithms.Aes256CbcHmacSha512)});client.DefaultRequestHeaders.Authorization=new("Bearer",handler.WriteToken(jwt));}
   return client;
  }
  // Igual que Auth en HU-35: firmado con HS256 y cifrado con A256KW + A256CBC-HS512.

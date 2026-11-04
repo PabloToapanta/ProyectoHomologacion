@@ -18,6 +18,7 @@ public partial class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddInternalAccess();
         builder.Services.AddProblemDetails();
         builder.Services.AddHomologacionInfrastructure();
         builder.Services.AddScoped<EvaluarEquivalencia>();
@@ -77,6 +78,7 @@ public partial class Program
             });
         });
         var app = builder.Build();
+        app.UseInternalAccess();
         _ = app.Services.GetRequiredService<IOptions<JwtOptions>>().Value;
         app.UseExceptionHandler();
         app.UseStatusCodePages();

@@ -50,10 +50,17 @@ public sealed class DocentesApiTests(DocentesApiFactory factory) : IClassFixture
 public sealed class DocentesApiFactory : WebApplicationFactory<Program>
 {
     private const string Issuer = "auth-docentes-test", Audience = "api-test";
+    private const string InternalKey = "hu36-test-only-internal-key-64-characters-for-isolated-tests";
     private readonly string key = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
     // HU-35: Auth exige un token cifrado; clave sintética por ejecución.
     private readonly string encryptionKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
     private readonly SqliteConnection connection = new("Data Source=:memory:");
+
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add("X-Internal-Key", InternalKey);
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -62,7 +69,8 @@ public sealed class DocentesApiFactory : WebApplicationFactory<Program>
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["ConnectionStrings:Auth"] = "Server=unused;Database=AuthTests;Integrated Security=true;TrustServerCertificate=true",
-            ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = key, ["Jwt:EncryptionKey"] = encryptionKey,
+            ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = key,
+            ["Jwt:EncryptionKey"] = encryptionKey, ["InternalAccess:Key"] = InternalKey,
             ["SeedAdmin:Enabled"] = "false", ["Database:ApplyMigrations"] = "false"
         }));
         builder.ConfigureServices(services =>
