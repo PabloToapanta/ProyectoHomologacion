@@ -1,5 +1,7 @@
 # Contrato HU-31 — análisis propio del docente junto al del agente
 
+Issue [#59](https://github.com/PabloToapanta/ProyectoHomologacion/issues/59).
+
 Historia del Sprint 0 (Sprint 3, prioridad Alta, 5 PH): «Como docente, quiero registrar mi propio análisis
 por asignatura (de acuerdo o ajuste, con observación) junto al del agente.» Adelantada al 04/11/2026 con
 autorización de Shirley, transmitida por Edwin. Base: `feature/hu-19-analisis-externo`; el PR se integra

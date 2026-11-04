@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import type {FormEvent} from 'react';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Postura='DeAcuerdo'|'Ajuste';
@@ -13,26 +13,30 @@ export function RevisionDocentePanel({request,solicitudId,aprobadaId,receptoraId
  const ruta=`/api/homologaciones/solicitudes/${solicitudId}/revisiones-docentes`;
  const [revisiones,setRevisiones]=useState<RevisionDocente[]>([]),[postura,setPostura]=useState<Postura|''>(''),[decision,setDecision]=useState<Decision|''>('');
  const [observacion,setObservacion]=useState(''),[ocupado,setOcupado]=useState(false),[error,setError]=useState(''),[aviso,setAviso]=useState('');
+ const version=useRef(0);
  async function leer<T>(init?:RequestInit):Promise<T> {
   const response=await request(ruta,init);
   if(!response.ok){let texto='No fue posible consultar o guardar el análisis docente.';try{const p=await response.json();texto=p.detail??p.title??texto;}catch{/* sin cuerpo */}throw new Error(texto);}
   return response.json() as Promise<T>;
  }
  useEffect(()=>{
-  const controller=new AbortController();setPostura('');setDecision('');setObservacion('');setAviso('');setError('');
+  const actual=++version.current;
+  const controller=new AbortController();setPostura('');setDecision('');setObservacion('');setAviso('');setError('');setOcupado(false);setRevisiones([]);
   leer<RevisionDocente[]>({signal:controller.signal}).then(r=>{if(!controller.signal.aborted)setRevisiones(r);})
    .catch(e=>{if(!controller.signal.aborted)setError(e instanceof Error?e.message:'No se pudieron consultar los análisis docentes.');});
-  return ()=>controller.abort();
+  return ()=>{if(version.current===actual)version.current++;controller.abort();};
  // request es estable; la pareja define qué se muestra.
  },[request,ruta,aprobadaId,receptoraId]);
  async function guardar(event:FormEvent) {
   event.preventDefault();if(ocupado||!postura)return;setOcupado(true);setError('');setAviso('');
+  const actual=version.current;
   try{
    const guardada=await leer<RevisionDocente>({method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({asignaturaAprobadaId:aprobadaId,asignaturaReceptoraId:receptoraId,
     postura,decision:postura==='Ajuste'?decision||null:null,observacion:observacion.trim()||null})});
+   if(actual!==version.current)return;
    setRevisiones(prev=>[...prev.filter(r=>r.docenteId!==guardada.docenteId||r.asignaturaAprobadaId!==aprobadaId||r.asignaturaReceptoraId!==receptoraId),guardada]);
    setAviso('Su análisis quedó registrado.');
-  }catch(e){setError(e instanceof Error?e.message:'No se registró el análisis.');}finally{setOcupado(false);}
+  }catch(e){if(actual===version.current)setError(e instanceof Error?e.message:'No se registró el análisis.');}finally{if(actual===version.current)setOcupado(false);}
  }
  const dePareja=revisiones.filter(r=>r.asignaturaAprobadaId===aprobadaId&&r.asignaturaReceptoraId===receptoraId);
  const conSugerencia=sugerenciaAgente==='Homologable'||sugerenciaAgente==='No homologable';

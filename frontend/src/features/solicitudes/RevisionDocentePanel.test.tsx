@@ -1,4 +1,4 @@
-import {render,screen,within} from '@testing-library/react';
+import {act,render,screen,within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {it,expect,vi} from 'vitest';
 import {RevisionDocentePanel} from './RevisionDocentePanel';
@@ -47,4 +47,19 @@ it('un rechazo del servidor se muestra sin anunciar el registro',async()=>{
  await user.click(screen.getByRole('button',{name:'Guardar mi análisis'}));
  expect(await screen.findByRole('alert')).toHaveTextContent('El ajuste requiere una observación.');
  expect(screen.queryByText('Su análisis quedó registrado.')).not.toBeInTheDocument();
+});
+
+it('no anuncia en otra pareja el guardado pendiente de la pareja anterior',async()=>{
+ let terminar!:(response:Response)=>void;
+ const pendiente=new Promise<Response>(resolve=>{terminar=resolve;});
+ const request=vi.fn(async(_path:string,init?:RequestInit)=>init?.method==='PUT'?pendiente:json([]));
+ const user=userEvent.setup();
+ const props={request,solicitudId:'sol-a',aprobadaId:'a1',receptoraId:'r1',sugerenciaAgente:'Homologable'};
+ const {rerender}=render(<RevisionDocentePanel {...props}/>);
+ await user.click(await screen.findByLabelText('De acuerdo con el agente'));
+ await user.click(screen.getByRole('button',{name:'Guardar mi análisis'}));
+ rerender(<RevisionDocentePanel {...props} receptoraId="r2"/>);
+ await act(async()=>{terminar(json({...otro,docenteId:'d1'}));await pendiente;});
+ expect(screen.queryByText('Su análisis quedó registrado.')).not.toBeInTheDocument();
+ expect(screen.queryByRole('list',{name:'Análisis de los docentes'})).not.toBeInTheDocument();
 });

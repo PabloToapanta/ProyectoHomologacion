@@ -3,7 +3,8 @@
 Responsable: Edwin Caraguay. Rama `feature/hu-31-revision-docente` sobre `feature/hu-19-analisis-externo`
 (`3b2e291`), porque necesita el análisis externo de HU-19. Fecha: 04/11/2026. Historia del Sprint 3
 adelantada con autorización de Shirley, transmitida por Edwin. Contrato: [contrato-hu-31.md](contrato-hu-31.md).
-Issue pendiente de crear en GitHub: borrador en [issue-hu-31.md](issue-hu-31.md).
+Issue [#59](https://github.com/PabloToapanta/ProyectoHomologacion/issues/59): criterios
+y pruebas en [issue-hu-31.md](issue-hu-31.md).
 
 ## Cambios
 
@@ -53,3 +54,24 @@ inexistente). En Application las pruebas se escribieron antes que el código, pe
 
 **No verificado:** «De acuerdo» de punta a punta con análisis completo (requiere el modelo o el doble HTTP de HU-18),
 prueba en navegador, CI en GitHub, revisión cruzada y aceptación de Shirley.
+
+## Revisión independiente para PR del 04/11/2026
+
+- Caso reproducido en rojo: cambiar de pareja mientras se guarda podía mostrar
+  «Su análisis quedó registrado» en la pareja nueva. Se corrigió ignorando las
+  respuestas de la pareja anterior; la prueba de regresión queda en verde.
+- Backend .NET 8 en contenedor, con SQL Server 2022 temporal: **689 aprobadas y
+  1 omitida** (Ollama real). Desglose: Homologación Domain 71, Application 101,
+  Api 128, Infrastructure 47; Auth Application 13, AuthService 64; Gateway 119;
+  Solicitudes 146. Red y contenedores temporales eliminados.
+- Frontend **132/132**; TypeScript y compilación Vite aprobados.
+- Se corrigió un error aritmético de la evidencia heredada de HU-19: su desglose
+  suma 655, no 755; no se alteraron los resultados individuales ni se atribuye
+  esa ejecución antigua a HU-31.
+- La issue #59 incluye criterios y casos de prueba. La autorización reportada
+  de adelanto de Sprint 3 debe registrarse allí, sin confundirla con aceptación.
+- Smoke independiente de HU-31 sobre copia aislada: **32/32**, con Gateway, JWT
+  cifrado y SQL Server reales; proyecto y volúmenes temporales eliminados. Verifica
+  ambos docentes, corrección propia, rechazos, reinicio y fallo controlado sin
+  reemplazar la revisión anterior. HTTP local: no acredita HTTPS. Sigue pendiente
+  «De acuerdo» de punta a punta con análisis automático completo y navegador real.

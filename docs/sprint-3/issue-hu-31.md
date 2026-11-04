@@ -29,3 +29,23 @@ Informe (HU-23), remisión (HU-32), finalización (HU-33) y cierre del análisis
 - [ ] API `PUT/GET /api/homologaciones/solicitudes/{id}/revisiones-docentes` y ruta del Gateway.
 - [ ] «Mi análisis» en la vista docente (HU-30), junto al análisis del agente.
 - [ ] Pruebas de integración con SQL Server real, smoke con Docker Compose y evidencia.
+
+## Pruebas y evidencia para revisión
+
+- **PA1 → CA1/CA3:** regla y API: «De acuerdo» requiere análisis completo; se deriva
+  la decisión de la sugerencia guardada y se rechaza una decisión distinta del cliente.
+- **PA2 → CA2/CA3:** «Ajuste» exige decisión y observación, incluso sin agente;
+  probar observación vacía/excesiva y postura/decisión inválidas sin guardar.
+- **PA3 → CA4:** dos docentes independientes, corrección solo del propio registro,
+  conservación de la fotografía del agente y aislamiento entre parejas/solicitudes.
+- **PA4 → CA5:** 401/403/404, rechazo de suplantación mediante `docenteId` y nueva
+  comprobación de asignación en cada operación.
+- **PA5 → CA6:** migración y lectura con conexiones nuevas en SQL Server real;
+  reinicio del servicio y fallo de guardado con 503 sin reemplazar el registro previo.
+- **PA6 → CA4:** frontend: mostrar únicamente la pareja seleccionada y no anunciar
+  en otra pareja la respuesta tardía de un guardado anterior.
+
+Los resultados se registran en `docs/sprint-3/evidencia-hu-31.md`. Las pruebas en
+verde no constituyen aceptación de la PO ni revisión cruzada. Quedan pendientes CI,
+prueba manual en navegador y registro en esta issue de la autorización de adelanto
+de Sprint 3 comunicada por Edwin. No incluye merge ni cierre automático.

@@ -81,7 +81,7 @@ Shirley y registro escrito de las decisiones D1–D4 y del bloqueo desde la asig
 ## Revisión para PR del 04/11/2026
 
 Ejecución independiente sobre el código de `3e200d8`, con SDK .NET 8 y SQL Server
-2022 en contenedores temporales: 755 pruebas backend aprobadas y 1 omitida (Ollama
+2022 en contenedores temporales: 655 pruebas backend aprobadas y 1 omitida (Ollama
 real). Desglose: dominio 71, aplicación 84 y API 121 de Homologación; infraestructura
 43; Auth Application 13 y AuthService 64; Gateway 117; Solicitudes 142.
 Frontend: 128/128; TypeScript y compilación Vite aprobados. Sin errores en
