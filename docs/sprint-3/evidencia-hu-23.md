@@ -3,7 +3,7 @@
 Responsable: Edwin Caraguay. Rama `feature/hu-23-informe-homologacion` sobre `feature/hu-31-revision-docente`
 (`cd034ca`). Fecha: 04/11/2026. Historia del Sprint 3 adelantada con autorización de Shirley, transmitida por
 Edwin. Contrato: [contrato-hu-23.md](contrato-hu-23.md). **La regla de combinación de decisiones y el cierre
-están sujetos a la consulta de Edwin con su docente.** Issue de HU-23 todavía sin crear.
+están sujetos a la consulta de Edwin con su docente.** Seguimiento: [Issue #61](https://github.com/PabloToapanta/ProyectoHomologacion/issues/61).
 
 ## Cambios
 
@@ -30,7 +30,7 @@ están sujetos a la consulta de Edwin con su docente.** Issue de HU-23 todavía 
 | CA1 — generar con agente, docentes y sugerencia final | Application, API y smoke | Verificado |
 | CA2 — Convalidar / No convalidar / Sin acuerdo | Application, API, frontend y smoke (una pareja en acuerdo y otra sin acuerdo) | Verificado |
 | CA3 — sin parejas o con un docente faltante no se genera | Application, API y smoke (400) | Verificado |
-| CA4 — único y fijo; análisis cerrados | Application, API, SQL Server real (4 generaciones simultáneas, 3 veces) y smoke (409) | Verificado |
+| CA4 — único y fijo; análisis cerrados | Application, API, SQL Server real y smoke (409); falta el intercalado corrección/cierre | Parcial: el cierre no es atómico |
 | CA5 — solo docentes asignados | API y smoke (401/403/404) | Verificado |
 | CA6 — persistencia y fallo controlado | SQLite y SQL Server real; smoke con reinicio | Ver ejecuciones |
 
@@ -53,4 +53,31 @@ TDD: la fase roja se observó en Application, Infrastructure, API (5 pruebas nue
 transacción común. Una corrección enviada en el mismo instante en que se genera el informe podría guardarse
 después del informe, sin cambiar el contenido del informe ya fijado.
 
-**No verificado:** prueba en navegador, CI en GitHub, revisión cruzada, Issue de HU-23 y aceptación de Shirley.
+**No verificado:** prueba en navegador, CI en GitHub, revisión cruzada y aceptación de Shirley.
+
+## Revisión para publicación del 04/11/2026
+
+Se creó la issue #61 con criterios y pruebas vinculadas, incluido el caso de
+concurrencia que falta. La revisión estática confirma que `RegistrarRevisionDocente`
+consulta el informe antes de guardar y que `RevisionesDocentesSql.GuardarAsync`
+no vuelve a validar el cierre en una operación atómica con la generación. Una
+corrección que superó la consulta previa puede confirmar después del informe.
+
+Las pruebas actuales cubren una corrección que empieza después del cierre y varias
+generaciones simultáneas. No cubren el intercalado edición iniciada → informe
+confirmado → edición guardada. El informe sigue fijo, pero la revisión cambia después
+del cierre prometido. Por ello CA4 no está completo y no se publica PR como lista.
+
+Frontend ejecutado de nuevo: **135/135**, TypeScript y compilación Vite aprobados.
+El primer intento de backend no pudo ejecutarse porque Docker estaba apagado;
+se inició Docker Desktop para repetir la verificación con SQL Server temporal.
+
+Repetición completada: **706 pruebas backend aprobadas y 1 omitida** (Ollama real).
+Desglose: Homologación Domain 71, Application 107, API 133, Infrastructure 51;
+Auth Application 13, AuthService 64; Gateway 121; Solicitudes 146. SDK .NET 8 y
+SQL Server 2022 en contenedores temporales, eliminados con su red al finalizar.
+Smoke independiente en copia aislada: **47/47**, con JWT cifrado y SQL Server real;
+proyecto y volúmenes eliminados. HTTP local: no acredita HTTPS. `git diff --check`
+sin errores. Se conserva el bloqueo de CA4: estos resultados no incluyen su
+intercalado concurrente pendiente. Descripción local de PR en `pr-hu-23.md`, sin
+publicar ni subir la rama mientras no se declare lista.

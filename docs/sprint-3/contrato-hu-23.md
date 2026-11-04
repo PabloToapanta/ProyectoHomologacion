@@ -2,8 +2,10 @@
 
 Historia del Sprint 0 (Sprint 3, prioridad Alta, 5 PH): «Como docente, quiero generar el informe con el
 análisis del agente, el mío y la sugerencia final de convalidar o no.» Adelantada el 04/11/2026 con
-autorización de Shirley, transmitida por Edwin. Base: `feature/hu-31-revision-docente` (#59); se integra
+autorización de Shirley, transmitida por Edwin. Base: `feature/hu-31-revision-docente` (issue #59, PR #60); se integra
 después de HU-19 (#56) y HU-31.
+
+Seguimiento: [Issue #61](https://github.com/PabloToapanta/ProyectoHomologacion/issues/61).
 
 ## Decisiones (Edwin, 04/11/2026)
 
