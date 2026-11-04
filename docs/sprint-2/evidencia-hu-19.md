@@ -5,7 +5,8 @@ desde `develop` `cbe9ac1`. Fecha: 04/11/2026.
 
 ## Decisiones aplicadas
 
-El contrato sigue la propuesta `docs/sprint-2/propuesta-contrato-hu-19.md` (PR de HU-20).
+El contrato sigue la [propuesta original de HU-19](propuesta-contrato-hu-19.md),
+incluida en esta rama para que el PR pueda revisarse sin depender de la rama de HU-20.
 Edwin informó el 04/11/2026 que Shirley aprobó D1–D4 y que Leslie está de acuerdo con los
 cambios en Homologación. Esa aprobación no consta todavía por escrito en el Issue #43: debe
 registrarse allí.
@@ -49,8 +50,8 @@ Precisiones de implementación respecto a la propuesta:
 
 | Criterio | Evidencia | Estado |
 |---|---|---|
-| CA1 — mínimos externos (≥ 2 períodos, ≥ 2 homologables, sin cambios previos) | Pruebas de `GestionarAnalisisExterno` (Cumple, NoCumple por cada dato, Incompleto); smoke `RN-05 externo` | Verificado según D1/D4 |
-| CA2 — datos ausentes no se presumen | Pruebas de dominio y de API (null = sin dato); smoke `RN-05 incompleto sin analisis completos` | Verificado |
+| CA1 — adaptador común y tipo de institución | Reutiliza fuentes HTTP y almacenamiento de HU-18/HU-20, sin agente por D2 y limitado a Ecuador por D1 | Ajustado por D1/D2; pendiente reflejarlo en #43 |
+| CA2 — mínimos externos (≥ 2 períodos, ≥ 2 homologables, sin cambios previos) | Pruebas de `GestionarAnalisisExterno` (Cumple, NoCumple por cada dato, Incompleto); datos ausentes no se presumen | Verificado según D4; «Cumple» solo con resultados completos sintéticos |
 | CA3 — apostilla/institución extranjera | Fuera de alcance por D1; prueba y smoke «sin apostilla» | Ajustado por D1 |
 | CA4 — horas y créditos sin conversiones inventadas | Pruebas de unidades iguales, normalizadas, distintas y ausentes; tope de 100 %; smoke D3 | Verificado |
 | CA5 — persistencia y acceso por asignación | SQLite y SQL Server real; smoke de reinicio, sin duplicados, 404 para ajeno y fallo controlado mediante trigger | Verificado |
@@ -76,3 +77,24 @@ primero en rojo (fallos de compilación o de pruebas) y después en verde.
 
 **No verificado:** CI en GitHub, revisión cruzada de Leslie sobre Homologación, aceptación de
 Shirley y registro escrito de las decisiones D1–D4 en el Issue #43.
+
+## Revisión para PR del 04/11/2026
+
+Ejecución independiente sobre el código de `3e200d8`, con SDK .NET 8 y SQL Server
+2022 en contenedores temporales: 755 pruebas backend aprobadas y 1 omitida (Ollama
+real). Desglose: dominio 71, aplicación 84 y API 121 de Homologación; infraestructura
+43; Auth Application 13 y AuthService 64; Gateway 117; Solicitudes 142.
+Frontend: 128/128; TypeScript y compilación Vite aprobados. Sin errores en
+`git diff --check`. Contenedores y red de esta revisión eliminados.
+
+El primer intento de esta revisión utilizó una ruta inexistente de la solución y
+no ejecutó pruebas; se corrigió para usar `Homologacion.sln` en la raíz y se volvió
+a ejecutar. No se repitieron los smokes: sus resultados anteriores se conservan
+como evidencia registrada, no como nuevas ejecuciones de esta revisión.
+
+**Hallazgo pendiente:** el bloqueo de corrección después de asignar docentes se
+valida en memoria antes de `SaveChanges`, sin condición de estado en la actualización.
+Una edición que lea «Registrada» puede guardarse tras una asignación concurrente.
+Se necesita una protección atómica y una prueba de intercalado antes de aceptar
+esa garantía. La preparación del PR se mantiene en borrador por este hallazgo y
+las decisiones de alcance pendientes de registrar en #43.
