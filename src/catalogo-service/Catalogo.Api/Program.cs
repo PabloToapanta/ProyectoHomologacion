@@ -2,7 +2,9 @@ using System.Text;
 using Catalogo.Api.Security;
 using Catalogo.Api;
 using Catalogo.Application;
+using Catalogo.Application.ImportacionProgramas;
 using Catalogo.Infrastructure;
+using Catalogo.Infrastructure.ImportacionProgramas;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -36,6 +38,11 @@ builder.Services.AddScoped<IUnidadRepository, UnidadRepository>();
 builder.Services.AddScoped<UnidadService>();
 builder.Services.AddScoped<IComparacionCatalogoRepository, ComparacionCatalogoRepository>();
 builder.Services.AddScoped<ComparacionCatalogoService>();
+// HU-08: carga masiva de programas analíticos con extracción determinista y revisión humana.
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IExtractorTextoPdf, ExtractorTextoPdfPig>();
+builder.Services.AddScoped<IImportacionProgramasRepository, ImportacionProgramasRepository>();
+builder.Services.AddScoped<ImportacionProgramasService>();
 
 var issuer = builder.Configuration["Jwt:Issuer"];
 var audience = builder.Configuration["Jwt:Audience"];
