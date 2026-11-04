@@ -94,6 +94,7 @@ public class OllamaAgenteInternoTests
         using var doc = JsonDocument.Parse(handler.RequestBody!);
         Assert.Equal("modelo-sintetico", doc.RootElement.GetProperty("model").GetString());
         Assert.False(doc.RootElement.GetProperty("stream").GetBoolean());
+        Assert.False(doc.RootElement.GetProperty("think").GetBoolean());
         Assert.False(doc.RootElement.GetProperty("format").GetProperty("additionalProperties").GetBoolean());
         Assert.Equal("/api/chat", handler.Uri!.AbsolutePath);
         Assert.Contains("plan-O/C", handler.RequestBody);

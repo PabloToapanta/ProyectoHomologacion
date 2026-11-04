@@ -11,6 +11,9 @@ namespace Catalogo.Api.Controllers;
 public sealed class ContextoAnalisisInternoController(AsignaturaService asignaturas, CarreraService carreras,
     IUnidadRepository unidades, ComparacionCatalogoService comparaciones) : ControllerBase
 {
+    /// <summary>Lista las receptoras de la carrera ya verificada en la solicitud.</summary>
+    [HttpGet("/api/carreras/{id:guid}/analisis-interno/asignaturas"), ProducesResponseType(typeof(IReadOnlyList<AsignaturaDto>), 200)]
+    public async Task<IActionResult> Receptoras(Guid id, CancellationToken ct) => Ok(await asignaturas.ListarAsync(id, ct));
     /// <summary>Lee el programa actual, sus unidades de medida y textos académicos.</summary>
     [HttpGet("contexto"), ProducesResponseType(typeof(AsignaturaContextoInterno), 200)]
     public async Task<IActionResult> Contexto(Guid id, CancellationToken ct)

@@ -1,4 +1,4 @@
-"""HU-18: recorrido real Gateway/JWE/servicios/SQL con modelo deshabilitado.
+"""HU-18/HU-20: Gateway/JWE/servicios/SQL reales, modelo deshabilitado y HTTP simulado.
 
 No lee .env existentes. HTTP local aislado: no acredita HTTPS ni modelo real.
 Solo elimina el proyecto aleatorio creado por esta ejecución.
@@ -41,6 +41,7 @@ def main():
         "ANALISIS_INTERNO_HABILITADO": "false", "OLLAMA_URL": "", "OLLAMA_MODELO": "",
     }
     environment = {**os.environ, **settings}
+    private_values = [settings[k] for k in ["AUTH_SQL_PASSWORD", "AUTH_JWT_KEY", "AUTH_JWT_ENCRYPTION_KEY", "APP_SECRET_KEY", "AUTH_ADMIN_PASSWORD"]]
     env_path = ROOT / (".env." + project)
     env_path.write_text("\n".join(f"{k}={v}" for k, v in settings.items()), encoding="utf-8")
     compose = ["docker", "compose", "--env-file", str(env_path), "-p", project,
@@ -51,7 +52,7 @@ def main():
         result = subprocess.run(args, cwd=ROOT, env=environment, capture_output=True, text=True, timeout=timeout)
         if result.returncode:
             diagnostic = result.stdout + result.stderr
-            for value in settings.values():
+            for value in private_values:
                 if value:
                     diagnostic = diagnostic.replace(value, "[oculto]")
             (output / "error.log").write_text(diagnostic, encoding="utf-8")
@@ -147,10 +148,59 @@ def main():
         check("no expone datos personales", "HU18-SINTETICO" in json.dumps(result), False)
         check("contexto Solicitudes no publicado", request(f"/api/solicitudes/{sid}/contexto-analisis-interno", token=docente)[0], 404)
         check("contexto Catalogo no publicado", request(f"/api/asignaturas/{subjects[0]}/analisis-interno/contexto", token=docente)[0], 404)
-        (output / "resultado.json").write_text(json.dumps({"proyecto": project, "casos": checks, "transporte": "HTTP local aislado; no acredita HTTPS", "modelo": "deshabilitado, no acredita Ollama real"}, ensure_ascii=False, indent=2), encoding="utf-8")
+        check("lectura guardada autorizada", request(path, token=docente)[0], 200)
+        check("lectura guardada ajena denegada", request(path, token=tokens["doc3.hu18"])[0], 404)
+        status, options = request(path + "/opciones", token=docente)
+        check("opciones receptoras autorizadas", status, 200)
+        check("opciones solo carrera receptora", [r["id"] for r in options], [subjects[1]])
+
+        # El doble de Ollama vive solo en la red del proyecto temporal, sin publicar puertos.
+        overlay = output / "compose-simulado.json"
+        overlay.write_text(json.dumps({"services": {
+            "ollama-simulado": {"image": "python:3.12-alpine", "command": ["python", "/fixture.py"],
+                "volumes": [{"type": "bind", "source": str(ROOT / "tests/security/hu18-ollama-fake.py"), "target": "/fixture.py", "read_only": True}]},
+            "homologacion-service": {"environment": {"AnalisisInterno__Habilitado": "true", "AnalisisInterno__OllamaUrl": "http://ollama-simulado:11434/", "AnalisisInterno__Modelo": "qwen3:4b"}}
+        }}), encoding="utf-8")
+        compose.extend(["-f", str(overlay)])
+        run(compose + ["up", "-d", "--no-build", "ollama-simulado", "homologacion-service"], 180)
+
+        def esperar_guardado():
+            limit = time.monotonic() + 60
+            while True:
+                try:
+                    code, saved = request(path, token=docente)
+                    if code == 200:
+                        return saved
+                except (URLError, TimeoutError, RemoteDisconnected, ConnectionResetError):
+                    pass
+                if time.monotonic() >= limit:
+                    raise RuntimeError("No fue posible recuperar el guardado tras reiniciar")
+                time.sleep(1)
+
+        saved = esperar_guardado()
+        check("Fallido conservado al recrear servicio", saved[0]["analisis"]["estado"], "Fallido")
+        check("resultado nulo conservado al recrear servicio", saved[0]["analisis"]["resultado"], None)
+        complete = post(path, body, docente, 200)
+        check("asistencia HTTP simulada completa", complete["estado"], "Completo")
+        check("tres criterios motor: creditos", complete["resultado"]["porcentajeCreditos"], 100)
+        check("evidencia simulada validada", len(complete["resultado"]["evidencias"]), 2)
+        run(compose + ["restart", "homologacion-service"])
+        saved = esperar_guardado()
+        check("reanálisis no duplica pareja", len(saved), 1)
+        check("Completo conservado tras reinicio", saved[0]["analisis"]["estado"], "Completo")
+        check("justificacion persistida", saved[0]["analisis"]["resultado"]["justificacion"], complete["resultado"]["justificacion"])
+        # Una denegación SQL reproduce el fallo de guardado sin modificar el registro anterior.
+        def sql_homologacion(query):
+            return run(compose + ["exec", "-T", "auth-db", "/bin/bash", "-c",
+                'exec /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -d HomologacionAnalisis -b -Q "' + query + '"'])
+        sql_homologacion("CREATE TRIGGER HU18_FalloPrueba ON AnalisisInternos AFTER UPDATE AS THROW 51000, 'Fallo sintetico de persistencia', 1;")
+        check("fallo de almacenamiento controlado", request(path, body, docente)[0], 503)
+        check("fallo no reemplaza resultado persistido", request(path, token=docente)[1][0]["analisis"], saved[0]["analisis"])
+        sql_homologacion("DROP TRIGGER HU18_FalloPrueba;")
+        (output / "resultado.json").write_text(json.dumps({"proyecto": project, "casos": checks, "transporte": "HTTP local aislado; no acredita HTTPS", "modelo": "deshabilitado y doble HTTP qwen3:4b, sin inferencia real por decisión de Leslie"}, ensure_ascii=False, indent=2), encoding="utf-8")
     except Exception:
         diagnostic = run(compose + ["logs", "--no-color", "--tail", "100"])
-        for value in settings.values():
+        for value in private_values:
             if value:
                 diagnostic = diagnostic.replace(value, "[oculto]")
         (output / "servicios-error.log").write_text(diagnostic, encoding="utf-8")

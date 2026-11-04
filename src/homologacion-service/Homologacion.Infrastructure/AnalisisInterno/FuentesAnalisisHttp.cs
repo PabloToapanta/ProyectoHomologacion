@@ -6,10 +6,13 @@ using System.Text.Json;
 namespace Homologacion.Infrastructure.AnalisisInterno;
 
 public sealed class FuentesAnalisisHttp(HttpClient http, IOptions<ConfiguracionAnalisisInterno> options)
-    : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno
+    : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno
 {
     private const int MaxBytes = 2 * 1024 * 1024;
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { MaxDepth = 32 };
+    public async Task<IReadOnlyList<ReceptoraAnalisis>> ListarAsync(Guid carreraId, CancellationToken ct) =>
+        await Leer<ReceptoraAnalisis[]>(options.Value.CatalogoUrl, $"api/carreras/{carreraId}/analisis-interno/asignaturas", ct)
+        ?? throw new FuenteAnalisisNoDisponibleException();
     public async Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct)
     {
         var r = await Leer<SolicitudParaAnalisis>(options.Value.SolicitudesUrl, $"api/solicitudes/{id}/contexto-analisis-interno", ct);

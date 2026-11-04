@@ -63,16 +63,76 @@ internal sealed class UmbralAnalisis : IUmbralEquivalencia { public decimal Valo
 
 public class AnalisisInternoEndpointTests
 {
+    private sealed class Receptoras : IReceptorasAnalisisInterno
+    {
+        public Guid Carrera { get; private set; }
+        public Task<IReadOnlyList<ReceptoraAnalisis>> ListarAsync(Guid carreraId, CancellationToken ct)
+        {
+            Carrera = carreraId;
+            return Task.FromResult<IReadOnlyList<ReceptoraAnalisis>>([new(Guid.NewGuid(), "Z", "Avanzada", 2), new(EscenarioInterno.ReceptoraId, "A", "Inicial", 1)]);
+        }
+    }
+    private sealed class Almacen : IResultadosAnalisisInterno
+    {
+        public bool Fallar { get; set; }
+        private readonly List<AnalisisGuardado> datos = [];
+        public Task GuardarAsync(AnalisisGuardado r, CancellationToken ct)
+        {
+            if (Fallar) throw new AlmacenAnalisisNoDisponibleException();
+            datos.RemoveAll(x => x.Analisis.SolicitudId == r.Analisis.SolicitudId && x.Analisis.AsignaturaAprobadaId == r.Analisis.AsignaturaAprobadaId && x.Analisis.AsignaturaReceptoraId == r.Analisis.AsignaturaReceptoraId);
+            datos.Add(r); return Task.CompletedTask;
+        }
+        public Task<IReadOnlyList<AnalisisGuardado>> ListarAsync(Guid id, CancellationToken ct) => Task.FromResult<IReadOnlyList<AnalisisGuardado>>(datos.Where(x => x.Analisis.SolicitudId == id).ToArray());
+    }
     private static string Ruta => $"/api/homologaciones/solicitudes/{EscenarioInterno.SolicitudId}/analisis-interno";
     private static object Input() => new { asignaturaAprobadaId = EscenarioInterno.AprobadaId, asignaturaReceptoraId = EscenarioInterno.ReceptoraId };
-    private static WebApplicationFactory<Homologacion.Api.Program> Host(MotorFactory factory, EscenarioInterno e, bool simular = true) =>
-        factory.WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+    private static WebApplicationFactory<Homologacion.Api.Program> Host(MotorFactory factory, EscenarioInterno e, bool simular = true, Almacen? almacen = null) =>
+        factory.WithWebHostBuilder(builder =>
         {
+            builder.UseSetting("AnalisisInterno:Habilitado", "false"); builder.ConfigureServices(services =>
+        {
+            services.RemoveAll<IResultadosAnalisisInterno>(); services.AddSingleton<IResultadosAnalisisInterno>(almacen ?? new Almacen());
+            services.RemoveAll<IReceptorasAnalisisInterno>(); services.AddSingleton<IReceptorasAnalisisInterno>(new Receptoras());
             services.RemoveAll<ISolicitudesAnalisisInterno>(); services.AddSingleton<ISolicitudesAnalisisInterno>(e);
             services.RemoveAll<ICatalogoAnalisisInterno>(); services.AddSingleton<ICatalogoAnalisisInterno>(e);
             services.RemoveAll<TimeProvider>(); services.AddSingleton<TimeProvider>(new RelojAnalisis());
             if (simular) { services.RemoveAll<IAgenteAnalisisInterno>(); services.AddSingleton<IAgenteAnalisisInterno>(e); }
-        }));
+        });
+        });
+    [Fact]
+    public async Task Opciones_se_limitan_a_carrera_de_solicitud_y_se_ordenan_por_nivel()
+    {
+        using var f = new MotorFactory(); var e = new EscenarioInterno(); using var host = Host(f, e); using var c = host.CreateClient();
+        c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Docente"));
+        using var response = await c.GetAsync(Ruta + "/opciones");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal(1, json.RootElement[0].GetProperty("nivel").GetInt32());
+        Assert.Equal(e.Solicitud!.CarreraReceptoraId, ((Receptoras)host.Services.GetRequiredService<IReceptorasAnalisisInterno>()).Carrera);
+        e.Solicitud = null;
+        Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(Ruta + "/opciones")).StatusCode);
+    }
+    [Fact]
+    public async Task Consulta_persistida_vuelve_a_comprobar_asignacion()
+    {
+        using var f = new MotorFactory(); var e = new EscenarioInterno(); using var host = Host(f, e); using var c = host.CreateClient();
+        c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Docente"));
+        Assert.Equal(HttpStatusCode.OK, (await c.PostAsJsonAsync(Ruta, Input())).StatusCode);
+        using var saved = await c.GetAsync(Ruta);
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        using var j = JsonDocument.Parse(await saved.Content.ReadAsStringAsync());
+        Assert.Single(j.RootElement.EnumerateArray());
+        Assert.Equal("Completo", j.RootElement[0].GetProperty("analisis").GetProperty("estado").GetString());
+        e.Solicitud = null;
+        Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(Ruta)).StatusCode);
+    }
+    [Fact]
+    public async Task Error_de_guardado_es_503_sin_exito_ficticio()
+    {
+        using var f = new MotorFactory(); var e = new EscenarioInterno(); using var host = Host(f, e, almacen: new Almacen { Fallar = true }); using var c = host.CreateClient();
+        c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Docente"));
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await c.PostAsJsonAsync(Ruta, Input())).StatusCode);
+    }
     [Fact]
     public async Task Docente_analiza_solo_ids_y_recibe_resultado_estructurado()
     {
@@ -95,6 +155,8 @@ public class AnalisisInternoEndpointTests
         using var f = new MotorFactory(); var e = new EscenarioInterno(); using var host = Host(f, e); using var c = host.CreateClient();
         if (role is not null) c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token(role));
         Assert.Equal(expected, (int)(await c.PostAsJsonAsync(Ruta, Input())).StatusCode);
+        Assert.Equal(expected, (int)(await c.GetAsync(Ruta)).StatusCode);
+        Assert.Equal(expected, (int)(await c.GetAsync(Ruta + "/opciones")).StatusCode);
         Assert.Equal(0, e.Consultas);
     }
     [Fact]

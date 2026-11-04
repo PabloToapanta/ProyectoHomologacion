@@ -38,6 +38,7 @@ public sealed class OllamaAgenteInterno : IAgenteAnalisisInterno
         {
             model = options.Modelo,
             stream = false,
+            think = false,
             format = Esquema(contexto),
             options = new { temperature = 0, num_predict = 1024 },
             messages = new[]

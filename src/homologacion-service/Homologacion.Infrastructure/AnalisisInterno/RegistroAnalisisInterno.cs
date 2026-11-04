@@ -2,6 +2,8 @@ using Homologacion.Application.AnalisisInterno;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Homologacion.Infrastructure.AnalisisInterno;
 
@@ -32,6 +34,12 @@ public static class RegistroAnalisisInterno
         });
         services.AddScoped<AsistirEvaluacionInterna>();
         services.AddScoped<AnalizarSolicitudInterna>();
+        services.AddDbContext<ResultadosDbContext>((p, options) => options.UseSqlServer(
+            p.GetRequiredService<IConfiguration>().GetConnectionString("Homologacion")
+            ?? throw new InvalidOperationException("Configure ConnectionStrings:Homologacion para guardar análisis.")));
+        services.AddScoped<IResultadosAnalisisInterno, ResultadosAnalisisSql>();
+        services.AddScoped<GestionarAnalisisInterno>();
+        services.AddScoped<IReceptorasAnalisisInterno>(p => p.GetRequiredService<FuentesAnalisisHttp>());
         return services;
     }
 
