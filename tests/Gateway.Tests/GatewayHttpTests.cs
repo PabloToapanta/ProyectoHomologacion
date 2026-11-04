@@ -174,7 +174,11 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        Assert.Equal(24, paths.EnumerateObject().Count());
+        Assert.Equal(27, paths.EnumerateObject().Count());
+        // HU-08: análisis y confirmación de programas analíticos y descarga del PDF original.
+        Assert.True(paths.GetProperty("/api/importaciones-programas/analisis").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/importaciones-programas/confirmacion").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/asignaturas/{id}/programa-analitico").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/solicitudes/asignadas/{id}").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-interno").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-interno").TryGetProperty("get", out _));

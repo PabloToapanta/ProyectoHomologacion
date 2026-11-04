@@ -256,12 +256,13 @@ internal sealed class CatalogoFactory : WebApplicationFactory<Program>
         });
     }
 
-    public string Token(string role, bool expired = false, string scenario = "valid")
+    public string Token(string role, bool expired = false, string scenario = "valid", string? usuario = null)
     {
         var descriptor = new SecurityTokenDescriptor
         {
             Issuer = "catalogo-tests", Audience = "catalogo-tests",
-            Subject = new ClaimsIdentity([new Claim("role", role)]),
+            // HU-08: el usuario opcional permite registrar quién cargó un programa analítico.
+            Subject = new ClaimsIdentity(usuario is null ? [new Claim("role", role)] : [new Claim("role", role), new Claim("sub", Guid.NewGuid().ToString()), new Claim("name", usuario)]),
             NotBefore = DateTime.UtcNow.AddMinutes(-10),
             Expires = expired ? DateTime.UtcNow.AddMinutes(-1) : DateTime.UtcNow.AddMinutes(5),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)), SecurityAlgorithms.HmacSha256),
