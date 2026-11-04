@@ -1,0 +1,143 @@
+{
+  "proyecto": "hu18-check-fa46782434",
+  "casos": [
+    {
+      "caso": "modelo deshabilitado",
+      "resultado": "false"
+    },
+    {
+      "caso": "login JWE real",
+      "resultado": 5
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/carreras",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas/f80a1e8e-08cc-4577-bb51-3de729b613ff/unidades",
+      "resultado": 201
+    },
+    {
+      "caso": "perfil sintetico",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/carreras",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas/579ef23d-3625-4cc2-9462-0c8039178444/unidades",
+      "resultado": 201
+    },
+    {
+      "caso": "perfil sintetico",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/solicitudes",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/solicitudes/2917064e-861d-431e-9f3c-15f852505ebe/asignaturas-aprobadas",
+      "resultado": 201
+    },
+    {
+      "caso": "directorio docente real",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/solicitudes/2917064e-861d-431e-9f3c-15f852505ebe/docentes",
+      "resultado": 200
+    },
+    {
+      "caso": "sin JWT",
+      "resultado": 401
+    },
+    {
+      "caso": "coordinador no suplanta docente",
+      "resultado": 403
+    },
+    {
+      "caso": "docente ajeno",
+      "resultado": 404
+    },
+    {
+      "caso": "no acepta cantidades del cliente",
+      "resultado": 400
+    },
+    {
+      "caso": "sin revision HTTP",
+      "resultado": 200
+    },
+    {
+      "caso": "sin revision no inventa equivalencia",
+      "resultado": "Incompleto"
+    },
+    {
+      "caso": "revision explicita",
+      "resultado": 200
+    },
+    {
+      "caso": "orquestacion HTTP real",
+      "resultado": 200
+    },
+    {
+      "caso": "sin modelo no declara exito",
+      "resultado": "Fallido"
+    },
+    {
+      "caso": "sin modelo resultado nulo",
+      "resultado": null
+    },
+    {
+      "caso": "motor conserva porcentaje academico",
+      "resultado": 100
+    },
+    {
+      "caso": "motor conserva porcentaje horas",
+      "resultado": 100
+    },
+    {
+      "caso": "datos sinteticos identificados",
+      "resultado": true
+    },
+    {
+      "caso": "no expone datos personales",
+      "resultado": false
+    },
+    {
+      "caso": "contexto Solicitudes no publicado",
+      "resultado": 404
+    },
+    {
+      "caso": "contexto Catalogo no publicado",
+      "resultado": 404
+    }
+  ],
+  "transporte": "HTTP local aislado; no acredita HTTPS",
+  "modelo": "deshabilitado, no acredita Ollama real"
+}

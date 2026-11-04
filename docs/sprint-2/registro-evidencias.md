@@ -87,3 +87,34 @@ prueba roja reproducible se corrigieron ambos contratos. Resultado final: 572
 pruebas xUnit correctas, ninguna fallida y 3 SQL omitidas por falta de
 `HU10_TEST_SQL`. La repetición Docker/SQL, CI, commit, push, revisión cruzada,
 aceptación y merge siguen pendientes; no se declara HU-36 terminada.
+
+## HU-18 — base local del 03/11/2026
+
+Leslie preparó `feature/hu-18-analisis-interno` desde develop `e01767b`, en un
+worktree independiente del incremento HU-36. Puerto y caso de uso en Application,
+adaptador Ollama en Infrastructure y pruebas sintéticas. Motor/fórmulas intactos;
+sin endpoints, persistencia, frontend ni módulos ajenos. TDD: 24 fallos iniciales y
+tres fallos de manejo de errores reproducidos antes de sus correcciones.
+Regresión Release: 345 correctas y una prueba de modelo real omitida por falta de
+configuración. La omisión no equivale a aceptación. Ver
+[alcance y contrato](hu-18-analisis-interno.md) y
+[evidencia de la base](evidencia-hu-18-base.md).
+Pendientes: modelo real, datos HU-11, autorización docente, HU-20, composición/API,
+revisión/CI y aceptación de Shirley. Sin commits, push ni merge.
+
+### HU-18: integración sobre develop fb40d0a, 03/11/2026
+
+Se preservó la base anterior y se continuó desde develop con HU-36/HTTPS/JWE/HU-29.
+Orquestación por solicitud, autorización del docente asignado y lecturas académicas
+privadas; motor determinista conservado, sin implementar HU-20/HU-30. Tres defectos
+de validación reproducidos antes de corregirlos y una llamada inexistente de Catálogo
+corregida tras fallo de compilación. Regresión final: 652 xUnit correctas, 0 fallidas,
+4 omitidas (modelo real y tres SQL de Solicitudes). Swagger repetido tras actualizar
+la expectativa de rutas. Docker/SQL aislado: 34 comprobaciones correctas, modelo
+deshabilitado, transporte HTTP local; entorno efímero eliminado.
+
+Ver [evidencia de integración y límites](evidencia-hu-18-integracion.md) y
+[propuesta para Pablo/Edwin](contrato-integracion-hu-18.md). Faltan modelo real,
+persistencia/vista de Edwin, revisión cruzada/CI y aceptación de Shirley. No se
+acredita HTTPS o navegador con esta prueba ni HU-18 terminada. Sin nuevos commits,
+push, merge ni comunicaciones externas.

@@ -1,0 +1,74 @@
+[
+  {
+    "archivo": "hu18-final-integracion_net8.0_20261103222234.trx",
+    "suite": "Auth.Application.Tests.dll",
+    "correctas": 13,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:22:34.2752975Z"
+  },
+  {
+    "archivo": "hu18-final-integracion_net8.0_20261103222246.trx",
+    "suite": "AuthService.Tests.dll",
+    "correctas": 64,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:22:46.7159704Z"
+  },
+  {
+    "archivo": "hu18-final-catalogo_net8.0_20261103222303.trx",
+    "suite": "Catalogo.Tests.dll",
+    "correctas": 94,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:23:03.7209996Z"
+  },
+  {
+    "archivo": "hu18-gateway-final_net8.0_20261103222541.trx",
+    "suite": "Gateway.Tests.dll",
+    "correctas": 104,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:25:41.2265521Z"
+  },
+  {
+    "archivo": "hu18-final-integracion_net8.0_20261103222242.trx",
+    "suite": "Homologacion.Api.Tests.dll",
+    "correctas": 106,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:22:41.5010719Z"
+  },
+  {
+    "archivo": "hu18-final-integracion_net8.0_20261103222231.trx",
+    "suite": "Homologacion.Application.Tests.dll",
+    "correctas": 60,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:22:31.7384929Z"
+  },
+  {
+    "archivo": "hu18-final-integracion_net8.0_20261103222229.trx",
+    "suite": "Homologacion.Domain.Tests.dll",
+    "correctas": 71,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:22:29.131635Z"
+  },
+  {
+    "archivo": "hu18-final-infra-privacidad_net8.0_20261103222708.trx",
+    "suite": "Homologacion.Infrastructure.Tests.dll",
+    "correctas": 33,
+    "fallidas": 0,
+    "omitidas": 1,
+    "fecha": "2026-11-04T03:27:08.8431237Z"
+  },
+  {
+    "archivo": "hu18-final-solicitudes_net8.0_20261103222313.trx",
+    "suite": "Solicitudes.Tests.dll",
+    "correctas": 107,
+    "fallidas": 0,
+    "omitidas": 3,
+    "fecha": "2026-11-04T03:23:13.3329932Z"
+  }
+]
