@@ -1,5 +1,9 @@
 # Propuesta de contrato HU-19 — análisis asistido de cambio externo
 
+> Propuesta histórica previa a la implementación. El estado aplicado y sus diferencias
+> se describen en [evidencia-hu-19.md](evidencia-hu-19.md). La aprobación reportada por
+> Edwin sigue pendiente de registro en el Issue #43; este documento no la sustituye.
+
 Issue #43. Responsables: Edwin Caraguay y Shirley Amaguaña. Propuesta del 04/11/2026
 sobre `develop` `cbe9ac1` (HU-10, HU-11, HU-29, HU-30, HU-34/35/36, HU-18 y la
 persistencia de HU-20 integradas). **No hay código de HU-19.** Según AGENTS.md, los
