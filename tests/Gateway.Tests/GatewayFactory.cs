@@ -22,6 +22,7 @@ public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
     public const string Audience = "hu01-api-tests";
     public const string Password = "Prueba-Gateway-123!";
     public string Key { get; } = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64));
+    public string EncryptionKey { get; } = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
     public ConcurrentQueue<ForwardedRequest> Forwarded { get; } = new();
     private BackendFactory? backend;
 
@@ -32,13 +33,14 @@ public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
         {
             ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = Key,
             ["InternalAccess:Key"] = InternalKey,
+            ["Jwt:EncryptionKey"] = EncryptionKey,
             ["ReverseProxy:Clusters:auth:Destinations:primary:Address"] = "http://auth.test/",
             ["ReverseProxy:Clusters:catalogo:Destinations:primary:Address"] = "http://catalogo.test/",
             ["ReverseProxy:Clusters:homologacion:Destinations:primary:Address"] = "http://homologacion.test/"
         }));
         builder.ConfigureServices(services =>
         {
-            backend = new BackendFactory(Key);
+            backend = new BackendFactory(Key, EncryptionKey);
             services.RemoveAll<IForwarderHttpClientFactory>();
             services.AddSingleton<IForwarderHttpClientFactory>(new TestProxyClients(backend, Forwarded));
         });
@@ -78,7 +80,7 @@ public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
             => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(new { destinoDePrueba = true }) });
     }
 
-    private sealed class BackendFactory(string key) : WebApplicationFactory<global::Program>
+    private sealed class BackendFactory(string key, string encryptionKey) : WebApplicationFactory<global::Program>
     {
         private readonly SqliteConnection connection = new("Data Source=:memory:");
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -90,6 +92,7 @@ public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
                 ["ConnectionStrings:Auth"] = "Server=unused;Database=AuthTests;Integrated Security=true",
                 ["InternalAccess:Key"] = InternalKey,
                 ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = key,
+                ["Jwt:EncryptionKey"] = encryptionKey,
                 ["SeedAdmin:Enabled"] = "false", ["Database:ApplyMigrations"] = "false"
             }));
             builder.ConfigureServices(services =>

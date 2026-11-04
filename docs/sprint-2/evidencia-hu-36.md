@@ -136,3 +136,30 @@ pasaron y los contenedores/volumen exclusivos se eliminaron al terminar.
 HU-36 está preparada para revisión del incremento local. La comprobación combinada
 con HTTPS/JWE, CI, revisión cruzada y aceptación humana siguen pendientes. HU-18
 se trabaja por separado; no se declara implementada en esta rama.
+
+## Integración local con `develop` del 03/11/2026
+
+Durante la revisión de la PR #54 se combinó localmente `origin/develop` (`afacebc`)
+con la rama de HU-36. Se resolvieron cuatro conflictos textuales conservando tanto
+la clave interna como HTTPS/JWE. La regresión detectó además dos conflictos
+semánticos: la factoría nueva de docentes no aportaba clave interna ni JWE, y
+Solicitudes todavía rechazaba el JWE emitido por Auth. Se registró una prueba roja
+en Solicitudes (36 fallos, 65 correctas y 3 omitidas), se incorporó validación JWE
+con `A256KW`/`A256CBC-HS512`, y se corrigieron las configuraciones de pruebas,
+Compose y del smoke aislado sin versionar secretos.
+
+Resultados finales ejecutados en Linux con .NET 8, configuración Release:
+
+| Verificación combinada | Resultado |
+|---|---|
+| `Homologacion.sln` | 381 correctas, 0 fallidas |
+| `Catalogo.sln` | 90 correctas, 0 fallidas |
+| `Solicitudes.Tests` | 101 correctas, 0 fallidas, 3 omitidas por requerir `HU10_TEST_SQL` |
+| Total xUnit | 572 correctas, 0 fallidas, 3 omitidas |
+| `git diff --check` | Correcto |
+
+Esta integración acredita compilación y pruebas xUnit combinadas. La comprobación
+Docker/SQL Server de 52 casos pertenece al incremento anterior; el smoke fue
+adaptado para generar una clave JWE efímera, pero todavía debe ejecutarse de nuevo
+sobre la combinación. CI, revisión cruzada, aceptación de Shirley, commit, push y
+merge continúan pendientes.

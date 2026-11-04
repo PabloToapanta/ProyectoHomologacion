@@ -14,12 +14,13 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
 using Homologacion.Infrastructure.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Xunit;
 using Yarp.ReverseProxy.Forwarder;
 
 namespace Homologacion.Api.Tests;
 
-public sealed class MotorFactory(decimal umbral = 80) : WebApplicationFactory<Homologacion.Api.Program>
+public sealed class MotorFactory(decimal umbral = 80, string? encryptionKeyOverride = null) : WebApplicationFactory<Homologacion.Api.Program>
 {
     protected override void ConfigureClient(HttpClient client)
     {
@@ -29,6 +30,7 @@ public sealed class MotorFactory(decimal umbral = 80) : WebApplicationFactory<Ho
     public const string Issuer = "hu14-tests";
     public const string Audience = "hu14-api";
     public string Key { get; } = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64));
+    public string EncryptionKey { get; } = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
@@ -36,17 +38,36 @@ public sealed class MotorFactory(decimal umbral = 80) : WebApplicationFactory<Ho
         {
             ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = Key,
             ["InternalAccess:Key"] = "hu36-test-only-internal-key-64-characters-for-isolated-tests",
+            ["Jwt:EncryptionKey"] = encryptionKeyOverride ?? EncryptionKey,
             ["Equivalencia:UmbralPct"] = umbral.ToString(System.Globalization.CultureInfo.InvariantCulture)
         }));
     }
     public string Token(string rol = "Administrador", string? issuer = null, bool expirado = false,
-        string? audience = null, string? key = null, string algorithm = SecurityAlgorithms.HmacSha256)
+        string? audience = null, string? key = null, string algorithm = SecurityAlgorithms.HmacSha256,
+        string scenario = "valid")
     {
         var now = DateTime.UtcNow;
-        return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(issuer ?? Issuer, audience ?? Audience,
-            [new Claim("sub", Guid.NewGuid().ToString()), new Claim("name", "usuario-sintetico"), new Claim("role", rol)],
-            now.AddMinutes(-10), expirado ? now.AddMinutes(-1) : now.AddMinutes(10),
-            new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key ?? Key)), algorithm)));
+        var encrypted = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityTokenHandler().CreateToken(
+            new SecurityTokenDescriptor
+            {
+                Issuer = issuer ?? Issuer, Audience = audience ?? Audience,
+                Subject = new ClaimsIdentity([new Claim("sub", Guid.NewGuid().ToString()),
+                    new Claim("name", "usuario-sintetico"), new Claim("role", rol)]),
+                NotBefore = now.AddMinutes(-10), Expires = expirado ? now.AddMinutes(-1) : now.AddMinutes(10),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key ?? Key)), algorithm),
+                EncryptingCredentials = scenario == "plain" ? null : new EncryptingCredentials(
+                    new SymmetricSecurityKey(scenario == "other-key"
+                        ? System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)
+                        : Convert.FromBase64String(EncryptionKey)),
+                    SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512)
+            }));
+        if (scenario == "tampered")
+        {
+            var parts = encrypted.Split('.');
+            parts[3] = (parts[3][0] == 'A' ? 'B' : 'A') + parts[3][1..];
+            return string.Join('.', parts);
+        }
+        return encrypted;
     }
     public HttpClient Autenticado(string rol = "Administrador")
     {
@@ -183,6 +204,27 @@ public class EvaluarEndpointTests
         }
     }
 
+    [Theory]
+    [InlineData("plain")]
+    [InlineData("other-key")]
+    [InlineData("tampered")]
+    public async Task Token_sin_cifrado_o_alterado_se_rechaza(string scenario)
+    {
+        using var factory = new MotorFactory(); using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", factory.Token(scenario: scenario));
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PostAsJsonAsync(Ruta, Datos())).StatusCode);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("corta")]
+    public void ClaveDeCifradoInvalida_ImpideArranque(string value)
+    {
+        using var factory = new MotorFactory(encryptionKeyOverride: value);
+        var error = Assert.Throws<OptionsValidationException>(() => factory.CreateClient());
+        if (value.Length > 0) Assert.DoesNotContain(value, error.Message);
+    }
+
     [Fact]
     public async Task Rol_ajeno_es_403()
     {
@@ -240,6 +282,7 @@ public class IntegracionGatewayTests
             {
                 ["Jwt:Issuer"] = MotorFactory.Issuer, ["Jwt:Audience"] = MotorFactory.Audience, ["Jwt:SigningKey"] = motor.Key,
                 ["InternalAccess:Key"] = "hu36-test-only-internal-key-64-characters-for-isolated-tests",
+                ["Jwt:EncryptionKey"] = motor.EncryptionKey,
                 ["ReverseProxy:Clusters:auth:Destinations:primary:Address"] = "http://auth.test/",
                 ["ReverseProxy:Clusters:catalogo:Destinations:primary:Address"] = "http://catalogo.test/",
                 ["ReverseProxy:Clusters:homologacion:Destinations:primary:Address"] = "http://motor.test/"

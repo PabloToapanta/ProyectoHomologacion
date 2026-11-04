@@ -18,6 +18,12 @@ using Solicitudes.Infrastructure;
 using Xunit;
 namespace Solicitudes.Tests;
 public sealed class SolicitudesApiTests {
+ [Fact] public async Task JwtFirmadoSinCifrarNoPermiteAcceso() {
+  using var f=new SolicitudesFactory();using var c=f.Client();
+  var jwt=new JwtSecurityToken("test","test",[new Claim("sub","usuario-sintetico"),new Claim("role","Coordinador")],DateTime.UtcNow.AddMinutes(-1),DateTime.UtcNow.AddMinutes(5),new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SolicitudesFactory.Key)),SecurityAlgorithms.HmacSha256));
+  c.DefaultRequestHeaders.Authorization=new("Bearer",new JwtSecurityTokenHandler().WriteToken(jwt));
+  Assert.Equal(HttpStatusCode.Unauthorized,(await c.GetAsync("/api/solicitudes")).StatusCode);
+ }
  [Fact] public async Task RegistraConsultaYRechazaQuipuxDuplicado() {
   using var f=new SolicitudesFactory();using var c=f.Client();
   var response=await c.PostAsJsonAsync("/api/solicitudes",f.Input());Assert.Equal(HttpStatusCode.Created,response.StatusCode);
@@ -91,30 +97,40 @@ public sealed class LogsCapturados : ILoggerProvider, ILogger {
 }
 public sealed class FakeCatalogo : ICatalogoCarreras {
  public Guid Origen {get;}=Guid.NewGuid();public Guid Receptora {get;}=Guid.NewGuid();public bool Falla {get;set;}
+ public AsignaturaCatalogo Algebra {get;}=new(Guid.NewGuid(),"COD-1","Álgebra sintética",1,3m,144);
  public Task<IReadOnlyList<CarreraReferencia>> Listar(CancellationToken ct)=>Falla?throw new CatalogoNoDisponibleException():Task.FromResult<IReadOnlyList<CarreraReferencia>>([new(Origen,"TI sintética"),new(Receptora,"Software sintética")]);
+ public Task<IReadOnlyList<AsignaturaCatalogo>> AsignaturasDe(Guid carreraId,CancellationToken ct)=>Falla?throw new CatalogoNoDisponibleException():Task.FromResult<IReadOnlyList<AsignaturaCatalogo>>(carreraId==Origen?[Algebra]:[]);
+}
+public sealed class FakeDirectorio : IDirectorioDocentes {
+ public (DocenteDisponible Ana,DocenteDisponible Luis,DocenteDisponible Rosa) Docentes {get;}=(new(Guid.NewGuid(),"docente.ana"),new(Guid.NewGuid(),"docente.luis"),new(Guid.NewGuid(),"docente.rosa"));
+ public bool Falla {get;set;}
+ public Task<IReadOnlyList<DocenteDisponible>> Listar(CancellationToken ct)=>Falla?throw new DirectorioNoDisponibleException():Task.FromResult<IReadOnlyList<DocenteDisponible>>([Docentes.Ana,Docentes.Luis,Docentes.Rosa]);
 }
 public sealed class SolicitudesFactory : WebApplicationFactory<Program> {
  protected override void ConfigureClient(HttpClient client) {
   base.ConfigureClient(client);
   client.DefaultRequestHeaders.Add("X-Internal-Key", "hu36-test-only-internal-key-64-characters-for-isolated-tests");
  }
- const string Key="clave-sintetica-pruebas-hu10-32-bytes-minimo";
+ public const string Key="clave-sintetica-pruebas-hu10-32-bytes-minimo";
+ readonly string encryptionKey=Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
  readonly SqliteConnection db=new("Data Source=:memory:");
  public FakeCatalogo Catalogo {get;}=new();
+ public FakeDirectorio Directorio {get;}=new();
  public LogsCapturados Logs {get;}=new();
+ public RelojFijo Reloj {get;}=new(new DateTimeOffset(2026,6,15,17,0,0,TimeSpan.Zero));
  public SolicitudesFactory(){db.Open();}
  protected override void ConfigureWebHost(IWebHostBuilder b) {
   b.ConfigureAppConfiguration((_,config)=>config.AddInMemoryCollection(new Dictionary<string,string?> {
    ["InternalAccess:Key"]="hu36-test-only-internal-key-64-characters-for-isolated-tests"
   }));
   b.UseEnvironment("Testing");b.ConfigureLogging(l=>l.AddProvider(Logs));foreach(var setting in new Dictionary<string,string?> {
-   ["ConnectionStrings:Solicitudes"]="Server=unused;Database=unused",["Catalogo:BaseUrl"]="http://catalogo.test/",["Jwt:Issuer"]="test",["Jwt:Audience"]="test",["Jwt:SigningKey"]=Key
+   ["ConnectionStrings:Solicitudes"]="Server=unused;Database=unused",["Catalogo:BaseUrl"]="http://catalogo.test/",["Auth:BaseUrl"]="http://auth.test/",["Jwt:Issuer"]="test",["Jwt:Audience"]="test",["Jwt:SigningKey"]=Key,["Jwt:EncryptionKey"]=encryptionKey
   }) b.UseSetting(setting.Key,setting.Value);
-  b.ConfigureServices(s=>{s.RemoveAll<DbContextOptions<SolicitudesDbContext>>();s.AddDbContext<SolicitudesDbContext>(o=>o.UseSqlite(db));s.RemoveAll<ICatalogoCarreras>();s.AddSingleton<ICatalogoCarreras>(Catalogo);});
+  b.ConfigureServices(s=>{s.RemoveAll<DbContextOptions<SolicitudesDbContext>>();s.AddDbContext<SolicitudesDbContext>(o=>o.UseSqlite(db));s.RemoveAll<ICatalogoCarreras>();s.AddSingleton<ICatalogoCarreras>(Catalogo);s.RemoveAll<IDirectorioDocentes>();s.AddSingleton<IDirectorioDocentes>(Directorio);s.RemoveAll<TimeProvider>();s.AddSingleton<TimeProvider>(Reloj);});
  }
  public HttpClient Client(string? role="Coordinador") {
   var client=CreateClient();using var scope=Services.CreateScope();scope.ServiceProvider.GetRequiredService<SolicitudesDbContext>().Database.EnsureCreated();
-  if(role is not null) {var jwt=new JwtSecurityToken("test","test",[new Claim("sub","usuario-sintetico"),new Claim("role",role)],DateTime.UtcNow.AddMinutes(-1),DateTime.UtcNow.AddMinutes(5),new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)),SecurityAlgorithms.HmacSha256));client.DefaultRequestHeaders.Authorization=new("Bearer",new JwtSecurityTokenHandler().WriteToken(jwt));}
+  if(role is not null) {var handler=new JwtSecurityTokenHandler();var jwt=handler.CreateToken(new SecurityTokenDescriptor {Issuer="test",Audience="test",Subject=new ClaimsIdentity([new Claim("sub","usuario-sintetico"),new Claim("role",role)]),NotBefore=DateTime.UtcNow.AddMinutes(-1),Expires=DateTime.UtcNow.AddMinutes(5),SigningCredentials=new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)),SecurityAlgorithms.HmacSha256),EncryptingCredentials=new EncryptingCredentials(new SymmetricSecurityKey(Convert.FromBase64String(encryptionKey)),SecurityAlgorithms.Aes256KW,SecurityAlgorithms.Aes256CbcHmacSha512)});client.DefaultRequestHeaders.Authorization=new("Bearer",handler.WriteToken(jwt));}
   return client;
  }
  public SolicitudInput Input()=>new("Q-001","EST-SINTETICO","Estudiante sintético","Interno",Catalogo.Origen,null,null,Catalogo.Receptora);

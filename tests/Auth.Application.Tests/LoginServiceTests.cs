@@ -100,6 +100,8 @@ public sealed class LoginServiceTests
             QueryToken = cancellationToken;
             return Task.FromResult(User);
         }
+        public Task<IReadOnlyList<Usuario>> ListActiveByRoleAsync(string roleName, CancellationToken cancellationToken = default)
+            => throw new NotSupportedException("El inicio de sesión no lista usuarios por rol.");
         public Task UpdatePasswordHashAsync(Usuario user, string passwordHash, CancellationToken cancellationToken = default)
         {
             user.PasswordHash = passwordHash;
@@ -128,7 +130,8 @@ public sealed class LoginServiceTests
 
     private sealed class TokenIssuerStub : ITokenIssuer
     {
-        public LoginResult Result { get; } = new("token-sintetico", "Bearer", DateTimeOffset.UnixEpoch);
+        public LoginResult Result { get; } = new("token-sintetico", "Bearer", DateTimeOffset.UnixEpoch,
+            "usuario-sintetico", "Administrador");
         public int Calls { get; private set; }
         public Usuario? LastUser { get; private set; }
         public string? HashAtIssuance { get; private set; }

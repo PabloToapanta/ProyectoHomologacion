@@ -27,6 +27,7 @@ services:
       Jwt__Issuer: ${AUTH_JWT_ISSUER:?Configure AUTH_JWT_ISSUER}
       Jwt__Audience: ${AUTH_JWT_AUDIENCE:?Configure AUTH_JWT_AUDIENCE}
       Jwt__SigningKey: ${AUTH_JWT_KEY:?Configure AUTH_JWT_KEY}
+      Jwt__EncryptionKey: ${AUTH_JWT_ENCRYPTION_KEY:?Configure AUTH_JWT_ENCRYPTION_KEY}
       Database__ApplyMigrations: "true"
       SeedAdmin__Enabled: "true"
       SeedAdmin__NombreUsuario: ${AUTH_ADMIN_USERNAME:?Configure AUTH_ADMIN_USERNAME}

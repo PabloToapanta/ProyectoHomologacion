@@ -24,6 +24,6 @@ public sealed class AuthController(LoginService login) : ControllerBase
         if (result is null)
             return Problem(statusCode: StatusCodes.Status401Unauthorized, title: "Credenciales incorrectas",
                 detail: "El usuario o la contraseña no son válidos.");
-        return Ok(new LoginResponse(result.AccessToken, result.TokenType, result.ExpiresAtUtc));
+        return Ok(new LoginResponse(result.AccessToken, result.TokenType, result.ExpiresAtUtc, result.Name, result.Role));
     }
 }

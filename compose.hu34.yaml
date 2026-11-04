@@ -1,0 +1,31 @@
+# Overlay de HU-34 sobre compose.sprint1.yaml. El navegador solo accede al Gateway.
+services:
+  auth-service:
+    ports: !override []
+
+  catalogo-api:
+    ports: !override []
+
+  homologacion-service:
+    ports: !override []
+
+  frontend:
+    ports: !override []
+    depends_on: !override []
+
+  gateway:
+    user: "${HU34_UID:-1000}:${HU34_GID:-1000}"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Hu34
+      Kestrel__Endpoints__Http__Url: http://0.0.0.0:8080
+      Kestrel__Endpoints__Https__Url: https://0.0.0.0:8443
+      Kestrel__Endpoints__Https__Certificate__Path: /https/localhost.pem
+      Kestrel__Endpoints__Https__Certificate__KeyPath: /https/localhost-key.pem
+    volumes:
+      - ${HU34_CERT_DIR:?Configure HU34_CERT_DIR}:/https:ro
+    ports: !override
+      - "127.0.0.1:80:8080"
+      - "127.0.0.1:443:8443"
+    depends_on:
+      frontend:
+        condition: service_started

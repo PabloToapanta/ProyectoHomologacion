@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace AuthService.Tests;
@@ -27,8 +28,10 @@ public sealed class LoginApiTests : IClassFixture<AuthApiFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
         Assert.NotNull(result);
-        Assert.Equal(3, result.AccessToken.Split('.').Length);
+        Assert.Equal(5, result.AccessToken.Split('.').Length);
         Assert.Equal("Bearer", result.TokenType);
+        Assert.Equal("admin-api", result.Name);
+        Assert.Equal("Administrador", result.Role);
         Assert.True(result.ExpiresAtUtc > DateTimeOffset.UtcNow);
         Assert.Equal("no-store", response.Headers.CacheControl?.ToString());
         var body = await response.Content.ReadAsStringAsync();
@@ -71,6 +74,18 @@ public sealed class LoginApiTests : IClassFixture<AuthApiFactory>
         Assert.Contains("401", body);
         Assert.Contains("400", body);
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("corta")]
+    public void ClaveDeCifradoInvalida_ImpideArranque(string value)
+    {
+        using var factory = new AuthApiFactory();
+        using var configured = factory.WithWebHostBuilder(builder => builder.ConfigureAppConfiguration((_, configuration) =>
+            configuration.AddInMemoryCollection(new Dictionary<string, string?> { ["Jwt:EncryptionKey"] = value })));
+        var error = Assert.Throws<OptionsValidationException>(() => configured.CreateClient());
+        if (value.Length > 0) Assert.DoesNotContain(value, error.Message);
+    }
 }
 
 public sealed class AuthApiFactory : WebApplicationFactory<Program>
@@ -93,6 +108,7 @@ public sealed class AuthApiFactory : WebApplicationFactory<Program>
             ["InternalAccess:Key"] = "hu36-test-only-internal-key-64-characters-for-isolated-tests",
             ["Jwt:Issuer"] = "auth-api-test", ["Jwt:Audience"] = "api-test",
             ["Jwt:SigningKey"] = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)),
+            ["Jwt:EncryptionKey"] = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)),
             ["SeedAdmin:Enabled"] = "false", ["Database:ApplyMigrations"] = "false"
         }));
         builder.ConfigureServices(services =>

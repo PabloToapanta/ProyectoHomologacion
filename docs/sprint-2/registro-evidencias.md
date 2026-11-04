@@ -15,6 +15,7 @@ Este registro no acredita implementación, pruebas ni aceptación. Completar sol
 | HU-30 Vista docente | Edwin / Shirley | Por crear o enlazar | Pendiente | Pendiente | Pendiente |
 | HU-19 Agente externo | Edwin / Shirley | Por crear o enlazar | Pendiente | Pendiente | Pendiente |
 | HU-20 Persistencia | Edwin / Shirley | Por crear o enlazar | Pendiente | Pendiente | Pendiente |
+| HU-08 Carga masiva | Por asignar | [#50](https://github.com/PabloToapanta/ProyectoHomologacion/issues/50) | Pendiente | [Propuesta de contrato](propuesta-contrato-hu-08.md), sin implementación | Pendiente |
 
 ## Seguimiento de jornadas
 
@@ -75,3 +76,14 @@ primera base. Leslie autorizó posteriormente los commits y push de HU-36 para
 revisión. La base verificada sigue siendo e01767b; al preparar la publicación,
 develop remoto avanzó a afacebc. Su combinación no está acreditada por esas pruebas.
 HTTPS/JWE, CI, revisión cruzada y aceptación humana siguen pendientes. Sin merge.
+
+### Revisión e integración local de la PR #54
+
+El 03/11/2026 se combinó localmente la rama HU-36 con `origin/develop` en
+`afacebc`. Cuatro conflictos textuales fueron resueltos y la regresión reveló dos
+incompatibilidades de seguridad adicionales: la factoría HU-29 carecía de la clave
+interna/JWE y Solicitudes aún no validaba el JWE emitido por Auth. Después de una
+prueba roja reproducible se corrigieron ambos contratos. Resultado final: 572
+pruebas xUnit correctas, ninguna fallida y 3 SQL omitidas por falta de
+`HU10_TEST_SQL`. La repetición Docker/SQL, CI, commit, push, revisión cruzada,
+aceptación y merge siguen pendientes; no se declara HU-36 terminada.

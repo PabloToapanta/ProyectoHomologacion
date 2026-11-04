@@ -23,6 +23,7 @@ public sealed class AuthBehaviorTests : IDisposable
     {
         Issuer = "auth-test", Audience = "api-test",
         SigningKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)),
+        EncryptionKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)),
         ExpirationMinutes = 15
     };
     private readonly DateTimeOffset now = new(2026, 10, 19, 12, 0, 0, TimeSpan.Zero);
@@ -73,6 +74,7 @@ public sealed class AuthBehaviorTests : IDisposable
             new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true, IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SigningKey)),
+                TokenDecryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(jwt.EncryptionKey)),
                 ValidateIssuer = true, ValidIssuer = jwt.Issuer, ValidateAudience = true, ValidAudience = jwt.Audience,
                 ValidateLifetime = true, ClockSkew = TimeSpan.Zero,
                 LifetimeValidator = (nbf, exp, _, _) => nbf <= now.UtcDateTime && exp > now.UtcDateTime,
@@ -80,7 +82,9 @@ public sealed class AuthBehaviorTests : IDisposable
             }, out var token);
         Assert.Equal(user.Id.ToString(), principal.FindFirst("sub")?.Value);
         Assert.True(principal.IsInRole("Administrador"));
-        Assert.Equal(SecurityAlgorithms.HmacSha256, ((JwtSecurityToken)token).Header.Alg);
+        Assert.Equal(SecurityAlgorithms.Aes256KW, ((JwtSecurityToken)token).Header.Alg);
+        Assert.Equal(SecurityAlgorithms.Aes256CbcHmacSha512, ((JwtSecurityToken)token).Header.Enc);
+        Assert.Equal(SecurityAlgorithms.HmacSha256, ((JwtSecurityToken)token).InnerToken?.Header.Alg);
         Assert.NotNull(principal.FindFirst("jti"));
         Assert.DoesNotContain("Password", result.AccessToken, StringComparison.OrdinalIgnoreCase);
     }

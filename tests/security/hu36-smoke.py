@@ -6,6 +6,7 @@ y escribe un resultado sin secretos en TestResults/hu36-integration/resultado.js
 """
 
 import json
+import base64
 from datetime import datetime, timedelta, timezone
 import os
 from pathlib import Path
@@ -31,6 +32,7 @@ def main():
         "AUTH_JWT_ISSUER": "hu36-isolated",
         "AUTH_JWT_AUDIENCE": "hu36-isolated-api",
         "AUTH_JWT_KEY": secrets.token_hex(32),
+        "AUTH_JWT_ENCRYPTION_KEY": base64.b64encode(secrets.token_bytes(32)).decode(),
         "APP_SECRET_KEY": secrets.token_urlsafe(32),
         "AUTH_SERVICE_URL": "http://auth-service:8080/",
         "CATALOGO_SERVICE_URL": "http://catalogo-api:8080/",

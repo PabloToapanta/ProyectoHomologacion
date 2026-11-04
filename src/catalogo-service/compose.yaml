@@ -23,6 +23,7 @@ services:
       Jwt__Issuer: ${JWT_ISSUER:?Configura JWT_ISSUER}
       Jwt__Audience: ${JWT_AUDIENCE:?Configura JWT_AUDIENCE}
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?Configura JWT_SIGNING_KEY}
+      Jwt__EncryptionKey: ${JWT_ENCRYPTION_KEY:?Configura JWT_ENCRYPTION_KEY}
       Database__ApplyMigrations: "true"
     depends_on:
       catalogo-db:

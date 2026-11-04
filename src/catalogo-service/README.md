@@ -35,6 +35,7 @@ Variables requeridas, sin valores reales en Git:
 | `Jwt__Issuer` | Mismo emisor de Auth/Gateway |
 | `Jwt__Audience` | Misma audiencia de Auth/Gateway |
 | `Jwt__SigningKey` | Mismo secreto HS256 de Auth/Gateway, mínimo 32 bytes UTF-8 |
+| `Jwt__EncryptionKey` | Clave JWE compartida con los validadores, 32 bytes aleatorios en Base64 |
 | `Database__ApplyMigrations` | `true` solo para aplicar migraciones explícitamente en desarrollo |
 | `ASPNETCORE_ENVIRONMENT` | `Development` habilita Swagger |
 
