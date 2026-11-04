@@ -4,6 +4,7 @@ using Homologacion.Application.Antiguedad;
 using Homologacion.Application.Equivalencias;
 using Homologacion.Application.RequisitosCambio;
 using Homologacion.Infrastructure.Configuration;
+using Homologacion.Infrastructure.AnalisisInterno;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -21,6 +22,7 @@ public partial class Program
         builder.Services.AddInternalAccess();
         builder.Services.AddProblemDetails();
         builder.Services.AddHomologacionInfrastructure();
+        builder.Services.AddAnalisisInterno();
         builder.Services.AddScoped<EvaluarEquivalencia>();
         builder.Services.AddScoped<ValidarAntiguedad>();
         builder.Services.AddScoped<ValidarRequisitosCambio>();

@@ -62,6 +62,10 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
       Equivalencia__UmbralPct: ${EQUIVALENCIA_UMBRAL_PCT:-80}
+      AnalisisInterno__Habilitado: ${ANALISIS_INTERNO_HABILITADO:-false}
+      AnalisisInterno__OllamaUrl: ${OLLAMA_URL:-}
+      AnalisisInterno__Modelo: ${OLLAMA_MODELO:-}
+      AnalisisInterno__TimeoutSegundos: ${ANALISIS_INTERNO_TIMEOUT_SEGUNDOS:-90}
 
   gateway:
     build:

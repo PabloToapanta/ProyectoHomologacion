@@ -174,8 +174,10 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        Assert.Equal(22, paths.EnumerateObject().Count());
+        Assert.Equal(23, paths.EnumerateObject().Count());
         Assert.True(paths.GetProperty("/api/solicitudes/asignadas/{id}").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-interno").TryGetProperty("post", out _));
+        Assert.DoesNotContain(paths.EnumerateObject(), p => p.Name.Contains("contexto-analisis-interno") || p.Name.Contains("/analisis-interno/contexto"));
         Assert.True(paths.GetProperty("/api/solicitudes").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/solicitudes/{id}/asignaturas-aprobadas").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/asignaturas/{id}/perfil-comparacion").TryGetProperty("put", out _));
