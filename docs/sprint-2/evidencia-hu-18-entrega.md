@@ -1,5 +1,10 @@
 # HU-18: entrega con persistencia y vista docente
 
+Actualización posterior: Shirley aprobó el código de la PR en GitHub. Se detectó
+y corrigió un fallo del orden de arranque en la CI de HU-36; ver
+[corrección y nuevas verificaciones](evidencia-correccion-arranque-hu18-hu36.md).
+Las decisiones y cifras siguientes corresponden a la entrega anterior a ese ajuste.
+
 Fecha local: 03/11/2026, America/Guayaquil. Base develop 95e604d. Rama
 feature/hu-18-analisis-interno. Issues relacionados: [#42 HU-18](https://github.com/PabloToapanta/ProyectoHomologacion/issues/42),
 [#44 HU-20](https://github.com/PabloToapanta/ProyectoHomologacion/issues/44) y

@@ -137,3 +137,16 @@ fallos intermedios de herramientas, expectativas y saturación se documentan en
 [evidencia de entrega](evidencia-hu-18-entrega.md). No se alteraron timeouts ni se
 acredita inferencia real, HTTPS/navegador nuevo o aceptación humana. No cerrar #42
 automáticamente. Publicación de PR autorizada; sin autorización para merge.
+
+### PR #55: revisión de Shirley y corrección de CI HU-36
+
+Shirley registró APPROVED para la versión 6781678. La comprobación HU-36 falló
+porque Homologación resolvía migraciones antes de validar seguridad. Leslie autorizó
+la corrección y publicación en la misma rama. Cuatro pruebas rojas reprodujeron
+el orden incorrecto sin conexión SQL; después del ajuste la solución pasó 436
+pruebas, ninguna fallida u omitida. El smoke encontró además un cierre transitorio
+durante la espera de arranque del Gateway: se contempló sin aumentar su límite.
+Repetición Docker/SQL: 52 comprobaciones correctas, entorno temporal eliminado.
+Ver [evidencia de la corrección](evidencia-correccion-arranque-hu18-hu36.md).
+No se acredita modelo real ni se atribuye a Shirley revisión de cambios posteriores
+a su aprobación. Se comprobará la nueva CI tras publicar; sin merge.

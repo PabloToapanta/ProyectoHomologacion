@@ -2,6 +2,13 @@
 
 ## Decisión vigente de Leslie para esta entrega
 
+Corrección de integración solicitada tras la revisión de Shirley en PR #55:
+se propone mover las validaciones existentes de clave interna/JWT antes del bloque
+de migraciones en Program.cs de Homologación. El arranque debe rechazar seguridad
+inválida antes de resolver la base; no se cambian la clave, su middleware, permisos,
+esquema ni migraciones. Se añade prueba de regresión sin conectar a ninguna base
+y se repetirá el smoke de HU-36 que falló en GitHub. Ajuste autorizado por Leslie.
+
 Leslie autorizó completar persistencia/vista, elegir el contrato, usar qwen3:4b,
 omitir las pruebas con Ollama real y publicar commits/PR. Indicó que Shirley no
 realizará revisión ni aceptación en esta entrega. No se registra una aceptación
