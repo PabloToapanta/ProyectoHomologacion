@@ -1,3 +1,4 @@
+using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
 using Microsoft.Extensions.Options;
 using System.Net;
@@ -6,7 +7,7 @@ using System.Text.Json;
 namespace Homologacion.Infrastructure.AnalisisInterno;
 
 public sealed class FuentesAnalisisHttp(HttpClient http, IOptions<ConfiguracionAnalisisInterno> options)
-    : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno
+    : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno, ISolicitudesAnalisisExterno
 {
     private const int MaxBytes = 2 * 1024 * 1024;
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { MaxDepth = 32 };
@@ -16,6 +17,12 @@ public sealed class FuentesAnalisisHttp(HttpClient http, IOptions<ConfiguracionA
     public async Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct)
     {
         var r = await Leer<SolicitudParaAnalisis>(options.Value.SolicitudesUrl, $"api/solicitudes/{id}/contexto-analisis-interno", ct);
+        if (r is not null && (r.Id != id || r.AsignaturasAprobadas is null)) throw new FuenteAnalisisNoDisponibleException();
+        return r;
+    }
+    public async Task<SolicitudExternaParaAnalisis?> ObtenerSolicitudExternaAsync(Guid id, CancellationToken ct)
+    {
+        var r = await Leer<SolicitudExternaParaAnalisis>(options.Value.SolicitudesUrl, $"api/solicitudes/{id}/contexto-analisis-externo", ct);
         if (r is not null && (r.Id != id || r.AsignaturasAprobadas is null)) throw new FuenteAnalisisNoDisponibleException();
         return r;
     }

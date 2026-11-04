@@ -1,4 +1,5 @@
 using Homologacion.Application.AnalisisInterno;
+using Homologacion.Infrastructure.AnalisisExterno;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Text.Json;
@@ -6,7 +7,7 @@ using System.Text.Json;
 namespace Homologacion.Infrastructure.AnalisisInterno;
 
 // Modelo técnico propio de Homologación: no tiene FK ni acceso a bases ajenas.
-public sealed class RegistroResultado
+public sealed class RegistroResultado : IRegistroAnalisis
 {
     public Guid SolicitudId { get; set; }
     public Guid AprobadaId { get; set; }
@@ -17,27 +18,50 @@ public sealed class RegistroResultado
 public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> options) : DbContext(options)
 {
     public DbSet<RegistroResultado> Resultados => Set<RegistroResultado>();
+    /// <summary>HU-19: análisis externos en tabla propia; no altera AnalisisInternos.</summary>
+    public DbSet<RegistroResultadoExterno> ResultadosExternos => Set<RegistroResultadoExterno>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         var r = model.Entity<RegistroResultado>();
         r.ToTable("AnalisisInternos");
         r.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId });
         r.Property(x => x.Contenido).IsRequired();
+        var e = model.Entity<RegistroResultadoExterno>();
+        e.ToTable("AnalisisExternos");
+        e.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId });
+        e.Property(x => x.Contenido).IsRequired();
     }
 }
 public sealed class ResultadosAnalisisSql(ResultadosDbContext db) : IResultadosAnalisisInterno
 {
+    public Task GuardarAsync(AnalisisGuardado resultado, CancellationToken ct) => AlmacenPorPareja.GuardarAsync(db, db.Resultados, resultado, ct);
+    public Task<IReadOnlyList<AnalisisGuardado>> ListarAsync(Guid solicitudId, CancellationToken ct) => AlmacenPorPareja.ListarAsync(db.Resultados, solicitudId, ct);
+}
+
+/// <summary>Fila técnica común: clave de pareja, fecha del último intento y resultado serializado.</summary>
+public interface IRegistroAnalisis
+{
+    Guid SolicitudId { get; set; }
+    Guid AprobadaId { get; set; }
+    Guid ReceptoraId { get; set; }
+    DateTimeOffset Fecha { get; set; }
+    string Contenido { get; set; }
+}
+
+/// <summary>Política de HU-20 compartida por análisis internos y externos: el último intento por pareja reemplaza al anterior.</summary>
+internal static class AlmacenPorPareja
+{
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
-    public async Task GuardarAsync(AnalisisGuardado resultado, CancellationToken ct)
+    public static async Task GuardarAsync<T>(DbContext db, DbSet<T> set, AnalisisGuardado resultado, CancellationToken ct) where T : class, IRegistroAnalisis, new()
     {
         try
         {
             var a = resultado.Analisis;
-            var row = await db.Resultados.FindAsync([a.SolicitudId, a.AsignaturaAprobadaId, a.AsignaturaReceptoraId], ct);
+            var row = await set.FindAsync([a.SolicitudId, a.AsignaturaAprobadaId, a.AsignaturaReceptoraId], ct);
             if (row is null)
             {
                 row = new() { SolicitudId = a.SolicitudId, AprobadaId = a.AsignaturaAprobadaId, ReceptoraId = a.AsignaturaReceptoraId };
-                db.Resultados.Add(row);
+                set.Add(row);
             }
             row.Fecha = resultado.Fecha;
             row.Contenido = JsonSerializer.Serialize(a, JsonOptions);
@@ -46,11 +70,11 @@ public sealed class ResultadosAnalisisSql(ResultadosDbContext db) : IResultadosA
         catch (DbUpdateException) { throw new AlmacenAnalisisNoDisponibleException(); }
         catch (DbException) { throw new AlmacenAnalisisNoDisponibleException(); }
     }
-    public async Task<IReadOnlyList<AnalisisGuardado>> ListarAsync(Guid solicitudId, CancellationToken ct)
+    public static async Task<IReadOnlyList<AnalisisGuardado>> ListarAsync<T>(DbSet<T> set, Guid solicitudId, CancellationToken ct) where T : class, IRegistroAnalisis
     {
         try
         {
-            var rows = await db.Resultados.AsNoTracking().Where(x => x.SolicitudId == solicitudId).ToArrayAsync(ct);
+            var rows = await set.AsNoTracking().Where(x => EF.Property<Guid>(x, nameof(IRegistroAnalisis.SolicitudId)) == solicitudId).ToArrayAsync(ct);
             return rows.Select(row =>
             {
                 var a = JsonSerializer.Deserialize<ResultadoInternoSolicitud>(row.Contenido, JsonOptions);

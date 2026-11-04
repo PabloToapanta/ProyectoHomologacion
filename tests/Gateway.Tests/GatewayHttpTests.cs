@@ -174,7 +174,13 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        Assert.Equal(24, paths.EnumerateObject().Count());
+        Assert.Equal(28, paths.EnumerateObject().Count());
+        // HU-19: análisis externo, RN-05 externo y datos declarados por el Coordinador; el contexto interno no se publica.
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-externo").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-externo/opciones").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/requisitos-externos").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/datos-cambio-externo").TryGetProperty("put", out _));
+        Assert.DoesNotContain(paths.EnumerateObject(), p => p.Name.Contains("contexto-analisis-externo"));
         Assert.True(paths.GetProperty("/api/solicitudes/asignadas/{id}").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-interno").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-interno").TryGetProperty("get", out _));

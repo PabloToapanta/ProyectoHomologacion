@@ -1,6 +1,6 @@
 using Solicitudes.Domain;
 namespace Solicitudes.Application;
-public sealed record SolicitudInput(string NumeroQuipux,string IdentificacionEstudiante,string NombreEstudiante,string TipoCambio,Guid? CarreraOrigenId,string? InstitucionOrigen,string? CarreraOrigenExterna,Guid CarreraReceptoraId);
+public sealed record SolicitudInput(string NumeroQuipux,string IdentificacionEstudiante,string NombreEstudiante,string TipoCambio,Guid? CarreraOrigenId,string? InstitucionOrigen,string? CarreraOrigenExterna,Guid CarreraReceptoraId,int? PeriodosCursados=null,int? CambiosPreviosCarrera=null);
 public sealed record CarreraReferencia(Guid Id,string Nombre);
 public sealed record AsignaturaCatalogo(Guid Id,string Codigo,string Nombre,int Nivel,decimal Creditos,int Horas);
 public interface ICatalogoCarreras {
@@ -21,9 +21,10 @@ public interface ISolicitudRepository {
  Task<IReadOnlyList<DocenteAsignado>> DocentesDe(Guid solicitudId,CancellationToken ct);
  Task<IReadOnlyList<Solicitud>> ListarAsignadasA(Guid docenteId,CancellationToken ct);
  Task<bool> EstaAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct);
+ Task GuardarCambios(CancellationToken ct);
 }
 public sealed record AsignaturaAprobadaInput(Guid? AsignaturaOrigenId,string? NombreAsignatura,decimal? Creditos,string? SistemaCreditos,int? Horas,string? UnidadHoras,string? ReferenciaPrograma,decimal Nota,decimal? NotaMaximaEscala,decimal? NotaMinimaAprobacion,DateOnly FechaAprobacion,string NumeroMatricula,int IntentoMatricula);
-public sealed record SolicitudDetalle(Guid Id,string NumeroQuipux,string IdentificacionEstudiante,string NombreEstudiante,string TipoCambio,Guid? CarreraOrigenId,string? InstitucionOrigen,string? CarreraOrigenExterna,Guid CarreraReceptoraId,string Estado,DateTime FechaRegistro,IReadOnlyList<AsignaturaAprobada> AsignaturasAprobadas,IReadOnlyList<DocenteAsignado> DocentesAsignados);
+public sealed record SolicitudDetalle(Guid Id,string NumeroQuipux,string IdentificacionEstudiante,string NombreEstudiante,string TipoCambio,Guid? CarreraOrigenId,string? InstitucionOrigen,string? CarreraOrigenExterna,Guid CarreraReceptoraId,string Estado,DateTime FechaRegistro,IReadOnlyList<AsignaturaAprobada> AsignaturasAprobadas,IReadOnlyList<DocenteAsignado> DocentesAsignados,int? PeriodosCursados,int? CambiosPreviosCarrera);
 /// <summary>Resultado del análisis de una solicitud (HU-30). Propuesta: HU-18 y HU-20 fijan el contrato definitivo.</summary>
 public sealed record ResultadoAnalisis(decimal? PorcentajeAcademico,decimal? PorcentajeHoras,decimal? PorcentajeCreditos,string Sugerencia,string Justificacion,IReadOnlyList<string> Evidencias);
 /// <summary>Estado: Pendiente, Completo, Incompleto o Fallido. Solo «Completo» trae resultado.</summary>
@@ -35,7 +36,7 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
  // Ecuador continental no aplica horario de verano; la fecha académica no depende de UTC ni del contenedor.
  static readonly TimeSpan OffsetEcuador=TimeSpan.FromHours(-5);
  public async Task<Solicitud> Crear(SolicitudInput input,CancellationToken ct) {
-  var solicitud=new Solicitud(input.NumeroQuipux,input.IdentificacionEstudiante,input.NombreEstudiante,input.TipoCambio,input.CarreraOrigenId,input.InstitucionOrigen,input.CarreraOrigenExterna,input.CarreraReceptoraId);
+  var solicitud=new Solicitud(input.NumeroQuipux,input.IdentificacionEstudiante,input.NombreEstudiante,input.TipoCambio,input.CarreraOrigenId,input.InstitucionOrigen,input.CarreraOrigenExterna,input.CarreraReceptoraId,input.PeriodosCursados,input.CambiosPreviosCarrera);
   var carreras=await catalogo.Listar(ct);
   if(!carreras.Any(c=>c.Id==solicitud.CarreraReceptoraId) || (solicitud.CarreraOrigenId is Guid id && !carreras.Any(c=>c.Id==id))) throw new SolicitudException("Las carreras seleccionadas deben existir y estar vigentes en FISEI. Actualice el catálogo.");
   await repository.Agregar(solicitud,ct);return solicitud;
@@ -46,7 +47,7 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
  }
  public async Task<SolicitudDetalle?> Obtener(Guid id,CancellationToken ct) {
   if(await repository.Obtener(id,ct) is not {} s) return null;
-  return new(s.Id,s.NumeroQuipux,s.IdentificacionEstudiante,s.NombreEstudiante,s.TipoCambio,s.CarreraOrigenId,s.InstitucionOrigen,s.CarreraOrigenExterna,s.CarreraReceptoraId,s.Estado,s.FechaRegistro,await repository.AsignaturasDe(id,ct),await repository.DocentesDe(id,ct));
+  return new(s.Id,s.NumeroQuipux,s.IdentificacionEstudiante,s.NombreEstudiante,s.TipoCambio,s.CarreraOrigenId,s.InstitucionOrigen,s.CarreraOrigenExterna,s.CarreraReceptoraId,s.Estado,s.FechaRegistro,await repository.AsignaturasDe(id,ct),await repository.DocentesDe(id,ct),s.PeriodosCursados,s.CambiosPreviosCarrera);
  }
  public async Task<AsignaturaAprobada> RegistrarAsignatura(Guid solicitudId,AsignaturaAprobadaInput input,CancellationToken ct) {
   var solicitud=await repository.Obtener(solicitudId,ct)??throw new SolicitudNoEncontradaException();
@@ -74,6 +75,13 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   // Sin respuesta del directorio no se presume que los usuarios tengan rol Docente.
   var asignados=DocenteAsignado.Asignar(solicitud,docenteIds,await directorio.Listar(ct));
   await repository.GuardarAsignacion(asignados,ct);
+  return (await Obtener(solicitudId,ct))!;
+ }
+ /// <summary>HU-19 (D4): el Coordinador corrige los datos de RN-05 antes de asignar docentes.</summary>
+ public async Task<SolicitudDetalle> DeclararDatosCambioExterno(Guid solicitudId,int? periodosCursados,int? cambiosPreviosCarrera,CancellationToken ct) {
+  var solicitud=await repository.ObtenerParaActualizar(solicitudId,ct)??throw new SolicitudNoEncontradaException();
+  solicitud.DeclararDatosCambioExterno(periodosCursados,cambiosPreviosCarrera);
+  await repository.GuardarCambios(ct);
   return (await Obtener(solicitudId,ct))!;
  }
  public Task<IReadOnlyList<Solicitud>> ListarAsignadas(Guid docenteId,CancellationToken ct)=>repository.ListarAsignadasA(docenteId,ct);

@@ -6,7 +6,7 @@ import '../catalogo/catalogo.css';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Solicitud={id:string;numeroQuipux:string;identificacionEstudiante:string;nombreEstudiante:string;tipoCambio:string;institucionOrigen:string|null;carreraOrigenExterna:string|null;estado:string;fechaRegistro:string};
 type Asignatura={id:string;nombreAsignatura:string;creditos:number;horas:number;nota:number;estado:string};
-type Detalle=Solicitud&{asignaturasAprobadas:Asignatura[];docentesAsignados:DocenteAsignado[]};
+type Detalle=Solicitud&{asignaturasAprobadas:Asignatura[];docentesAsignados:DocenteAsignado[];periodosCursados?:number|null;cambiosPreviosCarrera?:number|null};
 /** Propuesta HU-30: HU-18 y HU-20 fijan el contrato definitivo del resultado. */
 export type ResultadoAnalisis={porcentajeAcademico:number|null;porcentajeHoras:number|null;porcentajeCreditos:number|null;sugerencia:string;justificacion:string;evidencias:string[]};
 export type Analisis={estado:string;mensaje:string;resultado:ResultadoAnalisis|null};
@@ -26,7 +26,7 @@ export function AnalisisSolicitud({analisis}:{analisis:Analisis}) {
  const titulo=estado==='Pendiente'?'Análisis pendiente':estado==='Fallido'?'El análisis falló':'Información incompleta';
  return <section aria-labelledby="analisis-titulo" role="status"><h3 id="analisis-titulo">{titulo}</h3><p>{texto||'No hay un resultado de análisis disponible para esta solicitud.'}</p></section>;
 }
-/** HU-30 consulta solicitudes; HU-18 permite analizar parejas sin aprobar ni remitir (HU-31). */
+/** HU-30 consulta solicitudes; HU-18 (interno) y HU-19 (externo) analizan parejas sin aprobar ni remitir (HU-31). */
 export function SolicitudesDocentePage({request}:{request:Request}) {
  const [items,setItems]=useState<Solicitud[]>([]),[cargando,setCargando]=useState(true),[errorCarga,setErrorCarga]=useState(''),[intento,setIntento]=useState(0);
  const [detalle,setDetalle]=useState<SolicitudAsignada|null>(null),[error,setError]=useState(''),[ocupado,setOcupado]=useState(false);
@@ -55,10 +55,11 @@ export function SolicitudesDocentePage({request}:{request:Request}) {
    items.length===0?<p>No tiene solicitudes asignadas.</p>:<div className="solicitudes-table"><table><caption>Solicitudes asignadas</caption><thead><tr><th>Trámite Quipux</th><th>Estudiante</th><th>Tipo</th><th>Estado</th><th>Consulta</th></tr></thead>
    <tbody>{items.map(x=><tr key={x.id}><td>{x.numeroQuipux}</td><td>{x.nombreEstudiante}</td><td>{x.tipoCambio}</td><td>{x.estado}</td><td><button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>ver(x.id)}>Ver {x.numeroQuipux}</button></td></tr>)}</tbody></table></div>}
   {detalle&&s&&<FormDialog title={`Solicitud ${s.numeroQuipux}`} titleId="detalle-asignada" busy={ocupado} onDismiss={()=>setDetalle(null)}>
-   <dl><dt>Estudiante</dt><dd>{s.nombreEstudiante} · {s.identificacionEstudiante}</dd><dt>Tipo de cambio</dt><dd>{s.tipoCambio}{s.tipoCambio==='Externo'&&` · ${s.institucionOrigen} · ${s.carreraOrigenExterna}`}</dd><dt>Estado</dt><dd>{s.estado}</dd><dt>Fecha de registro</dt><dd>{new Date(s.fechaRegistro).toLocaleString('es-EC')}</dd></dl>
+   <dl><dt>Estudiante</dt><dd>{s.nombreEstudiante} · {s.identificacionEstudiante}</dd><dt>Tipo de cambio</dt><dd>{s.tipoCambio}{s.tipoCambio==='Externo'&&` · ${s.institucionOrigen} · ${s.carreraOrigenExterna}`}</dd><dt>Estado</dt><dd>{s.estado}</dd><dt>Fecha de registro</dt><dd>{new Date(s.fechaRegistro).toLocaleString('es-EC')}</dd>
+    {s.tipoCambio==='Externo'&&<><dt>Períodos cursados</dt><dd>{s.periodosCursados??'Sin dato'}</dd><dt>Cambios previos de carrera</dt><dd>{s.cambiosPreviosCarrera??'Sin dato'}</dd></>}</dl>
    <h3>Docentes asignados</h3><ul aria-label="Docentes asignados">{s.docentesAsignados.map(d=><li key={d.id}>{d.nombreUsuario}</li>)}</ul>
    <h3>Asignaturas aprobadas</h3>{s.asignaturasAprobadas.length?<ul>{s.asignaturasAprobadas.map(a=><li key={a.id}>{a.nombreAsignatura} · {a.creditos} créditos · {a.horas} horas · nota {a.nota} ({a.estado})</li>)}</ul>:<p>Sin asignaturas aprobadas registradas.</p>}
-   {s.tipoCambio==='Interno'?<AnalisisInternoPanel key={s.id} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas} inicial={detalle.analisis}/>:<AnalisisSolicitud analisis={detalle.analisis}/>}
+   {s.tipoCambio==='Interno'||s.tipoCambio==='Externo'?<AnalisisInternoPanel key={s.id} tipo={s.tipoCambio} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas} inicial={detalle.analisis}/>:<AnalisisSolicitud analisis={detalle.analisis}/>}
    <button className="app-button app-button--secondary" onClick={()=>setDetalle(null)}>Cerrar detalle</button>
   </FormDialog>}
  </section>;

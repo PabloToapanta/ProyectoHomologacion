@@ -1,4 +1,4 @@
-import {render,screen} from '@testing-library/react';
+import {render,screen,within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {it,expect,vi} from 'vitest';
 import {SolicitudesPage} from './SolicitudesPage';
@@ -79,4 +79,31 @@ it('cancelar el registro de asignatura no envía datos',async()=>{
 });
 it('fallo de carga permite reintentar sin inventar listado',async()=>{
  const request=vi.fn().mockRejectedValue(new Error('Sin conexión'));render(<SolicitudesPage request={request}/>);expect(await screen.findByRole('alert')).toHaveTextContent('Sin conexión');expect(screen.getByRole('button',{name:'Reintentar'})).toBeInTheDocument();expect(screen.queryByText('No hay solicitudes registradas.')).not.toBeInTheDocument();
+});
+it('externa registra períodos y cambios previos opcionales y los corrige antes de asignar docentes',async()=>{
+ const user=userEvent.setup();
+ const externaRegistrada={...registrada,tipoCambio:'Externo',carreraOrigenId:null,institucionOrigen:'Universidad sintética Ecuador',carreraOrigenExterna:'Carrera externa sintética',periodosCursados:null,cambiosPreviosCarrera:0,asignaturasAprobadas:[],docentesAsignados:[]};
+ const request=vi.fn(async(path:string,init?:RequestInit)=>path.endsWith('/carreras')?json(carreras):path==='/api/solicitudes'&&init?.method==='POST'?json(externaRegistrada,201):
+  path.endsWith('/datos-cambio-externo')?json({...externaRegistrada,periodosCursados:4}):path==='/api/solicitudes/sol-1'?json(externaRegistrada):path.endsWith('/docentes-disponibles')?json([]):json([]));
+ render(<SolicitudesPage request={request}/>);
+ await user.click(await screen.findByRole('button',{name:'Nueva solicitud'}));
+ await user.type(screen.getByLabelText('Número de trámite Quipux'),'UTA-001');await user.type(screen.getByLabelText('Identificación del estudiante'),'EST-01');await user.type(screen.getByLabelText('Nombre del estudiante'),'Estudiante sintético');
+ await user.selectOptions(screen.getByLabelText('Tipo de cambio'),'Externo');
+ await user.type(screen.getByLabelText('Universidad de origen (Ecuador)'),'Universidad sintética Ecuador');await user.type(screen.getByLabelText('Carrera de origen externa'),'Carrera externa sintética');
+ await user.selectOptions(screen.getByLabelText('Carrera receptora'),'receptora');
+ await user.type(screen.getByLabelText('Cambios previos de carrera (opcional)'),'0');
+ await user.click(screen.getByRole('button',{name:'Registrar solicitud'}));
+ await screen.findByRole('status');
+ const alta=request.mock.calls.find(c=>c[0]==='/api/solicitudes'&&c[1]?.method==='POST')!;
+ const enviado=JSON.parse(String(alta[1]!.body));
+ expect(enviado.periodosCursados).toBeNull();expect(enviado.cambiosPreviosCarrera).toBe(0);
+ await user.click(screen.getByRole('button',{name:'Ver UTA-001'}));
+ const dialogo=await screen.findByRole('dialog',{name:'Solicitud UTA-001'});
+ expect(within(dialogo).getByText('Sin dato')).toBeInTheDocument();
+ await user.type(within(dialogo).getByLabelText('Períodos cursados'),'4');
+ await user.click(within(dialogo).getByRole('button',{name:'Guardar datos del cambio externo'}));
+ expect(await within(dialogo).findByText('Datos del cambio externo guardados.')).toBeInTheDocument();
+ const put=request.mock.calls.find(c=>c[1]?.method==='PUT')!;
+ expect(put[0]).toBe('/api/solicitudes/sol-1/datos-cambio-externo');
+ expect(JSON.parse(String(put[1]!.body))).toEqual({periodosCursados:4,cambiosPreviosCarrera:0});
 });
