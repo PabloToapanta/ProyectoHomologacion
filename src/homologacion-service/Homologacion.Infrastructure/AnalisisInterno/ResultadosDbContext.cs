@@ -1,5 +1,6 @@
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Infrastructure.AnalisisExterno;
+using Homologacion.Infrastructure.RevisionDocente;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Text.Json;
@@ -20,6 +21,8 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<RegistroResultado> Resultados => Set<RegistroResultado>();
     /// <summary>HU-19: análisis externos en tabla propia; no altera AnalisisInternos.</summary>
     public DbSet<RegistroResultadoExterno> ResultadosExternos => Set<RegistroResultadoExterno>();
+    /// <summary>HU-31: análisis propio de cada docente asignado por pareja.</summary>
+    public DbSet<RegistroRevisionDocente> RevisionesDocentes => Set<RegistroRevisionDocente>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         var r = model.Entity<RegistroResultado>();
@@ -30,6 +33,16 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
         e.ToTable("AnalisisExternos");
         e.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId });
         e.Property(x => x.Contenido).IsRequired();
+        var d = model.Entity<RegistroRevisionDocente>();
+        d.ToTable("RevisionesDocentes");
+        d.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId, x.DocenteId });
+        d.Property(x => x.Docente).HasMaxLength(256).IsRequired();
+        d.Property(x => x.Postura).HasMaxLength(20).IsRequired();
+        d.Property(x => x.Decision).HasMaxLength(20).IsRequired();
+        d.Property(x => x.Observacion).HasMaxLength(2000);
+        d.Property(x => x.EstadoAgente).HasMaxLength(20).IsRequired();
+        d.Property(x => x.SugerenciaAgente).HasMaxLength(50);
+        d.HasIndex(x => x.SolicitudId);
     }
 }
 public sealed class ResultadosAnalisisSql(ResultadosDbContext db) : IResultadosAnalisisInterno
