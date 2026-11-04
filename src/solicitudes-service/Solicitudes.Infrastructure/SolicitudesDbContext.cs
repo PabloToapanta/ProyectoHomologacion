@@ -47,5 +47,7 @@ public sealed class SolicitudRepository(SolicitudesDbContext db) : ISolicitudRep
  public async Task<IReadOnlyList<DocenteAsignado>> DocentesDe(Guid solicitudId,CancellationToken ct)=>await db.DocentesAsignados.AsNoTracking().Where(x=>x.SolicitudId==solicitudId).OrderBy(x=>x.Orden).ToListAsync(ct);
  public async Task AgregarAsignatura(AsignaturaAprobada a,CancellationToken ct) {db.AsignaturasAprobadas.Add(a);await db.SaveChangesAsync(ct);}
  public async Task<IReadOnlyList<AsignaturaAprobada>> AsignaturasDe(Guid solicitudId,CancellationToken ct)=>await db.AsignaturasAprobadas.AsNoTracking().Where(x=>x.SolicitudId==solicitudId).OrderBy(x=>x.NombreAsignatura).ThenBy(x=>x.Id).ToListAsync(ct);
+ public async Task<IReadOnlyList<Solicitud>> ListarAsignadasA(Guid docenteId,CancellationToken ct)=>await db.Solicitudes.AsNoTracking().Where(s=>db.DocentesAsignados.Any(d=>d.SolicitudId==s.Id&&d.DocenteId==docenteId)).OrderByDescending(x=>x.FechaRegistro).ThenBy(x=>x.Id).ToListAsync(ct);
+ public Task<bool> EstaAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct)=>db.DocentesAsignados.AnyAsync(d=>d.SolicitudId==solicitudId&&d.DocenteId==docenteId,ct);
  public async Task<IReadOnlyList<Solicitud>> Listar(int pagina,CancellationToken ct)=>await db.Solicitudes.AsNoTracking().OrderByDescending(x=>x.FechaRegistro).ThenBy(x=>x.Id).Skip((pagina-1)*50).Take(50).ToListAsync(ct);
 }

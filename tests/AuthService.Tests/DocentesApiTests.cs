@@ -52,6 +52,7 @@ public sealed class DocentesApiFactory : WebApplicationFactory<Program>
     private const string Issuer = "auth-docentes-test", Audience = "api-test";
     private const string InternalKey = "hu36-test-only-internal-key-64-characters-for-isolated-tests";
     private readonly string key = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+    // HU-35: Auth exige un token cifrado; clave sintética por ejecución.
     private readonly string encryptionKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
     private readonly SqliteConnection connection = new("Data Source=:memory:");
 

@@ -4,7 +4,7 @@ Registro manual por el Coordinador de los trámites recibidos mediante Quipux. C
 
 ## Contrato
 
-Todas las rutas exigen JWT válido con rol `Coordinador` tanto para crear como para consultar.
+Todas las rutas exigen el JWT firmado y cifrado de Auth (HU-35). Las de coordinación exigen rol `Coordinador`; las de `/api/solicitudes/asignadas` (HU-30), rol `Docente`.
 
 | Método | Ruta | Resultado |
 | --- | --- | --- |
@@ -16,6 +16,8 @@ Todas las rutas exigen JWT válido con rol `Coordinador` tanto para crear como p
 | POST | `/api/solicitudes/{id}/docentes` | HU-29: dos docentes activos distintos; 200 con detalle, 400, 404, 409 si ya tiene docentes, 503 si Auth no responde. Ver `docs/sprint-2/evidencia-hu-29.md` |
 | GET | `/api/solicitudes/{id}/docentes-disponibles` | HU-29: docentes activos según Auth (`Auth:BaseUrl`) |
 | GET | `/api/solicitudes/carreras` | Referencias id/nombre de carreras FISEI vigentes |
+| GET | `/api/solicitudes/asignadas` | HU-30, rol `Docente`: solicitudes donde el `sub` del token figura entre los dos asignados |
+| GET | `/api/solicitudes/asignadas/{id}` | HU-30: `{ solicitud, analisis }`; 404 si no existe o no está asignada a quien consulta. `analisis.estado` es «Pendiente» hasta HU-18/HU-20. Ver `docs/sprint-2/evidencia-hu-30.md` |
 
 Cuerpo de ejemplo **sintético**; sustituir los UUID por dos carreras distintas del catálogo:
 
@@ -58,7 +60,7 @@ docker compose --env-file .env -f compose.sprint1.yaml -f compose.hu10.yaml up -
 
 El complemento incorpora el servicio y su base mediante migración al arrancar, y añade su destino al Gateway. No publica un puerto interno de Solicitudes ni modifica los cambios locales de puertos existentes en los Compose del usuario. La interfaz está en `/solicitudes`; el login del Coordinador lleva allí. El Swagger del servicio se expone en `/swagger` solo en Development; puede consultarse desde la red interna de Compose, o ejecutar localmente el servicio para usar la UI Swagger, sin abrir puertos internos permanentes.
 
-Para ejecución local configurar `ConnectionStrings__Solicitudes`, `Catalogo__BaseUrl`, `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey` y opcionalmente `Database__ApplyMigrations=true`, después:
+Para ejecución local configurar `ConnectionStrings__Solicitudes`, `Catalogo__BaseUrl`, `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey`, `Jwt__EncryptionKey` (32 bytes en Base64, la misma de Auth; HU-35), `Auth__BaseUrl` y opcionalmente `Database__ApplyMigrations=true`, después:
 
 ```powershell
 dotnet run --project src/solicitudes-service/Solicitudes.Api

@@ -74,13 +74,17 @@ describe('HU-01 / T3 — acceso al panel', () => {
     expect(await screen.findByRole('heading', { name: 'Panel de administración' })).toBeInTheDocument();
   });
 
-  it.each(['Docente'])('el rol %s no accede al panel de administrador', async (role) => {
-    mockLogin(role);
+  it('docente entra a sus solicitudes asignadas sin acceso al panel de administrador (HU-30)', async () => {
+    const fetchMock = vi.fn(async (path: string) => new Response(JSON.stringify(path === '/api/auth/login' ? loginResponse({ role: 'Docente' }) : []), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
     mount();
     const user = await fillLogin();
     await user.click(screen.getByRole('button', { name: 'Ingresar' }));
-    expect(await screen.findByRole('heading', { name: 'Acceso restringido' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Mis solicitudes asignadas' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Panel de administración' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Mis solicitudes/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Panel/ })).not.toBeInTheDocument();
+    await waitFor(() => expect(fetchMock.mock.calls.map(c => c[0])).toContain('/api/solicitudes/asignadas'));
     await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
     expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
   });
@@ -93,6 +97,7 @@ describe('HU-01 / T3 — acceso al panel', () => {
     expect(await screen.findByRole('heading', {name:'Solicitudes de homologación'})).toBeInTheDocument();
     expect(screen.queryByRole('heading', {name:'Panel de administración'})).not.toBeInTheDocument();
     expect(screen.getByRole('link', {name:/Solicitudes/})).toBeInTheDocument();
+    expect(screen.queryByRole('link', {name:/Mis solicitudes/})).not.toBeInTheDocument();
   });
 
   it('rechaza una respuesta con expiración vencida sin abrir el panel', async () => {

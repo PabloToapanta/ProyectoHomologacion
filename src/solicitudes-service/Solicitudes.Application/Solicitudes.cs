@@ -19,9 +19,18 @@ public interface ISolicitudRepository {
  Task<Solicitud?> ObtenerParaActualizar(Guid id,CancellationToken ct);
  Task GuardarAsignacion(IReadOnlyList<DocenteAsignado> docentes,CancellationToken ct);
  Task<IReadOnlyList<DocenteAsignado>> DocentesDe(Guid solicitudId,CancellationToken ct);
+ Task<IReadOnlyList<Solicitud>> ListarAsignadasA(Guid docenteId,CancellationToken ct);
+ Task<bool> EstaAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct);
 }
 public sealed record AsignaturaAprobadaInput(Guid? AsignaturaOrigenId,string? NombreAsignatura,decimal? Creditos,string? SistemaCreditos,int? Horas,string? UnidadHoras,string? ReferenciaPrograma,decimal Nota,decimal? NotaMaximaEscala,decimal? NotaMinimaAprobacion,DateOnly FechaAprobacion,string NumeroMatricula,int IntentoMatricula);
 public sealed record SolicitudDetalle(Guid Id,string NumeroQuipux,string IdentificacionEstudiante,string NombreEstudiante,string TipoCambio,Guid? CarreraOrigenId,string? InstitucionOrigen,string? CarreraOrigenExterna,Guid CarreraReceptoraId,string Estado,DateTime FechaRegistro,IReadOnlyList<AsignaturaAprobada> AsignaturasAprobadas,IReadOnlyList<DocenteAsignado> DocentesAsignados);
+/// <summary>Resultado del análisis de una solicitud (HU-30). Propuesta: HU-18 y HU-20 fijan el contrato definitivo.</summary>
+public sealed record ResultadoAnalisis(decimal? PorcentajeAcademico,decimal? PorcentajeHoras,decimal? PorcentajeCreditos,string Sugerencia,string Justificacion,IReadOnlyList<string> Evidencias);
+/// <summary>Estado: Pendiente, Completo, Incompleto o Fallido. Solo «Completo» trae resultado.</summary>
+public sealed record AnalisisSolicitud(string Estado,string Mensaje,ResultadoAnalisis? Resultado) {
+ public static AnalisisSolicitud Pendiente {get;}=new("Pendiente","El análisis automatizado aún no se ha ejecutado para esta solicitud.",null);
+}
+public sealed record SolicitudAsignada(SolicitudDetalle Solicitud,AnalisisSolicitud Analisis);
 public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCarreras catalogo,IDirectorioDocentes directorio,TimeProvider reloj) {
  // Ecuador continental no aplica horario de verano; la fecha académica no depende de UTC ni del contenedor.
  static readonly TimeSpan OffsetEcuador=TimeSpan.FromHours(-5);
@@ -66,6 +75,13 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   var asignados=DocenteAsignado.Asignar(solicitud,docenteIds,await directorio.Listar(ct));
   await repository.GuardarAsignacion(asignados,ct);
   return (await Obtener(solicitudId,ct))!;
+ }
+ public Task<IReadOnlyList<Solicitud>> ListarAsignadas(Guid docenteId,CancellationToken ct)=>repository.ListarAsignadasA(docenteId,ct);
+ /// <summary>Null si no existe o el docente no figura entre los asignados: no se distingue para no revelar solicitudes ajenas.</summary>
+ public async Task<SolicitudAsignada?> ObtenerAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct) {
+  if(!await repository.EstaAsignada(solicitudId,docenteId,ct) || await Obtener(solicitudId,ct) is not {} detalle) return null;
+  // Aún no existe resultado persistido (HU-20); no se presenta ninguna recomendación.
+  return new(detalle,AnalisisSolicitud.Pendiente);
  }
  public async Task<IReadOnlyList<DocenteDisponible>> DocentesDisponibles(Guid solicitudId,CancellationToken ct) {
   if(await repository.Obtener(solicitudId,ct) is null) throw new SolicitudNoEncontradaException();

@@ -84,6 +84,17 @@ public sealed class SolicitudesApiTests {
   using var document=System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
   Assert.Equal(title,document.RootElement.GetProperty("title").GetString());Assert.Equal((int)status,document.RootElement.GetProperty("status").GetInt32());
  }
+ [Theory][InlineData("plain")][InlineData("other-key")][InlineData("tampered")]
+ public async Task TokenSinCifradoOAlteradoSeRechaza(string scenario) {
+  using var f=new SolicitudesFactory();using var c=f.Client(scenario:scenario);
+  Assert.Equal(HttpStatusCode.Unauthorized,(await c.GetAsync("/api/solicitudes")).StatusCode);
+ }
+ [Theory][InlineData("")][InlineData("corta")]
+ public void ClaveDeCifradoInvalidaImpideArranque(string value) {
+  using var f=new SolicitudesFactory();using var configured=f.WithWebHostBuilder(b=>b.UseSetting("Jwt:EncryptionKey",value));
+  var error=Assert.Throws<InvalidOperationException>(()=>configured.CreateClient());
+  if(value.Length>0) Assert.DoesNotContain(value,error.Message);
+ }
  public sealed record SolicitudView(Guid Id,string Estado);
 }
 public sealed class LogsCapturados : ILoggerProvider, ILogger {
@@ -107,12 +118,15 @@ public sealed class FakeDirectorio : IDirectorioDocentes {
  public Task<IReadOnlyList<DocenteDisponible>> Listar(CancellationToken ct)=>Falla?throw new DirectorioNoDisponibleException():Task.FromResult<IReadOnlyList<DocenteDisponible>>([Docentes.Ana,Docentes.Luis,Docentes.Rosa]);
 }
 public sealed class SolicitudesFactory : WebApplicationFactory<Program> {
+ // HU-36: el Gateway añade la clave interna; las pruebas de la API la simulan en cada cliente.
+ const string InternalKey="hu36-test-only-internal-key-64-characters-for-isolated-tests";
  protected override void ConfigureClient(HttpClient client) {
   base.ConfigureClient(client);
-  client.DefaultRequestHeaders.Add("X-Internal-Key", "hu36-test-only-internal-key-64-characters-for-isolated-tests");
+  client.DefaultRequestHeaders.Add("X-Internal-Key",InternalKey);
  }
  public const string Key="clave-sintetica-pruebas-hu10-32-bytes-minimo";
- readonly string encryptionKey=Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+ // Clave de cifrado sintética por ejecución, nunca usada en despliegues (HU-35).
+ static readonly string EncryptionKey=Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
  readonly SqliteConnection db=new("Data Source=:memory:");
  public FakeCatalogo Catalogo {get;}=new();
  public FakeDirectorio Directorio {get;}=new();
@@ -121,17 +135,29 @@ public sealed class SolicitudesFactory : WebApplicationFactory<Program> {
  public SolicitudesFactory(){db.Open();}
  protected override void ConfigureWebHost(IWebHostBuilder b) {
   b.ConfigureAppConfiguration((_,config)=>config.AddInMemoryCollection(new Dictionary<string,string?> {
-   ["InternalAccess:Key"]="hu36-test-only-internal-key-64-characters-for-isolated-tests"
+   ["InternalAccess:Key"]=InternalKey
   }));
   b.UseEnvironment("Testing");b.ConfigureLogging(l=>l.AddProvider(Logs));foreach(var setting in new Dictionary<string,string?> {
-   ["ConnectionStrings:Solicitudes"]="Server=unused;Database=unused",["Catalogo:BaseUrl"]="http://catalogo.test/",["Auth:BaseUrl"]="http://auth.test/",["Jwt:Issuer"]="test",["Jwt:Audience"]="test",["Jwt:SigningKey"]=Key,["Jwt:EncryptionKey"]=encryptionKey
+   ["ConnectionStrings:Solicitudes"]="Server=unused;Database=unused",["Catalogo:BaseUrl"]="http://catalogo.test/",["Auth:BaseUrl"]="http://auth.test/",["Jwt:Issuer"]="test",["Jwt:Audience"]="test",["Jwt:SigningKey"]=Key,["Jwt:EncryptionKey"]=EncryptionKey
   }) b.UseSetting(setting.Key,setting.Value);
   b.ConfigureServices(s=>{s.RemoveAll<DbContextOptions<SolicitudesDbContext>>();s.AddDbContext<SolicitudesDbContext>(o=>o.UseSqlite(db));s.RemoveAll<ICatalogoCarreras>();s.AddSingleton<ICatalogoCarreras>(Catalogo);s.RemoveAll<IDirectorioDocentes>();s.AddSingleton<IDirectorioDocentes>(Directorio);s.RemoveAll<TimeProvider>();s.AddSingleton<TimeProvider>(Reloj);});
  }
- public HttpClient Client(string? role="Coordinador") {
+ public HttpClient Client(string? role="Coordinador",string sub="usuario-sintetico",string scenario="valid") {
   var client=CreateClient();using var scope=Services.CreateScope();scope.ServiceProvider.GetRequiredService<SolicitudesDbContext>().Database.EnsureCreated();
-  if(role is not null) {var handler=new JwtSecurityTokenHandler();var jwt=handler.CreateToken(new SecurityTokenDescriptor {Issuer="test",Audience="test",Subject=new ClaimsIdentity([new Claim("sub","usuario-sintetico"),new Claim("role",role)]),NotBefore=DateTime.UtcNow.AddMinutes(-1),Expires=DateTime.UtcNow.AddMinutes(5),SigningCredentials=new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)),SecurityAlgorithms.HmacSha256),EncryptingCredentials=new EncryptingCredentials(new SymmetricSecurityKey(Convert.FromBase64String(encryptionKey)),SecurityAlgorithms.Aes256KW,SecurityAlgorithms.Aes256CbcHmacSha512)});client.DefaultRequestHeaders.Authorization=new("Bearer",handler.WriteToken(jwt));}
+  if(role is not null) client.DefaultRequestHeaders.Authorization=new("Bearer",Token(role,sub,scenario));
   return client;
+ }
+ // Igual que Auth en HU-35: firmado con HS256 y cifrado con A256KW + A256CBC-HS512.
+ static string Token(string role,string sub,string scenario) {
+  var descriptor=new SecurityTokenDescriptor {
+   Issuer="test",Audience="test",Subject=new ClaimsIdentity([new Claim("sub",sub),new Claim("role",role)]),
+   NotBefore=DateTime.UtcNow.AddMinutes(-1),Expires=DateTime.UtcNow.AddMinutes(5),
+   SigningCredentials=new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)),SecurityAlgorithms.HmacSha256),
+   EncryptingCredentials=scenario=="plain"?null:new EncryptingCredentials(new SymmetricSecurityKey(scenario=="other-key"?System.Security.Cryptography.RandomNumberGenerator.GetBytes(32):Convert.FromBase64String(EncryptionKey)),SecurityAlgorithms.Aes256KW,SecurityAlgorithms.Aes256CbcHmacSha512)
+  };
+  var token=new JwtSecurityTokenHandler().WriteToken(new JwtSecurityTokenHandler().CreateToken(descriptor));
+  if(scenario!="tampered") return token;
+  var parts=token.Split('.');parts[3]=(parts[3][0]=='A'?'B':'A')+parts[3][1..];return string.Join('.',parts);
  }
  public SolicitudInput Input()=>new("Q-001","EST-SINTETICO","Estudiante sintético","Interno",Catalogo.Origen,null,null,Catalogo.Receptora);
  protected override void Dispose(bool disposing){base.Dispose(disposing);if(disposing)db.Dispose();}
