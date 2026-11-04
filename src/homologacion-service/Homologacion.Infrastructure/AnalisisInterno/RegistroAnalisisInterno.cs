@@ -3,6 +3,8 @@ using Homologacion.Application.AnalisisInterno;
 using Homologacion.Infrastructure.AnalisisExterno;
 using Homologacion.Application.RevisionDocente;
 using Homologacion.Infrastructure.RevisionDocente;
+using Homologacion.Application.Informe;
+using Homologacion.Infrastructure.Informe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -51,7 +53,12 @@ public static class RegistroAnalisisInterno
         services.AddScoped<GestionarAnalisisExterno>();
         // HU-31: análisis propio de los docentes asignados junto al del agente.
         services.AddScoped<IRevisionesDocentes, RevisionesDocentesSql>();
-        services.AddScoped<RegistrarRevisionDocente>();
+        services.AddScoped<IInformesHomologacion, InformesHomologacionSql>();
+        // HU-23: con el informe generado, RegistrarRevisionDocente rechaza correcciones.
+        services.AddScoped(p => new RegistrarRevisionDocente(p.GetRequiredService<ISolicitudesAnalisisInterno>(), p.GetRequiredService<ICatalogoAnalisisInterno>(),
+            p.GetRequiredService<IResultadosAnalisisInterno>(), p.GetRequiredService<IResultadosAnalisisExterno>(), p.GetRequiredService<IRevisionesDocentes>(),
+            p.GetRequiredService<TimeProvider>(), p.GetRequiredService<IInformesHomologacion>()));
+        services.AddScoped<GenerarInformeHomologacion>();
         return services;
     }
 

@@ -17,13 +17,16 @@ public interface IRevisionesDocentes
 
 /// <summary>HU-31: registra y consulta el análisis de los docentes asignados junto al del agente (HU-18/HU-19).</summary>
 public sealed class RegistrarRevisionDocente(ISolicitudesAnalisisInterno solicitudes, ICatalogoAnalisisInterno catalogo,
-    IResultadosAnalisisInterno internos, IResultadosAnalisisExterno externos, IRevisionesDocentes revisiones, TimeProvider reloj)
+    IResultadosAnalisisInterno internos, IResultadosAnalisisExterno externos, IRevisionesDocentes revisiones, TimeProvider reloj,
+    Informe.IInformesHomologacion? informes = null)
 {
     public async Task<RevisionDocenteRegistrada> RegistrarAsync(Guid solicitudId, Guid docenteId, string docente, RevisionDocenteInput input, CancellationToken ct)
     {
         if (docenteId == Guid.Empty) throw new SolicitudAnalisisNoEncontradaException();
         // La asignación se comprueba en Solicitudes con la identidad del token en cada petición.
         var solicitud = await Asignada(solicitudId, ct);
+        // HU-23: generado el informe, los análisis docentes de la solicitud quedan cerrados.
+        if (informes is not null && await informes.ObtenerAsync(solicitudId, ct) is not null) throw new Informe.InformeYaGeneradoException();
         if (input.AprobadaId == Guid.Empty || input.ReceptoraId == Guid.Empty)
             throw new DatosAnalisisSolicitudException("Seleccione la asignatura aprobada y la receptora.");
         if (!solicitud.AsignaturasAprobadas.Any(a => a?.Id == input.AprobadaId))

@@ -9,7 +9,9 @@ const pendiente={estado:'Pendiente',mensaje:'El análisis automatizado aún no s
 const resultado={porcentajeAcademico:85.5,porcentajeHoras:90,porcentajeCreditos:null,sugerencia:'Homologable',justificacion:'Los contenidos sintéticos coinciden.',evidencias:['R1 ↔ O1: Matrices']};
 function servidor(analisis:unknown=pendiente,detalleStatus=200) {
  return vi.fn(async(path:string,_init?:RequestInit)=>path==='/api/solicitudes/asignadas'?json([solicitud]):path==='/api/solicitudes/asignadas/sol-a'?(detalleStatus===200?json({solicitud:detalle,analisis}):json({title:'Solicitud no encontrada entre sus asignaciones.'},detalleStatus)):
-  path==='/api/homologaciones/solicitudes/sol-a/analisis-interno'?json([{fecha:'2026-11-03T12:00:00Z',analisis}]):json({title:'Ruta no esperada'},500));
+  path==='/api/homologaciones/solicitudes/sol-a/analisis-interno'?json([{fecha:'2026-11-03T12:00:00Z',analisis}]):
+  // HU-23: el detalle consulta el informe; sin generar responde 404.
+  path==='/api/homologaciones/solicitudes/sol-a/informe'?json({title:'El informe de esta solicitud aún no se ha generado.'},404):json({title:'Ruta no esperada'},500));
 }
 async function abrir(user:ReturnType<typeof userEvent.setup>) {
  await user.click(await screen.findByRole('button',{name:'Ver UTA-030'}));
@@ -22,7 +24,7 @@ it('lista solo lo que devuelve la API de asignadas y consulta el detalle con su 
  expect(within(dialogo).getByText('docente.ana')).toBeInTheDocument();expect(within(dialogo).getByText(/Álgebra sintética/)).toBeInTheDocument();
  expect(within(dialogo).getByRole('heading',{name:'Análisis pendiente'})).toBeInTheDocument();
  expect(within(dialogo).queryByText(/Sugerencia/)).not.toBeInTheDocument();
- await waitFor(()=>expect(request.mock.calls.map(c=>c[0])).toEqual(['/api/solicitudes/asignadas','/api/solicitudes/asignadas/sol-a','/api/homologaciones/solicitudes/sol-a/analisis-interno']));
+ await waitFor(()=>expect(request.mock.calls.map(c=>c[0])).toEqual(['/api/solicitudes/asignadas','/api/solicitudes/asignadas/sol-a','/api/homologaciones/solicitudes/sol-a/analisis-interno','/api/homologaciones/solicitudes/sol-a/informe']));
 });
 it.each([
  ['Fallido',{estado:'Fallido',mensaje:'El agente no respondió.',resultado:null},'El análisis falló'],
@@ -41,9 +43,11 @@ it('análisis completo muestra porcentajes, sugerencia, justificación y evidenc
  expect(within(dialogo).getByText('Homologable')).toBeInTheDocument();expect(within(dialogo).getByText('Los contenidos sintéticos coinciden.')).toBeInTheDocument();expect(within(dialogo).getByText('R1 ↔ O1: Matrices')).toBeInTheDocument();
  expect(within(dialogo).getByText(/no es la decisión final/)).toBeInTheDocument();
 });
-it('la consulta es de solo lectura: sin acciones de revisión, informe ni remisión',async()=>{
+// HU-23 añade «Generar informe» a petición del docente; sigue sin remisión al coordinador (HU-32) ni escrituras automáticas.
+it('al abrir no escribe nada: sin remisión y el informe solo se genera a petición',async()=>{
  const user=userEvent.setup();const request=servidor({estado:'Completo',mensaje:'',resultado});render(<SolicitudesDocentePage request={request}/>);const dialogo=await abrir(user);
- expect(within(dialogo).getAllByRole('button').map(b=>b.getAttribute('aria-label')??b.textContent)).toEqual(['Cerrar ventana','Consultar análisis interno','Cerrar detalle']);
+ await within(dialogo).findByRole('button',{name:'Generar informe'});
+ expect(within(dialogo).getAllByRole('button').map(b=>b.getAttribute('aria-label')??b.textContent)).toEqual(['Cerrar ventana','Consultar análisis interno','Generar informe','Cerrar detalle']);
  expect(request.mock.calls.every(c=>!c[1]?.method||c[1].method==='GET')).toBe(true);
 });
 it('detalle rechazado por la API muestra el error sin datos de otra solicitud',async()=>{

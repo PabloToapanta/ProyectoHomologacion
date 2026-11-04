@@ -133,7 +133,42 @@ internal static class ModeloRevisionesDocentes
     }
 }
 [DbContext(typeof(ResultadosDbContext))]
+[Migration("20261104000400_InformesHomologacionHu23")]
+public sealed class InformesHomologacionHu23 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(
+        name: "InformesHomologacion",
+        columns: table => new
+        {
+            SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+            GeneradoPorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Contenido = table.Column<string>(type: "nvarchar(max)", nullable: false)
+        },
+        constraints: table => table.PrimaryKey("PK_InformesHomologacion", x => x.SolicitudId));
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("InformesHomologacion");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloInformes.Construir(modelBuilder);
+}
+
+// Snapshot vigente: modelo de HU-31 más la tabla de HU-23.
+internal static class ModeloInformes
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloRevisionesDocentes.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroInforme", b =>
+        {
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Contenido").IsRequired().HasColumnType("nvarchar(max)");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<Guid>("GeneradoPorId").HasColumnType("uniqueidentifier");
+            b.HasKey("SolicitudId");
+            b.ToTable("InformesHomologacion");
+        });
+    }
+}
+[DbContext(typeof(ResultadosDbContext))]
 public sealed class ResultadosDbContextModelSnapshot : ModelSnapshot
 {
-    protected override void BuildModel(ModelBuilder modelBuilder) => ModeloRevisionesDocentes.Construir(modelBuilder);
+    protected override void BuildModel(ModelBuilder modelBuilder) => ModeloInformes.Construir(modelBuilder);
 }

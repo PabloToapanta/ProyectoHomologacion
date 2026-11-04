@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
+using Homologacion.Application.Informe;
 using Homologacion.Application.RevisionDocente;
 using Homologacion.Domain.Equivalencias;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -49,6 +50,13 @@ public class RevisionesDocentesEndpointTests
             Task.FromResult<IReadOnlyList<RevisionDocenteRegistrada>>(Revisiones.Where(r => r.SolicitudId == solicitudId).ToArray());
     }
 
+    /// <summary>HU-23: sin informe generado, los análisis docentes siguen abiertos.</summary>
+    private sealed class SinInforme : IInformesHomologacion
+    {
+        public Task<InformeHomologacion?> ObtenerAsync(Guid solicitudId, CancellationToken ct) => Task.FromResult<InformeHomologacion?>(null);
+        public Task GuardarAsync(InformeHomologacion informe, CancellationToken ct) => Task.CompletedTask;
+    }
+
     private static string Ruta => $"/api/homologaciones/solicitudes/{Solicitud}/revisiones-docentes";
     private static WebApplicationFactory<Homologacion.Api.Program> Host(MotorFactory f, Fuentes e) => f.WithWebHostBuilder(b =>
     {
@@ -60,6 +68,7 @@ public class RevisionesDocentesEndpointTests
             s.RemoveAll<IResultadosAnalisisInterno>(); s.AddSingleton<IResultadosAnalisisInterno>(e);
             s.RemoveAll<IResultadosAnalisisExterno>(); s.AddSingleton<IResultadosAnalisisExterno>(e);
             s.RemoveAll<IRevisionesDocentes>(); s.AddSingleton<IRevisionesDocentes>(e);
+            s.RemoveAll<IInformesHomologacion>(); s.AddSingleton<IInformesHomologacion>(new SinInforme());
             s.RemoveAll<TimeProvider>(); s.AddSingleton<TimeProvider>(new RelojAnalisis());
         });
     });
