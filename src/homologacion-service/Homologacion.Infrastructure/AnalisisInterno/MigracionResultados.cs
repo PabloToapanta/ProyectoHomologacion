@@ -42,7 +42,44 @@ internal static class ModeloResultadosInicial
     }
 }
 [DbContext(typeof(ResultadosDbContext))]
+[Migration("20261104000200_AnalisisExternosHu19")]
+public sealed class AnalisisExternosHu19 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(
+        name: "AnalisisExternos",
+        columns: table => new
+        {
+            SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            AprobadaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            ReceptoraId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+            Contenido = table.Column<string>(type: "nvarchar(max)", nullable: false)
+        },
+        constraints: table => table.PrimaryKey("PK_AnalisisExternos", x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId }));
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("AnalisisExternos");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloResultadosExternos.Construir(modelBuilder);
+}
+
+// Snapshot vigente: modelo inicial más la tabla de HU-19.
+internal static class ModeloResultadosExternos
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloResultadosInicial.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.AnalisisExterno.RegistroResultadoExterno", b =>
+        {
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("AprobadaId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("ReceptoraId").HasColumnType("uniqueidentifier");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<string>("Contenido").IsRequired().HasColumnType("nvarchar(max)");
+            b.HasKey("SolicitudId", "AprobadaId", "ReceptoraId");
+            b.ToTable("AnalisisExternos");
+        });
+    }
+}
+[DbContext(typeof(ResultadosDbContext))]
 public sealed class ResultadosDbContextModelSnapshot : ModelSnapshot
 {
-    protected override void BuildModel(ModelBuilder modelBuilder) => ModeloResultadosInicial.Construir(modelBuilder);
+    protected override void BuildModel(ModelBuilder modelBuilder) => ModeloResultadosExternos.Construir(modelBuilder);
 }

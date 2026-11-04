@@ -129,6 +129,9 @@ namespace Solicitudes.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("CambiosPreviosCarrera")
+                        .HasColumnType("int");
+
                     b.Property<string>("CarreraOrigenExterna")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -165,6 +168,9 @@ namespace Solicitudes.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("PeriodosCursados")
+                        .HasColumnType("int");
 
                     b.Property<string>("QuipuxNormalizado")
                         .IsRequired()
