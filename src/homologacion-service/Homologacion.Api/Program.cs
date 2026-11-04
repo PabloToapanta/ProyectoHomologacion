@@ -81,13 +81,13 @@ public partial class Program
             });
         });
         var app = builder.Build();
+        app.UseInternalAccess();
+        _ = app.Services.GetRequiredService<IOptions<JwtOptions>>().Value;
         if (builder.Configuration.GetValue<bool>("Database:ApplyMigrations"))
         {
             using var scope = app.Services.CreateScope();
             scope.ServiceProvider.GetRequiredService<ResultadosDbContext>().Database.Migrate();
         }
-        app.UseInternalAccess();
-        _ = app.Services.GetRequiredService<IOptions<JwtOptions>>().Value;
         app.UseExceptionHandler();
         app.UseStatusCodePages();
         if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }

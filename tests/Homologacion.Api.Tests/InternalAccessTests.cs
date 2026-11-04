@@ -1,6 +1,10 @@
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Homologacion.Infrastructure.AnalisisInterno;
 using Xunit;
 
 namespace Homologacion.Api.Tests;
@@ -9,6 +13,63 @@ public class InternalAccessTests
 {
     // Sintética: no se utiliza en despliegues.
     private const string Key = "hu36-test-only-internal-key-64-characters-for-isolated-tests";
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("secreto-corto-sintetico")]
+    public void Clave_invalida_se_rechaza_antes_de_resolver_la_base_para_migraciones(string? key)
+    {
+        var resoluciones = 0;
+        using var factory = new MotorFactory();
+        using var invalid = factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["InternalAccess:Key"] = key,
+                ["Database:ApplyMigrations"] = "true"
+            }));
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<ResultadosDbContext>();
+                services.AddScoped<ResultadosDbContext>(_ =>
+                {
+                    resoluciones++;
+                    throw new InvalidOperationException("No debe resolverse SQL antes de validar seguridad.");
+                });
+            });
+        });
+        var error = Assert.Throws<InvalidOperationException>(() => invalid.CreateClient());
+        Assert.Contains("Configure InternalAccess:Key", error.Message);
+        Assert.Equal(0, resoluciones);
+        if (!string.IsNullOrEmpty(key)) Assert.DoesNotContain(key, error.Message);
+    }
+
+    [Fact]
+    public void Jwt_invalido_se_rechaza_antes_de_resolver_la_base_para_migraciones()
+    {
+        var resoluciones = 0;
+        using var factory = new MotorFactory();
+        using var invalid = factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:SigningKey"] = "",
+                ["Database:ApplyMigrations"] = "true"
+            }));
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<ResultadosDbContext>();
+                services.AddScoped<ResultadosDbContext>(_ =>
+                {
+                    resoluciones++;
+                    throw new InvalidOperationException("No debe resolverse SQL antes de validar seguridad.");
+                });
+            });
+        });
+        Assert.Throws<OptionsValidationException>(() => invalid.CreateClient());
+        Assert.Equal(0, resoluciones);
+    }
 
     [Theory]
     [InlineData(null)]
