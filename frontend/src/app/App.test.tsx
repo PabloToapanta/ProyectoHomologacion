@@ -35,10 +35,12 @@ describe('HU-01 / T3 — acceso al panel', () => {
     expect(await screen.findByRole('heading', { name: 'Panel de administración' })).toBeInTheDocument();
     expect(screen.getByText('admin-prueba')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    // La sesión sobrevive a recargar la pestaña (sessionStorage), nunca en localStorage.
     expect(localStorage.length).toBe(0);
-    expect(sessionStorage.length).toBe(0);
+    expect(sessionStorage.length).toBe(1);
     await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
     expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
+    expect(sessionStorage.length).toBe(0);
   });
 
   it.each([400, 401, 502])('muestra un error %i y conserva el acceso protegido', async (status) => {
@@ -109,13 +111,17 @@ describe('HU-01 / T3 — acceso al panel', () => {
     expect(screen.queryByRole('heading', { name: 'Panel de administración' })).not.toBeInTheDocument();
   });
 
-  it('pierde la sesión al desmontar y volver a cargar la aplicación', async () => {
+  it('conserva la sesión al recargar y la pierde al cerrar la pestaña', async () => {
     mockLogin();
     const view = mount();
     const user = await fillLogin();
     await user.click(screen.getByRole('button', { name: 'Ingresar' }));
     await screen.findByRole('heading', { name: 'Panel de administración' });
     view.unmount();
+    const recarga = mount('/panel');
+    expect(await screen.findByRole('heading', { name: 'Panel de administración' })).toBeInTheDocument();
+    recarga.unmount();
+    sessionStorage.clear(); // cerrar la pestaña vacía su sessionStorage
     mount('/panel');
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument());
   });

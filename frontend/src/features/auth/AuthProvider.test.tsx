@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { loginResponse } from '../../test/fixtures';
@@ -89,5 +89,68 @@ describe('ciclo de vida de sesión en memoria', () => {
     await click('Salir');
     await act(async () => { resolve(new Response(JSON.stringify(loginResponse()), { status: 200 })); });
     expect(screen.getByTestId('session')).toHaveTextContent('Sin sesión');
+  });
+});
+
+describe('sesión de la pestaña tras recargar (sessionStorage)', () => {
+  const remount = () => { cleanup(); mount(); };
+  const guardada = () => sessionStorage.getItem('fisei.sesion');
+
+  it('conserva la sesión al recargar en la misma pestaña, nunca en localStorage', async () => {
+    backend();
+    mount();
+    await click('Autenticar');
+    expect(screen.getByTestId('session')).toHaveTextContent('admin-prueba');
+    expect(guardada()).not.toBeNull();
+    expect(localStorage.length).toBe(0);
+    remount();
+    expect(screen.getByTestId('session')).toHaveTextContent('admin-prueba');
+  });
+
+  it('cerrar sesión borra lo guardado y la recarga vuelve al login', async () => {
+    backend();
+    mount();
+    await click('Autenticar');
+    await click('Salir');
+    expect(guardada()).toBeNull();
+    remount();
+    expect(screen.getByTestId('session')).toHaveTextContent('Sin sesión');
+  });
+
+  it('una sesión guardada vencida no se restaura y se borra', () => {
+    sessionStorage.setItem('fisei.sesion', JSON.stringify({ accessToken: 'a.b.c.d.e', name: 'admin-prueba', role: 'Administrador', expiresAt: Date.now() - 1000 }));
+    mount();
+    expect(screen.getByTestId('session')).toHaveTextContent('Sin sesión');
+    expect(guardada()).toBeNull();
+  });
+
+  it.each([
+    'no-es-json',
+    JSON.stringify({ accessToken: 'a.b.c.d.e', name: 'x', role: 'Estudiante', expiresAt: Date.now() + 60_000 }),
+    JSON.stringify({ accessToken: '', name: 'x', role: 'Administrador', expiresAt: Date.now() + 60_000 }),
+    JSON.stringify({ accessToken: 'a.b.c.d.e', name: 'x', role: 'Administrador', expiresAt: 'mañana' }),
+  ])('datos guardados alterados no se restauran: %s', (valor) => {
+    sessionStorage.setItem('fisei.sesion', valor);
+    mount();
+    expect(screen.getByTestId('session')).toHaveTextContent('Sin sesión');
+    expect(guardada()).toBeNull();
+  });
+
+  it('un HTTP 401 borra la sesión guardada', async () => {
+    backend(401);
+    mount();
+    await click('Autenticar');
+    await click('Consultar');
+    expect(screen.getByTestId('session')).toHaveTextContent('Sin sesión');
+    expect(guardada()).toBeNull();
+  });
+
+  it('si el navegador bloquea el almacenamiento, la sesión sigue en memoria', async () => {
+    backend();
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('bloqueado', 'SecurityError'); });
+    mount();
+    await click('Autenticar');
+    expect(screen.getByTestId('session')).toHaveTextContent('admin-prueba');
+    setItem.mockRestore();
   });
 });

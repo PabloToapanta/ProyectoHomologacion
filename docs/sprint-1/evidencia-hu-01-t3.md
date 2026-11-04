@@ -94,3 +94,20 @@ Capturas conservadas:
 | Ruta protegida sin token válido: Gateway responde 401 | **Verificado** en las pruebas existentes de T2 y mediante `/api/carreras` a través del frontend en el E2E real |
 
 Los tres criterios funcionales tienen evidencia técnica. **HU-01 no se declara formalmente aceptada ni cerrada:** faltan revisión cruzada/PR, ejecución remota de CI y aceptación de Shirley con sus evidencias manuales. La integración de Catálogo/Homologación reales corresponde a sus historias e integración posterior y no se certifica con este panel mínimo. No se modificó el Issue. Durante la implementación y verificación no se realizaron commits, pushes o merges. Posteriormente, Pablo autorizó commits atómicos y el push de la rama; esta autorización no implica aceptación de HU-01 ni autoriza merges.
+
+## Cambio del 04/11/2026: sesión que sobrevive a la recarga
+
+Durante la verificación integral del Sprint 2, recargar la página (F5) obligaba a iniciar sesión de nuevo en cada
+prueba. Edwin decidió conservar la sesión **solo en la pestaña** mediante `sessionStorage`. Requiere la revisión de Pablo,
+responsable de HU-01.
+
+- **Al iniciar sesión:** se guardan token, nombre, rol y vencimiento en `sessionStorage` (clave `fisei.sesion`). Nunca en `localStorage`.
+- **Al recargar:** se restaura solo si la sesión guardada es válida (rol conocido, token y nombre presentes, vencimiento futuro);
+  si no, se borra.
+- **Se borra al:** cerrar sesión, vencer, recibir un 401 o cerrar la pestaña (comportamiento del navegador).
+- **Almacenamiento bloqueado:** si el navegador lo impide, la sesión sigue en memoria como antes.
+- **Riesgo aceptado:** un script malicioso en la página (XSS) podría leer el token mientras la pestaña esté abierta.
+  Se mitiga con el JWE (los claims no son legibles), con la expiración y con React escapando por defecto.
+  La alternativa más segura, una cookie HttpOnly, implica cambios en Auth y Gateway.
+- **Pruebas:** 7 nuevas o ajustadas que fallaron antes del cambio. La de «pierde la sesión al recargar» pasa a
+  «conserva la sesión al recargar y la pierde al cerrar la pestaña». Frontend 150/150 y `tsc`.
