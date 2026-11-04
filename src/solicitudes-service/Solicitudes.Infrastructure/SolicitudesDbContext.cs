@@ -14,6 +14,8 @@ public sealed class SolicitudesDbContext(DbContextOptions<SolicitudesDbContext> 
   s.HasIndex(x=>x.QuipuxNormalizado).IsUnique();
   s.Property(x=>x.IdentificacionEstudiante).HasMaxLength(50).IsRequired();s.Property(x=>x.NombreEstudiante).HasMaxLength(200).IsRequired();
   s.Property(x=>x.TipoCambio).HasMaxLength(20).IsRequired();s.Property(x=>x.Estado).HasMaxLength(30).IsRequired();
+  // HU-19: toda actualización exige el estado leído; una corrección no se guarda si otra petición ya asignó docentes.
+  s.Property(x=>x.Estado).IsConcurrencyToken();
   s.Property(x=>x.InstitucionOrigen).HasMaxLength(200);s.Property(x=>x.CarreraOrigenExterna).HasMaxLength(200);
   s.Property(x=>x.FechaRegistro).HasConversion(v=>v,v=>DateTime.SpecifyKind(v,DateTimeKind.Utc));
   s.HasIndex(x=>x.FechaRegistro);
@@ -42,13 +44,17 @@ public sealed class SolicitudRepository(SolicitudesDbContext db) : ISolicitudRep
  public Task<Solicitud?> ObtenerParaActualizar(Guid id,CancellationToken ct)=>db.Solicitudes.SingleOrDefaultAsync(x=>x.Id==id,ct);
  public async Task GuardarAsignacion(IReadOnlyList<DocenteAsignado> docentes,CancellationToken ct) {
   db.DocentesAsignados.AddRange(docentes);
-  try {await db.SaveChangesAsync(ct);} catch(DbUpdateException e) when(e.InnerException is SqlException {Number:2601 or 2627}) {throw new AsignacionNoPermitidaException();}
+  try {await db.SaveChangesAsync(ct);}
+  catch(DbUpdateConcurrencyException) {throw new AsignacionNoPermitidaException();}
+  catch(DbUpdateException e) when(e.InnerException is SqlException {Number:2601 or 2627}) {throw new AsignacionNoPermitidaException();}
  }
  public async Task<IReadOnlyList<DocenteAsignado>> DocentesDe(Guid solicitudId,CancellationToken ct)=>await db.DocentesAsignados.AsNoTracking().Where(x=>x.SolicitudId==solicitudId).OrderBy(x=>x.Orden).ToListAsync(ct);
  public async Task AgregarAsignatura(AsignaturaAprobada a,CancellationToken ct) {db.AsignaturasAprobadas.Add(a);await db.SaveChangesAsync(ct);}
  public async Task<IReadOnlyList<AsignaturaAprobada>> AsignaturasDe(Guid solicitudId,CancellationToken ct)=>await db.AsignaturasAprobadas.AsNoTracking().Where(x=>x.SolicitudId==solicitudId).OrderBy(x=>x.NombreAsignatura).ThenBy(x=>x.Id).ToListAsync(ct);
  public async Task<IReadOnlyList<Solicitud>> ListarAsignadasA(Guid docenteId,CancellationToken ct)=>await db.Solicitudes.AsNoTracking().Where(s=>db.DocentesAsignados.Any(d=>d.SolicitudId==s.Id&&d.DocenteId==docenteId)).OrderByDescending(x=>x.FechaRegistro).ThenBy(x=>x.Id).ToListAsync(ct);
- public Task GuardarCambios(CancellationToken ct)=>db.SaveChangesAsync(ct);
+ public async Task GuardarCambios(CancellationToken ct) {
+  try {await db.SaveChangesAsync(ct);} catch(DbUpdateConcurrencyException) {throw new DatosExternosNoEditablesException();}
+ }
  public Task<bool> EstaAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct)=>db.DocentesAsignados.AnyAsync(d=>d.SolicitudId==solicitudId&&d.DocenteId==docenteId,ct);
  public async Task<IReadOnlyList<Solicitud>> Listar(int pagina,CancellationToken ct)=>await db.Solicitudes.AsNoTracking().OrderByDescending(x=>x.FechaRegistro).ThenBy(x=>x.Id).Skip((pagina-1)*50).Take(50).ToListAsync(ct);
 }

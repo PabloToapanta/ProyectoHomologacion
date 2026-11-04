@@ -22,13 +22,12 @@ el análisis queda `Incompleto`, sin sugerencia ni invocación del agente.
   criterios antes de aceptar la historia. No cerrar #43 automáticamente.
 - Con datos reales actuales, RN-05 no puede llegar a «Cumple» porque ningún análisis
   externo puede ser completo. Las pruebas de ese estado usan resultados sintéticos.
-- La edición de datos se bloquea desde la asignación, incluso antes del primer análisis:
-  es más restrictiva que la propuesta inicial y requiere confirmación explícita.
-- Revisión de concurrencia pendiente: `DeclararDatosCambioExterno` valida el estado
-  leído y luego ejecuta `SaveChanges`, sin condición de estado ni token de concurrencia
-  en la actualización. Una edición iniciada antes de asignar puede guardarse después
-  de la asignación. Añadir protección atómica y una prueba de intercalado antes de
-  declarar garantizado el bloqueo posterior a asignar docentes.
+- La edición de datos se bloquea desde la asignación, incluso antes del primer análisis.
+  Shirley lo confirmó (comunicado por Edwin el 04/11/2026); registrarlo en #43.
+- Concurrencia corregida: `Estado` es token de concurrencia, por lo que una edición
+  iniciada antes de asignar y guardada después recibe 409 sin modificar datos.
+  Probado con intercalado determinista (SQLite y SQL Server real) y ejecuciones en
+  paralelo con SQL Server real.
 - Pendientes CI, revisión cruzada de Leslie y aceptación de Shirley.
 
 ## Validación
@@ -36,7 +35,9 @@ el análisis queda `Incompleto`, sin sugerencia ni invocación del agente.
 - Nueva revisión: 755 pruebas backend aprobadas y 1 omitida (Ollama real),
   incluyendo Solicitudes e infraestructura con SQL Server 2022 aislado.
 - Frontend: 128/128, comprobación TypeScript y compilación Vite aprobadas.
-- `git diff --check` sin errores. Smokes previos documentados, no repetidos aquí.
+- `git diff --check` sin errores.
+- Tras la corrección de concurrencia: Solicitudes con SQL Server real 146/146 y
+  `hu19-smoke.py` 46/46 sobre copia limpia.
 
 Consultar [evidencia-hu-19.md](evidencia-hu-19.md) para ejecuciones previas y la nueva
 revisión. Esta preparación conserva fuera del PR los puertos locales de Docker,

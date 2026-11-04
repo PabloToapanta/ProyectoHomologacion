@@ -76,7 +76,7 @@ primero en rojo (fallos de compilación o de pruebas) y después en verde.
    persistencia de HU-20 y fallo controlado sin cambios).
 
 **No verificado:** CI en GitHub, revisión cruzada de Leslie sobre Homologación, aceptación de
-Shirley y registro escrito de las decisiones D1–D4 en el Issue #43.
+Shirley y registro escrito de las decisiones D1–D4 y del bloqueo desde la asignación en el Issue #43.
 
 ## Revisión para PR del 04/11/2026
 
@@ -92,9 +92,25 @@ no ejecutó pruebas; se corrigió para usar `Homologacion.sln` en la raíz y se 
 a ejecutar. No se repitieron los smokes: sus resultados anteriores se conservan
 como evidencia registrada, no como nuevas ejecuciones de esta revisión.
 
-**Hallazgo pendiente:** el bloqueo de corrección después de asignar docentes se
-valida en memoria antes de `SaveChanges`, sin condición de estado en la actualización.
-Una edición que lea «Registrada» puede guardarse tras una asignación concurrente.
-Se necesita una protección atómica y una prueba de intercalado antes de aceptar
-esa garantía. La preparación del PR se mantiene en borrador por este hallazgo y
-las decisiones de alcance pendientes de registrar en #43.
+**Hallazgo (corregido):** el bloqueo de corrección después de asignar docentes se
+validaba en memoria antes de `SaveChanges`, sin condición de estado en la actualización.
+Una edición que leyera «Registrada» podía guardarse tras una asignación concurrente.
+
+## Corrección de concurrencia del 04/11/2026
+
+- `Solicitud.Estado` es token de concurrencia de EF: toda actualización de la solicitud
+  incluye `WHERE Estado = <estado leído>`. Sin cambio de esquema: la migración generada
+  quedó vacía y solo se actualizó el snapshot.
+- `GuardarCambios` traduce el conflicto a `DatosExternosNoEditablesException` (409);
+  `GuardarAsignacion` lo traduce a `AsignacionNoPermitidaException` (409), nunca a 500.
+- Shirley confirmó, según Edwin el 04/11/2026, que la edición se bloquea desde la
+  asignación de docentes, aunque todavía no exista análisis.
+- TDD: `ConcurrenciaDatosExternosTests` falló primero en SQLite y SQL Server real
+  (la edición tardía se guardaba) y pasó tras la corrección:
+  - intercalado determinista (lectura «Registrada» → asignación confirmada → guardado) en
+    SQLite y SQL Server real: 409 y períodos sin cambios;
+  - edición confirmada antes de asignar se conserva;
+  - 10 rondas de edición y asignación en paralelo con SQL Server real, repetidas 5 veces:
+    la asignación nunca falla y la edición tardía solo recibe el conflicto controlado.
+- Ejecuciones: Solicitudes.sln con SQL Server 2022 temporal 146/146 (incluye la asignación
+  concurrente de HU-29); `hu19-smoke.py` sobre copia limpia 46/46. Contenedores eliminados.

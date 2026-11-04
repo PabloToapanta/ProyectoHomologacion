@@ -143,6 +143,7 @@ namespace Solicitudes.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Estado")
+                        .IsConcurrencyToken()
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
