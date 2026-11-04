@@ -70,7 +70,9 @@ public class ResultadosAnalisisSqlServerTests
         Assert.Equal(antes, completo.Fecha);
         Assert.Equal(100, completo.Analisis.Resultado!.PorcentajeAcademico);
         Assert.Equal(80, completo.Analisis.Resultado.PorcentajeHoras);
+        Assert.Equal(100, completo.Analisis.Resultado.PorcentajeCreditos);
         Assert.Equal("Homologable", completo.Analisis.Resultado.Sugerencia);
+        Assert.Equal("Justificación sintética.", completo.Analisis.Resultado.Justificacion);
         Assert.Equal(["plan-sintetico-O/C ↔ plan-sintetico-D/C"], completo.Analisis.Resultado.Evidencias);
         Assert.Null(deA[0].Analisis.Resultado);
         var deB = Assert.Single(await repoLectura.ListarAsync(b, default));

@@ -62,3 +62,12 @@ Entorno: Windows con Docker; SDK .NET 8 en contenedor; SQL Server 2022 temporal.
 **No verificado:** CI en GitHub del nuevo workflow, revisión cruzada (Leslie revisa a Edwin)
 y aceptación de Shirley. El análisis externo (HU-19) no tiene persistencia todavía; ver
 [propuesta de contrato HU-19](propuesta-contrato-hu-19.md).
+
+## Revisión para PR del 04/11/2026
+
+Se volvió a ejecutar `Homologacion.Infrastructure.Tests` con SDK .NET 8 y SQL
+Server 2022 en contenedores aislados: **39 aprobadas, 1 omitida, 0 fallidas**.
+La omitida requiere Ollama real. Se añadieron aserciones explícitas para créditos
+y justificación persistidos. Los contenedores y la red temporales se eliminaron.
+`git diff --check` sin errores. No se repitió el smoke integrado en esta revisión;
+su ejecución anterior queda registrada arriba. HU-19 sigue como propuesta sin código.
