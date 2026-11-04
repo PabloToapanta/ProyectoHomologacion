@@ -38,6 +38,7 @@ public sealed class RevisionesDocentesController(RegistrarRevisionDocente servic
         try { return Ok(await accion(docente)); }
         catch (SolicitudAnalisisNoEncontradaException error) { return Problem(statusCode: 404, title: error.Message); }
         catch (DatosAnalisisSolicitudException error) { return Problem(statusCode: 400, title: error.Message); }
+        catch (Homologacion.Application.Informe.InformeYaGeneradoException error) { return Problem(statusCode: 409, title: error.Message); }
         catch (FuenteAnalisisNoDisponibleException error) { return Problem(statusCode: 503, title: error.Message); }
         catch (AlmacenAnalisisNoDisponibleException error) { return Problem(statusCode: 503, title: error.Message); }
     }

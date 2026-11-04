@@ -25,6 +25,8 @@ public class AnalisisExternoRouteTests
     [InlineData("PUT", "/api/solicitudes/{0}/datos-cambio-externo", "solicitudes")]
     [InlineData("PUT", "/api/homologaciones/solicitudes/{0}/revisiones-docentes", "homologacion")]
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/revisiones-docentes", "homologacion")]
+    [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
+    [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
     public async Task Enruta_al_servicio_dueno_conservando_Bearer(string metodo, string plantilla, string servicio)
     {
         using var f = new GatewayFactory(); using var c = await Autenticado(f);

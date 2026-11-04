@@ -1,6 +1,7 @@
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Infrastructure.AnalisisExterno;
 using Homologacion.Infrastructure.RevisionDocente;
+using Homologacion.Infrastructure.Informe;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Text.Json;
@@ -23,6 +24,8 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<RegistroResultadoExterno> ResultadosExternos => Set<RegistroResultadoExterno>();
     /// <summary>HU-31: análisis propio de cada docente asignado por pareja.</summary>
     public DbSet<RegistroRevisionDocente> RevisionesDocentes => Set<RegistroRevisionDocente>();
+    /// <summary>HU-23: un informe fijo por solicitud.</summary>
+    public DbSet<RegistroInforme> Informes => Set<RegistroInforme>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         var r = model.Entity<RegistroResultado>();
@@ -43,6 +46,11 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
         d.Property(x => x.EstadoAgente).HasMaxLength(20).IsRequired();
         d.Property(x => x.SugerenciaAgente).HasMaxLength(50);
         d.HasIndex(x => x.SolicitudId);
+        var i = model.Entity<RegistroInforme>();
+        i.ToTable("InformesHomologacion");
+        i.HasKey(x => x.SolicitudId);
+        i.Property(x => x.SolicitudId).ValueGeneratedNever();
+        i.Property(x => x.Contenido).IsRequired();
     }
 }
 public sealed class ResultadosAnalisisSql(ResultadosDbContext db) : IResultadosAnalisisInterno
