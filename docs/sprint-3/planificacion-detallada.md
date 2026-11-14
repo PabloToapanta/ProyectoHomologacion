@@ -18,7 +18,7 @@ Sistema de Homologación de Materias (FISEI-UTA) · 5 al 25 de noviembre de 2026
 
 - `develop` no tiene commits posteriores al 04/11 (último: `4b1162c`, HU-23). No existen Issues de GitHub para las historias pendientes del Sprint 3.
 - Ramas del cierre del Sprint 2 sin integrar: `feature/hu-08-revision-carga-masiva` y `feature/hu-01-sesion-recarga` (publicadas, sin PR registrado aquí) y `feature/hu-18-espera-agente` (solo local).
-- El avance real del 5 al 12 de noviembre debe confirmarlo el equipo. Se mantienen las 14 historias; la capacidad se revisa con ese dato (sección 3).
+- El avance real del 5 al 12 de noviembre debe confirmarlo el equipo. Se mantienen las 14 historias más HU-37; la capacidad se revisa con ese dato (sección 3).
 
 ## 2. Objetivo del sprint
 
@@ -33,16 +33,16 @@ Se planifican 15 jornadas: jueves 5 y viernes 6; del lunes 9 al viernes 13; del 
 | 4 integrantes × 3 h × 15 jornadas × 0,8 | **144 h** | Capacidad efectiva del sprint; 180 h brutas |
 | Desde el 13/11: 4 × 3 h × 9 jornadas × 0,8 | **86,4 h** | Si el 5–12 no tuvo avance |
 | 5,2 PH/día (Sprint 1) × 15 jornadas | 78 PH | Proyección orientativa |
-| Pendiente del Product Backlog | **56 PH · 96 h** | 14 historias (sección 4) |
+| Pendiente del Product Backlog | **59 PH · 101 h** | 15 historias, incluida HU-37 (sección 4) |
 | Cierre del Sprint 2 | 6 h | PR, revisión cruzada y aceptación de HU-08, HU-01 y HU-18 |
-| **Total planificado** | **102 h** | Margen de 42 h sobre el sprint completo |
+| **Total planificado** | **107 h** | Margen de 37 h sobre el sprint completo |
 
-**Decisión del 13/11/2026: se mantienen las 14 historias.** Las 102 h caben en el sprint completo, pero no en las 86,4 h restantes si el 5–12 no tuvo avance (faltarían 15,6 h). Si al revisar el avance falta capacidad, la PO decide qué sale. Las candidatas son **HU-21 (14 h)** y **HU-22 (8 h)**: sin ellas el compromiso sería 43 PH y 80 h, y además dependen de reglas aún no validadas (sección 6).
+**Decisión del 13/11/2026: se mantienen las 14 historias.** **14/11/2026:** se añade HU-37 (reutilizar el análisis del agente, 3 PH), pedida por el ingeniero y aceptada por la PO. Las 107 h caben en el sprint completo, pero no en las 86,4 h restantes si el 5–12 no tuvo avance (faltarían 20,6 h). Si al revisar el avance falta capacidad, la PO decide qué sale. Las candidatas son **HU-21 (14 h)** y **HU-22 (8 h)**: sin ellas el compromiso sería 46 PH y 85 h, y además dependen de reglas aún no validadas (sección 6).
 
 | Pareja | Horas asignadas | Efectivas (sprint completo) | Efectivas (desde el 13/11) | Si la PO retira HU-21/22 |
 | --- | --- | --- | --- | --- |
 | Pablo–Leslie | 54 h | 72 h | 43,2 h | 40 h |
-| Edwin–Shirley | 48 h | 72 h | 43,2 h | 40 h |
+| Edwin–Shirley | 53 h | 72 h | 43,2 h | 45 h |
 
 El 25 de noviembre se reserva para integración, aceptación de la PO, Review y retrospectiva; no se inician historias nuevas. Shirley conserva el rol de Product Owner y la aceptación: el trabajo que desarrolla lo revisa otro integrante.
 
@@ -64,7 +64,8 @@ El 25 de noviembre se reserva para integración, aceptación de la PO, Review y 
 | HU-25 | Historial y auditoría de informes | Baja | 3 | Edwin y Shirley | Tras HU-32/33 |
 | HU-21 | Agrupación N:M — CE-3 | Media | 8 | Pablo y Leslie | **Validar CE-3 antes de codificar** |
 | HU-22 | Carreras muy diferentes y ruta alternativa — CE-2 | Media | 5 | Edwin y Shirley | **Validar CE-2 antes de codificar**; usa HU-07 |
-| | **TOTAL: 14 historias comprometidas** | | **56** | | — |
+| HU-37 | Reutilizar el análisis del agente para el mismo par y los mismos programas ([#77](https://github.com/PabloToapanta/ProyectoHomologacion/issues/77)) | Media | 3 | Edwin y Shirley | Pedida por el ingeniero; aceptada por la PO el 14/11. Toca código de HU-18: revisa Pablo |
+| | **TOTAL: 15 historias comprometidas** | | **59** | | — |
 
 No incluida: la historia para registrar el programa analítico de la universidad de origen (decisión D2 de HU-19). No figura en el Product Backlog; sin ella el análisis externo no llega a «Completo». Solo se planifica si la PO la incorpora.
 
@@ -75,12 +76,12 @@ Cada pareja trabaja sobre los servicios que ya conoce, para no editar en paralel
 - **Pablo y Leslie:** Auth, Gateway, catálogo y motor (HU-02, HU-03, HU-07, HU-09 y HU-21), más el E2E y la CI de HU-27.
 - **Edwin y Shirley:** flujo de la solicitud y el informe, en Solicitudes y Homologación (HU-32, HU-33, HU-17, HU-25, HU-12, HU-24 y HU-22), más el plan de pruebas de HU-27 y HU-28.
 
-Las dos parejas tienen 24 PH cada una; HU-27 (8 PH) se comparte. Edwin y Shirley reciben 6 h menos porque Shirley también dedica tiempo a su rol de Product Owner (aceptación de las 14 historias y Review).
+Pablo y Leslie tienen 24 PH y Edwin y Shirley 27 PH con HU-37; HU-27 (8 PH) se comparte. Las horas quedan casi iguales (54 h y 53 h), aunque Shirley además dedica tiempo a su rol de Product Owner (aceptación de las historias y Review). HU-37 modifica la orquestación de HU-18 (`AsistirEvaluacionInterna`) y la persistencia de HU-20: se acuerda el cambio con Pablo antes de codificar y él lo revisa.
 
 | Pareja | Historias | PH | Horas |
 | --- | --- | --- | --- |
 | Pablo–Leslie | HU-02, HU-03, HU-07, HU-09, HU-21 y HU-27 (T66 E2E, T67 CI) | 24 + HU-27 | 54 h |
-| Edwin–Shirley | HU-32, HU-33, HU-12, HU-17, HU-24, HU-25, HU-22, HU-28 y HU-27 (T65 plan de pruebas) | 24 + HU-27 | 48 h |
+| Edwin–Shirley | HU-32, HU-33, HU-12, HU-17, HU-24, HU-25, HU-22, HU-37, HU-28 y HU-27 (T65 plan de pruebas) | 27 + HU-27 | 53 h |
 
 **Responsable principal por historia** (la pareja colabora; la revisión cruzada la hace un integrante de la otra pareja):
 
@@ -88,8 +89,8 @@ Las dos parejas tienen 24 PH cada una; HU-27 (8 PH) se comparte. Edwin y Shirley
 | --- | --- | --- |
 | Pablo | HU-02 usuarios (8 h), HU-03 parámetros (6 h), HU-21 junto con Leslie (7 h), E2E junto con Leslie (3 h), CI T67 (3 h), cierre del Sprint 2 (1,5 h) | 28,5 h |
 | Leslie | HU-07 mallas (6 h), HU-09 consulta FISEI (8 h), HU-21 junto con Pablo (7 h), E2E junto con Pablo (3 h), cierre del Sprint 2 (1,5 h) | 25,5 h |
-| Edwin | HU-32 remitir (5 h), HU-33 finalizar (6 h), HU-17 RN-07 (4 h), HU-25 auditoría (5 h), HU-22 junto con Shirley (4 h), cierre del Sprint 2 (1,5 h) | 25,5 h |
-| Shirley | HU-12 adjuntos (4 h), HU-24 PDF (5 h), HU-22 junto con Edwin (4 h), plan de pruebas T65 (3 h), HU-28 (5 h), cierre del Sprint 2 (1,5 h); además, la aceptación como PO | 22,5 h |
+| Edwin | HU-32 remitir (5 h), HU-33 finalizar (6 h), HU-17 RN-07 (4 h), HU-25 auditoría (5 h), HU-22 junto con Shirley (4 h), HU-37 junto con Shirley (2,5 h), cierre del Sprint 2 (1,5 h) | 28 h |
+| Shirley | HU-12 adjuntos (4 h), HU-24 PDF (5 h), HU-22 junto con Edwin (4 h), HU-37 junto con Edwin (2,5 h), plan de pruebas T65 (3 h), HU-28 (5 h), cierre del Sprint 2 (1,5 h); además, la aceptación como PO | 25 h |
 
 Cada integrante dispone de 36 h efectivas en el sprint completo (3 h × 15 × 0,8), o de 21,6 h desde el 13/11. Las coincidencias entre parejas son pocas y se coordinan: HU-22 usa las versiones de malla de HU-07, HU-03 toca las reglas de Edwin (HU-15/16) y el E2E de Pablo y Leslie necesita HU-32/33 terminadas.
 
@@ -124,7 +125,9 @@ Cada integrante dispone de 36 h efectivas en el sprint completo (3 h × 15 × 0,
 | T67 | HU-27 | Integración y E2E en GitHub Actions | 3 |
 | T68 | HU-28 | Documentación: arranque con Docker Compose, manual por rol y configuración | 3 |
 | T69 | HU-28 | Guion de demo con datos sintéticos | 2 |
-| | | **TOTAL** | **102 h** |
+| T70 | HU-37 | Homologación: clave de reutilización (par, firmas de ambos programas y correspondencias, umbral y modelo) y guardado solo de análisis completos | 3 |
+| T71 | HU-37 | Reutilizar o forzar un análisis nuevo; la interfaz indica «reutilizado» y su fecha original; pruebas | 2 |
+| | | **TOTAL** | **107 h** |
 
 HU-23 y HU-31 se adelantaron en el Sprint 2 y no consumen capacidad de este sprint; sus horas reales se registran en sus evidencias.
 
@@ -151,7 +154,7 @@ Si el lunes 16/11 no hay validación de CE-2 o CE-3, la PO decide si la historia
 | 13 nov | HU-07 (T58). Solicitar validación de CE-2 y CE-3. | HU-17 (T50). |
 | 16–17 nov | HU-07 (T59) y HU-09 (T60–T61). **Decisión sobre HU-21/22.** | HU-24 (T48) y HU-12 (T49). |
 | 18–19 nov | HU-21 (T62–T63) si se valida CE-3; si no, E2E (T66). | HU-25 (T53); HU-22 (T51) si se valida CE-2. |
-| 20 nov | E2E (T66) y CI (T67). | HU-22 (T52) o documentación (T68). |
+| 20 nov | E2E (T66) y CI (T67). | HU-37 (T70–T71); HU-22 (T52) o documentación (T68). |
 | 23–24 nov | HU-21 (T64) o estabilización. Congelar funcionalidad al cierre del 24. | Documentación (T68) y guion de demo (T69). |
 | 25 nov | Integración final y verificación de seguridad. | Aceptación de la PO, evidencias, Review y retrospectiva. |
 
@@ -161,12 +164,13 @@ Las filas del 5 al 12 de noviembre son el plan base. Si esas tareas no se ejecut
 
 | Riesgo | Mitigación |
 | --- | --- |
-| Avance del 5–12 sin confirmar; quedan 86,4 h efectivas frente a 102 h. | Confirmar en el Planning. Si falta capacidad, la PO decide; candidatas a salir: HU-21 y HU-22. |
+| Avance del 5–12 sin confirmar; quedan 86,4 h efectivas frente a 107 h. | Confirmar en el Planning. Si falta capacidad, la PO decide; candidatas a salir: HU-21 y HU-22. |
 | CE-2 y CE-3 no validados a tiempo. | Fecha límite el 16/11; sin validación, la historia vuelve al Product Backlog. No inventar reglas. |
 | HU-03 cambia el umbral y las reglas que usan HU-14/15/16 y sus pruebas. | Valores iniciales idénticos a los actuales y pruebas existentes en verde; coordinar con Edwin. |
 | HU-07 modifica el modelo del catálogo con datos reales ya cargados. | Migración que asigna la versión vigente a lo existente; respaldo previo de la base. |
 | HU-32/33 cruzan Homologación y Solicitudes. | Contrato acordado antes de T44; clave interna (HU-36) y JWT en ambas llamadas. |
 | E2E inestable en CI (Ollama no disponible en GitHub Actions). | E2E con agente simulado; la prueba con modelo real queda como evidencia local. |
+| HU-37 cambia código de HU-18/HU-20 de otra pareja. | Acordar el cambio con Pablo antes de T70; revisión de Pablo en el PR. |
 | Cambios de varias personas en `App.tsx`, `Program.cs` y Gateway. | Coordinar como en sprints anteriores; PR pequeños y revisados el mismo día. |
 
 ## Coordinación de implementación
