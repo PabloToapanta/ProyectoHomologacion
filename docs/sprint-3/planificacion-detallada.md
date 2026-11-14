@@ -68,6 +68,31 @@ El 25 de noviembre se reserva para integración, aceptación de la PO, Review y 
 
 No incluida: la historia para registrar el programa analítico de la universidad de origen (decisión D2 de HU-19). No figura en el Product Backlog; sin ella el análisis externo no llega a «Completo». Solo se planifica si la PO la incorpora.
 
+### Reparto entre las parejas
+
+Cada pareja trabaja sobre los servicios que ya conoce, para no editar en paralelo los mismos archivos:
+
+- **Pablo y Leslie:** Auth, Gateway, catálogo y motor (HU-02, HU-03, HU-07, HU-09 y HU-21), más el E2E y la CI de HU-27.
+- **Edwin y Shirley:** flujo de la solicitud y el informe, en Solicitudes y Homologación (HU-32, HU-33, HU-17, HU-25, HU-12, HU-24 y HU-22), más el plan de pruebas de HU-27 y HU-28.
+
+Las dos parejas tienen 24 PH cada una; HU-27 (8 PH) se comparte. Edwin y Shirley reciben 6 h menos porque Shirley también dedica tiempo a su rol de Product Owner (aceptación de las 14 historias y Review).
+
+| Pareja | Historias | PH | Horas |
+| --- | --- | --- | --- |
+| Pablo–Leslie | HU-02, HU-03, HU-07, HU-09, HU-21 y HU-27 (T66 E2E, T67 CI) | 24 + HU-27 | 54 h |
+| Edwin–Shirley | HU-32, HU-33, HU-12, HU-17, HU-24, HU-25, HU-22, HU-28 y HU-27 (T65 plan de pruebas) | 24 + HU-27 | 48 h |
+
+**Responsable principal por historia** (la pareja colabora; la revisión cruzada la hace un integrante de la otra pareja):
+
+| Integrante | Lidera | Horas |
+| --- | --- | --- |
+| Pablo | HU-02 usuarios (8 h), HU-03 parámetros (6 h), HU-21 junto con Leslie (7 h), E2E junto con Leslie (3 h), CI T67 (3 h), cierre del Sprint 2 (1,5 h) | 28,5 h |
+| Leslie | HU-07 mallas (6 h), HU-09 consulta FISEI (8 h), HU-21 junto con Pablo (7 h), E2E junto con Pablo (3 h), cierre del Sprint 2 (1,5 h) | 25,5 h |
+| Edwin | HU-32 remitir (5 h), HU-33 finalizar (6 h), HU-17 RN-07 (4 h), HU-25 auditoría (5 h), HU-22 junto con Shirley (4 h), cierre del Sprint 2 (1,5 h) | 25,5 h |
+| Shirley | HU-12 adjuntos (4 h), HU-24 PDF (5 h), HU-22 junto con Edwin (4 h), plan de pruebas T65 (3 h), HU-28 (5 h), cierre del Sprint 2 (1,5 h); además, la aceptación como PO | 22,5 h |
+
+Cada integrante dispone de 36 h efectivas en el sprint completo (3 h × 15 × 0,8), o de 21,6 h desde el 13/11. Las coincidencias entre parejas son pocas y se coordinan: HU-22 usa las versiones de malla de HU-07, HU-03 toca las reglas de Edwin (HU-15/16) y el E2E de Pablo y Leslie necesita HU-32/33 terminadas.
+
 ## 5. Sprint Backlog
 
 | Tarea | HU | Actividad | Horas |
