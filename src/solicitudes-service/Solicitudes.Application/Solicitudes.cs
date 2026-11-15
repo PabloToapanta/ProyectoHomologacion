@@ -107,8 +107,7 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   var nombre=Path.GetFileName((input.NombreArchivo??"").Replace('\\','/')).Trim();
   if(input.Contenido is not { Length: > 0 } || input.Contenido.LongLength>TamanoMaximoAdjuntoBytes)
    throw new SolicitudException("El archivo PDF debe tener contenido y no superar 20 MiB.");
-  var header=input.Contenido.AsSpan();
-  var firmaPdf=header.Length>=8 && header[..5].SequenceEqual("%PDF-"u8) && char.IsAsciiDigit((char)header[5]) && header[6]==(byte)'.' && char.IsAsciiDigit((char)header[7]);
+  var firmaPdf=EsFirmaPdf(input.Contenido);
   if(!string.Equals(Path.GetExtension(nombre),".pdf",StringComparison.OrdinalIgnoreCase) ||
      !string.Equals(input.ContentType,"application/pdf",StringComparison.OrdinalIgnoreCase) || !firmaPdf)
    throw new SolicitudException("El archivo debe ser un PDF válido (.pdf).");
@@ -129,4 +128,8 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   return docenteId is null || await repository.EstaAsignada(solicitudId,docenteId.Value,ct);
  }
  static AdjuntoSolicitudMetadata Metadata(AdjuntoSolicitud a)=>new(a.Id,a.SolicitudId,a.Tipo,a.NombreArchivo,a.TamanoBytes,a.HuellaSha256,a.SubidoPor,a.FechaSubidaUtc);
+ static bool EsFirmaPdf(byte[] contenido) {
+  var header=contenido.AsSpan();
+  return header.Length>=8 && header[..5].SequenceEqual("%PDF-"u8) && char.IsAsciiDigit((char)header[5]) && header[6]==(byte)'.' && char.IsAsciiDigit((char)header[7]);
+ }
 }

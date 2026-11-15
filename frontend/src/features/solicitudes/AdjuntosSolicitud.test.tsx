@@ -8,18 +8,22 @@ const metadata={id:'adj-1',solicitudId:'sol-1',tipo:'Sílabo',nombreArchivo:'sil
 
 it('permite adjuntar el PDF, lista sus metadatos y permite descargarlo',async()=>{
  const user=userEvent.setup();
- vi.stubGlobal('URL',{createObjectURL:vi.fn(()=> 'blob:adjunto-sintetico'),revokeObjectURL:vi.fn()});
  const request=vi.fn(async(_path:string,init?:RequestInit)=>init?.method==='POST'?json(metadata,201):_path.endsWith('/adj-1')?new Response('%PDF-1.7\n', {status:200,headers:{'Content-Type':'application/pdf'}}):json([metadata]));
  render(<AdjuntosSolicitud solicitudId="sol-1" request={request} puedeSubir/>);
  expect(await screen.findByText(/silabo\.pdf/)).toBeInTheDocument();
  await user.selectOptions(screen.getByLabelText('Tipo de documento'),'Sílabo');
  await user.upload(screen.getByLabelText('Archivo PDF'),new File(['%PDF-1.7\n'], 'silabo.pdf',{type:'application/pdf'}));
+ expect((screen.getByLabelText('Archivo PDF') as HTMLInputElement).files).toHaveLength(1);
  await user.click(screen.getByRole('button',{name:'Adjuntar PDF'}));
+ expect(request.mock.calls.some(([path,init])=>path==='/api/solicitudes/sol-1/adjuntos'&&init?.method==='POST')).toBe(true);
  expect(await screen.findByRole('status')).toHaveTextContent('Adjunto guardado en el expediente.');
  const post=request.mock.calls.find(call=>call[1]?.method==='POST');
  expect(post?.[1]?.body).toBeInstanceOf(FormData);
  expect((post?.[1]?.body as FormData).get('tipo')).toBe('Sílabo');
+ const click=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{});
+ vi.stubGlobal('URL',{createObjectURL:vi.fn(()=> 'blob:adjunto-sintetico'),revokeObjectURL:vi.fn()});
  await user.click(screen.getByRole('button',{name:'Descargar'}));
+ expect(click).toHaveBeenCalledOnce();click.mockRestore();
  expect(request).toHaveBeenCalledWith('/api/solicitudes/sol-1/adjuntos/adj-1');
 });
 

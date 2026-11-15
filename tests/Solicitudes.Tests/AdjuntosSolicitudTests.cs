@@ -67,7 +67,7 @@ public sealed class AdjuntosSolicitudTests
         using var f = new SolicitudesFactory(); using var c = f.Client("Coordinador", Guid.NewGuid().ToString());
         var id = await CrearSolicitud(f, c);
         Assert.Equal(HttpStatusCode.BadRequest, (await c.PostAsync($"/api/solicitudes/{id}/adjuntos", Form(pdf: System.Text.Encoding.UTF8.GetBytes(contenido), nombre: nombre, contentType: mediaType))).StatusCode);
-        Assert.Empty(await c.GetFromJsonAsync<List<AdjuntoView>>($"/api/solicitudes/{id}/adjuntos"));
+        Assert.Empty((await c.GetFromJsonAsync<List<AdjuntoView>>($"/api/solicitudes/{id}/adjuntos"))!);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public sealed class AdjuntosSolicitudTests
         var response = await c.PostAsync($"/api/solicitudes/{id}/adjuntos", Form(pdf: contenido));
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains("20 MiB", (await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>()).GetProperty("title").GetString());
-        Assert.Empty(await c.GetFromJsonAsync<List<AdjuntoView>>($"/api/solicitudes/{id}/adjuntos"));
+        Assert.Empty((await c.GetFromJsonAsync<List<AdjuntoView>>($"/api/solicitudes/{id}/adjuntos"))!);
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public sealed class AdjuntosSolicitudTests
         }
         var response = await c.PostAsync($"/api/solicitudes/{id}/adjuntos", Form());
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
-        Assert.Empty(await c.GetFromJsonAsync<List<AdjuntoView>>($"/api/solicitudes/{id}/adjuntos"));
+        Assert.Empty((await c.GetFromJsonAsync<List<AdjuntoView>>($"/api/solicitudes/{id}/adjuntos"))!);
     }
 
     public sealed record AdjuntoView(Guid Id, Guid SolicitudId, string Tipo, string NombreArchivo, long TamanoBytes, string HuellaSha256, string SubidoPor, string FechaSubidaUtc);

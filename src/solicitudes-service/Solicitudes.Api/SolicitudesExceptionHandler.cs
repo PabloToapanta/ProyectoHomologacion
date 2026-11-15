@@ -15,7 +15,7 @@ public sealed class SolicitudesExceptionFilter : IExceptionFilter {
 }
 public sealed class SolicitudesExceptionHandler(IProblemDetailsService problems) : IExceptionHandler {
  public async ValueTask<bool> TryHandleAsync(HttpContext context,Exception exception,CancellationToken ct) {
-  var status=exception is CatalogoNoDisponibleException or DirectorioNoDisponibleException?503:exception is Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException {StatusCode:413}?413:500;
+  var status=exception is CatalogoNoDisponibleException or DirectorioNoDisponibleException?503:exception is Microsoft.AspNetCore.Http.BadHttpRequestException {StatusCode:413}?413:500;
   context.Response.StatusCode=status;
   var title=status switch {413=>"El archivo PDF no puede superar 20 MiB.",503=>exception.Message,_=>"No se pudo completar la operación."};
   return await problems.TryWriteAsync(new ProblemDetailsContext {HttpContext=context,ProblemDetails=new ProblemDetails {Status=status,Title=title}});

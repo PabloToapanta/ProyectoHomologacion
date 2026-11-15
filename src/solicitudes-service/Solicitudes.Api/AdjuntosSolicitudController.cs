@@ -58,5 +58,5 @@ public sealed class AdjuntosSolicitudController(SolicitudService service) : Cont
         return File(adjunto.Contenido, "application/pdf", adjunto.NombreArchivo);
     }
 
-    Guid? DocenteId() => Guid.TryParse(User.FindFirst("sub")?.Value, out var id) ? id : null;
+    Guid? DocenteId() => User.IsInRole("Docente") && Guid.TryParse(User.FindFirst("sub")?.Value, out var id) ? id : null;
 }

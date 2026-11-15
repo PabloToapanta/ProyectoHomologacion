@@ -10,11 +10,12 @@
 - Migración `AdjuntosSolicitudHu12` y panel de adjuntos en vistas de coordinación y docencia.
 - Pruebas automatizadas añadidas en `tests/Solicitudes.Tests/AdjuntosSolicitudTests.cs` y `frontend/src/features/solicitudes/AdjuntosSolicitud.test.tsx`.
 
-## Verificación pendiente
+## Verificación al 15/11/2026, después de corregir errores de prueba
 
-- Backend: no se pudo restaurar NuGet (`api.nuget.org` no resolvió); migración no aplicada y suite .NET no ejecutada.
-- Frontend: `npm run typecheck` y la suite Vitest no se ejecutaron porque no está disponible el ejecutable `tsc`/`vitest` en esta copia.
-- No ejecutado en Docker Compose ni revisado por Leslie; falta aceptación integrada de Shirley.
+- Frontend: `npm run typecheck` aprobado; Vitest aprobó 143 pruebas en 22 archivos.
+- Backend: con .NET 8.0.34, `dotnet test tests/Solicitudes.Tests/Solicitudes.Tests.csproj -c Release` terminó correctamente: 154 pruebas, 149 aprobadas, 0 fallidas y 5 omitidas. Las omitidas requieren SQL Server aislado (`HU10_TEST_SQL`) y se ejecutan en CI. Los mensajes `fail` de excepciones de catálogo/directorio corresponden a pruebas que verifican respuestas de error; no causaron fallos en la suite.
+- La migración aún no se aplicó en SQL Server ni se ejecutó Docker Compose.
+- No revisado por Leslie; falta aceptación integrada de Shirley.
 - Edwin debe revisar que la transacción serializable de la carga se coordine correctamente con la finalización concurrente de HU-33 (#64).
 
-La verificación de migración, pruebas, Compose y revisión cruzada debe actualizarse aquí cuando ocurra; esta evidencia no declara la historia terminada.
+La suite de pruebas backend quedó verificada localmente. La migración en SQL Server, Docker Compose y revisión cruzada siguen pendientes; esta evidencia no declara la historia terminada.

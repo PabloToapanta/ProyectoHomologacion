@@ -34,7 +34,8 @@ public sealed class SolicitudesDbContext(DbContextOptions<SolicitudesDbContext> 
   adj.Property(x=>x.Tipo).HasMaxLength(40).IsRequired();adj.Property(x=>x.NombreArchivo).HasMaxLength(255).IsRequired();
   adj.Property(x=>x.HuellaSha256).HasMaxLength(64).IsRequired();adj.Property(x=>x.SubidoPor).HasMaxLength(256).IsRequired();
   adj.Property(x=>x.FechaSubidaUtc).HasConversion(v=>v,v=>DateTime.SpecifyKind(v,DateTimeKind.Utc));
-  adj.Property(x=>x.Contenido).HasColumnType("varbinary(max)").IsRequired();adj.HasIndex(x=>new{x.SolicitudId,x.FechaSubidaUtc});
+  // Se deja que cada proveedor elija su tipo binario: varbinary(max) en SQL Server y BLOB en SQLite.
+  adj.Property(x=>x.Contenido).IsRequired();adj.HasIndex(x=>new{x.SolicitudId,x.FechaSubidaUtc});
   adj.HasOne<Solicitud>().WithMany().HasForeignKey(x=>x.SolicitudId).OnDelete(DeleteBehavior.Restrict);
  }
 }
