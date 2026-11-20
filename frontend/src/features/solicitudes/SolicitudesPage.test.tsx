@@ -44,6 +44,11 @@ it('el detalle muestra datos, escala, estado e intento y aclara que no implican 
  const fila=screen.getByRole('row',{name:/Álgebra sintética/});for(const texto of ['COD-1','8.55 / 10','Aprobada','15/06/2025','MAT-SINTETICA-1','Segunda','144'])expect(fila).toHaveTextContent(texto);
  expect(screen.getByText(/no implica elegibilidad/i)).toBeInTheDocument();
 });
+it('HU-17: una asignatura en tercera matrícula indica que RN-07 la excluye de la homologación',async()=>{
+ const user=userEvent.setup();render(<SolicitudesPage request={servidor([{...algebra,intentoMatricula:3},externa])}/>);await abrirDetalle(user);
+ expect(screen.getByRole('row',{name:/Álgebra sintética/})).toHaveTextContent('Tercera · excluida (RN-07)');
+ expect(screen.getByRole('row',{name:/Álgebra externa/})).not.toHaveTextContent('RN-07');
+});
 it('sin asignaturas lo indica y el formulario permanece cerrado',async()=>{
  const user=userEvent.setup();render(<SolicitudesPage request={servidor([])}/>);await abrirDetalle(user);
  expect(screen.getByText('Sin asignaturas aprobadas registradas.')).toBeInTheDocument();expect(screen.queryByLabelText('Nota')).not.toBeInTheDocument();

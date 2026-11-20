@@ -53,7 +53,7 @@ public class AnalisisExternoInfraestructuraTests
             id = Id, tipoCambio = "Externo", carreraReceptoraId = Guid.NewGuid(), institucionOrigen = "Universidad sintética Ecuador",
             carreraOrigenExterna = "Carrera sintética", periodosCursados = (int?)null, cambiosPreviosCarrera = 0,
             asignaturasAprobadas = new[] { new { id = Guid.NewGuid(), nombre = "Externa sintética", horas = 64, unidadHoras = "hora", creditos = 4, sistemaCreditos = "sistema",
-                referenciaPrograma = "programa", estado = "Aprobada", fechaAprobacion = "2025-01-01" } }
+                referenciaPrograma = "programa", estado = "Aprobada", fechaAprobacion = "2025-01-01", intentoMatricula = 3 } }
         });
         using var handler = new Capture(body); using var http = new HttpClient(handler);
         var r = await Fuente(http).ObtenerSolicitudExternaAsync(Id, default);
@@ -61,6 +61,7 @@ public class AnalisisExternoInfraestructuraTests
         Assert.Null(r!.PeriodosCursados);
         Assert.Equal(0, r.CambiosPreviosCarrera);
         Assert.Equal("hora", Assert.Single(r.AsignaturasAprobadas).UnidadHoras);
+        Assert.Equal(3, r.AsignaturasAprobadas[0].IntentoMatricula);
     }
 
     [Fact]

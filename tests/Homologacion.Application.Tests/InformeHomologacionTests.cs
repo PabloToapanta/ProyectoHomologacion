@@ -23,6 +23,7 @@ public class InformeHomologacionTests
     {
         public bool Asignada { get; set; } = true;
         public string Tipo { get; set; } = "Interno";
+        public HashSet<Guid> TerceraMatricula { get; } = [];
         public List<AnalisisGuardado> Agente { get; } = [];
         public List<RevisionDocenteRegistrada> Revisiones { get; } = [];
         public InformeHomologacion? Informe { get; set; }
@@ -38,7 +39,7 @@ public class InformeHomologacionTests
             try { return await accion(); } finally { cierre.Release(); }
         }
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Solicitud && Asignada
-            ? new SolicitudParaAnalisis(Solicitud, Tipo, null, Carrera, new[] { A1, A2, A3 }.Select(a =>new AprobadaParaAnalisis(a, null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1))).ToArray())
+            ? new SolicitudParaAnalisis(Solicitud, Tipo, null, Carrera, new[] { A1, A2, A3 }.Select(a =>new AprobadaParaAnalisis(a, null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1), TerceraMatricula.Contains(a) ? 3 : 1)).ToArray())
             : null);
         public Task<IReadOnlyList<ReceptoraAnalisis>> ListarAsync(Guid carreraId, CancellationToken ct) =>
             Task.FromResult<IReadOnlyList<ReceptoraAnalisis>>(carreraId == Carrera ? [new(R1, "R-01", "Receptora uno", 1), new(R2, "R-02", "Receptora dos", 2)] : []);
@@ -69,6 +70,25 @@ public class InformeHomologacionTests
 
     private sealed class Reloj : TimeProvider { public override DateTimeOffset GetUtcNow() => new(2026, 11, 4, 20, 0, 0, TimeSpan.Zero); }
     private static (GenerarInformeHomologacion, Fuentes) Caso() { var f = new Fuentes(); return (new GenerarInformeHomologacion(f, f, f, f, f, f, new Reloj()), f); }
+
+    [Fact]
+    public async Task Tercera_matricula_queda_no_convalidar_con_su_motivo_y_no_afecta_a_las_demas()
+    {
+        var (caso, f) = Caso();
+        f.TerceraMatricula.Add(A1);
+        // Decisiones registradas antes de la regla: RN-07 prevalece sobre ellas en el informe.
+        f.Revision(Ana, A1, R1, "Homologable"); f.Revision(Luis, A1, R1, "Homologable");
+        f.Revision(Ana, A2, R2, "Homologable"); f.Revision(Luis, A2, R2, "Homologable");
+        var i = await caso.GenerarAsync(Solicitud, Ana, "docente.ana", default);
+        var excluida = i.Parejas.Single(p => p.AsignaturaAprobadaId == A1);
+        Assert.Equal("NoConvalidar", excluida.SugerenciaFinal);
+        Assert.Contains("RN-07", excluida.Exclusion);
+        var otra = i.Parejas.Single(p => p.AsignaturaAprobadaId == A2);
+        Assert.Equal("Convalidar", otra.SugerenciaFinal);
+        Assert.Null(otra.Exclusion);
+        Assert.Equal((1, 1), (i.Convalidar, i.NoConvalidar));
+        Assert.Contains(i.Advertencias, a => a.Contains("RN-07"));
+    }
 
     [Fact]
     public async Task Genera_con_agente_docentes_y_sugerencia_final_por_pareja()

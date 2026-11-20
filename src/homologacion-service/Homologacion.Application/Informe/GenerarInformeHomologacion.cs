@@ -1,14 +1,16 @@
 using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.RevisionDocente;
+using Homologacion.Domain.TerceraMatricula;
 
 namespace Homologacion.Application.Informe;
 
 public sealed record AgenteEnInforme(string Estado, string? Sugerencia, decimal? PorcentajeAcademico, decimal? PorcentajeHoras, decimal? PorcentajeCreditos);
 public sealed record DocenteEnInforme(Guid DocenteId, string Docente, string Postura, string Decision, string? Observacion, DateTimeOffset Fecha);
-/// <summary>SugerenciaFinal: Convalidar, NoConvalidar o SinAcuerdo (decide el coordinador).</summary>
+/// <summary>SugerenciaFinal: Convalidar, NoConvalidar o SinAcuerdo (decide el coordinador).
+/// Exclusion: motivo de una regla que impide convalidar (HU-17 / RN-07); null si no aplica. Los informes anteriores no lo incluyen.</summary>
 public sealed record ParejaEnInforme(Guid AsignaturaAprobadaId, Guid AsignaturaReceptoraId, string? ReceptoraCodigo, string? ReceptoraNombre,
-    AgenteEnInforme Agente, IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal);
+    AgenteEnInforme Agente, IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal, string? Exclusion = null);
 /// <summary>HU-23: versión fija del informe; no es una resolución oficial.</summary>
 public sealed record InformeHomologacion(Guid SolicitudId, string TipoCambio, DateTimeOffset Fecha, Guid GeneradoPorId, string GeneradoPor,
     IReadOnlyList<ParejaEnInforme> Parejas, IReadOnlyList<Guid> AprobadasSinAnalisis, int Convalidar, int NoConvalidar, int SinAcuerdo, IReadOnlyList<string> Advertencias);
@@ -52,6 +54,7 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
         if (pendientes.Length > 0)
             throw new DatosAnalisisSolicitudException("Falta el análisis de un docente en las parejas con receptora: " + string.Join(", ", pendientes) + ".");
         var agente = solicitud.TipoCambio == "Externo" ? await externos.ListarAsync(solicitudId, ct) : await internos.ListarAsync(solicitudId, ct);
+        var excluidas = solicitud.AsignaturasAprobadas.Where(a => ReglaTerceraMatricula.Excluye(a.IntentoMatricula)).Select(a => a.Id).ToHashSet();
         var lista = parejas.Select(p =>
         {
             var a = agente.Where(g => g.Analisis.SolicitudId == solicitudId && g.Analisis.AsignaturaAprobadaId == p.Key.AsignaturaAprobadaId
@@ -59,18 +62,21 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
             var docentes = p.OrderBy(r => r.Docente, StringComparer.Ordinal)
                 .Select(r => new DocenteEnInforme(r.DocenteId, r.Docente, r.Postura, r.Decision, r.Observacion, r.Fecha)).ToArray();
             var decisiones = docentes.Select(d => d.Decision).Distinct().ToArray();
-            var final = decisiones.Length > 1 ? "SinAcuerdo" : decisiones[0] == "Homologable" ? "Convalidar" : "NoConvalidar";
+            var excluida = excluidas.Contains(p.Key.AsignaturaAprobadaId);
+            var final = excluida ? "NoConvalidar" : decisiones.Length > 1 ? "SinAcuerdo" : decisiones[0] == "Homologable" ? "Convalidar" : "NoConvalidar";
             catalogo.TryGetValue(p.Key.AsignaturaReceptoraId, out var receptora);
             return new ParejaEnInforme(p.Key.AsignaturaAprobadaId, p.Key.AsignaturaReceptoraId, receptora?.Codigo, receptora?.Nombre,
                 new(a?.Estado ?? "SinAnalisis", a?.Estado == "Completo" ? a.Resultado?.Sugerencia : null,
                     a?.Evaluacion.CompatibilidadAcademicaPct, a?.Evaluacion.CompatibilidadHorariaPct, a?.Evaluacion.CompatibilidadCreditosPct),
-                docentes, final);
+                docentes, final, excluida ? ReglaTerceraMatricula.Motivo : null);
         }).OrderBy(p => p.ReceptoraCodigo ?? p.AsignaturaReceptoraId.ToString(), StringComparer.Ordinal).ThenBy(p => p.AsignaturaAprobadaId).ToArray();
         var analizadas = lista.Select(p => p.AsignaturaAprobadaId).ToHashSet();
         var sinAnalisis = solicitud.AsignaturasAprobadas.Select(a => a.Id).Where(id => !analizadas.Contains(id)).ToArray();
         var sinAcuerdo = lista.Count(p => p.SugerenciaFinal == "SinAcuerdo");
         var advertencias = new List<string> { "Informe técnico para el coordinador de carrera; no es una resolución oficial." };
         if (sinAcuerdo > 0) advertencias.Add("Hay parejas sin acuerdo entre los docentes: decide el coordinador de carrera.");
+        if (lista.Any(p => p.Exclusion is not null))
+            advertencias.Add("Hay asignaturas aprobadas en tercera matrícula: RN-07 las excluye y su sugerencia final es «No convalidar»; las demás se evalúan normalmente.");
         if (sinAnalisis.Length > 0) advertencias.Add("Hay asignaturas aprobadas sin análisis docente; no tienen sugerencia.");
         var nombre = string.IsNullOrWhiteSpace(docente) ? docenteId.ToString() : docente.Trim();
         var informe = new InformeHomologacion(solicitudId, solicitud.TipoCambio, reloj.GetUtcNow(), docenteId, nombre.Length > 256 ? nombre[..256] : nombre,

@@ -1,3 +1,4 @@
+using Homologacion.Domain.TerceraMatricula;
 using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Domain.RevisionDocente;
@@ -53,6 +54,9 @@ public sealed class RegistrarRevisionDocente(ISolicitudesAnalisisInterno solicit
         (string Postura, string Decision, string? Observacion) resuelto;
         try { resuelto = ReglaRevisionDocente.Resolver(input.Postura, input.Decision, input.Observacion, estado, sugerencia); }
         catch (RevisionDocenteInvalidaException error) { throw new DatosAnalisisSolicitudException(error.Message); }
+        // HU-17 / RN-07: la asignatura aprobada en tercera matrícula no admite una decisión «Homologable», ni siquiera de un análisis anterior.
+        if (resuelto.Decision == "Homologable" && solicitud.AsignaturasAprobadas.Any(a => a.Id == input.AprobadaId && ReglaTerceraMatricula.Excluye(a.IntentoMatricula)))
+            throw new DatosAnalisisSolicitudException(ReglaTerceraMatricula.Motivo + " Registre un ajuste con la decisión «No homologable».");
         var nombre = string.IsNullOrWhiteSpace(docente) ? docenteId.ToString() : docente.Trim();
         var registro = new RevisionDocenteRegistrada(solicitudId, input.AprobadaId, input.ReceptoraId, docenteId, nombre.Length > 256 ? nombre[..256] : nombre,
             resuelto.Postura, resuelto.Decision, resuelto.Observacion, estado, sugerencia, reloj.GetUtcNow());

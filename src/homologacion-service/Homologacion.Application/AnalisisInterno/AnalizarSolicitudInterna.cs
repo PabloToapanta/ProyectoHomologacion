@@ -1,6 +1,8 @@
 using Homologacion.Application.Antiguedad;
 using Homologacion.Application.Equivalencias;
+using Homologacion.Application.TerceraMatricula;
 using Homologacion.Domain.Antiguedad;
+using Homologacion.Domain.TerceraMatricula;
 
 namespace Homologacion.Application.AnalisisInterno;
 
@@ -41,6 +43,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         if (!Enum.TryParse<EstadoAsignatura>(aprobada.Estado, out var estado) || !Enum.IsDefined(estado)
             || aprobada.Estado != estado.ToString())
             throw new FuenteAnalisisNoDisponibleException();
+        var terceraMatricula = ExclusionTerceraMatricula.Evaluar(aprobada.IntentoMatricula);
         var hoy = DateOnly.FromDateTime(reloj.GetUtcNow().ToOffset(TimeSpan.FromHours(-5)).DateTime);
         ResultadoAntiguedad? antiguedad = null;
         if (aprobada.FechaAprobacion == default || aprobada.FechaAprobacion > hoy)
@@ -50,6 +53,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             antiguedad = new ValidarAntiguedad().Ejecutar(new(estado, aprobada.FechaAprobacion, hoy));
             if (antiguedad.Estado != EstadoAntiguedad.Elegible) faltantes.Add(antiguedad.Motivo);
         }
+        if (terceraMatricula == ResultadoTerceraMatricula.IntentoDesconocido) faltantes.Add(ReglaTerceraMatricula.FaltaIntento);
         var revision = await catalogo.ObtenerRevisionAsync(origenId, receptoraId, ct);
         if (!revision.Registrada || !revision.Vigente) faltantes.Add("faltan correspondencias explícitas revisadas y vigentes de ambos programas");
         else if (revision.Contenidos is null || revision.Resultados is null
@@ -58,6 +62,19 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             revision.Registrada && revision.Vigente ? Vinculos(origenId, revision.Contenidos) : null,
             revision.Registrada && revision.Vigente ? Vinculos(origenId, revision.Resultados) : null);
         var textos = Textos(origen).Concat(Textos(receptora)).ToArray();
+        var advertencias = new[]
+        {
+            "Los mínimos globales del cambio interno no están evaluados: faltan períodos cursados y el cómputo completo de la solicitud. No es una aprobación oficial.",
+            "Se consultó el catálogo actual; su versión histórica debe confirmarse durante la revisión académica."
+        };
+        if (terceraMatricula == ResultadoTerceraMatricula.Excluida)
+        {
+            EvaluacionEquivalencia motor;
+            try { motor = asistencia.EvaluarSinAgente(datos); }
+            catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
+            return ExclusionTerceraMatricula.Resultado(solicitudId, aprobadaId, receptoraId, motor, antiguedad,
+                origen.EsSintetico || receptora.EsSintetico, advertencias);
+        }
         AnalisisAsistido resultado;
         try { resultado = await asistencia.EjecutarAsync(datos, textos, faltantes, ct); }
         catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
@@ -75,9 +92,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         };
         var resumen = estadoAnalisis == "Completo" ? Resumen(resultado) : null;
         return new(solicitudId, aprobadaId, receptoraId, estadoAnalisis, mensaje, resumen, resultado.Evaluacion, antiguedad,
-            origen.EsSintetico || receptora.EsSintetico,
-            ["Los mínimos globales del cambio interno no están evaluados: faltan períodos cursados y el cómputo completo de la solicitud. No es una aprobación oficial.",
-                "Se consultó el catálogo actual; su versión histórica debe confirmarse durante la revisión académica."]);
+            origen.EsSintetico || receptora.EsSintetico, advertencias);
     }
 
     private static DatosAsignatura Datos(AsignaturaParaAnalisis a) => new(a.Id.ToString(), a.PlanAnalitico, a.Horas,
