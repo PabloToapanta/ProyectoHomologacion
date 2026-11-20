@@ -4,7 +4,7 @@ namespace Homologacion.Application.AnalisisExterno;
 
 /// <summary>HU-19: asignatura de otra universidad ecuatoriana (SC-01) tal como la registró el Coordinador en HU-11.</summary>
 public sealed record AprobadaExternaParaAnalisis(Guid Id, string Nombre, int Horas, string? UnidadHoras, decimal Creditos, string? SistemaCreditos,
-    string? ReferenciaPrograma, string Estado, DateOnly FechaAprobacion);
+    string? ReferenciaPrograma, string Estado, DateOnly FechaAprobacion, int? IntentoMatricula = null);
 /// <summary>HU-19: contexto mínimo de Solicitudes. Períodos y cambios previos null = sin dato declarado (D4).</summary>
 public sealed record SolicitudExternaParaAnalisis(Guid Id, string TipoCambio, Guid CarreraReceptoraId, string? InstitucionOrigen,
     string? CarreraOrigenExterna, int? PeriodosCursados, int? CambiosPreviosCarrera, IReadOnlyList<AprobadaExternaParaAnalisis> AsignaturasAprobadas);

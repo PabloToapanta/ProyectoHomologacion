@@ -55,6 +55,7 @@ public class ContextoAnalisisExternoTests
         Assert.Equal("programa-externo-sintetico", a.GetProperty("referenciaPrograma").GetString());
         Assert.Equal("Aprobada", a.GetProperty("estado").GetString());
         Assert.Equal("2025-07-15", a.GetProperty("fechaAprobacion").GetString());
+        Assert.Equal(1, a.GetProperty("intentoMatricula").GetInt32()); // HU-17 / RN-07
         foreach (var dato in new[] { "Q-EXT-CTX", "EST-SINTETICO-CTX", "Estudiante sintético contexto", "MATRICULA-EXTERNA-SINTETICA", "docente.ana" })
             Assert.DoesNotContain(dato, body);
     }

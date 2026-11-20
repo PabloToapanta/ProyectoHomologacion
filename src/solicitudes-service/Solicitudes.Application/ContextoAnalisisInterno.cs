@@ -1,6 +1,7 @@
 namespace Solicitudes.Application;
 
-public sealed record AsignaturaContextoInterno(Guid Id, Guid? AsignaturaOrigenId, decimal Creditos, int Horas, string Estado, DateOnly FechaAprobacion);
+/// <summary>IntentoMatricula (1–3): HU-17 / RN-07. No incluye el número de matrícula.</summary>
+public sealed record AsignaturaContextoInterno(Guid Id, Guid? AsignaturaOrigenId, decimal Creditos, int Horas, string Estado, DateOnly FechaAprobacion, int IntentoMatricula);
 public sealed record SolicitudContextoInterno(Guid Id, string TipoCambio, Guid? CarreraOrigenId, Guid CarreraReceptoraId,
     IReadOnlyList<AsignaturaContextoInterno> AsignaturasAprobadas);
 
@@ -14,6 +15,6 @@ public static class ConsultarContextoAnalisisInterno
         if (solicitud is null) return null;
         var materias = await repository.AsignaturasDe(solicitudId, ct);
         return new(solicitud.Id, solicitud.TipoCambio, solicitud.CarreraOrigenId, solicitud.CarreraReceptoraId,
-            materias.Select(a => new AsignaturaContextoInterno(a.Id, a.AsignaturaOrigenId, a.Creditos, a.Horas, a.Estado, a.FechaAprobacion)).ToArray());
+            materias.Select(a => new AsignaturaContextoInterno(a.Id, a.AsignaturaOrigenId, a.Creditos, a.Horas, a.Estado, a.FechaAprobacion, a.IntentoMatricula)).ToArray());
     }
 }

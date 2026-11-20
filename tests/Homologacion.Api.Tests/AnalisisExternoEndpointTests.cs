@@ -21,7 +21,7 @@ public class AnalisisExternoEndpointTests
     private sealed class Escenario : ISolicitudesAnalisisExterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno, ISolicitudesAnalisisInterno
     {
         public SolicitudExternaParaAnalisis? Solicitud { get; set; } = new(SolicitudId, "Externo", Carrera, "Universidad sintética Ecuador", "Carrera sintética", 3, 0,
-            [new(AprobadaId, "Externa sintética", 80, "hora-reloj", 8, "sistema-sintetico", "programa-sintetico", "Aprobada", new DateOnly(2025, 1, 1))]);
+            [new(AprobadaId, "Externa sintética", 80, "hora-reloj", 8, "sistema-sintetico", "programa-sintetico", "Aprobada", new DateOnly(2025, 1, 1), 1)]);
         public bool FuenteCaida { get; set; }
         public int Consultas { get; private set; }
         public Guid CarreraListada { get; private set; }

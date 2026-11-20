@@ -4,7 +4,7 @@ type Aprobada={id:string;nombreAsignatura:string};
 type DocenteEnInforme={docenteId:string;docente:string;postura:'DeAcuerdo'|'Ajuste';decision:'Homologable'|'NoHomologable';observacion:string|null;fecha:string};
 type Pareja={asignaturaAprobadaId:string;asignaturaReceptoraId:string;receptoraCodigo:string|null;receptoraNombre:string|null;
  agente:{estado:string;sugerencia:string|null;porcentajeAcademico:number|null;porcentajeHoras:number|null;porcentajeCreditos:number|null};
- docentes:DocenteEnInforme[];sugerenciaFinal:'Convalidar'|'NoConvalidar'|'SinAcuerdo'};
+ docentes:DocenteEnInforme[];sugerenciaFinal:'Convalidar'|'NoConvalidar'|'SinAcuerdo';exclusion?:string|null};
 type Informe={solicitudId:string;tipoCambio:string;fecha:string;generadoPor:string;parejas:Pareja[];aprobadasSinAnalisis:string[];
  convalidar:number;noConvalidar:number;sinAcuerdo:number;advertencias:string[]};
 const posturas={DeAcuerdo:'De acuerdo',Ajuste:'Ajuste'} as const;
@@ -56,7 +56,7 @@ export function InformePanel({request,solicitudId,aprobadas}:{request:Request;so
      <td>{p.agente.estado}{p.agente.sugerencia?` · ${p.agente.sugerencia}`:''}</td>
      <td>{pct(p.agente.porcentajeAcademico)} · {pct(p.agente.porcentajeHoras)} · {pct(p.agente.porcentajeCreditos)}</td>
      <td><ul>{p.docentes.map(d=><li key={d.docenteId}>{`${d.docente}: ${posturas[d.postura]} · ${decisiones[d.decision]}${d.observacion?` · ${d.observacion}`:''}`}</li>)}</ul></td>
-     <td><strong>{finales[p.sugerenciaFinal]}</strong></td>
+     <td><strong>{finales[p.sugerenciaFinal]}</strong>{p.exclusion&&<p>{p.exclusion}</p>}</td>
     </tr>)}</tbody></table></div>
    {informe.aprobadasSinAnalisis.length>0&&<p>Sin análisis docente: {informe.aprobadasSinAnalisis.map(nombre).join(', ')}.</p>}
    {informe.advertencias.map(a=><p key={a}>{a}</p>)}
