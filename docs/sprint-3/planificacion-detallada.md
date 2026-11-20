@@ -1,6 +1,6 @@
 # Planificación del Sprint 3
 
-Relacionado con [Issue #8 — planificación general](https://github.com/PabloToapanta/ProyectoHomologacion/issues/8). Versión de coordinación del 13/11/2026, preparada para el Planning con la Product Owner. Distribuye trabajo planificado; no acredita avance ni disponibilidad de días ya transcurridos.
+Relacionado con [Issue #8 — planificación general](https://github.com/PabloToapanta/ProyectoHomologacion/issues/8). Versión de coordinación del 13/11/2026, preparada para el Planning con la Product Owner; **actualizada el 20/11/2026** con las respuestas del ingeniero ([decisiones de validación](decisiones-validacion-ingeniero.md)) y el estado verificable de las ramas. Distribuye trabajo planificado; no acredita avance ni disponibilidad de días ya transcurridos.
 
 Sistema de Homologación de Materias (FISEI-UTA) · 5 al 25 de noviembre de 2026 · Desarrollo principal: 5–24 de noviembre · Integración, aceptación y Review: miércoles 25 de noviembre
 
@@ -19,6 +19,23 @@ Sistema de Homologación de Materias (FISEI-UTA) · 5 al 25 de noviembre de 2026
 - `develop` no tiene commits posteriores al 04/11 (último: `4b1162c`, HU-23). No existen Issues de GitHub para las historias pendientes del Sprint 3.
 - Ramas del cierre del Sprint 2 sin integrar: `feature/hu-08-revision-carga-masiva` y `feature/hu-01-sesion-recarga` (publicadas, sin PR registrado aquí) y `feature/hu-18-espera-agente` (solo local).
 - El avance real del 5 al 12 de noviembre debe confirmarlo el equipo. Se mantienen las 14 historias más HU-37; la capacidad se revisa con ese dato (sección 3).
+
+**Estado verificable al 20/11/2026** (repositorio remoto; el trabajo local no publicado no se ve):
+
+- `develop` sigue en `4b1162c` (04/11); no se ha integrado nada del Sprint 3.
+- Issues creados: #63–#77. PR abiertas a `develop`, todas sin merge:
+
+  | PR | Contenido |
+  | --- | --- |
+  | [#78](https://github.com/PabloToapanta/ProyectoHomologacion/pull/78) | HU-08 |
+  | [#79](https://github.com/PabloToapanta/ProyectoHomologacion/pull/79) | HU-01, sesión |
+  | [#80](https://github.com/PabloToapanta/ProyectoHomologacion/pull/80) | HU-18, espera del agente |
+  | [#81](https://github.com/PabloToapanta/ProyectoHomologacion/pull/81) | Esta planificación |
+  | [#82](https://github.com/PabloToapanta/ProyectoHomologacion/pull/82) | HU-12, adjuntos |
+  | [#83](https://github.com/PabloToapanta/ProyectoHomologacion/pull/83) | HU-24, PDF |
+
+- Sin ramas publicadas para HU-02, 03, 07, 09, 17, 21, 22, 25, 27, 28, 32, 33 ni 37.
+- Las respuestas del ingeniero (CE-2, CE-3, RN-07, HU-03, HU-32/33, HU-37) se registran en [decisiones de validación](decisiones-validacion-ingeniero.md). El equipo decide **mantener todas las historias** e implementar con esos criterios, como reglas de análisis del proyecto pendientes de confirmación institucional.
 
 ## 2. Objetivo del sprint
 
@@ -44,6 +61,16 @@ Se planifican 15 jornadas: jueves 5 y viernes 6; del lunes 9 al viernes 13; del 
 | Pablo–Leslie | 54 h | 72 h | 43,2 h | 40 h |
 | Edwin–Shirley | 53 h | 72 h | 43,2 h | 45 h |
 
+**Revisión del 20/11/2026.** Quedan tres jornadas de desarrollo (viernes 20, lunes 23 y martes 24): 4 × 3 h × 3 × 0,8 = **28,8 h efectivas**. Restando HU-12 y HU-24 (en PR) y el cierre del Sprint 2 ya abierto en PR, el trabajo sin código publicado ronda las **95 h**. El equipo decide mantener todas las historias. Para que el 25/11 haya un flujo demostrable, se trabaja en este orden de prioridad (sección 7):
+
+1. Integrar las PR abiertas.
+2. HU-32/33.
+3. HU-17, HU-03 y HU-37.
+4. HU-02, HU-07 y HU-09.
+5. HU-22 y HU-21.
+
+Lo que no esté integrado y aceptado el 24/11 no se declara hecho: la PO lo devuelve al Product Backlog en la Review. Si los integrantes amplían sus horas, se registra la disponibilidad real.
+
 El 25 de noviembre se reserva para integración, aceptación de la PO, Review y retrospectiva; no se inician historias nuevas. Shirley conserva el rol de Product Owner y la aceptación: el trabajo que desarrolla lo revisa otro integrante.
 
 ## 4. Historias
@@ -58,12 +85,12 @@ El 25 de noviembre se reserva para integración, aceptación de la PO, Review y 
 | HU-07 | Versionar mallas (vigente / no vigente) — CE-2 | Media | 3 | Pablo y Leslie | — |
 | HU-09 | Consultar materias homologables entre carreras FISEI | Media | 5 | Pablo y Leslie | Usa correspondencias revisadas |
 | HU-12 | Adjuntar historial y sílabos a la solicitud | Media | 2 | Edwin y Shirley | — |
-| HU-17 | Regla de tercera matrícula (RN-07) | Media | 2 | Edwin y Shirley | Precisar «la malla receptora considera la asignatura» |
+| HU-17 | Regla de tercera matrícula (RN-07) | Media | 2 | Edwin y Shirley | 20/11: se excluye la asignatura, no la solicitud |
 | HU-24 | Exportar el informe a PDF | Media | 3 | Edwin y Shirley | — |
 | HU-28 | Documentación y guion de demo | Media | 3 | Shirley y Edwin | Al final |
 | HU-25 | Historial y auditoría de informes | Baja | 3 | Edwin y Shirley | Tras HU-32/33 |
-| HU-21 | Agrupación N:M — CE-3 | Media | 8 | Pablo y Leslie | **Validar CE-3 antes de codificar** |
-| HU-22 | Carreras muy diferentes y ruta alternativa — CE-2 | Media | 5 | Edwin y Shirley | **Validar CE-2 antes de codificar**; usa HU-07 |
+| HU-21 | Agrupación N:M — CE-3 | Media | 8 | Pablo y Leslie | 20/11: alcance N:1 acotado, pendiente de validación institucional |
+| HU-22 | Carreras muy diferentes y ruta alternativa — CE-2 | Media | 5 | Edwin y Shirley | 20/11: solo alerta informativa, sin bloqueo; usa HU-07 |
 | HU-37 | Reutilizar el análisis del agente para el mismo par y los mismos programas ([#77](https://github.com/PabloToapanta/ProyectoHomologacion/issues/77)) | Media | 3 | Edwin y Shirley | Pedida por el ingeniero; aceptada por la PO el 14/11. Toca código de HU-18: revisa Pablo |
 | | **TOTAL: 15 historias comprometidas** | | **59** | | — |
 
@@ -101,23 +128,23 @@ Cada integrante dispone de 36 h efectivas en el sprint completo (3 h × 15 × 0,
 | — | Sprint 2 | PR a `develop`, revisión cruzada y aceptación de HU-08, HU-01 (sesión) y HU-18 (espera del agente) | 6 |
 | T44 | HU-32 | Homologación: remitir el informe una sola vez (fecha, docente asignado); la solicitud pasa a «Remitida» mediante contrato con Solicitudes | 3 |
 | T45 | HU-32 | Interfaz: «Remitir al coordinador» y estado visible para docentes y coordinador | 2 |
-| T46 | HU-33 | API del coordinador: informes remitidos, decisión en parejas «Sin acuerdo» y finalización; la solicitud queda en solo lectura | 4 |
+| T46 | HU-33 | API del coordinador: informes remitidos; en las parejas «Sin acuerdo», decisión propia motivada (resultado, justificación, autor, fecha); finalización con la solicitud en solo lectura. La devolución y la reapertura quedan fuera | 4 |
 | T47 | HU-33 | Interfaz de revisión y finalización del coordinador | 2 |
 | T48 | HU-24 | Exportar el informe fijo a PDF (acordar: hoja de impresión del navegador o generación en servidor) y prueba | 5 |
 | T49 | HU-12 | Adjuntos PDF de la solicitud (límite de tamaño, huella SHA-256, quién y cuándo) e interfaz | 4 |
-| T50 | HU-17 | RN-07 con TDD: aprobada con tercera matrícula y malla receptora que considera la asignatura → cambio no procedente; mostrarlo en análisis e informe | 4 |
-| T51 | HU-22 | CE-2 en el informe: sin el mínimo, sugerir «no convalidar» y la vía de admisión; malla de origen no vigente, indicar la ruta de cambio de plan | 5 |
+| T50 | HU-17 | RN-07 con TDD: una asignatura aprobada en tercera matrícula, con evidencia adjunta (HU-12), queda excluida; las demás se evalúan; sin evidencia, «información incompleta». Mostrarlo en el análisis y el informe | 4 |
+| T51 | HU-22 | CE-2 en el informe, como alerta sin bloqueo: sin el mínimo de HU-16, remitir al proceso de admisión y cambio de carrera de la UTA citando la fuente; si la malla de origen no está vigente, indicar que la carrera confirma la ruta de cambio de plan | 5 |
 | T52 | HU-22 | Interfaz e informe de la ruta alternativa | 3 |
 | T53 | HU-25 | Registro de eventos del informe (generado, remitido, finalizado) y consulta del historial | 5 |
 | T54 | HU-02 | Auth: el administrador crea, activa/desactiva y cambia el rol de docentes y coordinadores; contraseña temporal con hash | 5 |
 | T55 | HU-02 | Interfaz de usuarios y roles | 3 |
-| T56 | HU-03 | Parámetros persistidos (umbral, años máximos, mínimos interno/externo) con los valores vigentes como iniciales; el motor los lee | 4 |
+| T56 | HU-03 | Parámetros persistidos (umbral, años máximos —10 provisional—, mínimos interno/externo) con los valores vigentes como iniciales. Historial de cambios (actor, fecha, anterior/nuevo, motivo, respaldo) e instantánea de los parámetros en cada análisis. El motor los lee | 4 |
 | T57 | HU-03 | Interfaz de parámetros | 2 |
 | T58 | HU-07 | Catálogo: versión de malla vigente/no vigente y asignaturas por versión; migración sin pérdida de datos | 4 |
 | T59 | HU-07 | Interfaz de versiones de malla | 2 |
 | T60 | HU-09 | Consulta de homologables entre dos carreras FISEI con el motor determinista sobre correspondencias revisadas | 5 |
 | T61 | HU-09 | Interfaz de la consulta | 3 |
-| T62 | HU-21 | Motor N:M según CE-3 (unión de temas, suma de horas) con TDD | 6 |
+| T62 | HU-21 | Motor de agrupación N:1 con TDD: cobertura de cada elemento receptor contado una vez; suma de horas y créditos de los orígenes aprobados (tope 100 %); unidades distintas → «información incompleta»; origen de uso único por solicitud | 6 |
 | T63 | HU-21 | Solicitud, análisis e informe marcados «homologación por agrupación» | 5 |
 | T64 | HU-21 | Interfaz de agrupación | 3 |
 | T65 | HU-27 | Plan de pruebas: matriz HU → criterio → prueba automatizada o manual | 3 |
@@ -125,8 +152,8 @@ Cada integrante dispone de 36 h efectivas en el sprint completo (3 h × 15 × 0,
 | T67 | HU-27 | Integración y E2E en GitHub Actions | 3 |
 | T68 | HU-28 | Documentación: arranque con Docker Compose, manual por rol y configuración | 3 |
 | T69 | HU-28 | Guion de demo con datos sintéticos | 2 |
-| T70 | HU-37 | Homologación: clave de reutilización (par, firmas de ambos programas y correspondencias, umbral y modelo) y guardado solo de análisis completos | 3 |
-| T71 | HU-37 | Reutilizar o forzar un análisis nuevo; la interfaz indica «reutilizado» y su fecha original; pruebas | 2 |
+| T70 | HU-37 | Homologación: clave de reutilización (par, firmas de ambos programas y de las correspondencias, parámetros, modelo y versión de la plantilla del prompt), sin caducidad por tiempo, guardando solo análisis completos | 3 |
+| T71 | HU-37 | Reutilizar o forzar un análisis nuevo (docente asignado, motivo registrado, sin borrar el anterior); la interfaz indica «reutilizado», la fecha y el id del análisis original; pruebas | 2 |
 | | | **TOTAL** | **107 h** |
 
 HU-23 y HU-31 se adelantaron en el Sprint 2 y no consumen capacidad de este sprint; sus horas reales se registran en sus evidencias.
@@ -144,6 +171,22 @@ HU-23 y HU-31 se adelantaron en el Sprint 2 y no consumen capacidad de este spri
 
 Si el lunes 16/11 no hay validación de CE-2 o CE-3, la PO decide si la historia afectada se mantiene o vuelve al Product Backlog; no se codifican reglas sin validar.
 
+**Estado al 20/11/2026.** El ingeniero respondió las decisiones académicas con una lectura de fuentes públicas (RRA del CES e instructivo UTA RES CAU-P-005-2023); él mismo aclara que no sustituye el pronunciamiento institucional. El detalle está en [decisiones de validación](decisiones-validacion-ingeniero.md).
+
+| Decisión | Resultado para implementar |
+| --- | --- |
+| CE-3 (HU-21) | Solo agrupación N:1, con cobertura sin doble conteo, suma de horas y créditos de los orígenes aprobados, y cada origen usado una vez. Es regla del proyecto, pendiente de validación. |
+| CE-2 (HU-22) | No se define «muy diferentes». Alerta informativa sin bloqueo, que remite al proceso de la UTA. |
+| RN-07 (HU-17) | Se excluye la asignatura aprobada en tercera matrícula, no toda la solicitud. Ya no hace falta definir qué significa «considera». |
+| HU-03 | Historial de cambios e instantánea por análisis. La propuesta es que cambie los parámetros el rol Coordinador; **lo confirma la PO**. |
+| Estados HU-32/33 | Se remite con todas las parejas completas. En «Sin acuerdo», decisión motivada del coordinador. Finalizar bloquea la edición. La devolución y la reapertura quedan fuera. El contrato técnico lo acuerdan Edwin y Pablo. |
+| PDF (HU-24) | Lo resuelve la PR #83. Lleva la leyenda «Formato del sistema; no sustituye el formato oficial». |
+
+Hallazgos sobre lo entregado:
+
+- **Antigüedad.** El CES dice 10 años y el instructivo UTA de 2023, 5 años. Se mantienen 10 años como valor provisional y parametrizable.
+- **Tres criterios del motor.** Se presentan como regla de análisis del proyecto; el CES nombra contenido, profundidad y carga horaria.
+
 ## 7. Calendario
 
 | Fecha | Pablo y Leslie | Edwin y Shirley |
@@ -160,12 +203,25 @@ Si el lunes 16/11 no hay validación de CE-2 o CE-3, la PO decide si la historia
 
 Las filas del 5 al 12 de noviembre son el plan base. Si esas tareas no se ejecutaron, se recorren al período restante y se revisa la capacidad (sección 3).
 
+**Calendario ajustado del 20/11/2026.** Sigue el orden de prioridad de la sección 3 y mantiene todas las historias.
+
+| Fecha | Pablo y Leslie | Edwin y Shirley |
+| --- | --- | --- |
+| Vie 20 nov | Revisar e integrar #78, #79, #80 y #82/#83 (revisión cruzada). Contrato de estados con Edwin. HU-03 (T56). | Contrato de estados HU-32/33 con Pablo. HU-32 (T44–T45). HU-17 (T50) con TDD. |
+| Lun 23 nov | HU-03 (T57) y HU-02 (T54–T55). HU-07 (T58–T59). | HU-33 (T46–T47). HU-37 (T70–T71), revisado por Pablo. |
+| Mar 24 nov | HU-09 (T60–T61) y HU-21 (T62–T64). E2E (T66) y CI (T67). Congelar a las 18:00. | HU-25 (T53) y HU-22 (T51–T52). Plan de pruebas (T65), documentación (T68) y guion (T69). |
+| Mié 25 nov | Integración final con Docker Compose y verificación de seguridad. | Aceptación de la PO, evidencias, Review y retrospectiva. |
+
+Con 28,8 h efectivas no cabe todo: lo pendiente el martes 24 no se declara hecho (sección 3).
+
 ## 8. Riesgos del sprint
 
 | Riesgo | Mitigación |
 | --- | --- |
-| Avance del 5–12 sin confirmar; quedan 86,4 h efectivas frente a 107 h. | Confirmar en el Planning. Si falta capacidad, la PO decide; candidatas a salir: HU-21 y HU-22. |
-| CE-2 y CE-3 no validados a tiempo. | Fecha límite el 16/11; sin validación, la historia vuelve al Product Backlog. No inventar reglas. |
+| Avance del 5–12 sin confirmar; quedan 86,4 h efectivas frente a 107 h. | Confirmar en el Planning. Si falta capacidad, la PO decide; candidatas a salir: HU-21 y HU-22. (Revisado el 20/11: se mantienen; ver la fila de capacidad del 20/11). |
+| CE-2 y CE-3 no validados a tiempo. | 20/11: respuesta del ingeniero sin pronunciamiento institucional. Se implementan los alcances acotados de las [decisiones de validación](decisiones-validacion-ingeniero.md), marcados como reglas de análisis del proyecto; no se inventan reglas fuera de ellos. |
+| 20/11: unas 95 h sin código publicado frente a 28,8 h efectivas. | Seguir el orden de prioridad; integrar cada día; lo que no esté aceptado el 24/11 vuelve al Product Backlog. |
+| Antigüedad de 10 años (CES) frente a 5 años (instructivo UTA 2023). | Valor provisional de 10 años, parametrizado en HU-03 y advertido en la documentación; lo confirma la UTA. |
 | HU-03 cambia el umbral y las reglas que usan HU-14/15/16 y sus pruebas. | Valores iniciales idénticos a los actuales y pruebas existentes en verde; coordinar con Edwin. |
 | HU-07 modifica el modelo del catálogo con datos reales ya cargados. | Migración que asigna la versión vigente a lo existente; respaldo previo de la base. |
 | HU-32/33 cruzan Homologación y Solicitudes. | Contrato acordado antes de T44; clave interna (HU-36) y JWT en ambas llamadas. |
