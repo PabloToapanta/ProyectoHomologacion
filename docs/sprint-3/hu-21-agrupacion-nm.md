@@ -2,9 +2,9 @@
 
 **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** Pablo comunicó el 21/11/2026 que Shirley y el ingeniero revisaron y aceptaron el alcance funcional N:M. El contrato técnico se definió en las decisiones 1–7 de este documento. Pendientes: reestimación, implementación, pruebas y aceptación de la historia.
+**Estado:** Pablo comunicó el 21/11/2026 que Shirley y el ingeniero revisaron y aceptaron el alcance funcional N:M. El contrato técnico se definió en las decisiones 1–7 de este documento. Reestimación técnica registrada el 21/11/2026; pendientes implementación, pruebas y aceptación de la historia.
 
-**Sprint:** 3 · **Estimación vigente del backlog:** 8 PH, T62–T64 (14 h). El alcance N:M debe reestimarse antes de comprometer esas horas.
+**Sprint:** 3 · **Estimación original del backlog:** 8 PH, T62–T64 (14 h). **Reestimación técnica N:M:** 21 PH propuestos y 42 h de tareas; pendiente revisión de capacidad con Pablo, Leslie y Shirley.
 **Desarrollo:** Pablo y Leslie. **Revisión técnica:** Edwin. **Aceptación funcional:** Shirley (PO).
 
 ## Historia de usuario
@@ -16,7 +16,7 @@
 | Prioridad | Media |
 | Riesgo | Alto: distribución del aporte académico entre receptoras y compatibilidad con el modelo actual de parejas |
 | Nombre | Análisis de agrupación N:M |
-| Puntos de historia | 8 PH en el backlog, sujetos a revisión de alcance |
+| Puntos de historia | 8 PH originales; 21 PH propuestos para el alcance N:M |
 | Descripción | Como docente asignado, quiero analizar en una solicitud varias asignaturas cursadas frente a varias asignaturas receptoras, para conocer qué contenidos, horas y créditos respaldan cada posible homologación y obtener una sugerencia trazable. |
 
 ### Aclaración del alcance
@@ -29,7 +29,7 @@ Pablo aclaró que **N:M** significa analizar varias materias de origen y varias 
 | 1:N | Una materia de origen → dos receptoras cuyos temas se distribuyen entre ellas | Hay que decidir qué parte del origen respalda a cada receptora. |
 | N:M agrupado | Varias materias de origen → varias receptoras como conjunto | Hay que relacionar aportes y evitar contarlos dos veces. |
 
-La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21--agrupación-nm-ce-3) había acotado la implementación a N:1. Pablo comunicó el 21/11 que Shirley y el ingeniero revisaron y aceptaron el alcance ampliado descrito aquí: 1:1 en conjunto, 1:N y N:M. Esta actualización debe reflejarse también en el Issue #75 para que la decisión más reciente sea trazable. La lectura del ingeniero no sustituye un pronunciamiento institucional; los resultados del sistema siguen siendo sugerencias.
+La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21--agrupación-nm-ce-3) había acotado la implementación a N:1. Pablo comunicó el 21/11 que Shirley y el ingeniero revisaron y aceptaron el alcance ampliado descrito aquí: 1:1 en conjunto, 1:N y N:M. El [Issue #75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75) registra esta decisión más reciente y conserva la respuesta anterior como antecedente. La lectura del ingeniero no sustituye un pronunciamiento institucional; los resultados del sistema siguen siendo sugerencias.
 
 ## Criterios de aceptación acordados
 
@@ -133,27 +133,29 @@ Errores: `400` para IDs, pares o aportes inválidos; `401/403` para autenticaci�
 
 | Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
-| Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Reflejar en #75 y reestimar el sprint. |
+| Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Registrado en #75; revisar la nueva capacidad de 42 h en el sprint. |
 | Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo informa acuerdo de Shirley y el ingeniero. | Validación y precisión resueltas en el contrato técnico 1; implementar y probar. |
 | Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo informa acuerdo de Shirley y el ingeniero. | Representación y origen de evidencia resueltos en el contrato técnico 2; implementar y probar. |
 | La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Identidad y persistencia resueltas en el contrato técnico 3; implementar y probar. |
 | Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Reserva, concurrencia y corrección de borradores resueltas en el contrato técnico 4; implementar y probar. |
 
-El contrato técnico queda definido para iniciar TDD y desarrollo tras la revisión de Pablo y Leslie. La reestimación sigue pendiente: las 14 h del backlog se fijaron para el alcance anterior. Las parejas 1:1 existentes conservan su comportamiento. El acuerdo comunicado no equivale a aceptación de la implementación ni a pronunciamiento institucional.
+El contrato técnico queda definido para iniciar TDD y desarrollo tras la revisión de Pablo y Leslie. La reestimación técnica de 42 h sustituye las 14 h originales para planificar el alcance N:M; los 21 PH propuestos y la capacidad del sprint requieren revisión de Pablo, Leslie y Shirley. Las parejas 1:1 existentes conservan su comportamiento. El acuerdo comunicado no equivale a aceptación de la implementación ni a pronunciamiento institucional.
 
-## Tareas del Sprint Backlog, pendientes de reestimación
+## Tareas reestimadas para N:M
 
-| Tarea | Descripción del backlog | Horas originales | Alcance técnico definido; horas por reestimar |
-| --- | --- | ---: | --- |
-| T62 | Motor de agrupación con TDD | 6 | Implementar reparto decimal, tres criterios por receptora y sugerencia única del grupo; probar todos los casos. |
-| T63 | Solicitud, análisis e informe por agrupación | 5 | Implementar `grupoId`, reservas, rutas, análisis, dos revisiones e informe sin alterar registros 1:1. |
-| T64 | Interfaz de agrupación | 3 | Implementar tabla origen × receptora, edición de borrador, desglose y revisión grupal. |
-| **Total** | **8 PH de historia** | **14** | **Reestimar tras cerrar el alcance N:M.** |
+| Tarea | Alcance técnico y comprobación | Horas originales | Horas reestimadas |
+| --- | --- | ---: | ---: |
+| T62 | Modelo y TDD del motor N:M: reparto decimal, cobertura por receptora sin doble conteo, tres criterios y sugerencia única; pruebas de casos completos/incompletos y regresión 1:1. | 6 | **12** |
+| T63 | Persistencia y migración de grupos/reservas; API autorizada, ETag, análisis, dos revisiones docentes, informe mixto 1:1/grupal, OpenAPI y pruebas de integración/concurrencia. | 5 | **20** |
+| T64 | Tabla origen × receptora, edición de borrador, aportes y saldos, desglose y revisión grupal; pruebas de interfaz. | 3 | **10** |
+| **Total** | **8 PH originales → 21 PH propuestos** | **14** | **42** |
+
+**Base de la estimación:** T62 = 3 h de modelo/validación + 5 h de cálculo/cobertura + 4 h de TDD/regresión; T63 = 5 h de esquema/reservas + 5 h de API/concurrencia + 7 h de análisis/revisión/informe + 3 h de pruebas/OpenAPI; T64 = 5 h de selección y aportes + 3 h de resultado/revisión + 2 h de pruebas. Son horas de trabajo, no avance ejecutado. Al 21/11 quedan dos jornadas de desarrollo (23–24/11); con 42 h, la historia no cabe en la capacidad ordinaria de 3 h por persona y día. Shirley debe revisar el compromiso del sprint.
 
 ## Siguiente paso de coordinación
 
-1. Registrar en el Issue #75 el acuerdo N:M comunicado por Pablo y la fecha de revisión de Shirley y el ingeniero. La vista conjunta queda definida en el contrato técnico 5; el caso 1:1 individual existente conserva su flujo.
-2. Pablo y Leslie revisan el contrato de API/persistencia del [plan técnico](plan-implementacion-hu-21.md), ajustan T62–T64 y registran la reestimación con Shirley.
+1. Revisar en el Issue #75 el acuerdo N:M y la reestimación de 42 h/21 PH propuestos. La vista conjunta queda definida en el contrato técnico 5; el caso 1:1 individual existente conserva su flujo.
+2. Pablo y Leslie revisan el contrato de API/persistencia del [plan técnico](plan-implementacion-hu-21.md) y coordinan con Shirley la capacidad real del sprint.
 3. Implementar por partes en la Draft PR con TDD, revisión cruzada y evidencia de cada criterio.
 4. Trabajar en la rama `feature/hu-21-agrupacion-nm`, con Draft PR hacia `develop` creada por Pablo. Edwin revisa; Shirley acepta funcionalmente tras pruebas, OpenAPI y ejecución integrada con Docker Compose.
 
