@@ -1,7 +1,7 @@
 # HU-03 — Configuración de umbral, años máximos y mínimos
 
 **Issue:** [#67 — HU-03](https://github.com/PabloToapanta/ProyectoHomologacion/issues/67)  
-**Estado:** especificación acordada para iniciar la implementación; PR permanece en borrador de planificación.  
+**Estado:** implementación técnica de T56–T58 en la rama de HU-03; pendiente revisión cruzada y aceptación funcional.
 **Sprint:** 3 (planificación del Issue: 5–25 de noviembre de 2026).  
 **Responsable:** Pablo Toapanta.  
 **Revisión cruzada técnica:** Edwin Caraguay. **Aceptación funcional:** Shirley Amaguaña (PO).
@@ -104,6 +104,19 @@ Distribución: **1 + 1 + 1 = 3 PH**.
 | T58 | HU-03 | Implementar API, auditoría y pantalla de configuración | Exponer consulta/actualización solo a Coordinador, validar rangos y textos obligatorios, persistir auditoría, mostrar historial de solo lectura, implementar interfaz y documentar OpenAPI; verificar integración. | 1 PH |
 | **Total** | **HU-03** |  |  | **3 PH** |
 
+## Verificación técnica de T57 (21/11/2026)
+
+La integración de T57 conserva la versión vigente al inicio de cada análisis interno o externo y la incluye en la evaluación serializada del resultado. El umbral, la antigüedad y los mínimos de cambio usan esa fotografía durante la operación. Los requisitos externos solo se declaran cumplidos cuando hay suficientes análisis completos homologables; si aún faltan análisis y el mínimo no está demostrado, el estado es `Incompleto`.
+
+La migración crea la configuración versionada y el puntero vigente con clave foránea, `rowversion` y semilla 80/10/1/1/2/2. Las pruebas verifican la correspondencia del snapshot EF, el SQL generado, la persistencia y deserialización de la versión, y que mover el puntero vigente no cambia un resultado guardado. La migración se aplicó también a una base temporal de SQL Server aislada durante la verificación de T58. Esto no declara aceptada HU-03.
+
+## Verificación técnica de T58 (21/11/2026)
+
+- `GET /api/homologaciones/configuracion` devuelve los parámetros vigentes y un ETag fuerte de la versión. `PUT` exige `If-Match`, el conjunto completo de seis parámetros, motivo y respaldo; rechaza campos desconocidos y valores fuera de rango. Un ETag obsoleto produce 409 sin guardar parcialmente.
+- Cada cambio registra actor del JWT, fecha/hora del servidor, motivo, respaldo y vínculo con la versión anterior. La nueva versión y el cambio condicional del puntero ocurren en una transacción. `GET /api/homologaciones/configuracion/historial` devuelve entradas de solo lectura, valores anteriores/nuevos y paginación por cursor (50 por defecto, máximo 100).
+- API y Gateway restringen estas tres operaciones al rol Coordinador. La pantalla permite editar, consultar historial y recargar la versión vigente tras un conflicto.
+- Las migraciones T57/T58, la actualización, la auditoría, la paginación y dos escrituras concurrentes se probaron en SQL Server 2022 aislado en Docker. Última ejecución: Application 133/133, API 139/139, Infrastructure 61 aprobadas y 1 omitida (prueba ajena que requiere Ollama), Gateway 142/142 y frontend 162/162. Las compilaciones .NET y React pasaron; .NET reportó 0 advertencias y 0 errores. No se declara aceptación funcional de la PO.
+
 ## Fuera de alcance
 
 - Cambiar la fórmula de HU-14, agregar parámetros nuevos o cambiar la regla fija de cero cambios previos externos.
@@ -118,4 +131,4 @@ Distribución: **1 + 1 + 1 = 3 PH**.
 3. Ejecutar CI, regresión e integración; registrar evidencia.
 4. Shirley realiza la aceptación funcional. La aprobación de esta spec no equivale a aceptación de la historia.
 
-La especificación está lista para implementación; aún no acredita que el código esté implementado o aceptado.
+La implementación técnica de HU-03 está en la rama; su revisión cruzada y aceptación funcional siguen el proceso del proyecto.
