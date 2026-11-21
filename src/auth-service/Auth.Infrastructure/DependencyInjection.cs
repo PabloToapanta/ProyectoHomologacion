@@ -1,5 +1,6 @@
 using Auth.Application.Abstractions;
 using Auth.Application.Docentes;
+using Auth.Application.Usuarios;
 using Auth.Domain.Entities;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Repositories;
@@ -19,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUsuariosAdministracionRepository, UsuariosAdministracionRepository>();
+        services.AddScoped<UsuariosService>();
         services.AddScoped<DocentesService>();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();

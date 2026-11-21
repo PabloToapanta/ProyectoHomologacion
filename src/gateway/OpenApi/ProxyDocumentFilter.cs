@@ -21,7 +21,8 @@ public sealed class ProxyDocumentFilter(IProxyConfigProvider proxy) : IDocumentF
                 var operation = new OpenApiOperation
                 {
                     Summary = $"Reenviar a {route.ClusterId}",
-                    Description = "Conserva método, ruta, query, cuerpo y respuesta del servicio. El contrato del payload pertenece al microservicio.",
+                    Description = "Conserva método, ruta, query, cuerpo y respuesta del servicio. El contrato del payload pertenece al microservicio."
+                        + (route.AuthorizationPolicy == "UserAdministration" ? " Acceso exclusivo del rol Administrador." : ""),
                     Responses = new OpenApiResponses
                     {
                         ["200"] = new() { Description = "Respuesta del microservicio" },
