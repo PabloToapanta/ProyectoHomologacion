@@ -26,7 +26,8 @@ public interface IImportacionProgramasRepository
 public sealed class ImportacionProgramasService(IExtractorTextoPdf extractor, ICarreraRepository carreras,
     IAsignaturaRepository asignaturas, IImportacionProgramasRepository importaciones, TimeProvider reloj)
 {
-    public const int MaxArchivos = 20;
+    /// <summary>Admite la malla completa de una carrera en un lote (los planes FISEI pesan unos 40 KB).</summary>
+    public const int MaxArchivos = 50;
     public const int MaxBytesArchivo = ProgramaAnalitico.MaxBytes;
     public const int MaxUnidades = 50;
 
