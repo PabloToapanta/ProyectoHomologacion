@@ -1,11 +1,13 @@
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Domain.RequisitosCambio;
+using Homologacion.Application.Configuracion;
+using Homologacion.Domain.Configuracion;
 
 namespace Homologacion.Application.AnalisisExterno;
 
 /// <summary>HU-19: ejecuta y guarda el análisis externo por pareja, lo recupera y calcula RN-05 a partir de lo guardado.</summary>
 public sealed class GestionarAnalisisExterno(AnalizarSolicitudExterna analisis, ISolicitudesAnalisisExterno solicitudes,
-    IResultadosAnalisisExterno resultados, TimeProvider reloj)
+    IResultadosAnalisisExterno resultados, TimeProvider reloj, IParametrosHomologacionProvider? parametrosProvider = null)
 {
     public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitud, Guid aprobada, Guid receptora, CancellationToken ct)
     {
@@ -31,6 +33,7 @@ public sealed class GestionarAnalisisExterno(AnalizarSolicitudExterna analisis, 
     /// </summary>
     public async Task<ResultadoRequisitosExternos> RequisitosAsync(Guid solicitudId, CancellationToken ct)
     {
+        var parametros = parametrosProvider is null ? ParametrosHomologacion.Predeterminados() : await parametrosProvider.ObtenerVigentesAsync(ct);
         var solicitud = await AnalizarSolicitudExterna.ObtenerExternaAsync(solicitudes, solicitudId, ct);
         var aprobadas = solicitud.AsignaturasAprobadas.Select(a => a.Id).ToHashSet();
         var propios = (await resultados.ListarAsync(solicitudId, ct))
@@ -39,19 +42,20 @@ public sealed class GestionarAnalisisExterno(AnalizarSolicitudExterna analisis, 
         var conCompleto = propios.Select(g => g.Analisis.AsignaturaAprobadaId).Distinct().Count();
         var homologables = propios.Where(g => g.Analisis.Resultado?.Sugerencia == "Homologable")
             .Select(g => g.Analisis.AsignaturaAprobadaId).Distinct().Count();
-        var minimo = 2;
+        var minimo = parametros.PeriodosMinimosExterno;
+        var minimoHomologables = parametros.AsignaturasHomologablesMinimasExterno;
         var todasAnalizadas = aprobadas.Count > 0 && conCompleto == aprobadas.Count;
 
         var faltantes = new List<string>();
         if (solicitud.PeriodosCursados is null) faltantes.Add("períodos cursados no declarados por el Coordinador");
         if (solicitud.CambiosPreviosCarrera is null) faltantes.Add("cambios previos de carrera no declarados por el Coordinador");
-        var homologablesConocidas = homologables >= minimo || todasAnalizadas;
+        var homologablesConocidas = homologables >= minimoHomologables || todasAnalizadas;
         if (!homologablesConocidas)
             faltantes.Add(aprobadas.Count == 0
                 ? "asignaturas aprobadas registradas en la solicitud"
                 : $"análisis completos de las asignaturas aprobadas: {conCompleto} de {aprobadas.Count}");
         var validacion = ValidadorRequisitosCambio.Validar(TipoCambio.Externo, solicitud.PeriodosCursados ?? minimo,
-            homologablesConocidas ? homologables : minimo, solicitud.CambiosPreviosCarrera ?? 0);
+            homologablesConocidas ? homologables : minimoHomologables, solicitud.CambiosPreviosCarrera ?? 0, parametros);
         var estado = validacion.Incumplimientos.Count > 0 ? "NoCumple" : faltantes.Count > 0 ? "Incompleto" : "Cumple";
         return new(solicitudId, estado, solicitud.PeriodosCursados, solicitud.CambiosPreviosCarrera, aprobadas.Count, conCompleto, homologables,
             validacion.Incumplimientos, faltantes,

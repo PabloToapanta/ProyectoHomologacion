@@ -152,3 +152,26 @@ describe('HU-02 / T55 — acceso a usuarios', () => {
     expect(screen.queryByRole('link', { name: /Usuarios/ })).not.toBeInTheDocument();
   });
 });
+
+describe('HU-03 / T58 — acceso a configuración', () => {
+  it('redirige sin sesión y permite entrar solo al Coordinador', async () => {
+    mount('/configuracion');
+    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
+  });
+
+  it('muestra la navegación de configuración al Coordinador', async () => {
+    const parametros = { versionId: '11111111-1111-1111-1111-111111111111', umbralPct: 80,
+      antiguedadMaximaAnios: 10, periodosMinimosInterno: 1, asignaturasHomologablesMinimasInterno: 1,
+      periodosMinimosExterno: 2, asignaturasHomologablesMinimasExterno: 2 };
+    vi.stubGlobal('fetch', vi.fn(async (path: string) => new Response(JSON.stringify(
+      path === '/api/auth/login' ? loginResponse({ role: 'Coordinador' })
+        : path.startsWith('/api/homologaciones/configuracion/historial') ? { entradas: [], cursorSiguiente: null }
+          : path === '/api/homologaciones/configuracion' ? parametros : []),
+    { status: 200, headers: path === '/api/homologaciones/configuracion' ? { ETag: `"${parametros.versionId}"` } : {} })));
+    mount();
+    const user = await fillLogin();
+    await user.click(screen.getByRole('button', { name: 'Ingresar' }));
+    await user.click(await screen.findByRole('link', { name: /Configuración/ }));
+    expect(await screen.findByRole('heading', { name: 'Parámetros de homologación' })).toBeInTheDocument();
+  });
+});

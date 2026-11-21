@@ -22,7 +22,8 @@ public sealed class ProxyDocumentFilter(IProxyConfigProvider proxy) : IDocumentF
                 {
                     Summary = $"Reenviar a {route.ClusterId}",
                     Description = "Conserva método, ruta, query, cuerpo y respuesta del servicio. El contrato del payload pertenece al microservicio."
-                        + (route.AuthorizationPolicy == "UserAdministration" ? " Acceso exclusivo del rol Administrador." : ""),
+                        + (route.AuthorizationPolicy == "UserAdministration" ? " Acceso exclusivo del rol Administrador." : "")
+                        + (route.AuthorizationPolicy == "ConfigurationManagement" ? " Acceso exclusivo del rol Coordinador." : ""),
                     Responses = new OpenApiResponses
                     {
                         ["200"] = new() { Description = "Respuesta del microservicio" },

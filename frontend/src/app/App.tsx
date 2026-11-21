@@ -6,6 +6,7 @@ import { LoginPage } from '../features/auth/LoginPage';
 import { ValidacionesPage } from '../features/validaciones/ValidacionesPage';
 import { CatalogoRoute } from '../features/catalogo/CatalogoRoute';
 import { UsuariosRoute } from '../features/usuarios/UsuariosRoute';
+import { ConfiguracionRoute } from '../features/configuracion/ConfiguracionRoute';
 
 export function App() {
   return <AuthProvider><Routes>
@@ -16,7 +17,7 @@ export function App() {
       <Route path="/admin/usuarios" element={<UsuariosRoute />} />
     </Route>
     <Route element={<ProtectedRoute />}><Route path="/validaciones" element={<ValidacionesPage />} /></Route>
-    <Route element={<ProtectedRoute role="Coordinador" />}><Route path="/solicitudes" element={<SolicitudesRoute />} /></Route>
+    <Route element={<ProtectedRoute role="Coordinador" />}><Route path="/solicitudes" element={<SolicitudesRoute />} /><Route path="/configuracion" element={<ConfiguracionRoute />} /></Route>
     <Route element={<ProtectedRoute role="Docente" />}><Route path="/docente/solicitudes" element={<SolicitudesDocenteRoute />} /></Route>
     <Route path="*" element={<Navigate to="/panel" replace />} />
   </Routes></AuthProvider>;
