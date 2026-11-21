@@ -1,0 +1,69 @@
+{
+  "fecha": "2026-11-03",
+  "issue": 42,
+  "historia": "HU-18",
+  "base": "e01767b",
+  "rama": "feature/hu-18-analisis-interno",
+  "estado": "base local sin commit; historia incompleta",
+  "tdd": {
+    "fallidasIniciales": 24,
+    "fallidasRobustez": 3
+  },
+  "suites": [
+    {
+      "suite": "Homologacion.Domain.Tests.dll",
+      "total": 71,
+      "correctas": 71,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Homologacion.Application.Tests.dll",
+      "total": 42,
+      "correctas": 42,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Auth.Application.Tests.dll",
+      "total": 13,
+      "correctas": 13,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Homologacion.Api.Tests.dll",
+      "total": 85,
+      "correctas": 85,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "AuthService.Tests.dll",
+      "total": 44,
+      "correctas": 44,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Gateway.Tests.dll",
+      "total": 71,
+      "correctas": 71,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Homologacion.Infrastructure.Tests.dll",
+      "total": 20,
+      "correctas": 19,
+      "fallidas": 0,
+      "omitidas": 1
+    }
+  ],
+  "correctas": 345.0,
+  "omitidas": 1.0,
+  "modeloReal": "pendiente de URL y modelo; prueba omitida",
+  "integracionHTTP": "simulada; no modelo real",
+  "ci": "pendiente",
+  "aceptacionPO": "pendiente"
+}

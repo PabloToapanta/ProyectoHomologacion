@@ -170,6 +170,51 @@ namespace Catalogo.Infrastructure.Migrations
                     b.ToTable("PerfilesComparacion", (string)null);
                 });
 
+            modelBuilder.Entity("Catalogo.Domain.ProgramaAnalitico", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AsignaturaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CargadoPor")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<byte[]>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTimeOffset>("FechaCarga")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NombreArchivo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nchar(64)")
+                        .IsFixedLength();
+
+                    b.Property<int>("Tamano")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AsignaturaId")
+                        .IsUnique();
+
+                    b.ToTable("ProgramasAnaliticos", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ProgramasAnaliticos_Tamano", "[Tamano] > 0");
+                        });
+                });
+
             modelBuilder.Entity("Catalogo.Domain.RevisionComparacion", b =>
                 {
                     b.Property<Guid>("OrigenId")
@@ -284,6 +329,15 @@ namespace Catalogo.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("Catalogo.Domain.PerfilComparacion", b =>
+                {
+                    b.HasOne("Catalogo.Domain.Asignatura", null)
+                        .WithMany()
+                        .HasForeignKey("AsignaturaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.ProgramaAnalitico", b =>
                 {
                     b.HasOne("Catalogo.Domain.Asignatura", null)
                         .WithMany()

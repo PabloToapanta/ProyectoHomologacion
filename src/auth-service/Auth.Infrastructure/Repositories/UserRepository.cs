@@ -11,6 +11,10 @@ public sealed class UserRepository(AuthDbContext db) : IUserRepository
         => db.Usuarios.Include(x => x.Rol)
             .SingleOrDefaultAsync(x => x.NombreNormalizado == normalizedName, cancellationToken);
 
+    public async Task<IReadOnlyList<Usuario>> ListActiveByRoleAsync(string roleName, CancellationToken cancellationToken = default)
+        => await db.Usuarios.AsNoTracking().Include(x => x.Rol)
+            .Where(x => x.Activo && x.Rol.Nombre == roleName).ToListAsync(cancellationToken);
+
     public async Task UpdatePasswordHashAsync(Usuario usuario, string passwordHash, CancellationToken cancellationToken = default)
     {
         usuario.PasswordHash = passwordHash;

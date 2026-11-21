@@ -1,4 +1,5 @@
 using System.Text;
+using Auth.Api.Security;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure;
 using Auth.Infrastructure.Security;
@@ -10,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddInternalAccess();
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
@@ -57,6 +59,7 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 var app = builder.Build();
+app.UseInternalAccess();
 // Validar secretos antes de tocar la base de datos. No incluir sus valores en los errores.
 if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Auth")))
     throw new InvalidOperationException("Configure ConnectionStrings:Auth para la base exclusiva de autenticación.");

@@ -22,7 +22,7 @@ pendiente de coordinación; no se modifican aquí sus mínimos académicos.
 - Estados futuros de solicitud: Registrada → Docentes asignados → En análisis → En revisión docente → Informe remitido → Finalizada.
 - El Consejo Directivo conserva la decisión académica final.
 
-El equipo confirma la entrega del Sprint 1. El alcance activo del Sprint 2 está en `sprint-2/planificacion-detallada.md`: seguridad HU-34/35/36 y flujo HU-10/11/29/30/18/19/20. No adelantar revisión docente, informes ni carga masiva. Conservar las reglas y pruebas del Sprint 1.
+El equipo confirma la entrega del Sprint 1. El alcance activo del Sprint 2 está en `sprint-2/planificacion-detallada.md`: seguridad HU-34/35/36, flujo HU-10/11/29/30/18/19/20 y HU-08, pendiente de confirmación de la PO. No adelantar revisión docente ni informes. Conservar las reglas y pruebas del Sprint 1.
 
 ## Sprint 1 comprometido (cierre 21 de octubre de 2026)
 **Objetivo:** un administrador autenticado puede registrar carreras y sus asignaturas, unidades y contenidos; un núcleo determinista calcula y valida las reglas de equivalencia, antigüedad y requisitos mínimos.
@@ -95,7 +95,7 @@ Ejemplo de prueba mencionado en el documento: **Álgebra Lineal**, carrera Softw
 - Clean/Onion **obligatorio** dentro de cada microservicio ASP.NET Core: Domain, Application, Infrastructure y Api. Gateway YARP y frontend React no necesitan esas cuatro capas de negocio. Mantener el diseño proporcional al plazo.
 
 ## Continuidad planificada
-Sprint 2: seguridad HTTPS/JWT cifrado/clave interna; solicitudes, dos docentes, análisis interno/externo y persistencia/visualización de resultados. La carga masiva HU-08 se propone para Sprint 3; consultar la planificación vigente para fechas, responsabilidades y criterios.
+Sprint 2: seguridad HTTPS/JWT cifrado/clave interna; solicitudes, dos docentes, análisis interno/externo y persistencia/visualización de resultados. La carga masiva HU-08 se mantiene en Sprint 2 por indicación del 01/11/2026, pendiente de confirmación de la PO; consultar la planificación vigente para fechas, responsabilidades y criterios.
 Sprint 3: revisión humana final, emisión y exportación PDF, administración, auditoría, casos especiales y pruebas finales.
 Los entregables del Sprint 1 no deben presentarse como si incluyeran esas capacidades.
 

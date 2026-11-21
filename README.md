@@ -8,7 +8,8 @@ Proyecto académico de la asignatura **Metodologías Ágiles**. Se desarrolla co
 
 El equipo confirma la entrega del Sprint 1. El trabajo principal del Sprint 2 se
 planifica del **22 al 30 de octubre**, con integración y Review el **4 de noviembre**.
-Compromiso: **40 PH y 69 h**, capacidad efectiva supuesta **76,8 h** en ocho jornadas.
+Compromiso original: **40 PH y 69 h**, capacidad efectiva supuesta **76,8 h** en ocho jornadas.
+HU-08 se mantiene en el sprint (propuesta: **45 PH y 81 h**), pendiente de confirmación de la PO.
 Se priorizan HTTPS, JWT cifrado, clave interna y flujo base de solicitudes con análisis
 asistido. Ver [planificación y coordinación](docs/sprint-2/planificacion-detallada.md)
 y [registro de ejecución](docs/sprint-2/registro-evidencias.md). Son elementos

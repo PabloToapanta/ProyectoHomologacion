@@ -84,5 +84,16 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
         contenido.Property(c => c.Tema).HasMaxLength(4000).IsRequired();
         contenido.HasIndex(c => new { c.UnidadCurricularId, c.Orden }).IsUnique();
         unidad.HasMany(u => u.Contenidos).WithOne().HasForeignKey(c => c.UnidadCurricularId).OnDelete(DeleteBehavior.Cascade);
+        // HU-08: PDF original del programa analítico confirmado, uno por asignatura, para trazabilidad.
+        var programa = modelBuilder.Entity<ProgramaAnalitico>();
+        programa.ToTable("ProgramasAnaliticos", t => t.HasCheckConstraint("CK_ProgramasAnaliticos_Tamano", "[Tamano] > 0"));
+        programa.HasKey(p => p.Id);
+        programa.Property(p => p.Id).ValueGeneratedNever();
+        programa.Property(p => p.NombreArchivo).HasMaxLength(200).IsRequired();
+        programa.Property(p => p.Sha256).HasMaxLength(64).IsFixedLength().IsRequired();
+        programa.Property(p => p.Contenido).IsRequired();
+        programa.Property(p => p.CargadoPor).HasMaxLength(256).IsRequired();
+        programa.HasIndex(p => p.AsignaturaId).IsUnique();
+        programa.HasOne<Asignatura>().WithMany().HasForeignKey(p => p.AsignaturaId).OnDelete(DeleteBehavior.Restrict);
     }
 }

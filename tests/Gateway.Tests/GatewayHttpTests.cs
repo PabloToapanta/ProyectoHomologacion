@@ -16,6 +16,11 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
     {
         { "GET", "/api/solicitudes", "solicitudes" }, { "POST", "/api/solicitudes", "solicitudes" },
         { "GET", "/api/solicitudes/solicitud-prueba", "solicitudes" }, { "GET", "/api/solicitudes/carreras", "solicitudes" },
+        { "POST", "/api/solicitudes/solicitud-prueba/asignaturas-aprobadas", "solicitudes" },
+        { "GET", "/api/solicitudes/solicitud-prueba/asignaturas-origen", "solicitudes" },
+        { "POST", "/api/solicitudes/solicitud-prueba/docentes", "solicitudes" },
+        { "GET", "/api/solicitudes/solicitud-prueba/docentes-disponibles", "solicitudes" },
+        { "GET", "/api/solicitudes/asignadas", "solicitudes" }, { "GET", "/api/solicitudes/asignadas/solicitud-prueba", "solicitudes" },
         { "GET", "/api/carreras", "catalogo" }, { "POST", "/api/carreras", "catalogo" },
         { "GET", "/api/carreras/carrera-prueba", "catalogo" },
         { "PUT", "/api/carreras/carrera-prueba", "catalogo" }, { "DELETE", "/api/carreras/carrera-prueba", "catalogo" },
@@ -169,8 +174,27 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        Assert.Equal(16, paths.EnumerateObject().Count());
+        // 29 hasta HU-31, 3 de HU-08 (importaciones y programa analítico) y 1 de HU-23.
+        Assert.Equal(33, paths.EnumerateObject().Count());
+        // HU-23: generación y consulta del informe de homologación.
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("get", out _));
+        // HU-31: análisis propio de los docentes asignados.
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/revisiones-docentes").TryGetProperty("put", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/revisiones-docentes").TryGetProperty("get", out _));
+        // HU-19: análisis externo, RN-05 externo y datos declarados por el Coordinador; el contexto interno no se publica.
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-externo").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-externo/opciones").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/requisitos-externos").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/datos-cambio-externo").TryGetProperty("put", out _));
+        Assert.DoesNotContain(paths.EnumerateObject(), p => p.Name.Contains("contexto-analisis-externo"));
+        Assert.True(paths.GetProperty("/api/solicitudes/asignadas/{id}").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-interno").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-interno").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/analisis-interno/opciones").TryGetProperty("get", out _));
+        Assert.DoesNotContain(paths.EnumerateObject(), p => p.Name.Contains("contexto-analisis-interno") || p.Name.Contains("/analisis-interno/contexto"));
         Assert.True(paths.GetProperty("/api/solicitudes").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/asignaturas-aprobadas").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/asignaturas/{id}/perfil-comparacion").TryGetProperty("put", out _));
         Assert.True(paths.GetProperty("/api/asignaturas/{id}/correspondencias/{receptoraId}").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/asignaturas/{id}/unidades/{unidadId}").TryGetProperty("put", out _));

@@ -1,0 +1,74 @@
+[
+  {
+    "archivo": "hu18-entrega-final_net8.0_20261103225240.trx",
+    "suite": "Auth.Application.Tests.dll",
+    "correctas": 13,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:52:40.0970021Z"
+  },
+  {
+    "archivo": "hu18-entrega-final_net8.0_20261103225258.trx",
+    "suite": "AuthService.Tests.dll",
+    "correctas": 64,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:52:58.252877Z"
+  },
+  {
+    "archivo": "hu18-catalogo-final_net8.0_20261103225442.trx",
+    "suite": "Catalogo.Tests.dll",
+    "correctas": 94,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:54:42.4877385Z"
+  },
+  {
+    "archivo": "hu18-entrega-final_net8.0_20261103225327.trx",
+    "suite": "Gateway.Tests.dll",
+    "correctas": 110,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:53:27.7834136Z"
+  },
+  {
+    "archivo": "hu18-entrega-final_net8.0_20261103225345.trx",
+    "suite": "Homologacion.Api.Tests.dll",
+    "correctas": 109,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:53:45.7521229Z"
+  },
+  {
+    "archivo": "hu18-entrega-final_net8.0_20261103225304.trx",
+    "suite": "Homologacion.Application.Tests.dll",
+    "correctas": 65,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:53:05.0061771Z"
+  },
+  {
+    "archivo": "hu18-entrega-final_net8.0_20261103225236.trx",
+    "suite": "Homologacion.Domain.Tests.dll",
+    "correctas": 71,
+    "fallidas": 0,
+    "omitidas": 0,
+    "fecha": "2026-11-04T03:52:36.6467969Z"
+  },
+  {
+    "archivo": "hu18-infra-entrega-completa_net8.0_20261103230017.trx",
+    "suite": "Homologacion.Infrastructure.Tests.dll",
+    "correctas": 36,
+    "fallidas": 0,
+    "omitidas": 1,
+    "fecha": "2026-11-04T04:00:17.4508926Z"
+  },
+  {
+    "archivo": "hu18-solicitudes-final_net8.0_20261103225514.trx",
+    "suite": "Solicitudes.Tests.dll",
+    "correctas": 120,
+    "fallidas": 0,
+    "omitidas": 3,
+    "fecha": "2026-11-04T03:55:14.0325407Z"
+  }
+]

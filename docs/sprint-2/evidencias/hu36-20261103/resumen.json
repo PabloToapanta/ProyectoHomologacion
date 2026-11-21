@@ -1,0 +1,290 @@
+{
+  "fecha": "2026-11-03",
+  "issue": 37,
+  "historia": "HU-36",
+  "base": "e01767b",
+  "rama": "feature/hu-36-clave-interna",
+  "estado": "resultados obtenidos antes de la publicación autorizada; combinación con develop posterior pendiente",
+  "tdd": {
+    "fallidasBaseInicial": 28,
+    "fallidasSolicitudesAntesImplementacion": 11
+  },
+  "suites": [
+    {
+      "suite": "Homologacion.Domain.Tests.dll",
+      "total": 71,
+      "correctas": 71,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Auth.Application.Tests.dll",
+      "total": 13,
+      "correctas": 13,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Homologacion.Application.Tests.dll",
+      "total": 32,
+      "correctas": 32,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "AuthService.Tests.dll",
+      "total": 52,
+      "correctas": 52,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Homologacion.Api.Tests.dll",
+      "total": 93,
+      "correctas": 93,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Gateway.Tests.dll",
+      "total": 75,
+      "correctas": 75,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Catalogo.Tests.dll",
+      "total": 84,
+      "correctas": 84,
+      "fallidas": 0,
+      "omitidas": 0
+    },
+    {
+      "suite": "Solicitudes.Tests.dll",
+      "total": 30,
+      "correctas": 29,
+      "fallidas": 0,
+      "omitidas": 1
+    }
+  ],
+  "totalCorrectas": 449.0,
+  "totalOmitidas": 1.0,
+  "comprobacionesDocker": {
+    "proyecto": "hu36-check-7edcf16cfe",
+    "casos": [
+      {
+        "caso": "clave interna ausente de frontend",
+        "resultado": false
+      },
+      {
+        "caso": "auth-service sin puertos publicados",
+        "resultado": false
+      },
+      {
+        "caso": "catalogo-api sin puertos publicados",
+        "resultado": false
+      },
+      {
+        "caso": "homologacion-service sin puertos publicados",
+        "resultado": false
+      },
+      {
+        "caso": "solicitudes-service sin puertos publicados",
+        "resultado": false
+      },
+      {
+        "caso": "auth-service no arranca sin clave",
+        "resultado": true
+      },
+      {
+        "caso": "auth-service identifica configuracion invalida",
+        "resultado": true
+      },
+      {
+        "caso": "auth-service no revela clave al fallar",
+        "resultado": false
+      },
+      {
+        "caso": "catalogo-api no arranca sin clave",
+        "resultado": true
+      },
+      {
+        "caso": "catalogo-api identifica configuracion invalida",
+        "resultado": true
+      },
+      {
+        "caso": "catalogo-api no revela clave al fallar",
+        "resultado": false
+      },
+      {
+        "caso": "homologacion-service no arranca sin clave",
+        "resultado": true
+      },
+      {
+        "caso": "homologacion-service identifica configuracion invalida",
+        "resultado": true
+      },
+      {
+        "caso": "homologacion-service no revela clave al fallar",
+        "resultado": false
+      },
+      {
+        "caso": "solicitudes-service no arranca sin clave",
+        "resultado": true
+      },
+      {
+        "caso": "solicitudes-service identifica configuracion invalida",
+        "resultado": true
+      },
+      {
+        "caso": "solicitudes-service no revela clave al fallar",
+        "resultado": false
+      },
+      {
+        "caso": "gateway no arranca sin clave",
+        "resultado": true
+      },
+      {
+        "caso": "gateway identifica configuracion invalida",
+        "resultado": true
+      },
+      {
+        "caso": "gateway no revela clave al fallar",
+        "resultado": false
+      },
+      {
+        "caso": "login por Gateway",
+        "resultado": 200
+      },
+      {
+        "caso": "Gateway sobrescribe cabecera del navegador",
+        "resultado": 200
+      },
+      {
+        "caso": "Catalogo autenticado por Gateway",
+        "resultado": 200
+      },
+      {
+        "caso": "JWT sigue siendo obligatorio",
+        "resultado": 401
+      },
+      {
+        "caso": "JWT invalido se rechaza",
+        "resultado": 401
+      },
+      {
+        "caso": "Homologacion por Gateway",
+        "resultado": 200
+      },
+      {
+        "caso": "login Coordinador",
+        "resultado": 200
+      },
+      {
+        "caso": "carrera sintetica creada: Origen sintetico HU36",
+        "resultado": 201
+      },
+      {
+        "caso": "carrera sintetica creada: Receptora sintetica HU36",
+        "resultado": 201
+      },
+      {
+        "caso": "Solicitud consulta Catalogo con JWT y clave interna",
+        "resultado": 200
+      },
+      {
+        "caso": "referencias correctas del Catalogo real",
+        "resultado": true
+      },
+      {
+        "caso": "Solicitud sintetica persistida",
+        "resultado": 201
+      },
+      {
+        "caso": "Solicitud consultable tras guardar",
+        "resultado": 200
+      },
+      {
+        "caso": "Solicitud sin JWT se rechaza",
+        "resultado": 401
+      },
+      {
+        "caso": "Administrador no suplanta al Coordinador",
+        "resultado": 403
+      },
+      {
+        "caso": "auth-service llamada interna missing",
+        "resultado": "403"
+      },
+      {
+        "caso": "auth-service llamada interna wrong",
+        "resultado": "403"
+      },
+      {
+        "caso": "auth-service llamada interna valid",
+        "resultado": "200"
+      },
+      {
+        "caso": "catalogo-api llamada interna missing",
+        "resultado": "403"
+      },
+      {
+        "caso": "catalogo-api llamada interna wrong",
+        "resultado": "403"
+      },
+      {
+        "caso": "catalogo-api llamada interna valid",
+        "resultado": "200"
+      },
+      {
+        "caso": "homologacion-service llamada interna missing",
+        "resultado": "403"
+      },
+      {
+        "caso": "homologacion-service llamada interna wrong",
+        "resultado": "403"
+      },
+      {
+        "caso": "homologacion-service llamada interna valid",
+        "resultado": "200"
+      },
+      {
+        "caso": "solicitudes-service llamada interna missing",
+        "resultado": "403"
+      },
+      {
+        "caso": "solicitudes-service llamada interna wrong",
+        "resultado": "403"
+      },
+      {
+        "caso": "solicitudes-service llamada interna valid",
+        "resultado": "200"
+      },
+      {
+        "caso": "secreto interno ausente de logs",
+        "resultado": false
+      },
+      {
+        "caso": "auth-service sin bindings efectivos",
+        "resultado": false
+      },
+      {
+        "caso": "catalogo-api sin bindings efectivos",
+        "resultado": false
+      },
+      {
+        "caso": "homologacion-service sin bindings efectivos",
+        "resultado": false
+      },
+      {
+        "caso": "solicitudes-service sin bindings efectivos",
+        "resultado": false
+      }
+    ],
+    "solicitudes": "incluido desde develop e01767b; guarda y cliente HTTP comprobados",
+    "https_jwe": "pendiente integracion PR #47/#49"
+  },
+  "ci": "pendiente tras publicación",
+  "aceptacionPO": "pendiente",
+  "commitImplementacion": "803645ce350d6dbfd589c752f85a3c383b3c849e"
+}

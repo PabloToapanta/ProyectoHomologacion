@@ -1,0 +1,37 @@
+name: HU-36 seguridad interna
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'compose*.yaml'
+      - '.env.example'
+      - '.github/workflows/hu36-security.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: dotnet test Homologacion.sln -c Release --logger trx --results-directory TestResults/solution
+      - run: dotnet test src/catalogo-service/Catalogo.sln -c Release --logger trx --results-directory TestResults/catalogo
+      - run: dotnet test src/solicitudes-service/Solicitudes.sln -c Release --logger trx --results-directory TestResults/solicitudes
+      - name: Gateway y servicios reales con SQL Server aislado
+        run: python -u tests/security/hu36-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hu36-resultados-sin-secretos
+          path: |
+            TestResults/**/*.trx
+            TestResults/hu36-integration/resultado.json

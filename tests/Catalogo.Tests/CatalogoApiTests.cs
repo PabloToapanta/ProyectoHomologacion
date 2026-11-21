@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -220,6 +221,11 @@ public class CatalogoApiTests
 
 internal sealed class CatalogoFactory : WebApplicationFactory<Program>
 {
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add("X-Internal-Key", "hu36-test-only-internal-key-64-characters-for-isolated-tests");
+    }
     // Clave sintética exclusiva de pruebas, nunca utilizada en despliegues.
     private const string Key = "catalogo-test-only-signing-key-32-bytes-minimum";
     private static readonly string EncryptionKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
@@ -236,6 +242,10 @@ internal sealed class CatalogoFactory : WebApplicationFactory<Program>
         builder.UseSetting("Jwt:SigningKey", Key);
         builder.UseSetting("Jwt:EncryptionKey", EncryptionKey);
         builder.UseSetting("Database:ApplyMigrations", "false");
+        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["InternalAccess:Key"] = "hu36-test-only-internal-key-64-characters-for-isolated-tests"
+        }));
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<DbContextOptions<CatalogoDbContext>>();
@@ -246,12 +256,13 @@ internal sealed class CatalogoFactory : WebApplicationFactory<Program>
         });
     }
 
-    public string Token(string role, bool expired = false, string scenario = "valid")
+    public string Token(string role, bool expired = false, string scenario = "valid", string? usuario = null)
     {
         var descriptor = new SecurityTokenDescriptor
         {
             Issuer = "catalogo-tests", Audience = "catalogo-tests",
-            Subject = new ClaimsIdentity([new Claim("role", role)]),
+            // HU-08: el usuario opcional permite registrar quién cargó un programa analítico.
+            Subject = new ClaimsIdentity(usuario is null ? [new Claim("role", role)] : [new Claim("role", role), new Claim("sub", Guid.NewGuid().ToString()), new Claim("name", usuario)]),
             NotBefore = DateTime.UtcNow.AddMinutes(-10),
             Expires = expired ? DateTime.UtcNow.AddMinutes(-1) : DateTime.UtcNow.AddMinutes(5),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)), SecurityAlgorithms.HmacSha256),

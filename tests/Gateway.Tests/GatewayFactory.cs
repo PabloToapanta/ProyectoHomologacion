@@ -17,6 +17,7 @@ namespace Gateway.Tests;
 
 public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
 {
+    public const string InternalKey = "hu36-test-only-internal-key-64-characters-for-isolated-tests";
     public const string Issuer = "hu01-gateway-tests";
     public const string Audience = "hu01-api-tests";
     public const string Password = "Prueba-Gateway-123!";
@@ -31,6 +32,7 @@ public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = Key,
+            ["InternalAccess:Key"] = InternalKey,
             ["Jwt:EncryptionKey"] = EncryptionKey,
             ["ReverseProxy:Clusters:auth:Destinations:primary:Address"] = "http://auth.test/",
             ["ReverseProxy:Clusters:catalogo:Destinations:primary:Address"] = "http://catalogo.test/",
@@ -66,7 +68,8 @@ public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
         {
             forwarded.Enqueue(new ForwardedRequest(service, request.Method.Method, request.RequestUri!.PathAndQuery,
                 request.Content is null ? null : await request.Content.ReadAsStringAsync(cancellationToken),
-                request.Headers.Authorization?.ToString()));
+                request.Headers.Authorization?.ToString(),
+                request.Headers.TryGetValues("X-Internal-Key", out var keys) ? keys.SingleOrDefault() : null));
             return await base.SendAsync(request, cancellationToken);
         }
     }
@@ -87,6 +90,7 @@ public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
             builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["ConnectionStrings:Auth"] = "Server=unused;Database=AuthTests;Integrated Security=true",
+                ["InternalAccess:Key"] = InternalKey,
                 ["Jwt:Issuer"] = Issuer, ["Jwt:Audience"] = Audience, ["Jwt:SigningKey"] = key,
                 ["Jwt:EncryptionKey"] = encryptionKey,
                 ["SeedAdmin:Enabled"] = "false", ["Database:ApplyMigrations"] = "false"
@@ -113,4 +117,4 @@ public sealed class GatewayFactory : WebApplicationFactory<Gateway.Program>
     }
 }
 
-public sealed record ForwardedRequest(string Service, string Method, string PathAndQuery, string? Body, string? Authorization);
+public sealed record ForwardedRequest(string Service, string Method, string PathAndQuery, string? Body, string? Authorization, string? InternalKey);

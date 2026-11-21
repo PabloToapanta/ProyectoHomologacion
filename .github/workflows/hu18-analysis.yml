@@ -1,0 +1,53 @@
+name: HU-18 analisis interno
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'src/homologacion-service/**'
+      - 'src/catalogo-service/**'
+      - 'src/solicitudes-service/**'
+      - 'src/gateway/**'
+      - 'tests/Catalogo.Tests/**'
+      - 'tests/Solicitudes.Tests/**'
+      - 'tests/Homologacion.Api.Tests/**'
+      - 'tests/Gateway.Tests/**'
+      - 'tests/Homologacion.Application.Tests/**'
+      - 'tests/Homologacion.Infrastructure.Tests/**'
+      - '.github/workflows/hu18-analysis.yml'
+      - 'frontend/**'
+      - 'tests/security/hu18-*.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet test Homologacion.sln -c Release --logger trx --results-directory TestResults/solution
+      - run: dotnet test tests/Homologacion.Infrastructure.Tests/Homologacion.Infrastructure.Tests.csproj -c Release --logger trx --results-directory TestResults/infrastructure
+      - run: dotnet test tests/Catalogo.Tests/Catalogo.Tests.csproj -c Release --logger trx --results-directory TestResults/catalogo
+      - run: dotnet test tests/Solicitudes.Tests/Solicitudes.Tests.csproj -c Release --logger trx --results-directory TestResults/solicitudes
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hu18-pruebas-simuladas
+          path: TestResults/**/*.trx
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
