@@ -49,6 +49,29 @@ it('HU-25: el detalle del coordinador consulta el historial del informe de la so
  expect(await screen.findByRole('heading',{name:'Historial del informe'})).toBeInTheDocument();
  expect(request.mock.calls.some(c=>c[0]==='/api/homologaciones/solicitudes/sol-1/informe/historial')).toBe(true);
 });
+it('HU-33: con la solicitud «Remitida» el coordinador revisa el informe; al finalizar, detalle y lista muestran «Finalizada»',async()=>{
+ const user=userEvent.setup();
+ const remitida={...registrada,estado:'Remitida'};
+ const base='/api/homologaciones/solicitudes/sol-1/informe';
+ const pareja={asignaturaAprobadaId:'asig-1',asignaturaReceptoraId:'r1',receptoraCodigo:'R-01',receptoraNombre:'Receptora',agente:{estado:'Completo',sugerencia:'Homologable',porcentajeAcademico:85,porcentajeHoras:90,porcentajeCreditos:100},
+  docentes:[{docenteId:'d1',docente:'docente.ana',postura:'DeAcuerdo',decision:'Homologable',observacion:null,fecha:'2026-11-20T10:00:00Z'},{docenteId:'d2',docente:'docente.luis',postura:'DeAcuerdo',decision:'Homologable',observacion:null,fecha:'2026-11-20T10:00:00Z'}],sugerenciaFinal:'Convalidar'};
+ const revision={informe:{solicitudId:'sol-1',fecha:'2026-11-20T12:00:00Z',generadoPor:'docente.ana',parejas:[pareja],aprobadasSinAnalisis:[],advertencias:[]},remitidoEl:'2026-11-21T09:00:00Z',remitidoPor:'docente.luis',decisiones:[],decisionesPendientes:0,finalizacion:null};
+ const request=vi.fn(async(path:string,init?:RequestInit)=>path===`${base}/revision`?json(revision):path===`${base}/finalizacion`&&init?.method==='POST'?json({solicitudId:'sol-1',fecha:'2026-11-23T16:00:00Z',finalizadoPorId:'c1',finalizadoPor:'coordinadora.eva'})
+  :path.endsWith('/historial')?json([]):path.endsWith('/carreras')?json(carreras):path==='/api/solicitudes/sol-1'?json({...remitida,asignaturasAprobadas:[algebra]}):json([remitida]));
+ render(<SolicitudesPage request={request}/>);await abrirDetalle(user);
+ expect(await screen.findByRole('table',{name:'Revisión del informe por pareja'})).toHaveTextContent('Álgebra sintética');
+ await user.click(screen.getByRole('button',{name:'Finalizar solicitud'}));
+ expect(await screen.findByText(/Solicitud finalizada por coordinadora\.eva/)).toBeInTheDocument();
+ const dialogo=screen.getByRole('heading',{name:'Solicitud UTA-001'}).closest('dialog,[role="dialog"],section')!;
+ expect(within(dialogo as HTMLElement).getAllByText('Finalizada').length).toBeGreaterThan(0);
+ await user.click(screen.getByRole('button',{name:'Cerrar detalle'}));
+ expect(screen.getByRole('row',{name:/UTA-001/})).toHaveTextContent('Finalizada');
+});
+it('HU-33: antes de la remisión el detalle no consulta la revisión del coordinador',async()=>{
+ const user=userEvent.setup();const request=servidor([algebra]);render(<SolicitudesPage request={request}/>);await abrirDetalle(user);
+ await screen.findByRole('heading',{name:'Historial del informe'});
+ expect(request.mock.calls.some(c=>String(c[0]).endsWith('/informe/revision'))).toBe(false);
+});
 it('sin asignaturas lo indica y el formulario permanece cerrado',async()=>{
  const user=userEvent.setup();render(<SolicitudesPage request={servidor([])}/>);await abrirDetalle(user);
  expect(screen.getByText('Sin asignaturas aprobadas registradas.')).toBeInTheDocument();expect(screen.queryByLabelText('Nota')).not.toBeInTheDocument();

@@ -64,6 +64,17 @@ public sealed class Solicitud
   if(Estado!=DocenteAsignado.EstadoAsignada) throw new EstadoSolicitudNoPermiteException($"La solicitud en estado «{Estado}» no puede remitirse.");
   Estado=EstadoRemitida;return true;
  }
+ public const string EstadoFinalizada="Finalizada";
+ /// <summary>HU-33: «Remitida» → «Finalizada». Repetir no cambia nada (false) para que Homologación pueda reintentar.</summary>
+ public bool MarcarFinalizada() {
+  if(Estado==EstadoFinalizada) return false;
+  if(Estado!=EstadoRemitida) throw new EstadoSolicitudNoPermiteException($"La solicitud en estado «{Estado}» no puede finalizarse.");
+  Estado=EstadoFinalizada;return true;
+ }
+ /// <summary>HU-33: una solicitud finalizada no admite la edición ordinaria.</summary>
+ public void ValidarEditable() {
+  if(Estado==EstadoFinalizada) throw new EstadoSolicitudNoPermiteException("La solicitud está finalizada y no admite cambios.");
+ }
  internal static string Limpiar(string? value,string campo,int max) {
   if(string.IsNullOrWhiteSpace(value)) throw new SolicitudException($"{campo} es obligatorio.");
   string text;

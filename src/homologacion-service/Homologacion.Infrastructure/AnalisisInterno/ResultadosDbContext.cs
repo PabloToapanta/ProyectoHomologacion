@@ -28,6 +28,8 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<RegistroInforme> Informes => Set<RegistroInforme>();
     /// <summary>HU-25: historial del informe, solo de inserción.</summary>
     public DbSet<RegistroEventoInforme> EventosInforme => Set<RegistroEventoInforme>();
+    /// <summary>HU-33: decisión del coordinador por pareja «Sin acuerdo».</summary>
+    public DbSet<RegistroDecisionCoordinador> DecisionesCoordinador => Set<RegistroDecisionCoordinador>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         var r = model.Entity<RegistroResultado>();
@@ -61,6 +63,12 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
         v.Property(x => x.Usuario).HasMaxLength(256).IsRequired();
         v.Property(x => x.Rol).HasMaxLength(30).IsRequired();
         v.HasIndex(x => new { x.SolicitudId, x.Tipo }).IsUnique();
+        var c = model.Entity<RegistroDecisionCoordinador>();
+        c.ToTable("DecisionesCoordinador");
+        c.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId });
+        c.Property(x => x.Resultado).HasMaxLength(20).IsRequired();
+        c.Property(x => x.Justificacion).HasMaxLength(2000).IsRequired();
+        c.Property(x => x.Coordinador).HasMaxLength(256).IsRequired();
     }
 }
 public sealed class ResultadosAnalisisSql(ResultadosDbContext db) : IResultadosAnalisisInterno

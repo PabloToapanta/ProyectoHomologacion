@@ -65,6 +65,9 @@ public static class RegistroAnalisisInterno
         // HU-32: Solicitudes es dueño del estado; la remisión y el evento «Remitido» se confirman juntos.
         services.AddScoped<IEstadoSolicitudes>(p => p.GetRequiredService<FuentesAnalisisHttp>());
         services.AddScoped<RemitirInformeHomologacion>();
+        // HU-33: decisión del coordinador en «Sin acuerdo» y finalización.
+        services.AddScoped<IDecisionesCoordinador, DecisionesCoordinadorSql>();
+        services.AddScoped<RevisionCoordinadorInforme>();
         return services;
     }
 

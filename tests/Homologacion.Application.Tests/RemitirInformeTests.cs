@@ -41,6 +41,7 @@ public class RemitirInformeTests
             MarcasRemitida++;
             return Task.CompletedTask;
         }
+        public Task MarcarFinalizadaAsync(Guid solicitudId, CancellationToken ct) => throw new InvalidOperationException();
     }
 
     private sealed class Reloj : TimeProvider { public override DateTimeOffset GetUtcNow() => Ahora; }

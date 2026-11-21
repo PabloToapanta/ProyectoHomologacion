@@ -29,6 +29,10 @@ public class AnalisisExternoRouteTests
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe/historial", "homologacion")]
     [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe/remision", "homologacion")]
+    // HU-33: revisión del coordinador, decisión en «Sin acuerdo» y finalización.
+    [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe/revision", "homologacion")]
+    [InlineData("PUT", "/api/homologaciones/solicitudes/{0}/informe/decisiones", "homologacion")]
+    [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe/finalizacion", "homologacion")]
     public async Task Enruta_al_servicio_dueno_conservando_Bearer(string metodo, string plantilla, string servicio)
     {
         using var f = new GatewayFactory(); using var c = await Autenticado(f);
@@ -60,6 +64,15 @@ public class AnalisisExternoRouteTests
         using var response = await c.PostAsync($"/api/solicitudes/{Guid.NewGuid()}/remision", JsonContent.Create(new { }));
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.DoesNotContain(f.Forwarded, x => x.PathAndQuery.EndsWith("/remision", StringComparison.Ordinal) && x.Service == "solicitudes");
+    }
+
+    [Fact]
+    public async Task HU33_la_finalizacion_interna_de_Solicitudes_no_se_publica()
+    {
+        using var f = new GatewayFactory(); using var c = await Autenticado(f);
+        using var response = await c.PostAsync($"/api/solicitudes/{Guid.NewGuid()}/finalizacion", JsonContent.Create(new { }));
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.DoesNotContain(f.Forwarded, x => x.PathAndQuery.EndsWith("/finalizacion", StringComparison.Ordinal) && x.Service == "solicitudes");
     }
 
     [Fact]

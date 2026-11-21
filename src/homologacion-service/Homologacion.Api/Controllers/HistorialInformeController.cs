@@ -13,8 +13,8 @@ namespace Homologacion.Api.Controllers;
 public sealed class HistorialInformeController(ConsultarHistorialInforme service) : ControllerBase
 {
     /// <summary>Eventos del informe en orden cronológico, con fecha, usuario y rol.</summary>
-    /// <remarks>Una solicitud sin informe generado devuelve una lista vacía. «Remitido» lo registra la remisión (HU-32);
-    /// «Finalizado» lo registrará HU-33.</remarks>
+    /// <remarks>Una solicitud sin informe generado devuelve una lista vacía. «Remitido» lo registra la remisión (HU-32)
+    /// y «Finalizado», la finalización del coordinador (HU-33).</remarks>
     [HttpGet, ProducesResponseType(typeof(IReadOnlyList<EventoInformeResponse>), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 400), ProducesResponseType(401), ProducesResponseType(403), ProducesResponseType(typeof(ProblemDetails), 503)]
     public async Task<IActionResult> Consultar(Guid id, CancellationToken ct)

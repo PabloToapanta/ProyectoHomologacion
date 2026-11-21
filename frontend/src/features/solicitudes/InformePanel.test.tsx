@@ -67,6 +67,12 @@ it('HU-32: una solicitud ya remitida no ofrece remitir otra vez',async()=>{
  expect(screen.queryByRole('button',{name:'Remitir al coordinador'})).not.toBeInTheDocument();
 });
 
+it('HU-33: una solicitud finalizada no ofrece remitir y lo indica',async()=>{
+ render(<InformePanel request={vi.fn(async()=>json(informe))} solicitudId="sol-a" aprobadas={aprobadas} estadoSolicitud="Finalizada"/>);
+ expect(await screen.findByText('Solicitud finalizada por el coordinador de carrera.')).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Remitir al coordinador'})).not.toBeInTheDocument();
+});
+
 it('HU-32: sin informe generado no se ofrece remitir',async()=>{
  render(<InformePanel request={vi.fn(async()=>json({title:'El informe de esta solicitud aún no se ha generado.'},404))} solicitudId="sol-a" aprobadas={aprobadas} estadoSolicitud="Docentes asignados"/>);
  expect(await screen.findByText(/aún no se ha generado/)).toBeInTheDocument();

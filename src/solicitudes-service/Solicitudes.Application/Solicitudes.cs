@@ -51,6 +51,7 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
  }
  public async Task<AsignaturaAprobada> RegistrarAsignatura(Guid solicitudId,AsignaturaAprobadaInput input,CancellationToken ct) {
   var solicitud=await repository.Obtener(solicitudId,ct)??throw new SolicitudNoEncontradaException();
+  solicitud.ValidarEditable();
   var hoy=DateOnly.FromDateTime(reloj.GetUtcNow().ToOffset(OffsetEcuador).DateTime);
   var asignatura=solicitud.CarreraOrigenId is Guid carreraOrigen?await Interna(solicitudId,carreraOrigen,input,hoy,ct):Externa(solicitudId,input,hoy);
   await repository.AgregarAsignatura(asignatura,ct);return asignatura;
@@ -92,6 +93,13 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   try {await repository.GuardarCambios(ct);}
   // Estado es token de concurrencia: si otra petición lo cambió antes, se rechaza en vez de sobrescribir.
   catch(DatosExternosNoEditablesException) {throw new EstadoSolicitudNoPermiteException("El estado de la solicitud cambió durante la remisión. Intente nuevamente.");}
+ }
+ /// <summary>HU-33: lo invoca Homologación al finalizar el coordinador, después de comprobar el informe remitido y las decisiones.</summary>
+ public async Task MarcarFinalizada(Guid solicitudId,CancellationToken ct) {
+  var solicitud=await repository.ObtenerParaActualizar(solicitudId,ct)??throw new SolicitudNoEncontradaException();
+  if(!solicitud.MarcarFinalizada()) return;
+  try {await repository.GuardarCambios(ct);}
+  catch(DatosExternosNoEditablesException) {throw new EstadoSolicitudNoPermiteException("El estado de la solicitud cambió durante la finalización. Intente nuevamente.");}
  }
  public Task<IReadOnlyList<Solicitud>> ListarAsignadas(Guid docenteId,CancellationToken ct)=>repository.ListarAsignadasA(docenteId,ct);
  /// <summary>Null si no existe o el docente no figura entre los asignados: no se distingue para no revelar solicitudes ajenas.</summary>
