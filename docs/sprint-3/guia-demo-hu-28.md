@@ -2,7 +2,7 @@
 
 **Issue:** [#73 — Documentación y guion de demo](https://github.com/PabloToapanta/ProyectoHomologacion/issues/73)  
 **Revisión de la guía:** 21/11/2026 · **Base revisada:** `origin/develop` en `10a2b5e`  
-**Estado:** borrador de documentación. El 21/11/2026 `docker compose config --quiet` pasó para HTTP y HTTPS usando un archivo temporal con valores ficticios, eliminado al terminar. **No se levantaron contenedores ni se ejecutó la demo en navegador**: Docker Desktop no estaba iniciado y no había `.env.sprint1` local. La aceptación de la PO y la revisión cruzada siguen pendientes.
+**Estado:** borrador de documentación. El 21/11/2026 el stack HTTP aislado `hu28-demo-20261121` compiló y sus siete servicios quedaron saludables. La página de login respondió 200, el login de la cuenta local respondió 200 y una ruta protegida sin sesión respondió 401. Para suplir dos claves vacías se generaron valores aleatorios solo en el proceso de Compose; no se escribieron en `.env.sprint1`. El overlay HTTPS solo pasó `config --quiet`; no se ejecutó con certificado ni en navegador. La revisión visual, el flujo completo, la aceptación de la PO y la revisión cruzada siguen pendientes.
 
 Esta guía usa cuentas y registros sintéticos. No copiar contraseñas, tokens, certificados privados ni datos personales en el repositorio, capturas o evidencias.
 
@@ -23,6 +23,14 @@ notepad .env.sprint1
 ```
 
 Completar los campos vacíos del archivo privado, en especial `AUTH_SQL_PASSWORD`, `AUTH_JWT_KEY`, `APP_SECRET_KEY`, `AUTH_JWT_ENCRYPTION_KEY` y `AUTH_ADMIN_PASSWORD`. Usar valores distintos y aleatorios según los comentarios de `.env.example`. El usuario `AUTH_ADMIN_USERNAME` será la cuenta Administrador local de demostración. No pegar secretos en chats, Issues o descripciones del PR.
+
+Para generar por separado `APP_SECRET_KEY` y `AUTH_JWT_ENCRYPTION_KEY`, ejecutar dos veces y copiar cada resultado solo al campo correspondiente del archivo privado:
+
+```powershell
+python -c "import base64,secrets; print(base64.b64encode(secrets.token_bytes(32)).decode())"
+```
+
+No guardar el mismo valor en ambos campos. El stack aislado comprobado el 21/11 recibió suplentes aleatorios solo durante el comando de arranque porque esos dos valores estaban vacíos; para reiniciarlo después de detenerlo, completa y guarda ambos en `.env.sprint1`.
 
 ## 2. Arranque en HTTP local
 
@@ -116,8 +124,8 @@ No afirmar que el flujo completo de remisión/finalización, adjuntos, auditorí
 
 | Elemento | Estado en esta guía |
 | --- | --- |
-| Compose base `compose.sprint1.yaml` y overlay de Solicitudes `compose.hu10.yaml` | `docker compose config --quiet` pasó el 21/11 con valores ficticios; no se iniciaron contenedores porque Docker Engine no estaba disponible. |
-| Overlay HTTPS `compose.hu34.yaml` y rutas de login por rol | `docker compose config --quiet` pasó el 21/11 con valores ficticios; TLS y navegador siguen sin ejecutarse. |
+| Compose base `compose.sprint1.yaml` y overlay de Solicitudes `compose.hu10.yaml` | Stack aislado compilado el 21/11; 7/7 servicios saludables. Login `/login`: 200; login local: 200; ruta protegida sin sesión: 401. Dos claves de prueba temporales no se guardaron. |
+| Overlay HTTPS `compose.hu34.yaml` y rutas de login por rol | `docker compose config --quiet` pasó el 21/11 con valores de prueba; no se montó certificado ni se recorrió en navegador. |
 | Roles Administrador, Coordinador y Docente; solicitudes, análisis e informe | Rutas y componentes presentes en la base `10a2b5e`; requieren comprobación manual de la demo. |
 | Adjuntos HU-12 (#82) y exportación PDF HU-24 (#83) | PR abiertas en la revisión del 21/11; no dar por integradas hasta comprobar `develop`. |
 | Remisión HU-32 (#86), auditoría HU-25 (#85) y finalización HU-33 (#89) | PR abiertas en la revisión del 21/11; los pasos 6–7 del guion dependen de integración y de verificar el recorrido en navegador. |
