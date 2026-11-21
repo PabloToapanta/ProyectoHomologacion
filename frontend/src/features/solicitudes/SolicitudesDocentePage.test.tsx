@@ -47,7 +47,7 @@ it('análisis completo muestra porcentajes, sugerencia, justificación y evidenc
 it('al abrir no escribe nada: sin remisión y el informe solo se genera a petición',async()=>{
  const user=userEvent.setup();const request=servidor({estado:'Completo',mensaje:'',resultado});render(<SolicitudesDocentePage request={request}/>);const dialogo=await abrir(user);
  await within(dialogo).findByRole('button',{name:'Generar informe'});
- expect(within(dialogo).getAllByRole('button').map(b=>b.getAttribute('aria-label')??b.textContent)).toEqual(['Cerrar ventana','Consultar análisis interno','Generar informe','Cerrar detalle']);
+ expect(within(dialogo).getAllByRole('button').map(b=>b.getAttribute('aria-label')??b.textContent)).toEqual(['Cerrar ventana','Consultar análisis interno','Generar informe','Abrir agrupaciones','Cerrar detalle']);
  expect(request.mock.calls.every(c=>!c[1]?.method||c[1].method==='GET')).toBe(true);
 });
 it('detalle rechazado por la API muestra el error sin datos de otra solicitud',async()=>{
