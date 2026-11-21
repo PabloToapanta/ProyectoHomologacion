@@ -51,7 +51,7 @@ El informe existente de la solicitud debe admitir unidades individuales y grupal
 ## Persistencia y compatibilidad propuestas
 
 - Crear un registro de grupo con `grupoId` estable y pertenencia a solicitud; tablas hijas para orígenes, receptoras y aportes origen–receptora. Guardar horas aportadas como `decimal(12,2)` y créditos aportados como `decimal(6,2)`; las horas aprobadas actuales son enteras, pero el reparto admite fracciones con dos decimales. Validar cada suma por origen sin redondear, y conservar la distinción entre `null` y `0`.
-- Guardar el análisis y la revisión docente **por grupo**, con el desglose por receptora. No usar un ID de origen o receptora ficticio para encajar en la clave compuesta de las parejas existentes.
+- Guardar el último análisis por `grupoId` y una revisión por `(grupoId, docenteId)`, con el desglose por receptora. El docente puede corregir su revisión hasta que se genere el informe. No usar un ID de origen o receptora ficticio para encajar en la clave compuesta de las parejas existentes. El informe enumera unidades 1:1 y grupales, cada grupo una sola vez; sus registros históricos 1:1 permanecen legibles.
 - En una transacción, comprobar y reservar la pertenencia única del origen a una unidad de análisis. Integrar la misma regla con el flujo 1:1 para impedir que una petición concurrente lo use fuera del grupo. La migración conserva resultados e informes ya emitidos; no les inventa agrupaciones.
 - Para orígenes externos sin programa analítico registrado, mantener «Información incompleta» según D2 de HU-19. HU-21 no crea ese programa.
 

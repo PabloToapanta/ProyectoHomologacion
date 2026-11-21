@@ -66,7 +66,7 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 
 - **Given** resultados de una agrupación, **when** los dos docentes revisan y se genera el informe, **then** se muestra una sola sugerencia y una decisión docente por grupo, con detalle de orígenes, receptoras, vínculos, aportes, porcentajes, evidencia y faltantes de cada receptora.
 - **Given** una agrupación, **when** se presenta, **then** muestra «Homologación por agrupación — regla de análisis pendiente de validación institucional» y deja claro que no es una decisión académica oficial.
-- El modelo actual guarda análisis e informes por pareja 1:1; el contrato técnico debe introducir una identidad de grupo sin reinterpretar esos registros históricos.
+- El grupo tiene un `grupoId` propio. Análisis, revisiones docentes e informe referencian ese ID. Las parejas 1:1 existentes conservan sus IDs y registros históricos; no se convierten en grupos ficticios.
 
 ### CA6 — Verificación
 
@@ -87,12 +87,18 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 - Solo una revisión `Registrada` y `Vigente` acredita cobertura. Cada correspondencia usada conserva tipo (`Contenido` o `ResultadoAprendizaje`), ID de elemento de origen, ID de elemento receptor y ubicaciones de evidencia en ambos programas. Una misma fuente puede figurar en dos receptoras con vínculos separados; cada elemento receptor cuenta una vez en su propia evaluación.
 - Al guardar un análisis, Homologación conserva una **fotografía de los vínculos y evidencias efectivamente usados**, junto con IDs de origen/receptora y resultados. Cambios posteriores del Catálogo no reescriben el análisis o informe ya guardados; un análisis nuevo consulta la revisión vigente de nuevo.
 
+### Contrato técnico resuelto 3 — identidad, análisis, doble revisión e informe
+
+- Pablo confirmó el 21/11/2026 una entidad de agrupación separada. Homologación crea un `grupoId` estable para una solicitud y registra por separado sus orígenes, receptoras y aportes origen→receptora. El ID de grupo no reemplaza `asignaturaAprobadaId` ni `asignaturaReceptoraId` en tablas de parejas existentes.
+- El último análisis calculado de un grupo se guarda por `grupoId`, con desglose y fotografía de evidencia por receptora, versión de HU-03 y sugerencia única. Cada docente asignado guarda **una revisión por grupo**; la clave lógica es `(grupoId, docenteId)` y puede corregirla hasta la generación del informe, igual que en el flujo de parejas.
+- El informe de la solicitud lista unidades individuales y grupos. Cada grupo aparece una vez, con sus dos revisiones docentes y el detalle por receptora. La generación sigue exigiendo las dos revisiones de cada unidad analizada y conserva el cierre que impide cambios docentes posteriores. Los informes y análisis 1:1 anteriores siguen siendo legibles sin migración semántica.
+
 | Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
 | Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Reflejar en #75 y reestimar el sprint. |
 | Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo informa acuerdo de Shirley y el ingeniero. | Validación y precisión resueltas en el contrato técnico 1; implementar y probar. |
 | Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo informa acuerdo de Shirley y el ingeniero. | Representación y origen de evidencia resueltos en el contrato técnico 2; implementar y probar. |
-| La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Ajustar persistencia, doble revisión e informe. |
+| La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Identidad y persistencia resueltas en el contrato técnico 3; implementar y probar. |
 | Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Verificar exclusividad y concurrencia. |
 
 Las reglas funcionales ya permiten preparar el contrato técnico. La reestimación sigue pendiente: las 14 h del backlog se fijaron para el alcance anterior. Las parejas 1:1 existentes conservan su comportamiento. El acuerdo comunicado no equivale a aceptación de la implementación ni a pronunciamiento institucional.
