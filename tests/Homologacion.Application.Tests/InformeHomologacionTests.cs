@@ -19,10 +19,12 @@ public class InformeHomologacionTests
     private static readonly Guid Ana = Guid.Parse("90000000-0000-0000-0000-0000000000d1");
     private static readonly Guid Luis = Guid.Parse("90000000-0000-0000-0000-0000000000d2");
 
-    private sealed class Fuentes : ISolicitudesAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno, IRevisionesDocentes, IInformesHomologacion
+    private sealed class Fuentes : ISolicitudesAnalisisInterno, ISolicitudesAnalisisExterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno, IRevisionesDocentes, IInformesHomologacion
     {
         public bool Asignada { get; set; } = true;
         public string Tipo { get; set; } = "Interno";
+        public int? PeriodosCursados { get; set; } = 2;
+        public int? CambiosPreviosCarrera { get; set; } = 0;
         public List<AnalisisGuardado> Agente { get; } = [];
         public List<RevisionDocenteRegistrada> Revisiones { get; } = [];
         public InformeHomologacion? Informe { get; set; }
@@ -39,6 +41,10 @@ public class InformeHomologacionTests
         }
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Solicitud && Asignada
             ? new SolicitudParaAnalisis(Solicitud, Tipo, null, Carrera, new[] { A1, A2, A3 }.Select(a =>new AprobadaParaAnalisis(a, null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1))).ToArray())
+            : null);
+        public Task<SolicitudExternaParaAnalisis?> ObtenerSolicitudExternaAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Solicitud && Asignada
+            ? new SolicitudExternaParaAnalisis(Solicitud, "Externo", Carrera, "Institución sintética", "Carrera sintética", PeriodosCursados, CambiosPreviosCarrera,
+                new[] { A1, A2, A3 }.Select(a => new AprobadaExternaParaAnalisis(a, "Asignatura sintética", 144, "horas", 3, "UTA", "Programa sintético", "Aprobada", new DateOnly(2025, 1, 1))).ToArray())
             : null);
         public Task<IReadOnlyList<ReceptoraAnalisis>> ListarAsync(Guid carreraId, CancellationToken ct) =>
             Task.FromResult<IReadOnlyList<ReceptoraAnalisis>>(carreraId == Carrera ? [new(R1, "R-01", "Receptora uno", 1), new(R2, "R-02", "Receptora dos", 2)] : []);
@@ -63,12 +69,13 @@ public class InformeHomologacionTests
         public void Revision(Guid docente, Guid aprobada, Guid receptora, string decision, string postura = "Ajuste") =>
             Revisiones.Add(new(Solicitud, aprobada, receptora, docente, docente == Ana ? "docente.ana" : "docente.luis", postura, decision, "Observación sintética.",
                 "Completo", "Homologable", new DateTimeOffset(2026, 11, 4, 12, 0, 0, TimeSpan.Zero)));
-        public void AnalisisAgente(Guid aprobada, Guid receptora) => Agente.Add(new(DateTimeOffset.UnixEpoch, new(Solicitud, aprobada, receptora, "Completo", "m",
-            new ResumenAnalisisInterno(90, 85, 100, "Homologable", "j", []), new([], null, 90, 85, 100, 80, EstadoEquivalencia.Homologable, "", [], [], []), null, true, [])));
+        public void AnalisisAgente(Guid aprobada, Guid receptora, string sugerencia = "Homologable") => Agente.Add(new(DateTimeOffset.UnixEpoch, new(Solicitud, aprobada, receptora, "Completo", "m",
+            new ResumenAnalisisInterno(90, 85, 100, sugerencia, "j", []), new([], null, 90, 85, 100, 80,
+                sugerencia == "Homologable" ? EstadoEquivalencia.Homologable : EstadoEquivalencia.NoHomologable, "", [], [], []), null, true, [])));
     }
 
     private sealed class Reloj : TimeProvider { public override DateTimeOffset GetUtcNow() => new(2026, 11, 4, 20, 0, 0, TimeSpan.Zero); }
-    private static (GenerarInformeHomologacion, Fuentes) Caso() { var f = new Fuentes(); return (new GenerarInformeHomologacion(f, f, f, f, f, f, new Reloj()), f); }
+    private static (GenerarInformeHomologacion, Fuentes) Caso() { var f = new Fuentes(); return (new GenerarInformeHomologacion(f, f, f, f, f, f, new Reloj(), solicitudesExternas: f), f); }
 
     [Fact]
     public async Task Genera_con_agente_docentes_y_sugerencia_final_por_pareja()
@@ -139,6 +146,82 @@ public class InformeHomologacionTests
         f.AlmacenCaido = false;
         var i = await caso.GenerarAsync(Solicitud, Ana, "ana", default);
         Assert.Equal(("Externo", "Completo"), (i.TipoCambio, i.Parejas[0].Agente.Estado));
+    }
+
+    [Fact]
+    public async Task Informe_externo_advierte_minimos_no_alcanzados_sin_bloquear_y_cita_fuente()
+    {
+        var (caso, f) = Caso();
+        f.Tipo = "Externo";
+        f.PeriodosCursados = 1;
+        f.CambiosPreviosCarrera = 1;
+        foreach (var aprobada in new[] { A1, A2, A3 })
+        {
+            f.AnalisisAgente(aprobada, R1, "No homologable");
+            f.Revision(Ana, aprobada, R1, "NoHomologable");
+            f.Revision(Luis, aprobada, R1, "NoHomologable");
+        }
+
+        var informe = await caso.GenerarAsync(Solicitud, Ana, "ana", default);
+
+        Assert.NotNull(informe);
+        Assert.Contains(informe.Advertencias, a => a.Contains("períodos cursados: mínimo 2, alcanzado 1", StringComparison.Ordinal));
+        Assert.Contains(informe.Advertencias, a => a.Contains("asignaturas homologables: mínimo 2, alcanzado 0", StringComparison.Ordinal));
+        Assert.Contains(informe.Advertencias, a => a.Contains("RRA del CES, art. 79", StringComparison.Ordinal));
+        Assert.Equal(3, informe.Parejas.Count);
+    }
+
+    [Fact]
+    public async Task Informe_no_recomienda_ruta_por_conteo_si_faltan_asignaturas_por_analizar()
+    {
+        var (caso, f) = Caso();
+        f.Tipo = "Externo";
+        f.PeriodosCursados = 2;
+        f.CambiosPreviosCarrera = 0;
+        f.Revision(Ana, A1, R1, "NoHomologable"); f.Revision(Luis, A1, R1, "NoHomologable");
+
+        var informe = await caso.GenerarAsync(Solicitud, Ana, "ana", default);
+
+        Assert.Contains(informe.Advertencias, a => a.Contains("No se puede determinar el mínimo de asignaturas homologables", StringComparison.Ordinal));
+        Assert.DoesNotContain(informe.Advertencias, a => a.Contains("mínimo 2, alcanzado 0", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task Informe_interno_muestra_alerta_de_minimo_sin_alterar_veredictos_y_expone_falta_de_periodos()
+    {
+        var (caso, f) = Caso();
+        foreach (var aprobada in new[] { A1, A2, A3 })
+        {
+            f.AnalisisAgente(aprobada, R1, "No homologable");
+            var decision = aprobada == A1 ? "Homologable" : "NoHomologable";
+            f.Revision(Ana, aprobada, R1, decision);
+            f.Revision(Luis, aprobada, R1, decision);
+        }
+
+        var informe = await caso.GenerarAsync(Solicitud, Ana, "ana", default);
+
+        Assert.Contains(informe.Advertencias, a => a.Contains("asignaturas homologables: mínimo 1, alcanzado 0", StringComparison.Ordinal));
+        Assert.Contains(informe.Advertencias, a => a.Contains("No se registran períodos cursados para solicitudes internas", StringComparison.Ordinal));
+        Assert.Equal(1, informe.Convalidar);
+        Assert.Equal("Convalidar", informe.Parejas.Single(p => p.AsignaturaAprobadaId == A1).SugerenciaFinal);
+    }
+
+    [Fact]
+    public async Task Informe_no_recomienda_ruta_alcanzado_el_minimo_de_asignaturas()
+    {
+        var (caso, f) = Caso();
+        f.AnalisisAgente(A1, R1, "Homologable");
+        f.AnalisisAgente(A2, R1, "No homologable");
+        f.AnalisisAgente(A3, R1, "No homologable");
+        f.Revision(Ana, A1, R1, "Homologable"); f.Revision(Luis, A1, R1, "Homologable");
+        f.Revision(Ana, A2, R1, "NoHomologable"); f.Revision(Luis, A2, R1, "NoHomologable");
+        f.Revision(Ana, A3, R1, "NoHomologable"); f.Revision(Luis, A3, R1, "NoHomologable");
+
+        var informe = await caso.GenerarAsync(Solicitud, Ana, "ana", default);
+
+        Assert.DoesNotContain(informe.Advertencias, a => a.Contains("Alerta informativa de ruta alternativa", StringComparison.Ordinal));
+        Assert.Equal(1, informe.Convalidar);
+        Assert.Equal(2, informe.NoConvalidar);
     }
 
     [Fact]
