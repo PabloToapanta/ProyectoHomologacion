@@ -2,7 +2,7 @@
 
 **Base funcional:** [spec HU-21](hu-21-agrupacion-nm.md) · **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** contrato técnico definido para revisión de Pablo y Leslie sobre el alcance funcional que Pablo comunicó como acordado por Shirley y el ingeniero el 21/11/2026. Reestimación técnica: T62 12 h, T63 20 h, T64 10 h (42 h, 21 PH propuestos). Requiere revisar capacidad y verificar la implementación.
+**Estado:** contrato técnico definido para revisión de Pablo y Leslie sobre el alcance funcional que Pablo comunicó como acordado por Shirley y el ingeniero el 21/11/2026. Estimación total indicada por Pablo: T62 2 h, T63 3 h, T64 2 h (7 h; Pablo 4 h y Leslie 3 h). Requiere verificar la implementación.
 **Rama de trabajo:** `feature/hu-21-agrupacion-nm` desde `develop`. La [Draft PR #91](https://github.com/PabloToapanta/ProyectoHomologacion/pull/91) apunta a `develop`; Pablo y Leslie harán commits en su rama.
 
 ## Contrato funcional que guía el diseño
@@ -19,7 +19,7 @@
 
 | Paso | Responsable inicial | Entregable | Dependencia |
 | --- | --- | --- | --- |
-| 0. Revisar contrato y capacidad | Pablo y Leslie; Shirley revisa compromiso; Edwin revisa contrato | Revisión de los contratos técnicos 1–7 y reestimación de 42 h/21 PH propuestos en #75 | Acuerdo funcional N:M comunicado por Pablo |
+| 0. Revisar contrato y capacidad | Pablo y Leslie; Shirley revisa compromiso; Edwin revisa contrato | Revisión de los contratos técnicos 1–7 y estimación de 7 h indicada por Pablo en #75 | Acuerdo funcional N:M comunicado por Pablo |
 | 1. Pruebas del motor | Pablo | Pruebas fallidas para 1:1 conjunto, 1:N, N:M, límites de asignación, cobertura y veredicto del grupo | Paso 0 |
 | 2. Motor determinista | Pablo | Modelo de grupo y cálculo por receptora; resultado único con desglose; pruebas verdes | Paso 1 |
 | 3. Persistencia y contratos de grupo | Leslie | Identidad del grupo, vínculos y aportes persistidos; API de consulta/registro con validación de pertenencia y exclusividad | Paso 0; integrar con 2 |
@@ -70,4 +70,4 @@ El detalle devuelve ETag; `PUT`, `DELETE` y `POST /{grupoId}/analisis` exigen `I
 3. Cada uno trabaja en su checkout de **la misma rama remota**; antes de empezar un archivo compartido, sincroniza la rama y avisa qué archivo tomará. Commits pequeños con Conventional Commits en español y referencia a T62/T63/T64.
 4. Integrar los commits cada día, resolver conflictos de uno en uno y mantener la PR como Draft hasta pruebas, revisión y aceptación. No hacer merge ni declarar la historia terminada antes de la definición de hecho.
 
-**Capacidad:** las 14 h del backlog estimaban un alcance N:1 más acotado. 1:N y N:M añaden reparto, nuevas entidades y cambios a revisión e informe. La reestimación técnica es **42 h**: T62 12 h (Pablo), T63 20 h (8 h Pablo / 12 h Leslie) y T64 10 h (Leslie), para una carga orientativa de **20 h Pablo / 22 h Leslie**. Se proponen **21 PH** frente a los 8 PH originales. Con la disponibilidad ordinaria de 3 h por persona y día, no cabe antes del cierre de desarrollo del 24/11; Shirley debe revisar el compromiso del sprint. Esta cifra no representa trabajo ya ejecutado.
+**Capacidad:** Pablo fijó **7 h totales** para completar HU-21: T62 2 h (Pablo), T63 3 h (2 h Pablo / 1 h Leslie) y T64 2 h (Leslie). Queda una carga de **4 h Pablo / 3 h Leslie**. Los 8 PH del Product Backlog se conservan hasta que la PO los ajuste. El contrato N:M incluye nuevas entidades, reservas, API, motor, revisión, informe, interfaz y pruebas; la estimación de 7 h tiene riesgo alto de subestimación y no acredita avance ni definición de hecho. Si faltan criterios al agotar el tiempo, se registran como pendientes para decisión de Shirley.

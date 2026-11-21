@@ -156,6 +156,8 @@ Cada integrante dispone de 36 h efectivas en el sprint completo (3 h × 15 × 0,
 | T71 | HU-37 | Reutilizar o forzar un análisis nuevo (docente asignado, motivo registrado, sin borrar el anterior); la interfaz indica «reutilizado», la fecha y el id del análisis original; pruebas | 2 |
 | | | **TOTAL** | **107 h** |
 
+**Actualización de HU-21 del 21/11/2026.** Las filas T62–T64 y el total de 107 h anteriores son la línea base original (N:1, 14 h para HU-21). Pablo indicó una nueva estimación **total de 7 h para el alcance N:M acordado**: T62 2 h (Pablo), T63 3 h (Pablo 2 h, Leslie 1 h) y T64 2 h (Leslie). Por tanto, la carga asignada a HU-21 pasa a Pablo 4 h y Leslie 3 h; si todo lo demás del backlog permanece igual, el total aritmético del sprint pasa de 107 h a **100 h**. Se conservan los 8 PH originales hasta decisión de la PO. El alcance y las pruebas siguen en [HU-21](hu-21-agrupacion-nm.md); 7 h implica riesgo alto de subestimación y no equivale a historia terminada.
+
 HU-23 y HU-31 se adelantaron en el Sprint 2 y no consumen capacidad de este sprint; sus horas reales se registran en sus evidencias.
 
 ## 6. Decisiones previas a codificar
