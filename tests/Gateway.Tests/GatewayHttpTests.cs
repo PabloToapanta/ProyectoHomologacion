@@ -12,6 +12,41 @@ namespace Gateway.Tests;
 
 public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<GatewayFactory>
 {
+    public static TheoryData<string, string> RutasGestionHu02 => new()
+    {
+        { "GET", "/api/usuarios" }, { "POST", "/api/usuarios" },
+        { "GET", "/api/usuarios/00000000-0000-0000-0000-000000000001" },
+        { "PATCH", "/api/usuarios/00000000-0000-0000-0000-000000000001/estado" },
+        { "PUT", "/api/usuarios/00000000-0000-0000-0000-000000000001/rol" },
+        { "PUT", "/api/usuarios/00000000-0000-0000-0000-000000000001/contrasena" }
+    };
+
+    [Theory]
+    [MemberData(nameof(RutasGestionHu02))]
+    public async Task GestionHu02_SinSesionNoLlegaAAuth(string metodo, string ruta)
+    {
+        using var client = factory.CreateClient();
+        var antes = factory.Forwarded.Count;
+        using var respuesta = await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta));
+        Assert.Equal(HttpStatusCode.Unauthorized, respuesta.StatusCode);
+        Assert.Equal(antes, factory.Forwarded.Count);
+    }
+
+    [Theory]
+    [MemberData(nameof(RutasGestionHu02))]
+    public async Task GestionHu02_AdministradorSeEnrutaAAuth(string metodo, string ruta)
+    {
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token());
+        var antes = factory.Forwarded.Count;
+        using var respuesta = await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta));
+        Assert.Equal(antes + 1, factory.Forwarded.Count);
+        var enviada = factory.Forwarded.Last();
+        Assert.Equal("auth", enviada.Service);
+        Assert.Equal(metodo, enviada.Method);
+        Assert.Equal(ruta, enviada.PathAndQuery);
+    }
+
     public static TheoryData<string, string, string> AcademicRoutes => new()
     {
         { "GET", "/api/solicitudes", "solicitudes" }, { "POST", "/api/solicitudes", "solicitudes" },
