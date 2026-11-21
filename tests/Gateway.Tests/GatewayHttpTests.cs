@@ -222,8 +222,8 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        // 33 rutas previas y 5 rutas de administración HU-02.
-        Assert.Equal(38, paths.EnumerateObject().Count());
+        // 33 rutas previas, 5 rutas de administración HU-02 y 2 de HU-12 (adjuntos).
+        Assert.Equal(40, paths.EnumerateObject().Count());
         Assert.True(paths.GetProperty("/api/usuarios").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/usuarios").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/usuarios/{id}").TryGetProperty("get", out _));
@@ -231,6 +231,10 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.True(paths.GetProperty("/api/usuarios/{id}/rol").TryGetProperty("put", out _));
         Assert.True(paths.GetProperty("/api/usuarios/{id}/contrasena").TryGetProperty("put", out _));
         Assert.Contains("Administrador", paths.GetProperty("/api/usuarios").GetProperty("get").GetProperty("description").GetString());
+        // HU-12: adjuntos del expediente.
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos/{adjuntoId}").TryGetProperty("get", out _));
         // HU-23: generación y consulta del informe de homologación.
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("get", out _));
