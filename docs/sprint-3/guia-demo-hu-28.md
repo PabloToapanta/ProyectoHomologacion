@@ -2,7 +2,7 @@
 
 **Issue:** [#73 — Documentación y guion de demo](https://github.com/PabloToapanta/ProyectoHomologacion/issues/73)  
 **Revisión de la guía:** 21/11/2026 · **Base revisada:** `origin/develop` en `10a2b5e`  
-**Estado:** borrador de documentación. El 21/11/2026 el stack HTTP aislado `hu28-demo-20261121` compiló y sus siete servicios quedaron saludables. Está disponible en `http://127.0.0.1:15173/login` (frontend) y `http://127.0.0.1:15080` (Gateway). La página de login respondió 200, el login de la cuenta local respondió 200 y una ruta protegida sin sesión respondió 401. Para suplir dos claves vacías se generaron valores aleatorios solo en el proceso de Compose; no se escribieron en `.env.sprint1`. El volumen del stack es independiente de los datos existentes. El overlay HTTPS solo pasó `config --quiet`; no se ejecutó con certificado ni en navegador. La revisión visual, el flujo completo, la aceptación de la PO y la revisión cruzada siguen pendientes.
+**Estado:** borrador de documentación. El 21/11/2026 se levantaron dos stacks aislados, HTTP (`hu28-demo-20261121`) y HTTPS (`hu28-https-20261121`); los siete servicios de cada uno quedaron saludables. HTTP está disponible en `http://127.0.0.1:15173/login` y `http://127.0.0.1:15080`; HTTPS en `https://localhost/login`. La página de login respondió 200, el login de la cuenta local respondió 200 y una ruta protegida sin sesión respondió 401. HTTP redirigió a HTTPS con 308; HTTPS respondió 200 y `Strict-Transport-Security: max-age=60`. Brave mostró el login sin intersticial de certificado. Los stacks conservan volúmenes separados. Al inicio faltaban dos claves en `.env.sprint1`; se generaron aleatoriamente y se guardaron solo en ese archivo privado antes de reiniciar ambos stacks. No se mostraron ni versionaron. La revisión visual del flujo por roles, el flujo completo, la aceptación de la PO y la revisión cruzada siguen pendientes.
 
 Esta guía usa cuentas y registros sintéticos. No copiar contraseñas, tokens, certificados privados ni datos personales en el repositorio, capturas o evidencias.
 
@@ -11,7 +11,7 @@ Esta guía usa cuentas y registros sintéticos. No copiar contraseñas, tokens, 
 - Docker Desktop/Engine con Docker Compose v2 y conexión para descargar imágenes.
 - Puertos locales libres: 80 y 443 para el acceso HTTPS; 5080–5083 y 5173 para el modo HTTP local.
 - PowerShell o una terminal desde la raíz del repositorio.
-- Para HTTPS local: `mkcert` instalado en el equipo y certificado de desarrollo confiado por el navegador. No desactivar la validación TLS.
+- Para HTTPS local: certificado de desarrollo confiado por el navegador, generado con `mkcert` o `dotnet dev-certs`. No desactivar la validación TLS.
 - Si se demostrará el análisis interno con el modelo real: servidor Ollama accesible desde los contenedores y modelo `qwen3:4b` disponible, según `docs/sprint-2/hu-18-analisis-interno.md`. Si Ollama no responde, la aplicación conserva la opción de revisión manual; no anunciar un resultado del agente.
 - Una copia privada de `.env.example`, llamada `.env.sprint1`, con valores locales aleatorios. No utilizar contraseñas institucionales.
 
@@ -51,17 +51,18 @@ El entorno HTTP es para desarrollo local. No usarlo para transmitir credenciales
 
 ## 3. Arranque con HTTPS local
 
-El overlay `compose.hu34.yaml` publica la aplicación a través del Gateway en `localhost` y monta el certificado en solo lectura. Crear certificados **fuera del repositorio**, por ejemplo en una carpeta temporal del usuario:
+El overlay `compose.hu34.yaml` publica la aplicación a través del Gateway en `localhost` y monta el certificado en solo lectura. Crear certificados **fuera del repositorio**. Una opción que se probó en esta revisión es el certificado de desarrollo de .NET; el comando de confianza puede presentar una confirmación de Windows:
 
 ```powershell
-mkcert -install
+dotnet dev-certs https --trust
 $certDir = Join-Path $env:TEMP 'hu34-certs'
 New-Item -ItemType Directory -Force $certDir | Out-Null
-mkcert -cert-file (Join-Path $certDir 'localhost.pem') `
-  -key-file (Join-Path $certDir 'localhost-key.pem') localhost 127.0.0.1 ::1
+dotnet dev-certs https --export-path (Join-Path $certDir 'exported.pem') --format Pem --no-password
+Copy-Item (Join-Path $certDir 'exported.pem') (Join-Path $certDir 'localhost.pem')
+Copy-Item (Join-Path $certDir 'exported.key') (Join-Path $certDir 'localhost-key.pem')
 ```
 
-En `.env.sprint1`, añadir `HU34_CERT_DIR` con la ruta absoluta a esa carpeta, usando barras `/` (por ejemplo `C:/Users/<usuario>/AppData/Local/Temp/hu34-certs`). No versionar el certificado ni su clave privada. Si el equipo ya dispone de un certificado de desarrollo aprobado, puede usarlo siempre que los archivos se llamen `localhost.pem` y `localhost-key.pem`.
+También se puede usar `mkcert -install` y generar `localhost.pem` y `localhost-key.pem` para `localhost`. En `.env.sprint1`, añadir `HU34_CERT_DIR` con la ruta absoluta a la carpeta, usando barras `/` (por ejemplo `C:/Users/<usuario>/AppData/Local/Temp/hu34-certs`). No versionar el certificado ni su clave privada. Si el equipo ya dispone de un certificado de desarrollo aprobado, puede usarlo siempre que los archivos se llamen `localhost.pem` y `localhost-key.pem`.
 
 Arrancar los tres archivos Compose con el mismo nombre de proyecto:
 
@@ -124,8 +125,8 @@ No afirmar que el flujo completo de remisión/finalización, adjuntos, auditorí
 
 | Elemento | Estado en esta guía |
 | --- | --- |
-| Compose base `compose.sprint1.yaml` y overlay de Solicitudes `compose.hu10.yaml` | Stack aislado compilado el 21/11; 7/7 servicios saludables. Login `/login`: 200; login local: 200; ruta protegida sin sesión: 401. Dos claves de prueba temporales no se guardaron. |
-| Overlay HTTPS `compose.hu34.yaml` y rutas de login por rol | `docker compose config --quiet` pasó el 21/11 con valores de prueba; no se montó certificado ni se recorrió en navegador. |
+| Compose base `compose.sprint1.yaml` y overlay de Solicitudes `compose.hu10.yaml` | Stack HTTP aislado compilado y reiniciado con `.env.sprint1`; 7/7 servicios saludables. Frontend `/login`: 200; login de la cuenta local: 200; ruta protegida sin sesión: 401. |
+| Overlay HTTPS `compose.hu34.yaml` y rutas de login por rol | Stack HTTPS aislado con certificado .NET confiable; 7/7 saludables. HTTP → HTTPS: 308; HTTPS `/login`: 200; HSTS `max-age=60`; ruta protegida: 401; login: 200. Brave mostró el login sin intersticial de certificado. |
 | Roles Administrador, Coordinador y Docente; solicitudes, análisis e informe | Rutas y componentes presentes en la base `10a2b5e`; requieren comprobación manual de la demo. |
 | Adjuntos HU-12 (#82) y exportación PDF HU-24 (#83) | PR abiertas en la revisión del 21/11; no dar por integradas hasta comprobar `develop`. |
 | Remisión HU-32 (#86), auditoría HU-25 (#85) y finalización HU-33 (#89) | PR abiertas en la revisión del 21/11; los pasos 6–7 del guion dependen de integración y de verificar el recorrido en navegador. |
