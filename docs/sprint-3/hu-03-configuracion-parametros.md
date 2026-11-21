@@ -23,12 +23,59 @@
 
 Los criterios de Issue #67 y su comentario del 20/11 son la base. La PO debe confirmarlos antes de codificar.
 
-1. **CA1 — Valores iniciales conservados.** Con la configuración inicial, el umbral es 80 %, los mínimos coinciden exactamente con HU-16 y la antigüedad se inicia en 10 años como valor provisional. El motor mantiene los resultados actuales en las pruebas de regresión.
-2. **CA2 — Consulta y modificación autorizadas.** Un usuario con el rol acordado puede consultar la configuración. Solo el rol acordado puede modificarla; sin sesión se responde 401 y con otro rol 403. Los parámetros se validan en servidor: umbral mayor que 0 y hasta 100; años y mínimos enteros positivos dentro de límites acordados.
-3. **CA3 — Aplicación temporal.** Los análisis iniciados después de un cambio usan una sola versión vigente de parámetros. Los análisis e informes ya persistidos conservan la fotografía usada al crearse y no cambian retroactivamente.
-4. **CA4 — Auditoría y reproducción.** Cada cambio registra actor, fecha, valores anteriores y nuevos, motivo y respaldo. Cada análisis conserva los parámetros/versionado con los que se calculó. Recalcular requiere una acción explícita y genera un nuevo registro auditable; no sobrescribe silenciosamente el análisis previo.
-5. **CA5 — Mínimos internos y externos.** La configuración incluye por separado los períodos y asignaturas homologables mínimos para cambio interno y externo, y la regla de cambios previos que ya aplica HU-16. No permite configuraciones que contradigan las reglas acordadas ni elimina la condición externa de cero cambios previos sin aprobación expresa.
-6. **CA6 — Contrato y evidencia.** Endpoints documentados en OpenAPI; pruebas unitarias, API, autorización y regresión comprueban límites, configuración inicial, aplicación a análisis nuevos, conservación de resultados históricos y auditoría. La aceptación de Shirley queda registrada como evidencia separada.
+### CA1 — Valores iniciales conservados
+
+- **Given** la instalación tiene la configuración inicial y el motor ejecuta una evaluación de equivalencia, una validación de antigüedad o una validación de requisitos de cambio.
+- **When** el sistema procesa cada evaluación con los parámetros iniciales.
+- **Then** usa umbral de 80 %, diez años como valor provisional y los mínimos vigentes de HU-16; los resultados existentes de las pruebas de regresión se conservan.
+
+### CA2 — Consulta, autorización y validación de rangos
+
+- **Given** un usuario autenticado con el rol editor acordado solicita consultar o modificar la configuración.
+- **When** envía parámetros con valores dentro de los rangos acordados.
+- **Then** el sistema permite la operación y devuelve la configuración persistida sin exponer secretos.
+- **Given** una petición de consulta o modificación sin sesión válida o con un rol distinto al rol editor.
+- **When** el servicio autoriza la petición.
+- **Then** responde 401 si no hay sesión y 403 si el rol no está autorizado.
+- **Given** una petición contiene un umbral fuera del rango permitido, años o mínimos no enteros/positivos, o valores que exceden los máximos acordados.
+- **When** el servicio valida la configuración.
+- **Then** rechaza la modificación con un error de validación y no cambia la versión vigente.
+
+### CA3 — Aplicación temporal y conservación histórica
+
+- **Given** existe una versión vigente de parámetros y se guarda un nuevo análisis después de cambiar esa versión.
+- **When** el motor calcula el análisis.
+- **Then** usa y almacena la versión vigente en ese instante.
+- **Given** ya existen análisis o informes guardados con una versión anterior.
+- **When** se modifica la configuración vigente.
+- **Then** los resultados históricos conservan sus valores y versión originales, sin recalcularse ni alterarse automáticamente.
+
+### CA4 — Auditoría y reproducción
+
+- **Given** un editor autorizado realiza un cambio válido en la configuración.
+- **When** el sistema persiste el cambio.
+- **Then** registra actor, fecha, valores anteriores y nuevos, motivo y respaldo.
+- **Given** un análisis se consulta o se solicita recalcular explícitamente.
+- **When** el sistema reconstruye o vuelve a ejecutar el análisis.
+- **Then** puede identificar los parámetros/versionado originales; el recálculo crea un nuevo registro auditable y no sobrescribe silenciosamente el análisis previo.
+
+### CA5 — Mínimos internos y externos
+
+- **Given** se configura el mínimo de períodos y asignaturas homologables para cambios internos y externos.
+- **When** se validan los requisitos de HU-16 para cada tipo de cambio.
+- **Then** se aplican los valores configurados por separado y se conserva la regla acordada de cambios previos para el cambio externo.
+- **Given** una propuesta de configuración contradice las invariantes de HU-16 acordadas con Edwin o elimina la condición externa de cero cambios previos sin autorización.
+- **When** el sistema valida la modificación.
+- **Then** rechaza el cambio y conserva los mínimos vigentes.
+
+### CA6 — Contrato, pruebas y aceptación
+
+- **Given** la configuración, consulta y modificación ya están implementadas según el contrato aprobado.
+- **When** se ejecuta la verificación de HU-03.
+- **Then** OpenAPI documenta los endpoints y las pruebas verifican valores iniciales, límites, permisos, auditoría, aplicación a análisis nuevos y conservación de análisis históricos.
+- **Given** la PO revisa las evidencias funcionales de los criterios acordados.
+- **When** Shirley registra su decisión de aceptación.
+- **Then** la aceptación queda documentada separadamente de los resultados de pruebas técnicas.
 
 ## Alcance y decisiones que deben acordarse
 
