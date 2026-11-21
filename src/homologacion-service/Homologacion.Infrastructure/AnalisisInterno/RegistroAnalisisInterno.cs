@@ -58,7 +58,13 @@ public static class RegistroAnalisisInterno
         services.AddScoped(p => new RegistrarRevisionDocente(p.GetRequiredService<ISolicitudesAnalisisInterno>(), p.GetRequiredService<ICatalogoAnalisisInterno>(),
             p.GetRequiredService<IResultadosAnalisisInterno>(), p.GetRequiredService<IResultadosAnalisisExterno>(), p.GetRequiredService<IRevisionesDocentes>(),
             p.GetRequiredService<TimeProvider>(), p.GetRequiredService<IInformesHomologacion>()));
+        // HU-25: el evento «Generado» se registra en la misma transacción que el informe.
+        services.AddScoped<IAuditoriaInformes, EventosInformeSql>();
         services.AddScoped<GenerarInformeHomologacion>();
+        services.AddScoped<ConsultarHistorialInforme>();
+        // HU-32: Solicitudes es dueño del estado; la remisión y el evento «Remitido» se confirman juntos.
+        services.AddScoped<IEstadoSolicitudes>(p => p.GetRequiredService<FuentesAnalisisHttp>());
+        services.AddScoped<RemitirInformeHomologacion>();
         return services;
     }
 

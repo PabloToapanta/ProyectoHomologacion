@@ -174,8 +174,12 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        // 29 hasta HU-31, 3 de HU-08 (importaciones y programa analítico) y 1 de HU-23.
-        Assert.Equal(33, paths.EnumerateObject().Count());
+        // 29 hasta HU-31, 3 de HU-08 (importaciones y programa analítico), 1 de HU-23, 1 de HU-25 y 1 de HU-32.
+        Assert.Equal(35, paths.EnumerateObject().Count());
+        // HU-32: remisión del informe al coordinador.
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe/remision").TryGetProperty("post", out _));
+        // HU-25: historial del informe, solo lectura.
+        Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe/historial").TryGetProperty("get", out _));
         // HU-23: generación y consulta del informe de homologación.
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("get", out _));

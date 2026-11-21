@@ -26,6 +26,8 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<RegistroRevisionDocente> RevisionesDocentes => Set<RegistroRevisionDocente>();
     /// <summary>HU-23: un informe fijo por solicitud.</summary>
     public DbSet<RegistroInforme> Informes => Set<RegistroInforme>();
+    /// <summary>HU-25: historial del informe, solo de inserción.</summary>
+    public DbSet<RegistroEventoInforme> EventosInforme => Set<RegistroEventoInforme>();
     protected override void OnModelCreating(ModelBuilder model)
     {
         var r = model.Entity<RegistroResultado>();
@@ -51,6 +53,14 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
         i.HasKey(x => x.SolicitudId);
         i.Property(x => x.SolicitudId).ValueGeneratedNever();
         i.Property(x => x.Contenido).IsRequired();
+        var v = model.Entity<RegistroEventoInforme>();
+        v.ToTable("EventosInforme");
+        v.HasKey(x => x.Id);
+        v.Property(x => x.Id).ValueGeneratedNever();
+        v.Property(x => x.Tipo).HasMaxLength(20).IsRequired();
+        v.Property(x => x.Usuario).HasMaxLength(256).IsRequired();
+        v.Property(x => x.Rol).HasMaxLength(30).IsRequired();
+        v.HasIndex(x => new { x.SolicitudId, x.Tipo }).IsUnique();
     }
 }
 public sealed class ResultadosAnalisisSql(ResultadosDbContext db) : IResultadosAnalisisInterno
