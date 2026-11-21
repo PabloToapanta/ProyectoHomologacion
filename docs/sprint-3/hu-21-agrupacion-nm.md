@@ -108,6 +108,22 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 - Por fila se muestran horas y créditos aprobados, suma asignada y saldo. Por columna se muestran cantidades receptoras, aportes recibidos y cobertura/veredicto cuando exista análisis. Los errores de servidor se asocian al vínculo o fila afectada, sin confiar solo en validación del navegador.
 - La vista del análisis muestra el desglose por receptora y una sugerencia única del grupo. El borrador ofrece corregir/eliminar; tras el primer análisis guardado, la composición aparece de solo lectura.
 
+### Contrato técnico resuelto 6 — rutas y mensajes de agrupación
+
+Pablo confirmó el 21/11/2026 rutas propias para grupos. Las rutas actuales de parejas 1:1 conservan su contrato. Base nueva: `/api/homologaciones/solicitudes/{solicitudId}/agrupaciones` (docente asignado, con JWT; el Gateway aplica la misma protección académica que al análisis existente).
+
+| Método y sufijo | Uso |
+| --- | --- |
+| `POST /` | Crear borrador; devuelve `201`, `grupoId` y composición. |
+| `GET /` · `GET /{grupoId}` | Listar y consultar grupos de la solicitud con estado y último análisis, si existe. |
+| `PUT /{grupoId}` · `DELETE /{grupoId}` | Reemplazar o eliminar un borrador **solo antes** del primer análisis guardado. La eliminación libera reservas. |
+| `POST /{grupoId}/analisis` | Evaluar el grupo; devuelve sugerencia única y desglose por receptora. Si faltan aportes `null`, devuelve «Información incompleta» con `guardado: false`. |
+| `GET /{grupoId}/revisiones` · `PUT /{grupoId}/revisiones` | Consultar ambas revisiones y guardar/corregir la del docente autenticado hasta generar el informe. |
+
+El cuerpo de creación/reemplazo incluye `origenes[]` (IDs de asignaturas aprobadas), `receptoras[]` (IDs de catálogo) y `aportes[]` con `asignaturaAprobadaId`, `asignaturaReceptoraId`, `horasAportadas` y `creditosAportados`. Cada par aparece a lo sumo una vez y cada asignatura seleccionada participa en al menos un par. La respuesta incluye `grupoId`, estado de borrador/análisis, esos vínculos y, si existe, el último análisis con `configuracionVersionId`, estado/sugerencia del grupo, porcentajes y faltantes por receptora, y evidencias fotografiadas. El cliente no declara aprobación, revisión vigente ni veredicto: el servidor los obtiene y calcula.
+
+Errores: `400` para IDs, pares o aportes inválidos; `401/403` para autenticación/asignación; `404` para grupo ajeno o inexistente; `409` para origen reservado, borrador congelado o conflicto concurrente; `503` si la fuente autorizada no está disponible. Los faltantes académicos se devuelven en el resultado «Información incompleta», no como error de forma. OpenAPI documenta cada operación.
+
 | Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
 | Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Reflejar en #75 y reestimar el sprint. |

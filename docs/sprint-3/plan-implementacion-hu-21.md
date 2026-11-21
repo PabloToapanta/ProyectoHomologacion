@@ -35,18 +35,19 @@
 
 Los archivos de coordinación tienen **un solo editor a la vez**. Antes del primer cambio compartido, acordar campos y nombres de endpoints en la Draft PR. El otro integrante revisa y consume ese contrato en su parte. Evitar commits simultáneos sobre `ResultadosDbContext`, controladores de informe/revisión y páginas que ensamblan los paneles.
 
-## Propuesta de contrato HTTP para revisión
+## Contrato HTTP de agrupaciones
 
-Mantener intactas las rutas actuales de parejas 1:1. Añadir rutas de agrupaciones bajo `/api/homologaciones/solicitudes/{id}/agrupaciones`:
+Mantener intactas las rutas actuales de parejas 1:1. Pablo confirmó rutas propias de agrupaciones bajo `/api/homologaciones/solicitudes/{id}/agrupaciones`. El detalle de cuerpos, respuestas y errores está en el contrato técnico 6 de la spec.
 
 | Operación propuesta | Función |
 | --- | --- |
-| `POST /` | Registrar un grupo con `origenes[]`, `receptoras[]` y `aportes[]` (origen, receptora, horas, créditos); devuelve `grupoId`. |
-| `GET /` y `GET /{grupoId}` | Consultar composición, aportes, estado y resultados. |
+| `POST /` | Registrar un borrador con `origenes[]`, `receptoras[]` y `aportes[]`; devuelve `201` y `grupoId`. |
+| `GET /` y `GET /{grupoId}` | Consultar composición, aportes, estado y último análisis. |
+| `PUT /{grupoId}` y `DELETE /{grupoId}` | Corregir o eliminar un borrador antes de su primer análisis guardado. |
 | `POST /{grupoId}/analisis` | Ejecutar evaluación; devuelve resultado único y desglose por receptora. |
-| `PUT /{grupoId}/revisiones` | Registrar la postura y decisión del docente asignado para el grupo. |
+| `GET /{grupoId}/revisiones` y `PUT /{grupoId}/revisiones` | Consultar ambas revisiones y registrar/corregir la del docente autenticado. |
 
-El informe existente de la solicitud debe admitir unidades individuales y grupales sin reinterpretar los campos históricos `asignaturaAprobadaId`/`asignaturaReceptoraId`. Los nombres exactos de DTO, rutas y tablas se fijan en el paso 0. Validaciones de API: 400 para selección/aportes inválidos, 401/403 para autorización, 404 si grupo o solicitud no pertenecen al contexto, 409 para reutilización del origen o cambio concurrente, 503 si la fuente no está disponible. La falta de evidencia académica produce un resultado «Información incompleta» con detalle.
+El informe existente de la solicitud debe admitir unidades individuales y grupales sin reinterpretar los campos históricos `asignaturaAprobadaId`/`asignaturaReceptoraId`. Los nombres de clases y tablas se fijan en el paso 0 sin cambiar el contrato público descrito. La falta de evidencia académica produce un resultado «Información incompleta» con detalle.
 
 ## Persistencia y compatibilidad propuestas
 
