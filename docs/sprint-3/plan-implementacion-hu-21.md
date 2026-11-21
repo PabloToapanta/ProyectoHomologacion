@@ -25,6 +25,8 @@
 
 La parte de Leslie sigue siendo identidad/persistencia/API del grupo y la interfaz. Un cambio en esos contratos se coordina en la Draft PR antes de modificar archivos compartidos.
 
+**Contrato de integración tras la parte de Pablo:** `EvaluarAgrupacion` recibe orígenes, receptoras y aportes con correspondencias revisadas; el servidor debe construir esa entrada desde la solicitud y el Catálogo, sin confiar en aprobación, evidencia ni veredicto enviados por el cliente. `IResultadosAgrupacionInforme` devuelve el último `AnalisisAgrupacionGuardado` por `grupoId` y solicitud. `IRevisionesAgrupacion` guarda una revisión por `(grupoId, docenteId)` y permite listarlas. Leslie conecta ambos almacenes y registra `RegistrarRevisionAgrupacion` y las dos fuentes grupales de `GenerarInformeHomologacion` en DI. Los guardados de revisión y la generación del informe deben compartir `IInformesHomologacion.ConCierreAsync`; la transacción y el bloqueo entre instancias son responsabilidad de la infraestructura. Los campos `Grupos` del informe son adicionales: los informes 1:1 anteriores se leen con una lista vacía.
+
 | Paso | Responsable inicial | Entregable | Dependencia |
 | --- | --- | --- | --- |
 | 0. Revisar contrato y capacidad | Pablo y Leslie; Shirley revisa compromiso; Edwin revisa contrato | Revisión de los contratos técnicos 1–7 y estimación de 7 h indicada por Pablo en #75 | Acuerdo funcional N:M comunicado por Pablo |

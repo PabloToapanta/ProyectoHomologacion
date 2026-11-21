@@ -21,6 +21,22 @@ public sealed class EvaluarAgrupacionTests
         new EvaluarAgrupacion(new Umbral(umbral)).Ejecutar(solicitud);
 
     [Fact]
+    public void Dos_parejas_independientes_se_evalúan_por_receptora_sin_sumar_porcentajes()
+    {
+        var entrada = new SolicitudAgrupacion(
+            [new(Materia("O1", 60, 2.5m, ["C1"]), true), new(Materia("O2", 40, 1.5m, ["C2"]), true)],
+            [Materia("D1", 60, 2.5m, ["C1"]), Materia("D2", 40, 1.5m, ["C2"])],
+            [Aporte("O1", "D1", 60, 2.5m), Aporte("O2", "D2", 40, 1.5m, "C2", "C2")]);
+
+        var resultado = Evaluar(entrada);
+
+        Assert.Equal(EstadoEquivalencia.Homologable, resultado.Estado);
+        Assert.Equal(2, resultado.Receptoras.Count);
+        Assert.All(resultado.Receptoras, r => Assert.Equal((100m, 100m, 100m),
+            (r.CompatibilidadAcademicaPct, r.CompatibilidadHorariaPct, r.CompatibilidadCreditosPct)));
+    }
+
+    [Fact]
     public void Una_materia_puede_repartirse_en_dos_receptoras_sin_duplicar_horas_ni_creditos()
     {
         var entrada = new SolicitudAgrupacion(
