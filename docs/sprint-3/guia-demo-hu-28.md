@@ -97,7 +97,7 @@ Abrir <https://localhost/login>. También se puede visitar `http://localhost/log
 4. Repetir con la segunda cuenta Docente para comprobar que cada análisis es individual.
 5. La pantalla del informe es de consulta. Remisión y finalización requieren la integración pendiente indicada abajo.
 
-## 6. Guion de demo disponible en la base revisada
+## 6. Guion de demo
 
 Duración orientativa: 8–12 minutos, más el tiempo de inicio de contenedores. Usar un registro interno con datos sintéticos para que el ejemplo no dependa de documentación académica inventada.
 
@@ -106,7 +106,9 @@ Duración orientativa: 8–12 minutos, más el tiempo de inicio de contenedores.
 3. **Coordinador (2 min):** registrar una solicitud interna sintética, seleccionar las asignaturas preparadas y asignar a los dos docentes.
 4. **Docentes (2–3 min):** iniciar sesión separadamente con cada cuenta, abrir la solicitud asignada y guardar cada análisis individual. Mostrar que una cuenta no edita el análisis de la otra.
 5. **Informe (1 min):** volver a la cuenta Coordinador y mostrar el informe disponible cuando se completen los análisis. Describir únicamente los campos y el estado que aparezcan en pantalla.
-6. **Calidad y cierre (1 min):** enseñar los checks de la PR y la matriz de pruebas solo si están visibles y actuales. Cerrar sesión y detener el stack conservando el volumen.
+6. **Remisión (solo después de integrar HU-32, PR #86):** iniciar sesión como uno de los docentes asignados, abrir el informe y pulsar **Remitir al coordinador**. Volver a Coordinador y comprobar el estado **Remitida**.
+7. **Revisión y finalización (solo después de integrar HU-33, PR #89):** como Coordinador, abrir la revisión del informe; si hay parejas **Sin acuerdo**, registrar una decisión propia con justificación; finalizar y comprobar que la solicitud queda en solo lectura. Mostrar eventos del historial solo si HU-25 (PR #85) está integrada.
+8. **Calidad y cierre (1 min):** enseñar los checks de la PR y la matriz de pruebas solo si están visibles y actuales. Cerrar sesión y detener el stack conservando el volumen.
 
 No afirmar que el flujo completo de remisión/finalización, adjuntos, auditoría o exportación PDF está disponible hasta verificar que sus PR correspondientes están integradas y pasar el recorrido de extremo a extremo.
 
@@ -118,7 +120,7 @@ No afirmar que el flujo completo de remisión/finalización, adjuntos, auditorí
 | Overlay HTTPS `compose.hu34.yaml` y rutas de login por rol | `docker compose config --quiet` pasó el 21/11 con valores ficticios; TLS y navegador siguen sin ejecutarse. |
 | Roles Administrador, Coordinador y Docente; solicitudes, análisis e informe | Rutas y componentes presentes en la base `10a2b5e`; requieren comprobación manual de la demo. |
 | Adjuntos HU-12 (#82) y exportación PDF HU-24 (#83) | PR abiertas en la revisión del 21/11; no dar por integradas hasta comprobar `develop`. |
-| Remisión HU-32 (#86), auditoría HU-25 (#85) y finalización HU-33 (#89) | PR abiertas en la revisión del 21/11; la demo de flujo completo depende de integración, resolución de conflictos y aceptación. |
+| Remisión HU-32 (#86), auditoría HU-25 (#85) y finalización HU-33 (#89) | PR abiertas en la revisión del 21/11; los pasos 6–7 del guion dependen de integración y de verificar el recorrido en navegador. |
 | Certificado, cuentas, datos de prueba, captura y aceptación de PO | Preparación/ejecución pendiente del equipo; no se adjuntan secretos ni resultados simulados. |
 
 Antes de la demo, actualizar esta tabla con el SHA real de `develop`, el estado de cada PR, fecha, persona que ejecutó Compose, resultado observado y evidencias saneadas. Un check de CI o una prueba de servicio no equivale por sí solo a aceptación funcional de la PO.
