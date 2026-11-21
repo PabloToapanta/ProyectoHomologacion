@@ -11,6 +11,21 @@ namespace Homologacion.Infrastructure.Tests;
 public class GruposAgrupacionSqlTests
 {
     [Fact]
+    public async Task Revision_manual_1a1_sin_agente_tambien_reserva_la_unidad_y_no_roba_un_grupo()
+    {
+        using var c = new SqliteConnection("Data Source=:memory:"); await c.OpenAsync();
+        await using var db = new ResultadosDbContext(new DbContextOptionsBuilder<ResultadosDbContext>().UseSqlite(c).Options);
+        await db.Database.EnsureCreatedAsync(); var repo = new GruposAgrupacionSql(db); var cierre = new InformesHomologacionSql(db);
+        var s = Guid.NewGuid(); var o = Guid.NewGuid(); var r = Guid.NewGuid(); var t = Guid.NewGuid();
+        var g = GrupoAgrupacion.Crear(s, [o], [r, t], [new(o, r, 1, 1), new(o, t, 2, 2)]);
+        await cierre.ConCierreAsync(s, async () => { await repo.GuardarAsync(g, null, default); return true; }, default);
+        var revisiones = new Homologacion.Infrastructure.RevisionDocente.RevisionesDocentesSql(db);
+        await Assert.ThrowsAsync<ConflictoGrupoException>(() => revisiones.GuardarAsync(new(s, o, r, Guid.NewGuid(), "Docente", "Ajuste", "NoHomologable", "Sin agente", "SinAnalisis", null, DateTimeOffset.UtcNow), default));
+        var otro = Guid.NewGuid(); await revisiones.GuardarAsync(new(s, otro, r, Guid.NewGuid(), "Docente", "Ajuste", "NoHomologable", "Sin agente", "SinAnalisis", null, DateTimeOffset.UtcNow), default);
+        var nuevo = GrupoAgrupacion.Crear(s, [otro], [r, t], [new(otro, r, 1, 1), new(otro, t, 2, 2)]);
+        await Assert.ThrowsAsync<ConflictoGrupoException>(() => cierre.ConCierreAsync(s, async () => { await repo.GuardarAsync(nuevo, null, default); return true; }, default));
+    }
+    [Fact]
     public async Task Corregir_borrador_intercambia_reservas_sin_modificar_otro_grupo_y_conserva_null()
     {
         using var c = new SqliteConnection("Data Source=:memory:"); await c.OpenAsync();

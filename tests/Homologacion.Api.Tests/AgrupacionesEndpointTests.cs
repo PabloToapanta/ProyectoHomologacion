@@ -40,6 +40,10 @@ public class AgrupacionesEndpointTests
             var route = schema.RootElement.GetProperty("paths").GetProperty("/api/homologaciones/solicitudes/{id}/agrupaciones/{grupoId}");
             Assert.True(route.GetProperty("put").GetProperty("parameters").EnumerateArray().Single(x => x.GetProperty("name").GetString() == "If-Match").GetProperty("required").GetBoolean());
             Assert.True(route.GetProperty("get").GetProperty("responses").GetProperty("200").GetProperty("headers").TryGetProperty("ETag", out _));
+            var schemas = schema.RootElement.GetProperty("components").GetProperty("schemas");
+            var estadoHistorico = schemas.GetProperty("EvaluacionEquivalencia").GetProperty("properties").GetProperty("estado");
+            if (estadoHistorico.TryGetProperty("$ref", out var referencia)) estadoHistorico = schemas.GetProperty(referencia.GetString()!.Split('/').Last());
+            Assert.Equal("integer", estadoHistorico.GetProperty("type").GetString());
         }
         var token1 = f.Token("Docente"); var token2 = f.Token("Docente"); c.DefaultRequestHeaders.Authorization = new("Bearer", token1);
         var ruta = $"/api/homologaciones/solicitudes/{EscenarioInterno.SolicitudId}/agrupaciones";
@@ -71,6 +75,15 @@ public class AgrupacionesEndpointTests
         Assert.Equal(2, a.RootElement.GetProperty("evaluacion").GetProperty("receptoras").GetArrayLength());
         etag = evaluated.Headers.ETag!.ToString(); c.DefaultRequestHeaders.Remove("If-Match"); c.DefaultRequestHeaders.TryAddWithoutValidation("If-Match", etag);
         Assert.Equal(HttpStatusCode.Conflict, (await c.DeleteAsync(detalle)).StatusCode);
+        e.Solicitud = e.Solicitud! with { AsignaturasAprobadas = [e.Solicitud.AsignaturasAprobadas[0] with { IntentoMatricula = 3 }] };
+        using (var reanalizado = await c.PostAsync(detalle + "/analisis", null))
+        {
+            Assert.Equal(HttpStatusCode.OK, reanalizado.StatusCode);
+            etag = reanalizado.Headers.ETag!.ToString();
+        }
+        c.DefaultRequestHeaders.Remove("If-Match"); c.DefaultRequestHeaders.TryAddWithoutValidation("If-Match", etag);
+        using (var persistido = JsonDocument.Parse(await c.GetStringAsync(detalle)))
+            Assert.Contains(persistido.RootElement.GetProperty("ultimoAnalisis").GetProperty("evaluacion").GetProperty("informacionFaltante").EnumerateArray(), x => x.GetString()!.Contains("tercera matrícula"));
         var revision = new { postura = "Ajuste", decision = "NoHomologable", observacion = "Revisión sintética del grupo" };
         Assert.Equal(HttpStatusCode.OK, (await c.PutAsJsonAsync(detalle + "/revisiones", revision)).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await c.PutAsJsonAsync(detalle + "/revisiones", revision)).StatusCode);

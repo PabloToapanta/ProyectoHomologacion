@@ -61,6 +61,13 @@ public sealed class GestionarAgrupaciones(ISolicitudesAnalisisInterno solicitude
         var d = await Exigir(id, grupo, version, ct);
         var entrada = await preparar.ConstruirAsync(s, d.Grupo, p, ct);
         var r = motor.Ejecutar(entrada.Datos, p);
+        // Fotografía los motivos comprobados sin modificar porcentajes, estado o sugerencia del motor.
+        if (entrada.Advertencias.Count > 0)
+            r = r with
+            {
+                Justificacion = r.Justificacion + " " + string.Join("; ", entrada.Advertencias),
+                InformacionFaltante = r.InformacionFaltante.Concat(entrada.Advertencias).Distinct().ToArray()
+            };
         return await informes.ConCierreAsync(id, async () =>
         {
             await Abierto(id, ct); var actual = await Exigir(id, grupo, version, ct);

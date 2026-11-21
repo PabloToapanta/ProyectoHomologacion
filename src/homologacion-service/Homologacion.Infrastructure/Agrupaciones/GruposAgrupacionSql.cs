@@ -98,7 +98,8 @@ public sealed class GruposAgrupacionSql(ResultadosDbContext db) : IGruposAgrupac
             {
                 var reservado = await db.Set<ReservaOrigen>().FindAsync([grupo.SolicitudId, origen], ct);
                 var historico = await db.Resultados.AsNoTracking().AnyAsync(x => x.SolicitudId == grupo.SolicitudId && x.AprobadaId == origen, ct)
-                    || await db.ResultadosExternos.AsNoTracking().AnyAsync(x => x.SolicitudId == grupo.SolicitudId && x.AprobadaId == origen, ct);
+                    || await db.ResultadosExternos.AsNoTracking().AnyAsync(x => x.SolicitudId == grupo.SolicitudId && x.AprobadaId == origen, ct)
+                        || await db.RevisionesDocentes.AsNoTracking().AnyAsync(x => x.SolicitudId == grupo.SolicitudId && x.AprobadaId == origen, ct);
                 if (historico || reservado is not null && reservado.GrupoId != grupo.GrupoId)
                     throw new ConflictoGrupoException($"Origen {origen}: reservado en otra pareja o agrupación de la solicitud.");
             }

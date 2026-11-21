@@ -4,6 +4,8 @@ using Homologacion.Application.Agrupaciones;
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Informe;
 using Homologacion.Application.RevisionDocente;
+using Homologacion.Application.Equivalencias;
+using Homologacion.Api.Contracts;
 using Homologacion.Domain.Agrupaciones;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +21,18 @@ public sealed record AporteGrupoRequest(Guid AsignaturaAprobadaId, Guid Asignatu
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record RevisionGrupoRequest(string? Postura, string? Decision, string? Observacion);
 public sealed record GrupoResponse(Guid GrupoId, Guid SolicitudId, string Version, bool Congelado, IReadOnlyList<Guid> Origenes,
-    IReadOnlyList<Guid> Receptoras, IReadOnlyList<AporteGrupo> Aportes, AnalisisAgrupacionGuardado? UltimoAnalisis, string Leyenda)
+    IReadOnlyList<Guid> Receptoras, IReadOnlyList<AporteGrupo> Aportes, AnalisisAgrupacionGuardadoResponse? UltimoAnalisis, string Leyenda)
 {
     public static GrupoResponse Desde(DetalleGrupo d) => new(d.Grupo.GrupoId, d.Grupo.SolicitudId, GestionarAgrupaciones.ETag(d.Grupo),
-        d.Grupo.Congelado, d.Grupo.Origenes, d.Grupo.Receptoras, d.Grupo.Aportes, d.UltimoAnalisis, GestionarAgrupaciones.Leyenda);
+        d.Grupo.Congelado, d.Grupo.Origenes, d.Grupo.Receptoras, d.Grupo.Aportes, d.UltimoAnalisis is { } a ? new(a.SolicitudId, a.GrupoId, a.AsignaturasAprobadas, ResultadoAgrupacionResponse.Desde(a.Evaluacion), a.Fecha) : null, GestionarAgrupaciones.Leyenda);
 }
-public sealed record AnalisisGrupoResponse(bool Guardado, Homologacion.Application.Equivalencias.ResultadoAgrupacion Evaluacion, GrupoResponse Detalle, IReadOnlyList<string> Advertencias);
+public sealed record AnalisisAgrupacionGuardadoResponse(Guid SolicitudId, Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas, ResultadoAgrupacionResponse Evaluacion, DateTimeOffset Fecha);
+public sealed record ResultadoAgrupacionResponse(IReadOnlyList<EvaluarResponse> Receptoras, decimal UmbralPct, string Estado, string Justificacion,
+    IReadOnlyList<string> InformacionFaltante, IReadOnlyList<AporteEvaluadoAgrupacion> Aportes, IReadOnlyList<EvidenciaAgrupacion> Evidencias, bool Homologable, Guid? ConfiguracionVersionId)
+{
+    public static ResultadoAgrupacionResponse Desde(ResultadoAgrupacion r) => new(r.Receptoras.Select(EvaluarResponse.FromApplication).ToArray(), r.UmbralPct, r.Estado.ToString(), r.Justificacion, r.InformacionFaltante, r.Aportes, r.Evidencias, r.Homologable, r.ConfiguracionVersionId);
+}
+public sealed record AnalisisGrupoResponse(bool Guardado, ResultadoAgrupacionResponse Evaluacion, GrupoResponse Detalle, IReadOnlyList<string> Advertencias);
 /// <summary>HU-21 / Issue #75: agrupaciones con reservas por solicitud y versión fuerte del borrador.</summary>
 [ApiController, Authorize(Roles = "Docente")]
 [Route("api/homologaciones/solicitudes/{id:guid}/agrupaciones")]
@@ -65,7 +73,7 @@ public sealed class AgrupacionesController(GestionarAgrupaciones grupos, Registr
     /// Devuelve nueva versión ETag. No usa LLM ni convierte unidades. El informe cierra análisis y revisiones.</remarks>
     [HttpPost("{grupoId:guid}/analisis"), ProducesResponseType(typeof(AnalisisGrupoResponse), 200)]
     public Task<IActionResult> Analizar(Guid id, Guid grupoId, [FromHeader(Name = "If-Match")] string? ifMatch, CancellationToken ct) => Responder(async _ =>
-    { var r = await grupos.AnalizarAsync(id, grupoId, ifMatch, ct); Version(r.Detalle); return new AnalisisGrupoResponse(r.Guardado, r.Evaluacion, GrupoResponse.Desde(r.Detalle), r.Advertencias); });
+    { var r = await grupos.AnalizarAsync(id, grupoId, ifMatch, ct); Version(r.Detalle); return new AnalisisGrupoResponse(r.Guardado, ResultadoAgrupacionResponse.Desde(r.Evaluacion), GrupoResponse.Desde(r.Detalle), r.Advertencias); });
     /// <summary>Lista las revisiones de los docentes del grupo autorizado.</summary>
     [HttpGet("{grupoId:guid}/revisiones"), ProducesResponseType(typeof(IReadOnlyList<RevisionAgrupacionRegistrada>), 200)]
     public Task<IActionResult> ListarRevisiones(Guid id, Guid grupoId, CancellationToken ct) => Responder(async _ =>

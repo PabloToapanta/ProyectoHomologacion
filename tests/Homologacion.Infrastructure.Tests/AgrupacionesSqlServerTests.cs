@@ -77,7 +77,12 @@ public class AgrupacionesSqlServerTests
             // Inserción de historia representativa previa a HU-21, sin utilizar el nuevo reservador.
             foreach (var r in new[] { Guid.NewGuid(), Guid.NewGuid() }) db.Resultados.Add(new() { SolicitudId = s, AprobadaId = o, ReceptoraId = r, Fecha = DateTimeOffset.UtcNow, Contenido = System.Text.Json.JsonSerializer.Serialize(Pareja(s, o, r).Analisis, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)) });
             db.Informes.Add(new() { SolicitudId = s, GeneradoPorId = Guid.NewGuid(), Fecha = DateTimeOffset.UtcNow, Contenido = $"{{\"solicitudId\":\"{s}\",\"tipoCambio\":\"Interno\",\"parejas\":[],\"aprobadasSinAnalisis\":[],\"advertencias\":[]}}" });
-            await db.SaveChangesAsync(); await db.Database.MigrateAsync();
+            await db.SaveChangesAsync();
+            var parejasAntes = await db.Resultados.AsNoTracking().OrderBy(x => x.ReceptoraId).Select(x => x.Contenido).ToArrayAsync();
+            var informeAntes = await db.Informes.AsNoTracking().Select(x => x.Contenido).SingleAsync();
+            await db.Database.MigrateAsync();
+            Assert.Equal(parejasAntes, await db.Resultados.AsNoTracking().OrderBy(x => x.ReceptoraId).Select(x => x.Contenido).ToArrayAsync());
+            Assert.Equal(informeAntes, await db.Informes.AsNoTracking().Select(x => x.Contenido).SingleAsync());
             Assert.Equal(2, await db.Resultados.CountAsync()); Assert.Empty(await db.Set<RegistroGrupo>().ToArrayAsync()); Assert.Empty(await db.Set<ReservaOrigen>().ToArrayAsync());
             var informe = await new InformesHomologacionSql(db).ObtenerAsync(s, default); Assert.Empty(informe!.Grupos);
             var repo = new GruposAgrupacionSql(db); await Assert.ThrowsAsync<ConflictoGrupoException>(() => new InformesHomologacionSql(db).ConCierreAsync(s, async () => { await repo.GuardarAsync(Crear(s, o), null, default); return true; }, default));
@@ -100,26 +105,27 @@ public class AgrupacionesSqlServerTests
         finally { await init.Database.EnsureDeletedAsync(); }
     }
     [Hu21SqlFact]
-    public async Task Pareja_y_grupo_concurrentes_no_comparten_origen_y_rollback_libera_todo()
+    public async Task Pareja_revision_manual_y_grupo_concurrentes_no_comparten_origen_y_rollback_libera_todo()
     {
         var options = Options(); await using var init = new ResultadosDbContext(options);
         try
         {
             await init.Database.MigrateAsync(); var s = Guid.NewGuid(); var o = Guid.NewGuid();
-            async Task<bool> Escribir(bool grupo)
+            async Task<bool> Escribir(int modo)
             {
                 await using var db = new ResultadosDbContext(options); try
                 {
-                    if (grupo) await new InformesHomologacionSql(db).ConCierreAsync(s, async () => { await new GruposAgrupacionSql(db).GuardarAsync(Crear(s, o), null, default); return true; }, default);
-                    else await new ResultadosAnalisisSql(db).GuardarAsync(Pareja(s, o, Guid.NewGuid()), default); return true;
+                    if (modo == 0) await new InformesHomologacionSql(db).ConCierreAsync(s, async () => { await new GruposAgrupacionSql(db).GuardarAsync(Crear(s, o), null, default); return true; }, default);
+                    else if (modo == 1) await new ResultadosAnalisisSql(db).GuardarAsync(Pareja(s, o, Guid.NewGuid()), default);
+                    else await new Homologacion.Infrastructure.RevisionDocente.RevisionesDocentesSql(db).GuardarAsync(new(s, o, Guid.NewGuid(), Guid.NewGuid(), "Docente", "Ajuste", "NoHomologable", "Sin agente", "SinAnalisis", null, DateTimeOffset.UtcNow), default); return true;
                 }
                 catch (ConflictoGrupoException) { return false; }
             }
-            var r = await Task.WhenAll(Escribir(true), Escribir(false)); Assert.Single(r.Where(x => x)); Assert.Equal(1, await init.Set<ReservaOrigen>().CountAsync());
+            var r = await Task.WhenAll(Escribir(0), Escribir(1), Escribir(2)); Assert.Single(r.Where(x => x)); Assert.Equal(1, await init.Set<ReservaOrigen>().CountAsync());
             var otro = Guid.NewGuid(); await using (var db = new ResultadosDbContext(options))
             { await Assert.ThrowsAsync<InvalidOperationException>(() => new InformesHomologacionSql(db).ConCierreAsync(s, async () => { await new GruposAgrupacionSql(db).GuardarAsync(Crear(s, otro), null, default); return await Task.FromException<bool>(new InvalidOperationException("Fallo sintético después del guardado")); }, default)); }
             Assert.False(await init.Set<ReservaOrigen>().AnyAsync(x => x.AprobadaId == otro));
-            Assert.Equal(1, await init.Set<RegistroGrupo>().CountAsync() + await init.Resultados.CountAsync());
+            Assert.Equal(1, await init.Set<RegistroGrupo>().CountAsync() + await init.Resultados.CountAsync() + await init.RevisionesDocentes.CountAsync());
         }
         finally { await init.Database.EnsureDeletedAsync(); }
     }
