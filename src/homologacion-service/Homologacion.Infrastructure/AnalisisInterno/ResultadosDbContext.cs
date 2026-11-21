@@ -31,6 +31,7 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<ConfiguracionHomologacionVigente> ConfiguracionVigente => Set<ConfiguracionHomologacionVigente>();
     protected override void OnModelCreating(ModelBuilder model)
     {
+        Homologacion.Infrastructure.Agrupaciones.ModeloGruposHu21.Configurar(model);
         var r = model.Entity<RegistroResultado>();
         r.ToTable("AnalisisInternos");
         r.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId });
@@ -92,6 +93,33 @@ internal static class AlmacenPorPareja
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     public static async Task GuardarAsync<T>(DbContext db, DbSet<T> set, AnalisisGuardado resultado, CancellationToken ct) where T : class, IRegistroAnalisis, new()
+    {
+        if (db is not ResultadosDbContext contexto) throw new InvalidOperationException("Se requiere el contexto propio de Homologación.");
+        try
+        {
+            await new InformesHomologacionSql(contexto).ConCierreAsync(resultado.Analisis.SolicitudId, async () =>
+            {
+                var a = resultado.Analisis;
+                if (await contexto.Informes.AnyAsync(i => i.SolicitudId == a.SolicitudId, ct)) throw new Homologacion.Application.Informe.InformeYaGeneradoException();
+                var reserva = await db.Set<Homologacion.Infrastructure.Agrupaciones.ReservaOrigen>().FindAsync([a.SolicitudId, a.AsignaturaAprobadaId], ct);
+                if (reserva is not null && (reserva.GrupoId is not null || reserva.ReceptoraParejaId != a.AsignaturaReceptoraId))
+                    throw new Homologacion.Domain.Agrupaciones.ConflictoGrupoException("El origen está reservado en otra unidad de análisis.");
+                var existente = await set.AnyAsync(x => EF.Property<Guid>(x, nameof(IRegistroAnalisis.SolicitudId)) == a.SolicitudId
+                    && EF.Property<Guid>(x, nameof(IRegistroAnalisis.AprobadaId)) == a.AsignaturaAprobadaId && EF.Property<Guid>(x, nameof(IRegistroAnalisis.ReceptoraId)) == a.AsignaturaReceptoraId, ct);
+                if (reserva is null && !existente)
+                {
+                    if (await contexto.Resultados.AnyAsync(x => x.SolicitudId == a.SolicitudId && x.AprobadaId == a.AsignaturaAprobadaId, ct)
+                        || await contexto.ResultadosExternos.AnyAsync(x => x.SolicitudId == a.SolicitudId && x.AprobadaId == a.AsignaturaAprobadaId, ct))
+                        throw new Homologacion.Domain.Agrupaciones.ConflictoGrupoException("El origen pertenece a una pareja histórica de la solicitud.");
+                    db.Add(new Homologacion.Infrastructure.Agrupaciones.ReservaOrigen { SolicitudId = a.SolicitudId, AprobadaId = a.AsignaturaAprobadaId, ReceptoraParejaId = a.AsignaturaReceptoraId });
+                }
+                await GuardarParejaAsync(db, set, resultado, ct); return true;
+            }, ct);
+        }
+        catch (DbException) { throw new AlmacenAnalisisNoDisponibleException(); }
+        catch (DbUpdateException) { throw new AlmacenAnalisisNoDisponibleException(); }
+    }
+    private static async Task GuardarParejaAsync<T>(DbContext db, DbSet<T> set, AnalisisGuardado resultado, CancellationToken ct) where T : class, IRegistroAnalisis, new()
     {
         try
         {
