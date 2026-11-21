@@ -44,6 +44,7 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 - **Given** las materias de origen seleccionadas, **when** se prepara el análisis, **then** se verifica individualmente aprobación, antigüedad de HU-15 y exclusión por tercera matrícula de HU-17 cuando corresponda. Una materia no elegible no aporta contenidos, horas ni créditos y se informa el motivo.
 - **Given** información académica o documental insuficiente, **when** no se puede verificar la elegibilidad, **then** el análisis correspondiente queda en «información incompleta»; no se presume aprobación.
 - **Given** un origen ya pertenece a otra pareja o agrupación de la misma solicitud, **when** se intenta agregarlo a una unidad de análisis nueva, **then** se rechaza la operación, incluso ante peticiones concurrentes. Dentro de su agrupación sí puede vincularse a varias receptoras.
+- **Given** una agrupación todavía sin análisis guardado, **when** el docente corrige sus materias, vínculos o aportes, o elimina el borrador, **then** se actualizan o liberan sus reservas de origen de forma atómica. Desde el primer análisis guardado, incluso si su estado es incompleto, la composición y las reservas ya no se editan ni eliminan.
 
 ### CA3 — Contenidos y resultados
 
@@ -72,14 +73,15 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 
 - **Given** el contrato académico y técnico cerrado, **when** se implementa, **then** las pruebas cubren: varias parejas 1:1 sin suma global, 1:N con temas distribuidos, N:M, cobertura sin doble conteo, aportes de horas/créditos, incompatibilidad de unidades, datos faltantes, elegibilidad por origen, integración con revisión docente e informe. OpenAPI documenta contratos y errores nuevos.
 
-## Decisiones funcionales confirmadas y pendientes técnicos
+## Decisiones funcionales y contratos técnicos
 
 ### Contrato técnico resuelto 1 — aportes numéricos
 
 - Cada vínculo origen→receptora registra `horasAportadas` y `creditosAportados` como decimales no negativos con **máximo dos cifras decimales**. Pablo confirmó el 21/11/2026 que se permiten fracciones de hora.
 - `null` expresa que el reparto todavía no se declaró; `0` es un aporte conocido de cero. No se equiparan. Si un vínculo tiene un aporte pendiente, el análisis del grupo queda en «Información incompleta» con el origen, la receptora y la magnitud faltante.
+- Un intento de analizar con aportes `null` devuelve los faltantes **sin guardar un análisis** ni congelar el borrador; el docente puede completar el reparto y volver a intentar. Otros análisis incompletos que sí se guarden congelan la composición desde ese primer guardado.
 - Para cada origen, las sumas de horas y créditos de todos sus vínculos dentro del grupo deben ser menores o iguales a las cantidades aprobadas respectivas. Puede quedar una parte sin asignar. El servidor rechaza una suma excesiva, un negativo o más de dos decimales como entrada inválida; valida la suma con aritmética decimal, sin redondearla para hacerla pasar.
-- Precisión propuesta para persistencia: horas `decimal(12,2)` y créditos `decimal(6,2)`, consistente con los créditos `decimal(6,2)` de Solicitudes. El algoritmo de agrupación trata un aporte conocido de cero como **0 %** frente a un total receptor positivo, sin cambiar el comportamiento histórico de las parejas 1:1. Los porcentajes se limitan al 100 % y se comparan con el umbral sin redondeo previo.
+- Precisión definida para persistencia: horas `decimal(12,2)` y créditos `decimal(6,2)`, consistente con los créditos `decimal(6,2)` de Solicitudes. El algoritmo de agrupación trata un aporte conocido de cero como **0 %** frente a un total receptor positivo, sin cambiar el comportamiento histórico de las parejas 1:1. Los porcentajes se limitan al 100 % y se comparan con el umbral sin redondeo previo.
 
 ### Contrato técnico resuelto 2 — vínculos y evidencia
 
@@ -93,13 +95,19 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 - El último análisis calculado de un grupo se guarda por `grupoId`, con desglose y fotografía de evidencia por receptora, versión de HU-03 y sugerencia única. Cada docente asignado guarda **una revisión por grupo**; la clave lógica es `(grupoId, docenteId)` y puede corregirla hasta la generación del informe, igual que en el flujo de parejas.
 - El informe de la solicitud lista unidades individuales y grupos. Cada grupo aparece una vez, con sus dos revisiones docentes y el detalle por receptora. La generación sigue exigiendo las dos revisiones de cada unidad analizada y conserva el cierre que impide cambios docentes posteriores. Los informes y análisis 1:1 anteriores siguen siendo legibles sin migración semántica.
 
+### Contrato técnico resuelto 4 — uso único, concurrencia y borradores
+
+- Homologación mantiene una reserva por `(solicitudId, asignaturaAprobadaId)` con el tipo e ID de la unidad propietaria (pareja o grupo). La clave única de base de datos impide asignar el mismo origen a dos unidades. Al guardar por primera vez un análisis de pareja 1:1 se registra su reserva; al crear o modificar un grupo borrador se registran o actualizan todas las suyas en una transacción.
+- Las operaciones que asignan, modifican o liberan orígenes de una solicitud se serializan en la base de Homologación y comprueban también las parejas históricas antes de aceptar un grupo. Un conflicto concurrente devuelve 409 sin grupo ni reservas parciales. No se eliminan ni reinterpretan análisis 1:1 anteriores, incluso si el legado ya contiene usos repetidos.
+- Pablo confirmó el 21/11/2026 que el grupo puede editarse o eliminarse hasta antes del **primer análisis guardado**. El borrado libera sus reservas en la misma transacción. Después, composición y pertenencia son inmutables; puede ejecutarse otro análisis de la misma composición, y los docentes pueden corregir su revisión hasta generar el informe. Un intento con reparto `null` no guarda análisis para no congelar accidentalmente el borrador.
+
 | Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
 | Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Reflejar en #75 y reestimar el sprint. |
 | Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo informa acuerdo de Shirley y el ingeniero. | Validación y precisión resueltas en el contrato técnico 1; implementar y probar. |
 | Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo informa acuerdo de Shirley y el ingeniero. | Representación y origen de evidencia resueltos en el contrato técnico 2; implementar y probar. |
 | La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Identidad y persistencia resueltas en el contrato técnico 3; implementar y probar. |
-| Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Verificar exclusividad y concurrencia. |
+| Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Reserva, concurrencia y corrección de borradores resueltas en el contrato técnico 4; implementar y probar. |
 
 Las reglas funcionales ya permiten preparar el contrato técnico. La reestimación sigue pendiente: las 14 h del backlog se fijaron para el alcance anterior. Las parejas 1:1 existentes conservan su comportamiento. El acuerdo comunicado no equivale a aceptación de la implementación ni a pronunciamiento institucional.
 
