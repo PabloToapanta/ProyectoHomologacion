@@ -1,11 +1,21 @@
 using System.Globalization;
 using Homologacion.Domain.Equivalencias;
+using Homologacion.Domain.Configuracion;
 
 namespace Homologacion.Application.Equivalencias;
 
 public sealed class EvaluarEquivalencia(IUmbralEquivalencia umbral)
 {
     public EvaluacionEquivalencia Ejecutar(SolicitudEquivalencia solicitud)
+        => Ejecutar(solicitud, umbral.Valor);
+
+    public EvaluacionEquivalencia Ejecutar(SolicitudEquivalencia solicitud, ParametrosHomologacion parametros)
+    {
+        ArgumentNullException.ThrowIfNull(parametros);
+        return Ejecutar(solicitud, parametros.UmbralPct);
+    }
+
+    private EvaluacionEquivalencia Ejecutar(SolicitudEquivalencia solicitud, decimal umbralPct)
     {
         ArgumentNullException.ThrowIfNull(solicitud);
         var origenes = solicitud.Origenes ?? [];
@@ -34,7 +44,7 @@ public sealed class EvaluarEquivalencia(IUmbralEquivalencia umbral)
         var academica = faltantes.Count == 0 ? cobertura.Porcentaje : null;
         var horas = CompararCantidad(origenes, solicitud.Receptora, true, faltantes);
         var creditos = CompararCantidad(origenes, solicitud.Receptora, false, faltantes);
-        var valorUmbral = umbral.Valor;
+        var valorUmbral = umbralPct;
         var decision = MotorEquivalencia.Evaluar(academica, horas, creditos, valorUmbral);
         var estado = faltantes.Count > 0 ? EstadoEquivalencia.InformacionIncompleta : decision.Estado;
         var justificacion = estado switch
