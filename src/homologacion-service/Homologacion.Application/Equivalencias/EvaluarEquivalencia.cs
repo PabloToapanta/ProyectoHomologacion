@@ -12,7 +12,7 @@ public sealed class EvaluarEquivalencia(IUmbralEquivalencia umbral)
     public EvaluacionEquivalencia Ejecutar(SolicitudEquivalencia solicitud, ParametrosHomologacion parametros)
     {
         ArgumentNullException.ThrowIfNull(parametros);
-        return Ejecutar(solicitud, parametros.UmbralPct);
+        return Ejecutar(solicitud, parametros.UmbralPct) with { ConfiguracionVersionId = parametros.VersionId };
     }
 
     private EvaluacionEquivalencia Ejecutar(SolicitudEquivalencia solicitud, decimal umbralPct)

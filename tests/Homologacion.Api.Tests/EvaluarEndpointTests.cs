@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
 using Homologacion.Infrastructure.Configuration;
+using Homologacion.Application.Configuracion;
+using Homologacion.Domain.Configuracion;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Xunit;
@@ -41,6 +43,10 @@ public sealed class MotorFactory(decimal umbral = 80, string? encryptionKeyOverr
             ["Jwt:EncryptionKey"] = encryptionKeyOverride ?? EncryptionKey,
             ["Equivalencia:UmbralPct"] = umbral.ToString(System.Globalization.CultureInfo.InvariantCulture)
         }));
+        builder.ConfigureServices(services => services.RemoveAll<IParametrosHomologacionProvider>());
+        builder.ConfigureServices(services => services.AddSingleton<IParametrosHomologacionProvider>(
+            new ProveedorParametrosPrueba(new ParametrosHomologacion(
+                Guid.Parse("9e0ce28d-e93a-4cad-b650-48ad9b260301"), checked((int)umbral), 10, 1, 1, 2, 2))));
     }
     public string Token(string rol = "Administrador", string? issuer = null, bool expirado = false,
         string? audience = null, string? key = null, string algorithm = SecurityAlgorithms.HmacSha256,
@@ -75,6 +81,11 @@ public sealed class MotorFactory(decimal umbral = 80, string? encryptionKeyOverr
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token(rol));
         return client;
     }
+}
+
+internal sealed class ProveedorParametrosPrueba(ParametrosHomologacion parametros) : IParametrosHomologacionProvider
+{
+    public Task<ParametrosHomologacion> ObtenerVigentesAsync(CancellationToken cancellationToken) => Task.FromResult(parametros);
 }
 
 public class EvaluarEndpointTests

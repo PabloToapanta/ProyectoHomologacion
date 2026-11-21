@@ -1,6 +1,8 @@
 using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
+using Homologacion.Application.Configuracion;
 using Homologacion.Infrastructure.AnalisisExterno;
+using Homologacion.Infrastructure.Configuracion;
 using Homologacion.Application.RevisionDocente;
 using Homologacion.Infrastructure.RevisionDocente;
 using Homologacion.Application.Informe;
@@ -43,6 +45,10 @@ public static class RegistroAnalisisInterno
         services.AddDbContext<ResultadosDbContext>((p, options) => options.UseSqlServer(
             p.GetRequiredService<IConfiguration>().GetConnectionString("Homologacion")
             ?? throw new InvalidOperationException("Configure ConnectionStrings:Homologacion para guardar análisis.")));
+        services.AddScoped<ParametrosHomologacionSql>();
+        services.AddScoped<IParametrosHomologacionProvider>(p => p.GetRequiredService<ParametrosHomologacionSql>());
+        services.AddScoped<IConfiguracionHomologacionStore>(p => p.GetRequiredService<ParametrosHomologacionSql>());
+        services.AddScoped<GestionarConfiguracionHomologacion>();
         services.AddScoped<IResultadosAnalisisInterno, ResultadosAnalisisSql>();
         services.AddScoped<GestionarAnalisisInterno>();
         services.AddScoped<IReceptorasAnalisisInterno>(p => p.GetRequiredService<FuentesAnalisisHttp>());
