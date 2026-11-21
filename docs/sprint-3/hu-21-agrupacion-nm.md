@@ -38,6 +38,7 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 - **Given** una solicitud y un docente asignado, **when** elige asignaturas de origen registradas y receptoras de la carrera destino, **then** el sistema conserva los IDs seleccionados, sus vínculos explícitos y la evidencia que sustenta cada vínculo.
 - **Given** una selección con IDs inexistentes, repetidos o ajenos a la solicitud/carrera, **when** se intenta analizar, **then** se rechaza con un mensaje concreto.
 - **Given** varias parejas 1:1, **when** se analizan en el mismo caso, **then** se conservan los resultados de cada pareja por separado; presentarlas juntas no suma automáticamente horas ni créditos entre parejas.
+- **Given** el docente prepara un conjunto, **when** abre la pantalla de agrupación, **then** ve orígenes en filas y receptoras en columnas. Activa únicamente celdas con correspondencias revisadas y vigentes, declara horas y créditos por vínculo y ve, por cada origen, cuánto asignó y cuánto queda disponible. La misma tabla permite varias parejas 1:1, 1:N y N:M.
 
 ### CA2 — Elegibilidad del origen
 
@@ -101,6 +102,12 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 - Las operaciones que asignan, modifican o liberan orígenes de una solicitud se serializan en la base de Homologación y comprueban también las parejas históricas antes de aceptar un grupo. Un conflicto concurrente devuelve 409 sin grupo ni reservas parciales. No se eliminan ni reinterpretan análisis 1:1 anteriores, incluso si el legado ya contiene usos repetidos.
 - Pablo confirmó el 21/11/2026 que el grupo puede editarse o eliminarse hasta antes del **primer análisis guardado**. El borrado libera sus reservas en la misma transacción. Después, composición y pertenencia son inmutables; puede ejecutarse otro análisis de la misma composición, y los docentes pueden corregir su revisión hasta generar el informe. Un intento con reparto `null` no guarda análisis para no congelar accidentalmente el borrador.
 
+### Contrato técnico resuelto 5 — selección en la interfaz
+
+- Pablo confirmó el 21/11/2026 una tabla de orígenes × receptoras para los tres casos. Una celda seleccionada representa un vínculo origen→receptora; el docente escribe `horasAportadas` y `creditosAportados` allí. Las celdas sin revisión vigente del Catálogo no son seleccionables y explican la razón.
+- Por fila se muestran horas y créditos aprobados, suma asignada y saldo. Por columna se muestran cantidades receptoras, aportes recibidos y cobertura/veredicto cuando exista análisis. Los errores de servidor se asocian al vínculo o fila afectada, sin confiar solo en validación del navegador.
+- La vista del análisis muestra el desglose por receptora y una sugerencia única del grupo. El borrador ofrece corregir/eliminar; tras el primer análisis guardado, la composición aparece de solo lectura.
+
 | Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
 | Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Reflejar en #75 y reestimar el sprint. |
@@ -122,7 +129,7 @@ Las reglas funcionales ya permiten preparar el contrato técnico. La reestimaci�
 
 ## Siguiente paso de coordinación
 
-1. Registrar en el Issue #75 el acuerdo N:M comunicado por Pablo y la fecha de revisión de Shirley y el ingeniero. El caso 1:1 ya existe como flujo individual; definir la vista conjunta que requiere HU-21.
+1. Registrar en el Issue #75 el acuerdo N:M comunicado por Pablo y la fecha de revisión de Shirley y el ingeniero. La vista conjunta queda definida en el contrato técnico 5; el caso 1:1 individual existente conserva su flujo.
 2. Pablo y Leslie revisan el contrato de API/persistencia del [plan técnico](plan-implementacion-hu-21.md), ajustan T62–T64 y registran la reestimación con Shirley.
 3. Implementar por partes en la Draft PR con TDD, revisión cruzada y evidencia de cada criterio.
 4. Trabajar en la rama `feature/hu-21-agrupacion-nm`, con Draft PR hacia `develop` creada por Pablo. Edwin revisa; Shirley acepta funcionalmente tras pruebas, OpenAPI y ejecución integrada con Docker Compose.

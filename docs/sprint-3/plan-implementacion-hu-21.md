@@ -24,7 +24,7 @@
 | 2. Motor determinista | Pablo | Modelo de grupo y cálculo por receptora; resultado único con desglose; pruebas verdes | Paso 1 |
 | 3. Persistencia y contratos de grupo | Leslie | Identidad del grupo, vínculos y aportes persistidos; API de consulta/registro con validación de pertenencia y exclusividad | Paso 0; integrar con 2 |
 | 4. Análisis docente e informe | Pablo y Leslie, con archivos asignados antes de editar | Dos revisiones por grupo, análisis guardado e informe de una sola unidad con desglose; migración compatible con parejas históricas | Pasos 2–3 |
-| 5. Interfaz | Leslie | Selección de orígenes/receptoras, asignación explícita de aportes, errores, resultados y revisión grupal | Contratos de 3–4 |
+| 5. Interfaz | Leslie | Tabla de orígenes × receptoras: vínculos con revisión vigente, aportes por celda, sumas/saldos por fila, resultados por columna y revisión grupal | Contratos de 3–4 |
 | 6. Integración y evidencia | Pablo y Leslie; Edwin revisa | OpenAPI, pruebas de regresión, integración Docker Compose, evidencia por CA y revisión cruzada | Pasos 2–5 |
 
 ## Separación inicial de archivos
