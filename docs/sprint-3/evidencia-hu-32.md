@@ -47,7 +47,7 @@ La planificación pide acordar este contrato antes de T44. Se propone en esta PR
 | CA1. Remitir registra la fecha y el docente | `RemitirInformeTests.CA1_*`; `InformeEndpointTests.HU32_el_docente_remite_*` (historial con «Generado» y «Remitido») | Verificado |
 | CA2. Una sola vez; el segundo intento da 409 sin cambios | `RemitirInformeTests.CA2_*`; `InformeEndpointTests.HU32_el_docente_remite_*` | Verificado |
 | CA3. Sin informe, 400 con mensaje claro | `RemitirInformeTests.CA3_*`; `InformeEndpointTests.HU32_el_docente_remite_*`; `InformePanel.test.tsx` (sin informe no hay botón) | Verificado |
-| CA4. La solicitud pasa a «Remitida»; docentes y coordinador ven el estado | `RemisionSolicitudTests.El_docente_asignado_marca_*` (coordinador y el otro docente ven «Remitida»); `SolicitudesDocentePage.test.tsx` (HU-32) | Verificado con pruebas automáticas; falta la prueba manual en Compose |
+| CA4. La solicitud pasa a «Remitida»; docentes y coordinador ven el estado | `RemisionSolicitudTests.El_docente_asignado_marca_*` (coordinador y el otro docente ven «Remitida»); `SolicitudesDocentePage.test.tsx` (HU-32) | Verificado, también en Compose (`hu32-smoke.py`) |
 | CA5. Solo docentes asignados; 401, 403 y 404; identidad del JWT | `RemitirInformeTests.CA5_*`; `InformeEndpointTests.HU32_solo_el_docente_remite` y `HU32_docente_no_asignado_recibe_404`; `RemisionSolicitudTests.Solo_el_rol_docente_*` y `Docente_ajeno_*` | Verificado |
 | Remisión solo con los dos análisis por pareja | `RemitirInformeTests.Una_pareja_sin_el_analisis_*` | Verificado |
 | Sin estado confirmado no queda remisión | `RemitirInformeTests.Si_Solicitudes_no_confirma_*` y `Si_el_estado_*`; `EventosInformeSqlTests.HU32_si_falla_la_accion_*` (transacción real en SQLite) | Verificado |
@@ -69,11 +69,23 @@ La planificación pide acordar este contrato antes de T44. Se propone en esta PR
 
 - **Frontend (Vitest):** 150/150 pruebas y `npm run build` correcto.
 - **TDD:** las pruebas nuevas se ejecutaron primero y fallaron porque no compilaban (`MarcarRemitida`, `RemitirInformeHomologacion`, `IEstadoSolicitudes`) o porque faltaba el botón. Después se implementó.
-- **No ejecutado:** la suite contra SQL Server real ni la prueba manual en Docker Compose.
+- **SQL Server 2022 real**, temporal y aislado, con una contraseña aleatoria no guardada y eliminado después:
+  - `Homologacion.Infrastructure.Tests`: 70 superadas y 1 omitida (necesita el modelo de Ollama);
+  - `Solicitudes.Tests`: 156/156.
+- **Integración en Docker Compose** (`tests/security/hu32-smoke.py`): 45/45 comprobaciones superadas. El stack corrió aislado (Gateway, JWE, Auth, Catálogo, Solicitudes, Homologación y SQL Server) sobre una copia del commit `b8c9b1d`, con credenciales aleatorias por ejecución y usuarios y datos sintéticos; al terminar se eliminó el proyecto. Comprobado:
+  - antes del informe, remitir responde 400;
+  - sin sesión 401, el coordinador 403 y un docente ajeno 404;
+  - la ruta interna de Solicitudes no se publica (404 en el Gateway);
+  - la remisión queda con la fecha y el docente; el segundo intento da 409;
+  - «Remitida» aparece en el detalle y la lista del coordinador y en la lista del docente;
+  - el historial muestra «Generado» y «Remitido» con usuario y rol, sin datos personales.
+  
+  Transporte HTTP local: esta prueba no acredita HTTPS.
+- **No ejecutado:** la revisión visual en el navegador. La interfaz está cubierta por las pruebas de Vitest.
 
 ## Pendiente
 
 - Revisión del contrato de estados por Pablo y revisión cruzada de Leslie.
-- Prueba manual en el stack integrado: generar el informe, remitirlo como docente y ver «Remitida» y el historial como coordinador.
+- Si la PO lo pide en la aceptación: revisión visual en el navegador.
 - HU-33: «Finalizada», la decisión del coordinador en «Sin acuerdo» y el evento «Finalizado».
 - Aceptación de la PO.
