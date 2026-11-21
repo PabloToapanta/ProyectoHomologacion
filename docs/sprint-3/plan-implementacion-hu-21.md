@@ -3,7 +3,7 @@
 **Base funcional:** [spec HU-21](hu-21-agrupacion-nm.md) · **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
 **Estado:** contrato técnico definido para revisión de Pablo y Leslie sobre el alcance funcional que Pablo comunicó como acordado por Shirley y el ingeniero el 21/11/2026. Reestimación técnica: T62 12 h, T63 20 h, T64 10 h (42 h, 21 PH propuestos). Requiere revisar capacidad y verificar la implementación.
-**Rama de trabajo:** `feature/hu-21-agrupacion-nm` desde `develop`. Pablo creará la Draft PR hacia `develop`; Pablo y Leslie harán commits en su rama.
+**Rama de trabajo:** `feature/hu-21-agrupacion-nm` desde `develop`. La [Draft PR #91](https://github.com/PabloToapanta/ProyectoHomologacion/pull/91) apunta a `develop`; Pablo y Leslie harán commits en su rama.
 
 ## Contrato funcional que guía el diseño
 
@@ -65,7 +65,7 @@ El detalle devuelve ETag; `PUT`, `DELETE` y `POST /{grupoId}/analisis` exigen `I
 
 ## Coordinación de la Draft PR
 
-1. Publicar la spec y este plan en la rama y abrir la Draft PR enlazando #75. La descripción distingue el acuerdo funcional comunicado, la validación institucional aún pendiente y el estado real de pruebas.
+1. La spec y este plan están publicados en la Draft PR #91, enlazada con #75. La descripción distingue el acuerdo funcional comunicado, la validación institucional aún pendiente y el estado real de pruebas.
 2. Leslie revisa el contrato y comenta allí los campos/archivos de su parte. Pablo incorpora los acuerdos a la spec antes de iniciar TDD. Edwin revisa cambios sobre motor, revisión docente e informe; Shirley valida criterios y alcance.
 3. Cada uno trabaja en su checkout de **la misma rama remota**; antes de empezar un archivo compartido, sincroniza la rama y avisa qué archivo tomará. Commits pequeños con Conventional Commits en español y referencia a T62/T63/T64.
 4. Integrar los commits cada día, resolver conflictos de uno en uno y mantener la PR como Draft hasta pruebas, revisión y aceptación. No hacer merge ni declarar la historia terminada antes de la definición de hecho.
