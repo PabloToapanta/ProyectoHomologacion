@@ -173,6 +173,17 @@ public sealed class UsuariosAdministracionApiTests
             (await client.PutAsJsonAsync($"/api/usuarios/{factory.DocenteId}/rol", new { rol = "Administrador" })).StatusCode);
     }
 
+    [Fact]
+    public async Task CambioEstadoSinValor_NoDesactivaLaCuenta()
+    {
+        using var factory = new UsuariosAdministracionFactory();
+        using var client = factory.Client("Administrador");
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PatchAsJsonAsync($"/api/usuarios/{factory.DocenteId}/estado", new { })).StatusCode);
+        Assert.Equal(HttpStatusCode.OK,
+            (await client.PostAsJsonAsync("/api/auth/login", new { nombreUsuario = "docente.existe", password = Inicial })).StatusCode);
+    }
+
     private static void AssertNoSecreto(string texto)
     {
         Assert.DoesNotContain(Inicial, texto);
