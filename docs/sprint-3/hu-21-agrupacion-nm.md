@@ -2,7 +2,7 @@
 
 **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** alcance de los tres casos, reparto de horas/créditos y decisión única del grupo confirmados por Pablo; faltan criterios de agregación académica y confirmación funcional de Shirley.
+**Estado:** reglas funcionales propuestas confirmadas por Pablo; pendientes de revisión de Leslie, validación académica del ingeniero/Coordinación y aceptación de alcance por Shirley.
 
 **Sprint:** 3 · **Estimación vigente del backlog:** 8 PH, T62–T64 (14 h). El alcance N:M debe reestimarse antes de comprometer esas horas.
 **Desarrollo:** Pablo y Leslie. **Revisión técnica:** Edwin. **Aceptación funcional:** Shirley (PO).
@@ -47,14 +47,15 @@ La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21-
 ### CA3 — Contenidos y resultados
 
 - **Given** correspondencias revisadas, vigentes y con evidencia, **when** se evalúa una receptora, **then** cada elemento receptor cubierto se cuenta una sola vez aunque tenga varios vínculos de origen. Se muestran los elementos cubiertos, no cubiertos y sus evidencias.
-- **Given** un origen que aporta a varias receptoras, **when** se consultan sus vínculos, **then** el análisis muestra a cuál receptora se atribuye cada contenido o resultado. Está pendiente decidir si un mismo elemento de origen puede sustentar más de una receptora.
+- **Given** un origen que aporta a varias receptoras, **when** se consultan sus vínculos, **then** el análisis muestra a cuál receptora se atribuye cada contenido o resultado. Un mismo elemento de origen puede respaldar más de una receptora solo con correspondencias explícitas, revisadas, vigentes y trazables; dentro de cada receptora, su elemento de destino se cuenta una sola vez.
 
 ### CA4 — Horas, créditos y veredicto
 
 - **Given** un origen que aporta a varias receptoras, **when** se registran sus aportes, **then** se asignan cantidades explícitas de horas y créditos a cada receptora; la suma asignada para cada magnitud no supera el total del origen. El servidor valida esos límites y conserva el aporte por origen y receptora.
 - **Given** aportes explícitos y unidades comparables, **when** se calcula la equivalencia, **then** se muestran aportes, totales receptores y porcentajes acotados al 100 %. Los tres criterios existentes se comparan por separado con el umbral vigente de HU-03.
 - **Given** unidades o sistemas de créditos distintos, cantidades faltantes o una distribución de aportes no declarada, **when** se solicita un veredicto, **then** se informa «información incompleta»; no se convierten unidades ni se asigna automáticamente el total de un origen a varias receptoras.
-- **Pendiente:** definir si la decisión única del grupo exige que cada receptora alcance los tres criterios o si se calcula sobre los totales combinados. Sin esa decisión, CA4 no está listo para implementar 1:N/N:M.
+- **Given** todas las receptoras tienen datos completos, **when** se decide la sugerencia única, **then** el grupo es «Homologable» solo si **cada receptora** alcanza por separado el umbral en contenido, horas y créditos. Si al menos una receptora completa no alcanza algún criterio, el grupo es «No homologable» y se identifica cuál y por qué. No se promedian porcentajes entre receptoras.
+- **Given** alguna receptora tiene información incompleta, **when** se decide la sugerencia única, **then** el grupo queda en «Información incompleta» y muestra los datos faltantes por receptora; no se infiere una aprobación global.
 
 ### CA5 — Análisis e informe
 
@@ -72,11 +73,11 @@ La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21-
 | --- | --- | --- |
 | Las tres situaciones de la tabla están incluidas. | Pablo lo confirmó; Shirley debe validar la ampliación frente a la respuesta previa del ingeniero y al compromiso del sprint. | Shirley |
 | Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo confirmó esta regla del producto; falta confirmación académica frente a la respuesta previa N:1. | Shirley con ingeniero/Coordinación |
-| ¿Puede una misma correspondencia o elemento de origen sustentar más de una receptora? | Define el control de doble conteo académico. | Ingeniero/Coordinación con Shirley |
-| Una sola sugerencia y decisión docente para todo el grupo; falta definir si cada receptora debe pasar el umbral o si se usa un porcentaje combinado. | Define el algoritmo de decisión y evita que un caso débil quede oculto por otros. | Shirley con ingeniero/Coordinación |
-| ¿Un origen puede aparecer en dos grupos de la misma solicitud? | Define la restricción de uso y la concurrencia. | Ingeniero/Coordinación con Shirley |
+| Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo confirmó la regla del producto; requiere validación académica. | Shirley con ingeniero/Coordinación |
+| La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo confirmó la regla del producto; requiere validación académica y ajuste del contrato de informe. | Shirley con ingeniero/Coordinación |
+| Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Continúa la regla de uso único del origen de la respuesta del ingeniero y evita grupos solapados. | Leslie y Pablo verifican implementación; Shirley confirma |
 
-Hasta cerrar estas decisiones, la spec describe el objetivo y los casos, pero **no está lista para implementar el algoritmo 1:N/N:M**. Las parejas 1:1 existentes conservan su comportamiento.
+Las reglas funcionales están definidas para preparar el contrato técnico. **Antes de implementar el algoritmo 1:N/N:M**, Shirley y el ingeniero/Coordinación deben validar la ampliación frente a la respuesta del 20/11, y el equipo debe reestimar el trabajo. Las parejas 1:1 existentes conservan su comportamiento.
 
 ## Tareas del Sprint Backlog, pendientes de ajuste
 
@@ -90,8 +91,8 @@ Hasta cerrar estas decisiones, la spec describe el objetivo y los casos, pero **
 ## Siguiente paso de coordinación
 
 1. Shirley confirma la ampliación a las tres situaciones frente al acuerdo previo N:1 y el compromiso de 8 PH. El caso 1:1 ya existe como flujo individual; definir la vista conjunta que requiere HU-21.
-2. Shirley lleva al ingeniero/Coordinación las preguntas sobre reparto de contenidos, horas y créditos y uso de un origen en varias receptoras. Registrar la respuesta en el Issue #75 y en la spec.
-3. Con las reglas cerradas, ajustar CA3–CA5, reestimar T62–T64 y definir el contrato de API/persistencia. Después elaborar el plan de implementación y dividir archivos entre Pablo y Leslie.
+2. Shirley lleva al ingeniero/Coordinación el alcance N:M, el reparto explícito de horas y créditos, la reutilización trazable de contenidos y la regla de que todas las receptoras cumplen por separado. Registrar la respuesta en el Issue #75 y en la spec.
+3. Tras esa validación, reestimar T62–T64 y definir el contrato de API/persistencia. Después elaborar el plan de implementación y dividir archivos entre Pablo y Leslie.
 4. Trabajar en la rama `feature/hu-21-agrupacion-nm`, con Draft PR hacia `develop` creada por Pablo. Edwin revisa; Shirley acepta funcionalmente tras pruebas, OpenAPI y ejecución integrada con Docker Compose.
 
 ## Fuera de alcance confirmado
