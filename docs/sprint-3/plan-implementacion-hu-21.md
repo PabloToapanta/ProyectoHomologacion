@@ -17,6 +17,14 @@
 
 ## Orden de implementación y entregables
 
+### Plan corto de Pablo antes de T62
+
+1. Añadir pruebas de aplicación para 1:N, N:M y varias parejas 1:1: reparto decimal, cobertura sin doble conteo, origen compartido con evidencia, unidades incompatibles y sugerencia global. Ejecutarlas en rojo primero.
+2. Implementar un evaluador de agrupaciones separado del contrato 1:1. Reutilizar `CoberturaAcademica` y `MotorEquivalencia`; conservar la versión de parámetros de HU-03 y el desglose por receptora. Pasar las pruebas nuevas y la regresión del motor actual.
+3. Para la parte de Pablo en T63, integrar el resultado grupal con el flujo de análisis/revisión/informe mediante contratos acordados con Leslie, sin editar simultáneamente persistencia, controladores ni archivos compartidos. Probar que una unidad grupal aparece una sola vez y que el informe histórico 1:1 sigue legible.
+
+La parte de Leslie sigue siendo identidad/persistencia/API del grupo y la interfaz. Un cambio en esos contratos se coordina en la Draft PR antes de modificar archivos compartidos.
+
 | Paso | Responsable inicial | Entregable | Dependencia |
 | --- | --- | --- | --- |
 | 0. Revisar contrato y capacidad | Pablo y Leslie; Shirley revisa compromiso; Edwin revisa contrato | Revisión de los contratos técnicos 1–7 y estimación de 7 h indicada por Pablo en #75 | Acuerdo funcional N:M comunicado por Pablo |
