@@ -2,7 +2,7 @@
 
 **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** borrador corregido tras la aclaración de Pablo; requiere cerrar las decisiones de distribución antes del plan de implementación.
+**Estado:** alcance de los tres casos confirmado por Pablo; requiere cerrar las decisiones de distribución antes del plan de implementación.
 
 **Sprint:** 3 · **Estimación vigente del backlog:** 8 PH, T62–T64 (14 h). El alcance N:M debe reestimarse antes de comprometer esas horas.
 **Desarrollo:** Pablo y Leslie. **Revisión técnica:** Edwin. **Aceptación funcional:** Shirley (PO).
@@ -21,7 +21,7 @@
 
 ### Aclaración del alcance
 
-Pablo aclaró que **N:M** significa analizar varias materias de origen y varias de destino en un mismo caso. Sus ejemplos distinguen tres situaciones:
+Pablo aclaró que **N:M** significa analizar varias materias de origen y varias de destino en un mismo caso. Confirmó que HU-21 incluye las tres situaciones siguientes:
 
 | Situación | Ejemplo | Qué se analiza |
 | --- | --- | --- |
@@ -29,7 +29,7 @@ Pablo aclaró que **N:M** significa analizar varias materias de origen y varias 
 | 1:N | Una materia de origen → dos receptoras cuyos temas se distribuyen entre ellas | Hay que decidir qué parte del origen respalda a cada receptora. |
 | N:M agrupado | Varias materias de origen → varias receptoras como conjunto | Hay que relacionar aportes y evitar contarlos dos veces. |
 
-La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21--agrupación-nm-ce-3) había acotado la implementación a N:1. Esta aclaración de Pablo amplía el alcance solicitado; **no se presenta la regla anterior como definición de N:M ni se codifica la ampliación sin resolver las decisiones académicas y obtener la confirmación funcional de Shirley**. La lectura del ingeniero tampoco sustituye un pronunciamiento institucional. Los resultados del sistema siguen siendo sugerencias.
+La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21--agrupación-nm-ce-3) había acotado la implementación a N:1. Pablo confirmó un alcance más amplio que incluye 1:1 en conjunto, 1:N y N:M; **no se presenta la regla anterior como definición de N:M ni se codifica la ampliación sin resolver las decisiones académicas y obtener la confirmación funcional de Shirley**. La lectura del ingeniero tampoco sustituye un pronunciamiento institucional. Los resultados del sistema siguen siendo sugerencias.
 
 ## Criterios de aceptación en elaboración
 
@@ -69,7 +69,7 @@ La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21-
 
 | Decisión | Por qué hace falta | Quién la confirma |
 | --- | --- | --- |
-| ¿Se incluyen las tres situaciones de la tabla o solo algunas? | Fija el alcance real de HU-21. | Pablo y Shirley |
+| Las tres situaciones de la tabla están incluidas. | Pablo lo confirmó; Shirley debe validar la ampliación frente a la respuesta previa del ingeniero y al compromiso del sprint. | Shirley |
 | ¿Puede un origen aportar a varias receptoras? Si sí, ¿cómo se distribuyen contenidos, horas y créditos? | Evita atribuir el total de una materia varias veces. | Ingeniero/Coordinación con Shirley |
 | ¿Puede una misma correspondencia o elemento de origen sustentar más de una receptora? | Define el control de doble conteo académico. | Ingeniero/Coordinación con Shirley |
 | ¿La sugerencia y la decisión docente son por cada receptora o por el grupo completo? | Define persistencia, informe y doble revisión. | Shirley con Pablo y Leslie |
@@ -88,7 +88,7 @@ Hasta cerrar estas decisiones, la spec describe el objetivo y los casos, pero **
 
 ## Siguiente paso de coordinación
 
-1. Pablo y Leslie confirman con Shirley cuáles situaciones de la tabla pertenecen a HU-21. El caso 1:1 ya existe como flujo individual; decidir si la historia requiere una vista conjunta nueva.
+1. Shirley confirma la ampliación a las tres situaciones frente al acuerdo previo N:1 y el compromiso de 8 PH. El caso 1:1 ya existe como flujo individual; definir la vista conjunta que requiere HU-21.
 2. Shirley lleva al ingeniero/Coordinación las preguntas sobre reparto de contenidos, horas y créditos y uso de un origen en varias receptoras. Registrar la respuesta en el Issue #75 y en la spec.
 3. Con las reglas cerradas, ajustar CA3–CA5, reestimar T62–T64 y definir el contrato de API/persistencia. Después elaborar el plan de implementación y dividir archivos entre Pablo y Leslie.
 4. Trabajar en la rama `feature/hu-21-agrupacion-nm`, con Draft PR hacia `develop` creada por Pablo. Edwin revisa; Shirley acepta funcionalmente tras pruebas, OpenAPI y ejecución integrada con Docker Compose.
