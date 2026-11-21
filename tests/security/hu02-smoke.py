@@ -1,4 +1,4 @@
-"""HU-02 / T54: recorrido aislado Auth + Gateway + SQL Server por HTTPS.
+"""HU-02 / T54-T55: recorrido aislado Auth + Gateway + Frontend + SQL Server por HTTPS.
 
 Usa secretos y certificado sintéticos en un directorio temporal. No imprime claves
 ni tokens; elimina solamente su propio proyecto Compose al terminar.
@@ -76,6 +76,9 @@ def main():
     ports: !override
       - "127.0.0.1::8443"
     depends_on: !override []
+  frontend:
+    ports: !override []
+    depends_on: !override []
 """, encoding="utf-8")
         compose = ["docker", "compose", "--env-file", str(env_file), "-p", PROJECT,
                    "-f", "compose.sprint1.yaml", "-f", str(overlay)]
@@ -101,9 +104,9 @@ def main():
             print("PASS", name, flush=True)
 
         try:
-            command(compose + ["build", "auth-service", "gateway"], env, timeout=900)
+            command(compose + ["build", "auth-service", "gateway", "frontend"], env, timeout=900)
             command(compose + ["up", "-d", "--wait", "--wait-timeout", "180", "auth-db"], env, timeout=240)
-            command(compose + ["up", "-d", "--no-deps", "auth-service", "gateway"], env, timeout=120)
+            command(compose + ["up", "-d", "--no-deps", "auth-service", "frontend", "gateway"], env, timeout=120)
             port = command(compose + ["port", "gateway", "8443"], env).rsplit(":", 1)[-1]
             base = f"https://localhost:{port}"
             deadline = time.monotonic() + 90
@@ -120,6 +123,10 @@ def main():
                 time.sleep(1)
             admin = login["accessToken"]
             check("login administrador por HTTPS", login_status, 200)
+            with urlopen(base + "/admin/usuarios", context=context, timeout=15) as frontend_response:
+                html = frontend_response.read().decode()
+                check("ruta SPA de usuarios por Gateway HTTPS", frontend_response.status, 200)
+                check("HTML de frontend en ruta usuarios", 'id="root"' in html, True)
             check("sin token: 401", request(base, "/api/usuarios")[0], 401)
             status, docente = request(base, "/api/usuarios", "POST",
                                       {"nombreUsuario": "docente.hu02", "rol": "Docente", "contrasena": password_inicial}, admin)
