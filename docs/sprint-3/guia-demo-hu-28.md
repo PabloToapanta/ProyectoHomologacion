@@ -2,7 +2,7 @@
 
 **Issue:** [#73 — Documentación y guion de demo](https://github.com/PabloToapanta/ProyectoHomologacion/issues/73)  
 **Revisión de la guía:** 21/11/2026 · **Base revisada:** `origin/develop` en `10a2b5e`  
-**Estado:** borrador de documentación. El 21/11/2026 el stack HTTP aislado `hu28-demo-20261121` compiló y sus siete servicios quedaron saludables. La página de login respondió 200, el login de la cuenta local respondió 200 y una ruta protegida sin sesión respondió 401. Para suplir dos claves vacías se generaron valores aleatorios solo en el proceso de Compose; no se escribieron en `.env.sprint1`. El overlay HTTPS solo pasó `config --quiet`; no se ejecutó con certificado ni en navegador. La revisión visual, el flujo completo, la aceptación de la PO y la revisión cruzada siguen pendientes.
+**Estado:** borrador de documentación. El 21/11/2026 el stack HTTP aislado `hu28-demo-20261121` compiló y sus siete servicios quedaron saludables. Está disponible en `http://127.0.0.1:15173/login` (frontend) y `http://127.0.0.1:15080` (Gateway). La página de login respondió 200, el login de la cuenta local respondió 200 y una ruta protegida sin sesión respondió 401. Para suplir dos claves vacías se generaron valores aleatorios solo en el proceso de Compose; no se escribieron en `.env.sprint1`. El volumen del stack es independiente de los datos existentes. El overlay HTTPS solo pasó `config --quiet`; no se ejecutó con certificado ni en navegador. La revisión visual, el flujo completo, la aceptación de la PO y la revisión cruzada siguen pendientes.
 
 Esta guía usa cuentas y registros sintéticos. No copiar contraseñas, tokens, certificados privados ni datos personales en el repositorio, capturas o evidencias.
 
