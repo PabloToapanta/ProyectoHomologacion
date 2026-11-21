@@ -139,7 +139,7 @@ Errores: `400` para IDs, pares o aportes inválidos; `401/403` para autenticaci�
 | La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Identidad y persistencia resueltas en el contrato técnico 3; implementar y probar. |
 | Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Reserva, concurrencia y corrección de borradores resueltas en el contrato técnico 4; implementar y probar. |
 
-El contrato técnico queda definido para iniciar TDD y desarrollo tras la revisión de Pablo y Leslie. Pablo sustituyó la distribución de 42 h/21 PH propuesta previamente por **7 h totales**; esta cifra se registra como su estimación para toda la HU, sin recortar criterios de aceptación. El riesgo de subestimación es alto porque incluye motor, persistencia, concurrencia, doble revisión, informe, interfaz y pruebas. Las parejas 1:1 existentes conservan su comportamiento. La estimación no equivale a aceptación de la implementación ni a pronunciamiento institucional.
+El contrato técnico queda definido para iniciar TDD y desarrollo tras la revisión de Pablo y Leslie. La estimación vigente indicada por Pablo es **7 h totales** para toda la HU, sin recortar criterios de aceptación. El riesgo de subestimación es alto porque incluye motor, persistencia, concurrencia, doble revisión, informe, interfaz y pruebas. Las parejas 1:1 existentes conservan su comportamiento. La estimación no equivale a aceptación de la implementación ni a pronunciamiento institucional.
 
 ## Tareas reestimadas para N:M
 
