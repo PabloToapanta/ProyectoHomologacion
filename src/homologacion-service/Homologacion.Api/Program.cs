@@ -71,8 +71,9 @@ public partial class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Homologación FISEI-UTA — HU-14, HU-15 y HU-16 / Issues #5, #6 y #7", Version = "v1",
-                Description = "Equivalencia: tres criterios, contenidos y resultados combinados por elemento, horas y créditos. Múltiples orígenes no suman horas ni créditos sin regla aprobada. Antigüedad: aprobación y máximo diez años inclusive. Requisitos: mínimos de cambio interno y externo. Son evaluaciones independientes, no una resolución oficial." });
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Homologación FISEI-UTA — HU-14, HU-15, HU-16, HU-23 y HU-24", Version = "v1",
+                Description = "Equivalencia, antigüedad y requisitos de cambio son evaluaciones independientes, no una resolución oficial. HU-23: el docente asignado genera el informe fijo; docentes asignados y Coordinación consultan solo solicitudes FISEI existentes. HU-24: el navegador permite imprimir el informe y guardarlo como PDF; la exportación no está disponible antes de generarlo." });
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Homologacion.Api.xml"), includeControllerXmlComments: true);
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             { Type = SecuritySchemeType.Http, Scheme = "bearer", BearerFormat = "JWT" });
             options.AddSecurityRequirement(new OpenApiSecurityRequirement

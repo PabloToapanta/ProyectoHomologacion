@@ -26,7 +26,7 @@ public class InformeEndpointTests
         public bool Asignada { get; set; } = true;
         public int Consultas { get; private set; }
         public List<RevisionDocenteRegistrada> Revisiones { get; } = [];
-        public InformeHomologacion? Informe { get; private set; }
+        public InformeHomologacion? Informe { get; set; }
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct)
         {
             Consultas++;
@@ -71,6 +71,10 @@ public class InformeEndpointTests
     {
         var c = host.CreateClient(); c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Docente")); return c;
     }
+    private static HttpClient Coordinador(MotorFactory f, WebApplicationFactory<Homologacion.Api.Program> host)
+    {
+        var c = host.CreateClient(); c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Coordinador")); return c;
+    }
     private static object Ajuste(string decision) => new { asignaturaAprobadaId = Aprobada, asignaturaReceptoraId = Receptora, postura = "Ajuste", decision, observacion = "Observación sintética." };
 
     [Fact]
@@ -103,9 +107,19 @@ public class InformeEndpointTests
         Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(Base + "/informe")).StatusCode);
     }
 
+    [Fact]
+    public async Task Coordinador_consulta_un_informe_generado_pero_no_puede_generarlo()
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e); using var c = Coordinador(f, host);
+        Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(Base + "/informe")).StatusCode);
+        e.Informe = new InformeHomologacion(Solicitud, "Interno", DateTimeOffset.UtcNow, Guid.NewGuid(), "docente.ana",
+            [], [], 0, 0, 0, ["Informe técnico; no es una resolución oficial."]);
+        Assert.Equal(HttpStatusCode.OK, (await c.GetAsync(Base + "/informe")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await c.PostAsync(Base + "/informe", null)).StatusCode);
+    }
+
     [Theory]
     [InlineData(null, 401)]
-    [InlineData("Coordinador", 403)]
     [InlineData("Administrador", 403)]
     public async Task Otros_roles_no_generan_ni_consultan(string? rol, int esperado)
     {
