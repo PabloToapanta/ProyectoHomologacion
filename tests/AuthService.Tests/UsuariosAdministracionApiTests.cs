@@ -184,6 +184,23 @@ public sealed class UsuariosAdministracionApiTests
             (await client.PostAsJsonAsync("/api/auth/login", new { nombreUsuario = "docente.existe", password = Inicial })).StatusCode);
     }
 
+    [Fact]
+    public async Task Swagger_DeAuthDocumentaLasOperacionesDeUsuarios()
+    {
+        using var factory = new UsuariosAdministracionFactory();
+        using var client = factory.Client(null);
+        using var respuesta = await client.GetAsync("/swagger/v1/swagger.json");
+        Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
+        using var json = JsonDocument.Parse(await respuesta.Content.ReadAsStringAsync());
+        var rutas = json.RootElement.GetProperty("paths");
+        Assert.True(rutas.GetProperty("/api/usuarios").TryGetProperty("get", out _));
+        Assert.True(rutas.GetProperty("/api/usuarios").TryGetProperty("post", out _));
+        Assert.True(rutas.GetProperty("/api/usuarios/{id}").TryGetProperty("get", out _));
+        Assert.True(rutas.GetProperty("/api/usuarios/{id}/estado").TryGetProperty("patch", out _));
+        Assert.True(rutas.GetProperty("/api/usuarios/{id}/rol").TryGetProperty("put", out _));
+        Assert.True(rutas.GetProperty("/api/usuarios/{id}/contrasena").TryGetProperty("put", out _));
+    }
+
     private static void AssertNoSecreto(string texto)
     {
         Assert.DoesNotContain(Inicial, texto);

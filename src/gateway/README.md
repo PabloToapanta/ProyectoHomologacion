@@ -26,7 +26,7 @@ El Gateway conserva método, ruta, query, cuerpo y respuesta del destino. Reenv�
 
 Usar los mismos valores externos de `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey` y `Jwt__EncryptionKey` que auth-service. La clave de firma requiere al menos 32 bytes UTF-8; la de cifrado, 32 bytes aleatorios en Base64. No tienen valor predeterminado. El Gateway exige JWE `A256KW` + `A256CBC-HS512` con firma interna HS256, emisor, audiencia, expiración y `nbf` válidos, con `ClockSkew=0`. `MapInboundClaims=false`, `NameClaimType=name` y `RoleClaimType=role`.
 
-La política `AcademicAccess` exige autenticación y uno de los roles `Administrador`, `Docente` o `Coordinador`, respetando mayúsculas. Los tres roles superan esta barrera de acceso; la documentación vigente no define una matriz de permisos por operación para Docente/Coordinador. Los servicios conservan la responsabilidad de sus autorizaciones funcionales. No se introdujeron reglas de administración de usuarios o de catálogo.
+La política `AcademicAccess` exige autenticación y uno de los roles `Administrador`, `Docente` o `Coordinador`, respetando mayúsculas. Los tres roles superan esta barrera de acceso; los servicios conservan la responsabilidad de sus autorizaciones funcionales. La política `UserAdministration` exige el rol `Administrador` para las rutas de HU-02 (`/api/usuarios` y operaciones por identificador). Auth vuelve a comprobar ese rol. La consulta interna `GET /api/usuarios/docentes` de HU-29 permanece en Auth y no se publica como ruta nueva del Gateway.
 
 - Sin JWT o con JWT inválido: **401**, `WWW-Authenticate: Bearer`, sin contactar al destino.
 - JWT válido sin un rol reconocido: **403**, sin contactar al destino.

@@ -41,7 +41,7 @@ Fechas previstas dentro del tramo final de Sprint 3 (5–25 de noviembre de 2026
 
 ## Rutas propuestas para Auth mediante Gateway
 
-Se conserva la ruta existente de login. El Gateway enviará estas rutas a `auth-service`; el servicio comprobará además el rol Administrador en cada operación. Separar `/api/usuarios/docentes` de las rutas administrativas conserva la consulta de HU-29 y su permiso de Coordinador.
+Se conserva la ruta existente de login. El Gateway envía las rutas de administración a `auth-service`; el servicio comprueba además el rol Administrador en cada operación. La consulta `/api/usuarios/docentes` permanece en Auth para el consumo interno de Solicitudes y no necesita una ruta pública nueva en el Gateway. El Coordinador accede a `/api/solicitudes/{id}/docentes-disponibles`, que Solicitudes resuelve con Auth.
 
 | Método | Ruta | Uso | Acceso |
 | --- | --- | --- | --- |
@@ -51,7 +51,7 @@ Se conserva la ruta existente de login. El Gateway enviará estas rutas a `auth-
 | `PATCH` | `/api/usuarios/{id}/estado` | Activar o desactivar una cuenta | Administrador |
 | `PUT` | `/api/usuarios/{id}/rol` | Asignar rol Docente o Coordinador | Administrador |
 | `PUT` | `/api/usuarios/{id}/contrasena` | Reemplazar la contraseña con una elegida por el administrador | Administrador |
-| `GET` | `/api/usuarios/docentes` | Listar docentes activos (`id`, `nombreUsuario`) para elegir dos en HU-29 | Coordinador; contrato existente de HU-29 |
+| `GET` | `/api/usuarios/docentes` | Consulta interna de Auth: docentes activos (`id`, `nombreUsuario`) para HU-29; sin ruta pública nueva en Gateway | Coordinador; contrato existente de HU-29 |
 
 Las respuestas de administración nunca contienen contraseñas ni hashes. El Gateway debe declarar métodos y rutas concretos; Auth mantiene la autorización final. Evitar que la ruta variable `/api/usuarios/{id}` capture el segmento literal `docentes`.
 
