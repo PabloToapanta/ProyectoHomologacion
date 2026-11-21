@@ -2,7 +2,7 @@
 
 **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** alcance de los tres casos confirmado por Pablo; requiere cerrar las decisiones de distribución antes del plan de implementación.
+**Estado:** alcance de los tres casos, reparto de horas/créditos y decisión única del grupo confirmados por Pablo; faltan criterios de agregación académica y confirmación funcional de Shirley.
 
 **Sprint:** 3 · **Estimación vigente del backlog:** 8 PH, T62–T64 (14 h). El alcance N:M debe reestimarse antes de comprometer esas horas.
 **Desarrollo:** Pablo y Leslie. **Revisión técnica:** Edwin. **Aceptación funcional:** Shirley (PO).
@@ -47,19 +47,20 @@ La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21-
 ### CA3 — Contenidos y resultados
 
 - **Given** correspondencias revisadas, vigentes y con evidencia, **when** se evalúa una receptora, **then** cada elemento receptor cubierto se cuenta una sola vez aunque tenga varios vínculos de origen. Se muestran los elementos cubiertos, no cubiertos y sus evidencias.
-- **Given** un origen que aporta a varias receptoras, **when** se consultan sus vínculos, **then** el análisis debe mostrar a cuál receptora se atribuye cada aporte. La regla exacta para compartir o repartir un mismo elemento de origen está pendiente de decisión.
+- **Given** un origen que aporta a varias receptoras, **when** se consultan sus vínculos, **then** el análisis muestra a cuál receptora se atribuye cada contenido o resultado. Está pendiente decidir si un mismo elemento de origen puede sustentar más de una receptora.
 
 ### CA4 — Horas, créditos y veredicto
 
-- **Given** aportes asignados a cada receptora y unidades comparables, **when** se calcula su equivalencia, **then** se muestran horas y créditos atribuidos, totales de esa receptora y porcentajes acotados al 100 %. Los tres criterios existentes se comparan por separado con el umbral vigente de HU-03.
-- **Given** unidades o sistemas de créditos distintos, cantidades faltantes o una distribución de aportes todavía no definida, **when** se solicita un veredicto, **then** se informa «información incompleta» en las receptoras afectadas; no se convierten unidades ni se asigna automáticamente el total de un origen a varias receptoras.
-- **Pendiente:** decidir si horas y créditos se asignan enteros a una sola receptora, se reparten en cantidades explícitas o se usa otra regla académica aprobada. Sin esa decisión, CA4 no está listo para implementar 1:N/N:M.
+- **Given** un origen que aporta a varias receptoras, **when** se registran sus aportes, **then** se asignan cantidades explícitas de horas y créditos a cada receptora; la suma asignada para cada magnitud no supera el total del origen. El servidor valida esos límites y conserva el aporte por origen y receptora.
+- **Given** aportes explícitos y unidades comparables, **when** se calcula la equivalencia, **then** se muestran aportes, totales receptores y porcentajes acotados al 100 %. Los tres criterios existentes se comparan por separado con el umbral vigente de HU-03.
+- **Given** unidades o sistemas de créditos distintos, cantidades faltantes o una distribución de aportes no declarada, **when** se solicita un veredicto, **then** se informa «información incompleta»; no se convierten unidades ni se asigna automáticamente el total de un origen a varias receptoras.
+- **Pendiente:** definir si la decisión única del grupo exige que cada receptora alcance los tres criterios o si se calcula sobre los totales combinados. Sin esa decisión, CA4 no está listo para implementar 1:N/N:M.
 
 ### CA5 — Análisis e informe
 
-- **Given** resultados de una agrupación, **when** los dos docentes revisan y se genera el informe, **then** se identifican los orígenes, receptoras, vínculos, aportes, porcentajes, evidencia, faltantes y decisiones docentes sin perder la trazabilidad de cada receptora.
+- **Given** resultados de una agrupación, **when** los dos docentes revisan y se genera el informe, **then** se muestra una sola sugerencia y una decisión docente por grupo, con detalle de orígenes, receptoras, vínculos, aportes, porcentajes, evidencia y faltantes de cada receptora.
 - **Given** una agrupación, **when** se presenta, **then** muestra «Homologación por agrupación — regla de análisis pendiente de validación institucional» y deja claro que no es una decisión académica oficial.
-- **Pendiente:** decidir si la revisión y decisión final son por receptora o por el conjunto completo. El modelo actual guarda análisis e informes por pareja 1:1.
+- El modelo actual guarda análisis e informes por pareja 1:1; el contrato técnico debe introducir una identidad de grupo sin reinterpretar esos registros históricos.
 
 ### CA6 — Verificación
 
@@ -70,9 +71,9 @@ La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21-
 | Decisión | Por qué hace falta | Quién la confirma |
 | --- | --- | --- |
 | Las tres situaciones de la tabla están incluidas. | Pablo lo confirmó; Shirley debe validar la ampliación frente a la respuesta previa del ingeniero y al compromiso del sprint. | Shirley |
-| ¿Puede un origen aportar a varias receptoras? Si sí, ¿cómo se distribuyen contenidos, horas y créditos? | Evita atribuir el total de una materia varias veces. | Ingeniero/Coordinación con Shirley |
+| Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo confirmó esta regla del producto; falta confirmación académica frente a la respuesta previa N:1. | Shirley con ingeniero/Coordinación |
 | ¿Puede una misma correspondencia o elemento de origen sustentar más de una receptora? | Define el control de doble conteo académico. | Ingeniero/Coordinación con Shirley |
-| ¿La sugerencia y la decisión docente son por cada receptora o por el grupo completo? | Define persistencia, informe y doble revisión. | Shirley con Pablo y Leslie |
+| Una sola sugerencia y decisión docente para todo el grupo; falta definir si cada receptora debe pasar el umbral o si se usa un porcentaje combinado. | Define el algoritmo de decisión y evita que un caso débil quede oculto por otros. | Shirley con ingeniero/Coordinación |
 | ¿Un origen puede aparecer en dos grupos de la misma solicitud? | Define la restricción de uso y la concurrencia. | Ingeniero/Coordinación con Shirley |
 
 Hasta cerrar estas decisiones, la spec describe el objetivo y los casos, pero **no está lista para implementar el algoritmo 1:N/N:M**. Las parejas 1:1 existentes conservan su comportamiento.
