@@ -3,6 +3,8 @@ using Homologacion.Application.Antiguedad;
 using Homologacion.Application.Equivalencias;
 using Homologacion.Domain.Antiguedad;
 using Homologacion.Domain.Equivalencias;
+using Homologacion.Application.Configuracion;
+using Homologacion.Domain.Configuracion;
 
 namespace Homologacion.Application.AnalisisExterno;
 
@@ -12,7 +14,7 @@ namespace Homologacion.Application.AnalisisExterno;
 /// D3: horas y créditos solo se comparan con unidad y sistema idénticos (sin espacios ni distinción de mayúsculas).
 /// </summary>
 public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicitudes, ICatalogoAnalisisInterno catalogo,
-    EvaluarEquivalencia motor, TimeProvider reloj)
+    EvaluarEquivalencia motor, TimeProvider reloj, IParametrosHomologacionProvider? parametrosProvider = null)
 {
     public const string FaltaProgramaExterno =
         "contenidos y resultados de aprendizaje del programa externo: el sistema aún no los registra con su ubicación revisada";
@@ -20,6 +22,7 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
     public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitudId, Guid aprobadaId, Guid receptoraId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
+        var parametros = parametrosProvider is null ? ParametrosHomologacion.Predeterminados() : await parametrosProvider.ObtenerVigentesAsync(ct);
         if (solicitudId == Guid.Empty || aprobadaId == Guid.Empty || receptoraId == Guid.Empty)
             throw new DatosAnalisisSolicitudException("Seleccione la solicitud y ambas asignaturas.");
         var solicitud = await ObtenerExternaAsync(solicitudes, solicitudId, ct);
@@ -52,7 +55,7 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
             faltantes.Add("fecha de aprobación ausente o futura: requiere revisión");
         else
         {
-            antiguedad = new ValidarAntiguedad().Ejecutar(new(estado, aprobada.FechaAprobacion, hoy));
+            antiguedad = new ValidarAntiguedad().Ejecutar(new(estado, aprobada.FechaAprobacion, hoy), parametros);
             if (antiguedad.Estado != EstadoAntiguedad.Elegible) faltantes.Add(antiguedad.Motivo);
         }
 
@@ -63,7 +66,7 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
             receptora.Creditos, receptora.SistemaCreditos, receptora.Contenidos.Select(e => e.Id.ToString()).ToArray(),
             receptora.Resultados.Select(e => e.Id.ToString()).ToArray());
         EvaluacionEquivalencia evaluacion;
-        try { evaluacion = motor.Ejecutar(new([new(origen, estado == EstadoAsignatura.Aprobada)], destino, null, null)); }
+        try { evaluacion = motor.Ejecutar(new([new(origen, estado == EstadoAsignatura.Aprobada)], destino, null, null), parametros); }
         catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
         var todas = faltantes.Concat(evaluacion.InformacionFaltante).Distinct().ToArray();
         evaluacion = evaluacion with

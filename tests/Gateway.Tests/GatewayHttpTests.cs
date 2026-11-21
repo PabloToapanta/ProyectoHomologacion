@@ -21,6 +21,34 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         { "PUT", "/api/usuarios/00000000-0000-0000-0000-000000000001/contrasena" }
     };
 
+    public static TheoryData<string, string> RutasConfiguracionHu03 => new()
+    {
+        { "GET", "/api/homologaciones/configuracion" },
+        { "PUT", "/api/homologaciones/configuracion" },
+        { "GET", "/api/homologaciones/configuracion/historial" }
+    };
+
+    [Theory]
+    [MemberData(nameof(RutasConfiguracionHu03))]
+    public async Task ConfiguracionHu03_SoloCoordinadorLlegaAHomologacion(string metodo, string ruta)
+    {
+        using var client = factory.CreateClient();
+        var antes = factory.Forwarded.Count;
+        Assert.Equal(HttpStatusCode.Unauthorized,
+            (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: "Docente"));
+        Assert.Equal(HttpStatusCode.Forbidden,
+            (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        Assert.Equal(antes, factory.Forwarded.Count);
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: "Coordinador"));
+        using var request = new HttpRequestMessage(new HttpMethod(metodo), ruta + "?limit=10");
+        if (metodo == "PUT") request.Headers.TryAddWithoutValidation("If-Match", "\"version-sintetica\"");
+        Assert.Equal(HttpStatusCode.OK, (await client.SendAsync(request)).StatusCode);
+        Assert.Equal(antes + 1, factory.Forwarded.Count);
+        Assert.Equal("homologacion", factory.Forwarded.Last().Service);
+        Assert.Equal(ruta + "?limit=10", factory.Forwarded.Last().PathAndQuery);
+    }
+
     [Theory]
     [MemberData(nameof(RutasGestionHu02))]
     public async Task GestionHu02_SinSesionNoLlegaAAuth(string metodo, string ruta)
@@ -222,8 +250,11 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        // 33 rutas previas, 5 rutas de administración HU-02 y 2 de HU-12 (adjuntos).
-        Assert.Equal(40, paths.EnumerateObject().Count());
+        // Rutas existentes más HU-02, HU-03 y las dos rutas de HU-12.
+        Assert.Equal(42, paths.EnumerateObject().Count());
+        Assert.True(paths.GetProperty("/api/homologaciones/configuracion").TryGetProperty("put", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/configuracion/historial").TryGetProperty("get", out _));
+        Assert.Contains("Coordinador", paths.GetProperty("/api/homologaciones/configuracion").GetProperty("get").GetProperty("description").GetString());
         Assert.True(paths.GetProperty("/api/usuarios").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/usuarios").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/usuarios/{id}").TryGetProperty("get", out _));
