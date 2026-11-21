@@ -2,7 +2,7 @@
 
 **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** reglas funcionales propuestas confirmadas por Pablo; pendientes de revisión de Leslie, validación académica del ingeniero/Coordinación y aceptación de alcance por Shirley.
+**Estado:** Pablo comunicó el 21/11/2026 que Shirley y el ingeniero revisaron y aceptaron este alcance funcional N:M. Pendientes: contrato técnico, reestimación, implementación y aceptación de la historia tras las pruebas.
 
 **Sprint:** 3 · **Estimación vigente del backlog:** 8 PH, T62–T64 (14 h). El alcance N:M debe reestimarse antes de comprometer esas horas.
 **Desarrollo:** Pablo y Leslie. **Revisión técnica:** Edwin. **Aceptación funcional:** Shirley (PO).
@@ -29,7 +29,7 @@ Pablo aclaró que **N:M** significa analizar varias materias de origen y varias 
 | 1:N | Una materia de origen → dos receptoras cuyos temas se distribuyen entre ellas | Hay que decidir qué parte del origen respalda a cada receptora. |
 | N:M agrupado | Varias materias de origen → varias receptoras como conjunto | Hay que relacionar aportes y evitar contarlos dos veces. |
 
-La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21--agrupación-nm-ce-3) había acotado la implementación a N:1. Pablo confirmó un alcance más amplio que incluye 1:1 en conjunto, 1:N y N:M; **no se presenta la regla anterior como definición de N:M ni se codifica la ampliación sin resolver las decisiones académicas y obtener la confirmación funcional de Shirley**. La lectura del ingeniero tampoco sustituye un pronunciamiento institucional. Los resultados del sistema siguen siendo sugerencias.
+La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21--agrupación-nm-ce-3) había acotado la implementación a N:1. Pablo comunicó el 21/11 que Shirley y el ingeniero revisaron y aceptaron el alcance ampliado descrito aquí: 1:1 en conjunto, 1:N y N:M. Esta actualización debe reflejarse también en el Issue #75 para que la decisión más reciente sea trazable. La lectura del ingeniero no sustituye un pronunciamiento institucional; los resultados del sistema siguen siendo sugerencias.
 
 ## Criterios de aceptación en elaboración
 
@@ -70,19 +70,19 @@ La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21-
 
 - **Given** el contrato académico y técnico cerrado, **when** se implementa, **then** las pruebas cubren: varias parejas 1:1 sin suma global, 1:N con temas distribuidos, N:M, cobertura sin doble conteo, aportes de horas/créditos, incompatibilidad de unidades, datos faltantes, elegibilidad por origen, integración con revisión docente e informe. OpenAPI documenta contratos y errores nuevos.
 
-## Decisiones necesarias antes de implementar 1:N/N:M
+## Decisiones funcionales confirmadas y pendientes técnicos
 
-| Decisión | Por qué hace falta | Quién la confirma |
+| Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
-| Las tres situaciones de la tabla están incluidas. | Pablo lo confirmó; Shirley debe validar la ampliación frente a la respuesta previa del ingeniero y al compromiso del sprint. | Shirley |
-| Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo confirmó esta regla del producto; falta confirmación académica frente a la respuesta previa N:1. | Shirley con ingeniero/Coordinación |
-| Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo confirmó la regla del producto; requiere validación académica. | Shirley con ingeniero/Coordinación |
-| La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo confirmó la regla del producto; requiere validación académica y ajuste del contrato de informe. | Shirley con ingeniero/Coordinación |
-| Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Continúa la regla de uso único del origen de la respuesta del ingeniero y evita grupos solapados. | Leslie y Pablo verifican implementación; Shirley confirma |
+| Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Reflejar en #75 y reestimar el sprint. |
+| Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo informa acuerdo de Shirley y el ingeniero. | Definir validación y precisión de los aportes en el contrato. |
+| Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo informa acuerdo de Shirley y el ingeniero. | Definir representación de los vínculos y evidencia. |
+| La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Ajustar persistencia, doble revisión e informe. |
+| Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Verificar exclusividad y concurrencia. |
 
-Las reglas funcionales están definidas para preparar el contrato técnico. **Antes de implementar el algoritmo 1:N/N:M**, Shirley y el ingeniero/Coordinación deben validar la ampliación frente a la respuesta del 20/11, y el equipo debe reestimar el trabajo. Las parejas 1:1 existentes conservan su comportamiento.
+Las reglas funcionales ya permiten preparar el contrato técnico. La reestimación sigue pendiente: las 14 h del backlog se fijaron para el alcance anterior. Las parejas 1:1 existentes conservan su comportamiento. El acuerdo comunicado no equivale a aceptación de la implementación ni a pronunciamiento institucional.
 
-## Tareas del Sprint Backlog, pendientes de ajuste
+## Tareas del Sprint Backlog, pendientes de reestimación
 
 | Tarea | Descripción del backlog | Horas originales | Ajuste requerido |
 | --- | --- | ---: | --- |
@@ -93,9 +93,9 @@ Las reglas funcionales están definidas para preparar el contrato técnico. **An
 
 ## Siguiente paso de coordinación
 
-1. Shirley confirma la ampliación a las tres situaciones frente al acuerdo previo N:1 y el compromiso de 8 PH. El caso 1:1 ya existe como flujo individual; definir la vista conjunta que requiere HU-21.
-2. Shirley lleva al ingeniero/Coordinación el alcance N:M, el reparto explícito de horas y créditos, la reutilización trazable de contenidos y la regla de que todas las receptoras cumplen por separado. Registrar la respuesta en el Issue #75 y en la spec.
-3. Tras esa validación, reestimar T62–T64 y definir el contrato de API/persistencia. Después elaborar el plan de implementación y dividir archivos entre Pablo y Leslie.
+1. Registrar en el Issue #75 el acuerdo N:M comunicado por Pablo y la fecha de revisión de Shirley y el ingeniero. El caso 1:1 ya existe como flujo individual; definir la vista conjunta que requiere HU-21.
+2. Pablo y Leslie revisan el contrato de API/persistencia del [plan técnico](plan-implementacion-hu-21.md), ajustan T62–T64 y registran la reestimación con Shirley.
+3. Implementar por partes en la Draft PR con TDD, revisión cruzada y evidencia de cada criterio.
 4. Trabajar en la rama `feature/hu-21-agrupacion-nm`, con Draft PR hacia `develop` creada por Pablo. Edwin revisa; Shirley acepta funcionalmente tras pruebas, OpenAPI y ejecución integrada con Docker Compose.
 
 ## Fuera de alcance confirmado

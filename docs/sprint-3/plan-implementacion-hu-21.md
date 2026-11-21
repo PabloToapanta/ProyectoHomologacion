@@ -2,7 +2,7 @@
 
 **Base funcional:** [spec HU-21](hu-21-agrupacion-nm.md) · **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** propuesta revisable; requiere validación académica del alcance N:M, confirmación funcional de Shirley y reestimación antes de codificar.
+**Estado:** plan técnico borrador sobre el alcance funcional que Pablo comunicó como revisado y acordado por Shirley y el ingeniero el 21/11/2026. Requiere cerrar contrato, reestimar y verificar la implementación.
 **Rama de trabajo:** `feature/hu-21-agrupacion-nm` desde `develop`. Pablo creará la Draft PR hacia `develop`; Pablo y Leslie harán commits en su rama.
 
 ## Contrato funcional que guía el diseño
@@ -18,7 +18,7 @@
 
 | Paso | Responsable inicial | Entregable | Dependencia |
 | --- | --- | --- | --- |
-| 0. Cerrar contrato y reestimar | Pablo y Leslie; Shirley valida alcance; Edwin revisa | Esquema de petición/respuesta, identidad del grupo, reglas anteriores y estimación actualizada en #75 | Validación académica del alcance N:M |
+| 0. Cerrar contrato y reestimar | Pablo y Leslie; Shirley revisa estimación; Edwin revisa contrato | Esquema de petición/respuesta, identidad del grupo y estimación actualizada en #75 | Acuerdo funcional N:M comunicado por Pablo |
 | 1. Pruebas del motor | Pablo | Pruebas fallidas para 1:1 conjunto, 1:N, N:M, límites de asignación, cobertura y veredicto del grupo | Paso 0 |
 | 2. Motor determinista | Pablo | Modelo de grupo y cálculo por receptora; resultado único con desglose; pruebas verdes | Paso 1 |
 | 3. Persistencia y contratos de grupo | Leslie | Identidad del grupo, vínculos y aportes persistidos; API de consulta/registro con validación de pertenencia y exclusividad | Paso 0; integrar con 2 |
@@ -63,7 +63,7 @@ El informe existente de la solicitud debe admitir unidades individuales y grupal
 
 ## Coordinación de la Draft PR
 
-1. Pablo publica la spec y este plan en la rama y abre la Draft PR enlazando #75. La descripción separa acuerdos funcionales, decisiones institucionales pendientes y estado real de pruebas.
+1. Publicar la spec y este plan en la rama y abrir la Draft PR enlazando #75. La descripción distingue el acuerdo funcional comunicado, la validación institucional aún pendiente y el estado real de pruebas.
 2. Leslie revisa el contrato y comenta allí los campos/archivos de su parte. Pablo incorpora los acuerdos a la spec antes de iniciar TDD. Edwin revisa cambios sobre motor, revisión docente e informe; Shirley valida criterios y alcance.
 3. Cada uno trabaja en su checkout de **la misma rama remota**; antes de empezar un archivo compartido, sincroniza la rama y avisa qué archivo tomará. Commits pequeños con Conventional Commits en español y referencia a T62/T63/T64.
 4. Integrar los commits cada día, resolver conflictos de uno en uno y mantener la PR como Draft hasta pruebas, revisión y aceptación. No hacer merge ni declarar la historia terminada antes de la definición de hecho.
