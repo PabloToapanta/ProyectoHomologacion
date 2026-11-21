@@ -2,7 +2,7 @@
 
 **Issue:** [#73 — Documentación y guion de demo](https://github.com/PabloToapanta/ProyectoHomologacion/issues/73)  
 **Revisión de la guía:** 21/11/2026 · **Base revisada:** `origin/develop` en `10a2b5e`  
-**Estado:** borrador de documentación. Se inspeccionaron los archivos y rutas citados; **no se ejecutó Docker Compose ni una demo en navegador**. La aceptación de la PO y la revisión cruzada siguen pendientes.
+**Estado:** borrador de documentación. El 21/11/2026 `docker compose config --quiet` pasó para HTTP y HTTPS usando un archivo temporal con valores ficticios, eliminado al terminar. **No se levantaron contenedores ni se ejecutó la demo en navegador**: Docker Desktop no estaba iniciado y no había `.env.sprint1` local. La aceptación de la PO y la revisión cruzada siguen pendientes.
 
 Esta guía usa cuentas y registros sintéticos. No copiar contraseñas, tokens, certificados privados ni datos personales en el repositorio, capturas o evidencias.
 
@@ -114,8 +114,8 @@ No afirmar que el flujo completo de remisión/finalización, adjuntos, auditorí
 
 | Elemento | Estado en esta guía |
 | --- | --- |
-| Compose base `compose.sprint1.yaml` y overlay de Solicitudes `compose.hu10.yaml` | Configuración inspeccionada; **no ejecutada durante esta revisión**. |
-| Overlay HTTPS `compose.hu34.yaml` y rutas de login por rol | Configuración y código inspeccionados; **no ejecutados durante esta revisión**. |
+| Compose base `compose.sprint1.yaml` y overlay de Solicitudes `compose.hu10.yaml` | `docker compose config --quiet` pasó el 21/11 con valores ficticios; no se iniciaron contenedores porque Docker Engine no estaba disponible. |
+| Overlay HTTPS `compose.hu34.yaml` y rutas de login por rol | `docker compose config --quiet` pasó el 21/11 con valores ficticios; TLS y navegador siguen sin ejecutarse. |
 | Roles Administrador, Coordinador y Docente; solicitudes, análisis e informe | Rutas y componentes presentes en la base `10a2b5e`; requieren comprobación manual de la demo. |
 | Adjuntos HU-12 (#82) y exportación PDF HU-24 (#83) | PR abiertas en la revisión del 21/11; no dar por integradas hasta comprobar `develop`. |
 | Remisión HU-32 (#86), auditoría HU-25 (#85) y finalización HU-33 (#89) | PR abiertas en la revisión del 21/11; la demo de flujo completo depende de integración, resolución de conflictos y aceptación. |
