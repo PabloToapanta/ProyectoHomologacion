@@ -41,8 +41,8 @@ Fechas previstas dentro del tramo final de Sprint 3 (5–25 de noviembre de 2026
 
 ## Acuerdos pendientes antes de implementar
 
-- Confirmar con Shirley los criterios, la distribución T54/T55, el riesgo y las fechas. El Issue #66 propone responsables Pablo y Leslie; esta ficha asigna ejecución a Pablo por indicación actual del usuario y deja la colaboración de Leslie pendiente de coordinación.
+- Confirmar con Shirley los criterios, la distribución T54/T55, el riesgo y las fechas. Pablo Toapanta es el único responsable de HU-02 y de ambas tareas, según la indicación actual del usuario y el Issue #66 actualizado.
 - Acordar el mecanismo para entregar la contraseña temporal sin exponerla en respuestas, registros ni repositorio, y si se exigirá cambio al primer inicio de sesión. Esto último requiere un contrato adicional y no se presume implementado.
-- Acordar con Edwin las rutas de Gateway y el contrato de lectura de docentes de HU-29 antes de modificar archivos compartidos. La revisión cruzada corresponde a Edwin; la aceptación funcional corresponde a Shirley.
+- Coordinar con quien mantenga HU-29 la compatibilidad de la consulta de docentes activos: HU-02 no debe cambiar sin acuerdo los campos `id` y `nombreUsuario`, el filtro de rol Docente/estado activo ni el permiso de Coordinador usados para asignar dos docentes. Proponer las rutas de administración de usuarios en Gateway y revisar conflictos de archivos compartidos antes de implementarlas. La revisión cruzada corresponde a Edwin; la aceptación funcional corresponde a Shirley.
 
 **Definición de hecho aplicable:** PR hacia `develop` revisado, pruebas verificadas, Swagger actualizado, aceptación de la PO y recorrido integrado con Docker Compose. Esta documentación no acredita ninguno de esos hitos.
