@@ -2,7 +2,7 @@
 
 **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** Pablo comunicó el 21/11/2026 que Shirley y el ingeniero revisaron y aceptaron este alcance funcional N:M. Pendientes: contrato técnico, reestimación, implementación y aceptación de la historia tras las pruebas.
+**Estado:** Pablo comunicó el 21/11/2026 que Shirley y el ingeniero revisaron y aceptaron el alcance funcional N:M. El contrato técnico se definió en las decisiones 1–7 de este documento. Pendientes: reestimación, implementación, pruebas y aceptación de la historia.
 
 **Sprint:** 3 · **Estimación vigente del backlog:** 8 PH, T62–T64 (14 h). El alcance N:M debe reestimarse antes de comprometer esas horas.
 **Desarrollo:** Pablo y Leslie. **Revisión técnica:** Edwin. **Aceptación funcional:** Shirley (PO).
@@ -31,7 +31,7 @@ Pablo aclaró que **N:M** significa analizar varias materias de origen y varias 
 
 La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21--agrupación-nm-ce-3) había acotado la implementación a N:1. Pablo comunicó el 21/11 que Shirley y el ingeniero revisaron y aceptaron el alcance ampliado descrito aquí: 1:1 en conjunto, 1:N y N:M. Esta actualización debe reflejarse también en el Issue #75 para que la decisión más reciente sea trazable. La lectura del ingeniero no sustituye un pronunciamiento institucional; los resultados del sistema siguen siendo sugerencias.
 
-## Criterios de aceptación en elaboración
+## Criterios de aceptación acordados
 
 ### CA1 — Selección y trazabilidad
 
@@ -139,15 +139,15 @@ Errores: `400` para IDs, pares o aportes inválidos; `401/403` para autenticaci�
 | La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Identidad y persistencia resueltas en el contrato técnico 3; implementar y probar. |
 | Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Reserva, concurrencia y corrección de borradores resueltas en el contrato técnico 4; implementar y probar. |
 
-Las reglas funcionales ya permiten preparar el contrato técnico. La reestimación sigue pendiente: las 14 h del backlog se fijaron para el alcance anterior. Las parejas 1:1 existentes conservan su comportamiento. El acuerdo comunicado no equivale a aceptación de la implementación ni a pronunciamiento institucional.
+El contrato técnico queda definido para iniciar TDD y desarrollo tras la revisión de Pablo y Leslie. La reestimación sigue pendiente: las 14 h del backlog se fijaron para el alcance anterior. Las parejas 1:1 existentes conservan su comportamiento. El acuerdo comunicado no equivale a aceptación de la implementación ni a pronunciamiento institucional.
 
 ## Tareas del Sprint Backlog, pendientes de reestimación
 
-| Tarea | Descripción del backlog | Horas originales | Ajuste requerido |
+| Tarea | Descripción del backlog | Horas originales | Alcance técnico definido; horas por reestimar |
 | --- | --- | ---: | --- |
-| T62 | Motor de agrupación con TDD | 6 | Definir algoritmo N:M y pruebas tras acordar distribución y doble conteo. |
-| T63 | Solicitud, análisis e informe por agrupación | 5 | Definir identidad del grupo y si el resultado es por receptora o por conjunto. |
-| T64 | Interfaz de agrupación | 3 | Diseñar selección y visualización según el contrato acordado. |
+| T62 | Motor de agrupación con TDD | 6 | Implementar reparto decimal, tres criterios por receptora y sugerencia única del grupo; probar todos los casos. |
+| T63 | Solicitud, análisis e informe por agrupación | 5 | Implementar `grupoId`, reservas, rutas, análisis, dos revisiones e informe sin alterar registros 1:1. |
+| T64 | Interfaz de agrupación | 3 | Implementar tabla origen × receptora, edición de borrador, desglose y revisión grupal. |
 | **Total** | **8 PH de historia** | **14** | **Reestimar tras cerrar el alcance N:M.** |
 
 ## Siguiente paso de coordinación

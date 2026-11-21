@@ -2,7 +2,7 @@
 
 **Base funcional:** [spec HU-21](hu-21-agrupacion-nm.md) · **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
-**Estado:** plan técnico borrador sobre el alcance funcional que Pablo comunicó como revisado y acordado por Shirley y el ingeniero el 21/11/2026. Requiere cerrar contrato, reestimar y verificar la implementación.
+**Estado:** contrato técnico definido para revisión de Pablo y Leslie sobre el alcance funcional que Pablo comunicó como acordado por Shirley y el ingeniero el 21/11/2026. Requiere reestimar y verificar la implementación.
 **Rama de trabajo:** `feature/hu-21-agrupacion-nm` desde `develop`. Pablo creará la Draft PR hacia `develop`; Pablo y Leslie harán commits en su rama.
 
 ## Contrato funcional que guía el diseño
@@ -19,7 +19,7 @@
 
 | Paso | Responsable inicial | Entregable | Dependencia |
 | --- | --- | --- | --- |
-| 0. Cerrar contrato y reestimar | Pablo y Leslie; Shirley revisa estimación; Edwin revisa contrato | Esquema de petición/respuesta, identidad del grupo y estimación actualizada en #75 | Acuerdo funcional N:M comunicado por Pablo |
+| 0. Revisar contrato y reestimar | Pablo y Leslie; Shirley revisa estimación; Edwin revisa contrato | Revisión de los contratos técnicos 1–7 y estimación actualizada en #75 | Acuerdo funcional N:M comunicado por Pablo |
 | 1. Pruebas del motor | Pablo | Pruebas fallidas para 1:1 conjunto, 1:N, N:M, límites de asignación, cobertura y veredicto del grupo | Paso 0 |
 | 2. Motor determinista | Pablo | Modelo de grupo y cálculo por receptora; resultado único con desglose; pruebas verdes | Paso 1 |
 | 3. Persistencia y contratos de grupo | Leslie | Identidad del grupo, vínculos y aportes persistidos; API de consulta/registro con validación de pertenencia y exclusividad | Paso 0; integrar con 2 |
