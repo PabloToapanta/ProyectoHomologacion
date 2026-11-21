@@ -47,7 +47,7 @@ Mantener intactas las rutas actuales de parejas 1:1. Pablo confirmó rutas propi
 | `POST /{grupoId}/analisis` | Ejecutar evaluación; devuelve resultado único y desglose por receptora. |
 | `GET /{grupoId}/revisiones` y `PUT /{grupoId}/revisiones` | Consultar ambas revisiones y registrar/corregir la del docente autenticado. |
 
-El informe existente de la solicitud debe admitir unidades individuales y grupales sin reinterpretar los campos históricos `asignaturaAprobadaId`/`asignaturaReceptoraId`. Los nombres de clases y tablas se fijan en el paso 0 sin cambiar el contrato público descrito. La falta de evidencia académica produce un resultado «Información incompleta» con detalle.
+El detalle devuelve ETag; `PUT`, `DELETE` y `POST /{grupoId}/analisis` exigen `If-Match`. Versión obsoleta: 409 sin escritura; versión ausente: 428. El informe existente de la solicitud debe admitir unidades individuales y grupales sin reinterpretar los campos históricos `asignaturaAprobadaId`/`asignaturaReceptoraId`. Los nombres de clases y tablas se fijan en el paso 0 sin cambiar el contrato público descrito. La falta de evidencia académica produce un resultado «Información incompleta» con detalle.
 
 ## Persistencia y compatibilidad propuestas
 

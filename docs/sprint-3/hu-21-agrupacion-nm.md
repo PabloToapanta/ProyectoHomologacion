@@ -122,7 +122,14 @@ Pablo confirmó el 21/11/2026 rutas propias para grupos. Las rutas actuales de p
 
 El cuerpo de creación/reemplazo incluye `origenes[]` (IDs de asignaturas aprobadas), `receptoras[]` (IDs de catálogo) y `aportes[]` con `asignaturaAprobadaId`, `asignaturaReceptoraId`, `horasAportadas` y `creditosAportados`. Cada par aparece a lo sumo una vez y cada asignatura seleccionada participa en al menos un par. La respuesta incluye `grupoId`, estado de borrador/análisis, esos vínculos y, si existe, el último análisis con `configuracionVersionId`, estado/sugerencia del grupo, porcentajes y faltantes por receptora, y evidencias fotografiadas. El cliente no declara aprobación, revisión vigente ni veredicto: el servidor los obtiene y calcula.
 
-Errores: `400` para IDs, pares o aportes inválidos; `401/403` para autenticación/asignación; `404` para grupo ajeno o inexistente; `409` para origen reservado, borrador congelado o conflicto concurrente; `503` si la fuente autorizada no está disponible. Los faltantes académicos se devuelven en el resultado «Información incompleta», no como error de forma. OpenAPI documenta cada operación.
+Un grupo con exactamente un origen, una receptora y un vínculo usa el flujo 1:1 existente; para crear una agrupación se exige más de un vínculo o más de una asignatura en cualquiera de los lados. No se crean vínculos sin un origen y una receptora seleccionados.
+
+Errores: `400` para IDs, pares o aportes inválidos; `401/403` para autenticación/asignación; `404` para grupo ajeno o inexistente; `409` para origen reservado, borrador congelado o conflicto concurrente; `428` si falta la versión exigida; `503` si la fuente autorizada no está disponible. Los faltantes académicos se devuelven en el resultado «Información incompleta», no como error de forma. OpenAPI documenta cada operación.
+
+### Contrato técnico resuelto 7 — versión del borrador
+
+- Pablo confirmó el 21/11/2026 control de versión para editar/eliminar borradores. `POST` de creación y `GET` de detalle devuelven un ETag fuerte y opaco de la versión del grupo. `PUT` y `DELETE` exigen `If-Match`; `POST /{grupoId}/analisis` también lo exige para evaluar exactamente la composición que vio el docente. Un ETag obsoleto responde `409` sin modificar reservas ni guardar análisis; uno ausente responde `428`.
+- La escritura de nueva composición, reservas y versión es atómica. Una lectura de lista incluye la versión de cada grupo para que la interfaz pueda abrir el detalle vigente. Tras un `409`, la interfaz recarga el grupo y muestra la composición nueva antes de permitir reintentar; no mezcla automáticamente aportes de dos ediciones.
 
 | Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
