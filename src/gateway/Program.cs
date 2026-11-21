@@ -61,6 +61,8 @@ public partial class Program
             var academic = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
                 .RequireAuthenticatedUser().RequireRole("Administrador", "Docente", "Coordinador").Build();
             options.AddPolicy("AcademicAccess", academic);
+            options.AddPolicy("UserAdministration", new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser().RequireRole("Administrador").Build());
             options.DefaultPolicy = academic;
             options.FallbackPolicy = academic;
         });
