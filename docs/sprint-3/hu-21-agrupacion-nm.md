@@ -49,6 +49,7 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 
 - **Given** correspondencias revisadas, vigentes y con evidencia, **when** se evalúa una receptora, **then** cada elemento receptor cubierto se cuenta una sola vez aunque tenga varios vínculos de origen. Se muestran los elementos cubiertos, no cubiertos y sus evidencias.
 - **Given** un origen que aporta a varias receptoras, **when** se consultan sus vínculos, **then** el análisis muestra a cuál receptora se atribuye cada contenido o resultado. Un mismo elemento de origen puede respaldar más de una receptora solo con correspondencias explícitas, revisadas, vigentes y trazables; dentro de cada receptora, su elemento de destino se cuenta una sola vez.
+- **Given** un par origen→receptora sin correspondencias revisadas y vigentes en el catálogo, **when** se analiza la agrupación, **then** sus elementos no acreditan cobertura y se informa la falta de revisión. HU-21 no permite crear o aprobar correspondencias desde la pantalla de agrupación.
 
 ### CA4 — Horas, créditos y veredicto
 
@@ -80,11 +81,17 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 - Para cada origen, las sumas de horas y créditos de todos sus vínculos dentro del grupo deben ser menores o iguales a las cantidades aprobadas respectivas. Puede quedar una parte sin asignar. El servidor rechaza una suma excesiva, un negativo o más de dos decimales como entrada inválida; valida la suma con aritmética decimal, sin redondearla para hacerla pasar.
 - Precisión propuesta para persistencia: horas `decimal(12,2)` y créditos `decimal(6,2)`, consistente con los créditos `decimal(6,2)` de Solicitudes. El algoritmo de agrupación trata un aporte conocido de cero como **0 %** frente a un total receptor positivo, sin cambiar el comportamiento histórico de las parejas 1:1. Los porcentajes se limitan al 100 % y se comparan con el umbral sin redondeo previo.
 
+### Contrato técnico resuelto 2 — vínculos y evidencia
+
+- La agrupación guarda vínculos entre IDs de asignaturas de origen aprobadas de la solicitud y IDs de receptoras. Para cada par se consulta la revisión existente del Catálogo; HU-21 no crea correspondencias académicas nuevas. Pablo confirmó el 21/11/2026 que se usarán únicamente las ya revisadas.
+- Solo una revisión `Registrada` y `Vigente` acredita cobertura. Cada correspondencia usada conserva tipo (`Contenido` o `ResultadoAprendizaje`), ID de elemento de origen, ID de elemento receptor y ubicaciones de evidencia en ambos programas. Una misma fuente puede figurar en dos receptoras con vínculos separados; cada elemento receptor cuenta una vez en su propia evaluación.
+- Al guardar un análisis, Homologación conserva una **fotografía de los vínculos y evidencias efectivamente usados**, junto con IDs de origen/receptora y resultados. Cambios posteriores del Catálogo no reescriben el análisis o informe ya guardados; un análisis nuevo consulta la revisión vigente de nuevo.
+
 | Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
 | Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Reflejar en #75 y reestimar el sprint. |
 | Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo informa acuerdo de Shirley y el ingeniero. | Validación y precisión resueltas en el contrato técnico 1; implementar y probar. |
-| Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo informa acuerdo de Shirley y el ingeniero. | Definir representación de los vínculos y evidencia. |
+| Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo informa acuerdo de Shirley y el ingeniero. | Representación y origen de evidencia resueltos en el contrato técnico 2; implementar y probar. |
 | La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Ajustar persistencia, doble revisión e informe. |
 | Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Verificar exclusividad y concurrencia. |
 

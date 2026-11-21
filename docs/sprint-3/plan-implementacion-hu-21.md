@@ -11,6 +11,7 @@
 2. Una agrupación identifica una solicitud, sus orígenes, sus receptoras y los vínculos origen–receptora. Un origen pertenece a una sola unidad de análisis dentro de la solicitud; puede vincularse a varias receptoras **dentro** de esa unidad.
 3. Cada vínculo declara horas y créditos atribuidos con hasta dos decimales. La suma atribuida desde un origen, en todas las receptoras del grupo, no supera sus horas ni sus créditos aprobados. `null` significa pendiente y `0` un aporte conocido de cero. No hay reparto automático ni conversiones.
 4. Un contenido o resultado de origen puede respaldar varias receptoras con evidencia revisada y vigente. Cada elemento receptor cuenta una sola vez en su propia cobertura.
+   La agrupación reutiliza únicamente las revisiones ya guardadas en el Catálogo; no crea ni aprueba correspondencias. El análisis conserva una fotografía de los vínculos y ubicaciones de evidencia usados.
 5. Se calculan cobertura, horas y créditos por receptora. La sugerencia única del grupo es «Homologable» si **todas** las receptoras alcanzan el umbral en los tres criterios; «No homologable» si los datos están completos y alguna no lo alcanza; «Información incompleta» si falta información necesaria de cualquiera. Se conserva la versión de HU-03 usada.
 6. Los dos docentes revisan la agrupación como una unidad; el informe conserva el detalle por receptora y la leyenda de regla pendiente de validación institucional.
 
