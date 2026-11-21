@@ -164,3 +164,12 @@ El contrato técnico queda definido para iniciar TDD y desarrollo tras la revisi
 - Inventar conversiones de horas/créditos, correspondencias académicas o reglas normativas no validadas.
 - Modificar resultados históricos de parejas 1:1 o convertirlos en agrupaciones sin evidencia.
 - Registro nuevo de programas analíticos externos (D2 de HU-19) y decisión académica oficial automática.
+
+## Evidencia de implementación local — 21/11/2026
+
+Leslie continuó T63/T64 desde los contratos de Pablo en 3b8477c, sin reimplementar
+EvaluarAgrupacion. [Resultados y archivos de integración](evidencia-hu-21-t63-t64.md):
+1004 tests correctos, seis omitidos, 62 comprobaciones Docker/SQL, TypeScript y Vite
+correctos. Se conservan las parejas históricas y los contratos de revisión/informe.
+La implementación está en commits locales, pendiente de publicación autorizada,
+CI, revisión cruzada y aceptación. La historia permanece sin cierre funcional.

@@ -1,5 +1,24 @@
 # HU-21 — Plan técnico borrador para Pablo y Leslie
 
+## Incremento local de Leslie — 21/11/2026
+
+T63/T64 implementados localmente sobre 3b8477c: entidad/composición, reservas
+transaccionales, ETag/API/OpenAPI, entrada desde Catálogo revisado, último análisis,
+revisiones docentes y consumo de grupos en informe/UI. Los archivos y contratos de
+EvaluarAgrupacion, RegistrarRevisionAgrupacion y GenerarInformeHomologacion de Pablo
+permanecen intactos. Coordinación registrada en la Draft PR antes de los puntos compartidos.
+
+Ver [evidencia T63/T64](evidencia-hu-21-t63-t64.md): 1004 pruebas correctas, seis
+omitidas de otras integraciones/modelo, 62 comprobaciones Docker/SQL reales y
+TypeScript/Vite correctos. Una repetición frontend fue necesaria por un timeout
+en una prueba existente; no se modificaron esa prueba ni sus límites.
+Commits locales pequeños; sin push ni merge. Faltan publicación autorizada, CI
+sobre esos commits, revisión de Edwin/Pablo y aceptación funcional de Shirley.
+No se declara HU-21 terminada ni se modifica la estimación por el trabajo verificado.
+
+El plan y acuerdos que siguen conservan la asignación original; esta sección
+registra el incremento real, sin convertir la estimación de siete horas en evidencia.
+
 **Base funcional:** [spec HU-21](hu-21-agrupacion-nm.md) · **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
 
 **Estado:** contrato técnico definido para revisión de Pablo y Leslie sobre el alcance funcional que Pablo comunicó como acordado por Shirley y el ingeniero el 21/11/2026. Estimación total indicada por Pablo: T62 2 h, T63 3 h, T64 2 h (7 h; Pablo 4 h y Leslie 3 h). Requiere verificar la implementación.
