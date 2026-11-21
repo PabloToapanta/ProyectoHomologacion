@@ -43,6 +43,7 @@ La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21-
 
 - **Given** las materias de origen seleccionadas, **when** se prepara el análisis, **then** se verifica individualmente aprobación, antigüedad de HU-15 y exclusión por tercera matrícula de HU-17 cuando corresponda. Una materia no elegible no aporta contenidos, horas ni créditos y se informa el motivo.
 - **Given** información académica o documental insuficiente, **when** no se puede verificar la elegibilidad, **then** el análisis correspondiente queda en «información incompleta»; no se presume aprobación.
+- **Given** un origen ya pertenece a otra pareja o agrupación de la misma solicitud, **when** se intenta agregarlo a una unidad de análisis nueva, **then** se rechaza la operación, incluso ante peticiones concurrentes. Dentro de su agrupación sí puede vincularse a varias receptoras.
 
 ### CA3 — Contenidos y resultados
 
@@ -56,6 +57,8 @@ La [respuesta del ingeniero del 20/11](decisiones-validacion-ingeniero.md#hu-21-
 - **Given** unidades o sistemas de créditos distintos, cantidades faltantes o una distribución de aportes no declarada, **when** se solicita un veredicto, **then** se informa «información incompleta»; no se convierten unidades ni se asigna automáticamente el total de un origen a varias receptoras.
 - **Given** todas las receptoras tienen datos completos, **when** se decide la sugerencia única, **then** el grupo es «Homologable» solo si **cada receptora** alcanza por separado el umbral en contenido, horas y créditos. Si al menos una receptora completa no alcanza algún criterio, el grupo es «No homologable» y se identifica cuál y por qué. No se promedian porcentajes entre receptoras.
 - **Given** alguna receptora tiene información incompleta, **when** se decide la sugerencia única, **then** el grupo queda en «Información incompleta» y muestra los datos faltantes por receptora; no se infiere una aprobación global.
+
+**Ejemplo de reparto:** si un origen aprobado tiene 100 horas y 4 créditos y se usa hacia dos receptoras, pueden declararse 60 horas/2,5 créditos para una y 40 horas/1,5 créditos para la otra. No se permite declarar 100 horas/4 créditos para ambas. Cada receptora se compara con su propio programa; si una no alcanza cualquiera de los tres criterios, el grupo completo no se sugiere homologable.
 
 ### CA5 — Análisis e informe
 
