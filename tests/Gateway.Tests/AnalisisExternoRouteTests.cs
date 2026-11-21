@@ -28,6 +28,7 @@ public class AnalisisExternoRouteTests
     [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe/historial", "homologacion")]
+    [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe/remision", "homologacion")]
     public async Task Enruta_al_servicio_dueno_conservando_Bearer(string metodo, string plantilla, string servicio)
     {
         using var f = new GatewayFactory(); using var c = await Autenticado(f);
@@ -49,6 +50,16 @@ public class AnalisisExternoRouteTests
         using var response = await c.GetAsync($"/api/solicitudes/{Guid.NewGuid()}/contexto-analisis-externo");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.DoesNotContain(f.Forwarded, x => x.PathAndQuery.Contains("contexto-analisis-externo", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task HU32_la_remision_interna_de_Solicitudes_no_se_publica()
+    {
+        // Solo Homologación cambia el estado a «Remitida», después de comprobar el informe.
+        using var f = new GatewayFactory(); using var c = await Autenticado(f);
+        using var response = await c.PostAsync($"/api/solicitudes/{Guid.NewGuid()}/remision", JsonContent.Create(new { }));
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.DoesNotContain(f.Forwarded, x => x.PathAndQuery.EndsWith("/remision", StringComparison.Ordinal) && x.Service == "solicitudes");
     }
 
     [Fact]
