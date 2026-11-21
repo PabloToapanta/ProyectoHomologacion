@@ -35,8 +35,8 @@ public sealed record AnalisisSolicitud(string Estado,string Mensaje,ResultadoAna
  public static AnalisisSolicitud Pendiente {get;}=new("Pendiente","El análisis automatizado aún no se ha ejecutado para esta solicitud.",null);
 }
 public sealed record SolicitudAsignada(SolicitudDetalle Solicitud,AnalisisSolicitud Analisis);
-public sealed record AdjuntoSolicitudInput(string Tipo,string NombreArchivo,string ContentType,byte[] Contenido,string SubidoPor);
-public sealed record AdjuntoSolicitudMetadata(Guid Id,Guid SolicitudId,string Tipo,string NombreArchivo,long TamanoBytes,string HuellaSha256,string SubidoPor,DateTime FechaSubidaUtc);
+public sealed record AdjuntoSolicitudInput(string Tipo,string NombreArchivo,string ContentType,byte[] Contenido,string SubidoPor,string SubidoPorNombre);
+public sealed record AdjuntoSolicitudMetadata(Guid Id,Guid SolicitudId,string Tipo,string NombreArchivo,long TamanoBytes,string HuellaSha256,string SubidoPor,DateTime FechaSubidaUtc,string SubidoPorNombre);
 public sealed class SolicitudFinalizadaException() : Exception("No se pueden adjuntar archivos a una solicitud finalizada.");
 public sealed class AdjuntoNoEncontradoException() : Exception("El adjunto no existe en esta solicitud.");
 public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCarreras catalogo,IDirectorioDocentes directorio,TimeProvider reloj) {
@@ -111,7 +111,7 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   if(!string.Equals(Path.GetExtension(nombre),".pdf",StringComparison.OrdinalIgnoreCase) ||
      !string.Equals(input.ContentType,"application/pdf",StringComparison.OrdinalIgnoreCase) || !firmaPdf)
    throw new SolicitudException("El archivo debe ser un PDF válido (.pdf).");
-  var adjunto=new AdjuntoSolicitud(solicitudId,input.Tipo,nombre,input.SubidoPor,reloj.GetUtcNow().UtcDateTime,input.Contenido);
+  var adjunto=new AdjuntoSolicitud(solicitudId,input.Tipo,nombre,input.SubidoPor,input.SubidoPorNombre,reloj.GetUtcNow().UtcDateTime,input.Contenido);
   await repository.GuardarAdjunto(adjunto,ct);
   return Metadata(adjunto);
  }
@@ -127,7 +127,7 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   if(await repository.Obtener(solicitudId,ct) is null) return false;
   return docenteId is null || await repository.EstaAsignada(solicitudId,docenteId.Value,ct);
  }
- static AdjuntoSolicitudMetadata Metadata(AdjuntoSolicitud a)=>new(a.Id,a.SolicitudId,a.Tipo,a.NombreArchivo,a.TamanoBytes,a.HuellaSha256,a.SubidoPor,a.FechaSubidaUtc);
+ static AdjuntoSolicitudMetadata Metadata(AdjuntoSolicitud a)=>new(a.Id,a.SolicitudId,a.Tipo,a.NombreArchivo,a.TamanoBytes,a.HuellaSha256,a.SubidoPor,a.FechaSubidaUtc,a.SubidoPorNombre);
  static bool EsFirmaPdf(byte[] contenido) {
   var header=contenido.AsSpan();
   return header.Length>=8 && header[..5].SequenceEqual("%PDF-"u8) && char.IsAsciiDigit((char)header[5]) && header[6]==(byte)'.' && char.IsAsciiDigit((char)header[7]);

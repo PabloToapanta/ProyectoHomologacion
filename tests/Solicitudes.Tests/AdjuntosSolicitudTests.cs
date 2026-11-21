@@ -33,7 +33,7 @@ public sealed class AdjuntosSolicitudTests
     {
         using var f = new SolicitudesFactory();
         var coordinadorId = Guid.NewGuid();
-        using var coordinador = f.Client("Coordinador", coordinadorId.ToString());
+        using var coordinador = f.Client("Coordinador", coordinadorId.ToString(), name: "coordinador.sintetico");
         var solicitudId = await CrearSolicitud(f, coordinador);
         var subida = await coordinador.PostAsync($"/api/solicitudes/{solicitudId}/adjuntos", Form());
         Assert.Equal(HttpStatusCode.Created, subida.StatusCode);
@@ -44,6 +44,8 @@ public sealed class AdjuntosSolicitudTests
         Assert.Equal(Pdf.LongLength, metadata.TamanoBytes);
         Assert.Equal(Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Pdf)), metadata.HuellaSha256);
         Assert.Equal(coordinadorId.ToString(), metadata.SubidoPor);
+        // CA3: también queda el nombre de usuario del token para mostrar quién lo subió.
+        Assert.Equal("coordinador.sintetico", metadata.SubidoPorNombre);
         Assert.EndsWith("Z", metadata.FechaSubidaUtc);
 
         using var docenteAsignado = f.Client("Docente", f.Directorio.Docentes.Ana.Id.ToString());
@@ -55,6 +57,18 @@ public sealed class AdjuntosSolicitudTests
         Assert.Equal(HttpStatusCode.OK, descarga.StatusCode);
         Assert.Equal("application/pdf", descarga.Content.Headers.ContentType?.MediaType);
         Assert.Equal(Pdf, await descarga.Content.ReadAsByteArrayAsync());
+    }
+
+    [Fact]
+    public async Task SinNombreEnElTokenSeRegistraElIdentificadorComoNombre()
+    {
+        using var f = new SolicitudesFactory();
+        var coordinadorId = Guid.NewGuid();
+        using var c = f.Client("Coordinador", coordinadorId.ToString());
+        var solicitudId = await CrearSolicitud(f, c);
+        var subida = await c.PostAsync($"/api/solicitudes/{solicitudId}/adjuntos", Form());
+        Assert.Equal(HttpStatusCode.Created, subida.StatusCode);
+        Assert.Equal(coordinadorId.ToString(), (await subida.Content.ReadFromJsonAsync<AdjuntoView>())!.SubidoPorNombre);
     }
 
     [Theory]
@@ -112,5 +126,5 @@ public sealed class AdjuntosSolicitudTests
         Assert.Empty((await c.GetFromJsonAsync<List<AdjuntoView>>($"/api/solicitudes/{id}/adjuntos"))!);
     }
 
-    public sealed record AdjuntoView(Guid Id, Guid SolicitudId, string Tipo, string NombreArchivo, long TamanoBytes, string HuellaSha256, string SubidoPor, string FechaSubidaUtc);
+    public sealed record AdjuntoView(Guid Id, Guid SolicitudId, string Tipo, string NombreArchivo, long TamanoBytes, string HuellaSha256, string SubidoPor, string FechaSubidaUtc, string SubidoPorNombre);
 }

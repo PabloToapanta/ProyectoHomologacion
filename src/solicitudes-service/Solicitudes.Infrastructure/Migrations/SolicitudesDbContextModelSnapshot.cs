@@ -24,17 +24,52 @@ namespace Solicitudes.Infrastructure.Migrations
 
             modelBuilder.Entity("Solicitudes.Domain.AdjuntoSolicitud", b =>
                 {
-                    b.Property<Guid>("Id").ValueGeneratedOnAdd().HasColumnType("uniqueidentifier");
-                    b.Property<byte[]>("Contenido").IsRequired().HasColumnType("varbinary(max)");
-                    b.Property<DateTime>("FechaSubidaUtc").HasColumnType("datetime2");
-                    b.Property<string>("HuellaSha256").IsRequired().HasMaxLength(64).HasColumnType("nvarchar(64)");
-                    b.Property<string>("NombreArchivo").IsRequired().HasMaxLength(255).HasColumnType("nvarchar(255)");
-                    b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
-                    b.Property<string>("SubidoPor").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
-                    b.Property<long>("TamanoBytes").HasColumnType("bigint");
-                    b.Property<string>("Tipo").IsRequired().HasMaxLength(40).HasColumnType("nvarchar(40)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime>("FechaSubidaUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HuellaSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("NombreArchivo")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<Guid>("SolicitudId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SubidoPor")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("SubidoPorNombre")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<long>("TamanoBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
                     b.HasKey("Id");
+
                     b.HasIndex("SolicitudId", "FechaSubidaUtc");
+
                     b.ToTable("Adjuntos");
                 });
 
@@ -139,11 +174,6 @@ namespace Solicitudes.Infrastructure.Migrations
                     b.ToTable("DocentesAsignados");
                 });
 
-            modelBuilder.Entity("Solicitudes.Domain.AdjuntoSolicitud", b =>
-                {
-                    b.HasOne("Solicitudes.Domain.Solicitud", null).WithMany().HasForeignKey("SolicitudId").OnDelete(DeleteBehavior.Restrict).IsRequired();
-                });
-
             modelBuilder.Entity("Solicitudes.Domain.Solicitud", b =>
                 {
                     b.Property<Guid>("Id")
@@ -212,6 +242,15 @@ namespace Solicitudes.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Solicitudes");
+                });
+
+            modelBuilder.Entity("Solicitudes.Domain.AdjuntoSolicitud", b =>
+                {
+                    b.HasOne("Solicitudes.Domain.Solicitud", null)
+                        .WithMany()
+                        .HasForeignKey("SolicitudId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Solicitudes.Domain.AsignaturaAprobada", b =>

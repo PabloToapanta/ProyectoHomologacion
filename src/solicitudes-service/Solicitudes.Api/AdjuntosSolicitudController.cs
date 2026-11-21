@@ -18,7 +18,7 @@ public sealed class AdjuntosSolicitudController(SolicitudService service) : Cont
     const long MaximoCuerpoMultipart = SolicitudService.TamanoMaximoAdjuntoBytes + 65_536;
 
     /// <summary>Adjunta historial académico o sílabo a una solicitud. Solo Coordinador.</summary>
-    /// <remarks>El PDF no supera 20 MiB. El contenido, tamaño, SHA-256, usuario y fecha quedan en la base del servicio Solicitudes.</remarks>
+    /// <remarks>El PDF no supera 20 MiB. El contenido, tamaño, SHA-256, identificador y nombre de usuario (claim `name`) y fecha quedan en la base del servicio Solicitudes.</remarks>
     [HttpPost, Authorize(Roles = "Coordinador"), Consumes("multipart/form-data"),
      RequestSizeLimit(MaximoCuerpoMultipart), RequestFormLimits(MultipartBodyLengthLimit = MaximoCuerpoMultipart),
      ProducesResponseType(typeof(AdjuntoSolicitudMetadata), 201), ProducesResponseType(typeof(ProblemDetails), 400), ProducesResponseType(typeof(ProblemDetails), 403),
@@ -33,7 +33,8 @@ public sealed class AdjuntosSolicitudController(SolicitudService service) : Cont
         await using var stream = new MemoryStream((int)form.Archivo.Length);
         await form.Archivo.CopyToAsync(stream, ct);
         var metadata = await service.SubirAdjunto(id,
-            new(form.Tipo, form.Archivo.FileName, form.Archivo.ContentType, stream.ToArray(), coordinadorId.ToString()), ct);
+            new(form.Tipo, form.Archivo.FileName, form.Archivo.ContentType, stream.ToArray(), coordinadorId.ToString(),
+                User.FindFirst("name")?.Value ?? coordinadorId.ToString()), ct);
         return Created($"/api/solicitudes/{id}/adjuntos/{metadata.Id}", metadata);
     }
 
