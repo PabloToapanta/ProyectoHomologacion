@@ -9,7 +9,7 @@
 
 1. Un caso puede contener varias parejas 1:1, un vínculo 1:N o una agrupación N:M. Presentar varias parejas 1:1 juntas no mezcla sus cantidades.
 2. Una agrupación identifica una solicitud, sus orígenes, sus receptoras y los vínculos origen–receptora. Un origen pertenece a una sola unidad de análisis dentro de la solicitud; puede vincularse a varias receptoras **dentro** de esa unidad.
-3. Cada vínculo declara horas y créditos atribuidos. La suma atribuida desde un origen, en todas las receptoras del grupo, no supera sus horas ni sus créditos aprobados. No hay reparto automático ni conversiones.
+3. Cada vínculo declara horas y créditos atribuidos con hasta dos decimales. La suma atribuida desde un origen, en todas las receptoras del grupo, no supera sus horas ni sus créditos aprobados. `null` significa pendiente y `0` un aporte conocido de cero. No hay reparto automático ni conversiones.
 4. Un contenido o resultado de origen puede respaldar varias receptoras con evidencia revisada y vigente. Cada elemento receptor cuenta una sola vez en su propia cobertura.
 5. Se calculan cobertura, horas y créditos por receptora. La sugerencia única del grupo es «Homologable» si **todas** las receptoras alcanzan el umbral en los tres criterios; «No homologable» si los datos están completos y alguna no lo alcanza; «Información incompleta» si falta información necesaria de cualquiera. Se conserva la versión de HU-03 usada.
 6. Los dos docentes revisan la agrupación como una unidad; el informe conserva el detalle por receptora y la leyenda de regla pendiente de validación institucional.
@@ -49,7 +49,7 @@ El informe existente de la solicitud debe admitir unidades individuales y grupal
 
 ## Persistencia y compatibilidad propuestas
 
-- Crear un registro de grupo con `grupoId` estable y pertenencia a solicitud; tablas hijas para orígenes, receptoras y aportes origen–receptora. Guardar los decimales con precisión explícita; las horas aprobadas actuales son enteras, pero un reparto puede requerir fracción. Confirmar escala técnica en el contrato.
+- Crear un registro de grupo con `grupoId` estable y pertenencia a solicitud; tablas hijas para orígenes, receptoras y aportes origen–receptora. Guardar horas aportadas como `decimal(12,2)` y créditos aportados como `decimal(6,2)`; las horas aprobadas actuales son enteras, pero el reparto admite fracciones con dos decimales. Validar cada suma por origen sin redondear, y conservar la distinción entre `null` y `0`.
 - Guardar el análisis y la revisión docente **por grupo**, con el desglose por receptora. No usar un ID de origen o receptora ficticio para encajar en la clave compuesta de las parejas existentes.
 - En una transacción, comprobar y reservar la pertenencia única del origen a una unidad de análisis. Integrar la misma regla con el flujo 1:1 para impedir que una petición concurrente lo use fuera del grupo. La migración conserva resultados e informes ya emitidos; no les inventa agrupaciones.
 - Para orígenes externos sin programa analítico registrado, mantener «Información incompleta» según D2 de HU-19. HU-21 no crea ese programa.

@@ -53,6 +53,7 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 ### CA4 — Horas, créditos y veredicto
 
 - **Given** un origen que aporta a varias receptoras, **when** se registran sus aportes, **then** se asignan cantidades explícitas de horas y créditos a cada receptora; la suma asignada para cada magnitud no supera el total del origen. El servidor valida esos límites y conserva el aporte por origen y receptora.
+- **Given** un aporte numérico, **when** se registra, **then** admite cero o un valor positivo con hasta dos decimales; no admite negativos ni precisión mayor. Las horas aprobadas del origen siguen siendo enteras, pero su reparto puede tener fracciones de hora. Un aporte ausente (`null`) significa «pendiente de asignación» y deja incompleto el análisis afectado; cero significa «no aporta esa magnitud» y produce 0 % para ese criterio cuando el total receptor es positivo.
 - **Given** aportes explícitos y unidades comparables, **when** se calcula la equivalencia, **then** se muestran aportes, totales receptores y porcentajes acotados al 100 %. Los tres criterios existentes se comparan por separado con el umbral vigente de HU-03.
 - **Given** unidades o sistemas de créditos distintos, cantidades faltantes o una distribución de aportes no declarada, **when** se solicita un veredicto, **then** se informa «información incompleta»; no se convierten unidades ni se asigna automáticamente el total de un origen a varias receptoras.
 - **Given** todas las receptoras tienen datos completos, **when** se decide la sugerencia única, **then** el grupo es «Homologable» solo si **cada receptora** alcanza por separado el umbral en contenido, horas y créditos. Si al menos una receptora completa no alcanza algún criterio, el grupo es «No homologable» y se identifica cuál y por qué. No se promedian porcentajes entre receptoras.
@@ -72,10 +73,17 @@ La [respuesta documentada del ingeniero del 20/11](decisiones-validacion-ingenie
 
 ## Decisiones funcionales confirmadas y pendientes técnicos
 
+### Contrato técnico resuelto 1 — aportes numéricos
+
+- Cada vínculo origen→receptora registra `horasAportadas` y `creditosAportados` como decimales no negativos con **máximo dos cifras decimales**. Pablo confirmó el 21/11/2026 que se permiten fracciones de hora.
+- `null` expresa que el reparto todavía no se declaró; `0` es un aporte conocido de cero. No se equiparan. Si un vínculo tiene un aporte pendiente, el análisis del grupo queda en «Información incompleta» con el origen, la receptora y la magnitud faltante.
+- Para cada origen, las sumas de horas y créditos de todos sus vínculos dentro del grupo deben ser menores o iguales a las cantidades aprobadas respectivas. Puede quedar una parte sin asignar. El servidor rechaza una suma excesiva, un negativo o más de dos decimales como entrada inválida; valida la suma con aritmética decimal, sin redondearla para hacerla pasar.
+- Precisión propuesta para persistencia: horas `decimal(12,2)` y créditos `decimal(6,2)`, consistente con los créditos `decimal(6,2)` de Solicitudes. El algoritmo de agrupación trata un aporte conocido de cero como **0 %** frente a un total receptor positivo, sin cambiar el comportamiento histórico de las parejas 1:1. Los porcentajes se limitan al 100 % y se comparan con el umbral sin redondeo previo.
+
 | Decisión | Estado comunicado el 21/11/2026 | Trabajo pendiente |
 | --- | --- | --- |
 | Las tres situaciones de la tabla están incluidas. | Pablo informa acuerdo de Shirley y el ingeniero. | Reflejar en #75 y reestimar el sprint. |
-| Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo informa acuerdo de Shirley y el ingeniero. | Definir validación y precisión de los aportes en el contrato. |
+| Un origen puede aportar a varias receptoras; horas y créditos se asignan explícitamente por receptora y la suma no supera el total del origen. | Pablo informa acuerdo de Shirley y el ingeniero. | Validación y precisión resueltas en el contrato técnico 1; implementar y probar. |
 | Un mismo elemento de origen puede sustentar más de una receptora con vínculos explícitos y trazables; cada elemento receptor se cuenta una vez. | Pablo informa acuerdo de Shirley y el ingeniero. | Definir representación de los vínculos y evidencia. |
 | La sugerencia y decisión docente son únicas para el grupo; cada receptora debe cumplir por separado los tres criterios. | Pablo informa acuerdo de Shirley y el ingeniero. | Ajustar persistencia, doble revisión e informe. |
 | Un origen pertenece a una sola unidad de análisis de la solicitud, individual o grupal; dentro de su grupo puede vincularse a varias receptoras. | Regla del 20/11 conservada en este alcance. | Verificar exclusividad y concurrencia. |
