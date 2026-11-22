@@ -22,14 +22,16 @@ public class InformeEndpointTests
     private static readonly Guid Carrera = Guid.Parse("a0000000-0000-0000-0000-000000000004");
 
     private sealed class Fuentes : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno,
-        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, IEstadoSolicitudes
+        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, IEstadoSolicitudes, IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
     {
         public int MarcasRemitida { get; private set; }
         public Task MarcarRemitidaAsync(Guid solicitudId, CancellationToken ct) { MarcasRemitida++; return Task.CompletedTask; }
         public bool Asignada { get; set; } = true;
+        Task<IReadOnlyList<AnalisisAgrupacionGuardado>> IResultadosAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<AnalisisAgrupacionGuardado>>([]);
+        Task<IReadOnlyList<RevisionAgrupacionRegistrada>> IRevisionesAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<RevisionAgrupacionRegistrada>>([]);
         public int Consultas { get; private set; }
         public List<RevisionDocenteRegistrada> Revisiones { get; } = [];
-        public InformeHomologacion? Informe { get; private set; }
+        public InformeHomologacion? Informe { get; set; }
         public List<EventoInforme> Eventos { get; } = [];
         public Task RegistrarAsync(EventoInforme evento, CancellationToken ct) { Eventos.Add(evento); return Task.CompletedTask; }
         Task<IReadOnlyList<EventoInforme>> IAuditoriaInformes.ListarAsync(Guid solicitudId, CancellationToken ct) =>
@@ -73,12 +75,18 @@ public class InformeEndpointTests
             s.RemoveAll<IInformesHomologacion>(); s.AddSingleton<IInformesHomologacion>(e);
             s.RemoveAll<IAuditoriaInformes>(); s.AddSingleton<IAuditoriaInformes>(e);
             s.RemoveAll<IEstadoSolicitudes>(); s.AddSingleton<IEstadoSolicitudes>(e);
+            s.RemoveAll<IResultadosAgrupacionInforme>();s.AddSingleton<IResultadosAgrupacionInforme>(e);
+            s.RemoveAll<IRevisionesAgrupacionInforme>();s.AddSingleton<IRevisionesAgrupacionInforme>(e);
             s.RemoveAll<TimeProvider>(); s.AddSingleton<TimeProvider>(new RelojAnalisis());
         });
     });
     private static HttpClient Docente(MotorFactory f, WebApplicationFactory<Homologacion.Api.Program> host)
     {
         var c = host.CreateClient(); c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Docente")); return c;
+    }
+    private static HttpClient Coordinador(MotorFactory f, WebApplicationFactory<Homologacion.Api.Program> host)
+    {
+        var c = host.CreateClient(); c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Coordinador")); return c;
     }
     private static object Ajuste(string decision) => new { asignaturaAprobadaId = Aprobada, asignaturaReceptoraId = Receptora, postura = "Ajuste", decision, observacion = "Observación sintética." };
 
@@ -112,9 +120,19 @@ public class InformeEndpointTests
         Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(Base + "/informe")).StatusCode);
     }
 
+    [Fact]
+    public async Task Coordinador_consulta_un_informe_generado_pero_no_puede_generarlo()
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e); using var c = Coordinador(f, host);
+        Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(Base + "/informe")).StatusCode);
+        e.Informe = new InformeHomologacion(Solicitud, "Interno", DateTimeOffset.UtcNow, Guid.NewGuid(), "docente.ana",
+            [], [], 0, 0, 0, ["Informe técnico; no es una resolución oficial."]);
+        Assert.Equal(HttpStatusCode.OK, (await c.GetAsync(Base + "/informe")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await c.PostAsync(Base + "/informe", null)).StatusCode);
+    }
+
     [Theory]
     [InlineData(null, 401)]
-    [InlineData("Coordinador", 403)]
     [InlineData("Administrador", 403)]
     public async Task Otros_roles_no_generan_ni_consultan(string? rol, int esperado)
     {

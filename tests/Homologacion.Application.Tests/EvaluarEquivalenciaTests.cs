@@ -1,5 +1,6 @@
 using Homologacion.Application.Equivalencias;
 using Homologacion.Domain.Equivalencias;
+using Homologacion.Domain.Configuracion;
 using Xunit;
 
 namespace Homologacion.Application.Tests;
@@ -48,6 +49,17 @@ public class EvaluarEquivalenciaTests
     public void Umbral_configurable_ochenta_y_cinco_no_se_compensa_con_otros_criterios()
     {
         var r = Ejecutar(Completa(), 85);
+        Assert.Equal(85, r.UmbralPct);
+        Assert.Equal(EstadoEquivalencia.NoHomologable, r.Estado);
+    }
+
+    [Fact]
+    public void Evaluacion_usa_la_fotografia_de_parametros_recibida()
+    {
+        var parametros = new ParametrosHomologacion(Guid.NewGuid(), 85, 10, 1, 1, 2, 2);
+
+        var r = new EvaluarEquivalencia(new Umbral(80)).Ejecutar(Completa(), parametros);
+
         Assert.Equal(85, r.UmbralPct);
         Assert.Equal(EstadoEquivalencia.NoHomologable, r.Estado);
     }

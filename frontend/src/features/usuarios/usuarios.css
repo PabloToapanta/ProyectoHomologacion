@@ -1,0 +1,14 @@
+.usuarios { min-width: 0; }
+.usuarios-card { margin: 24px 0; padding: 24px; background: white; border: 1px solid var(--line); border-radius: 8px; }
+.usuarios-card h2 { margin-top: 0; font-size: 19px; }
+.usuarios-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; border: 0; padding: 0; margin: 20px 0; }
+.usuarios-fields .auth-input { margin-top: 8px; }
+.usuarios-fields select { font: inherit; }
+.usuarios-actions, .usuarios-list-heading { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.usuarios-list-heading { justify-content: space-between; margin-bottom: 18px; }
+.usuarios-table-scroll { overflow-x: auto; }
+.usuarios table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
+.usuarios th, .usuarios td { padding: 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.usuarios th { background: #f0f3f2; }
+.usuarios-aviso { padding: 14px; color: #376542; background: #eef4e9; border-radius: 7px; }
+@media (max-width: 650px) { .usuarios-fields { grid-template-columns: 1fr; } .usuarios-card { padding: 16px; } }

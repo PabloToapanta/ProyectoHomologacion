@@ -9,7 +9,7 @@ const docentes=[{id:'d-ana',nombreUsuario:'docente.ana'},{id:'d-luis',nombreUsua
 const asignada={...registrada,estado:'Docentes asignados',docentesAsignados:[{id:'a1',docenteId:'d-ana',nombreUsuario:'docente.ana',orden:1},{id:'a2',docenteId:'d-luis',nombreUsuario:'docente.luis',orden:2}]};
 const ruta='/api/solicitudes/sol-1/docentes';
 function servidor(detalle:unknown=registrada,asignar:()=>Response=()=>json(asignada),disponibles:()=>Response=()=>json(docentes)) {
- return vi.fn(async(path:string,_init?:RequestInit)=>path===ruta?asignar():path.endsWith('/docentes-disponibles')?disponibles():path.endsWith('/carreras')?json(carreras):path==='/api/solicitudes/sol-1'?json(detalle):json([registrada]));
+ return vi.fn(async(path:string,_init?:RequestInit)=>path===ruta?asignar():path.endsWith('/docentes-disponibles')?disponibles():path.endsWith('/informe')?json({title:'Sin informe'},404):path.endsWith('/carreras')?json(carreras):path==='/api/solicitudes/sol-1'?json(detalle):json([registrada]));
 }
 async function abrir(user:ReturnType<typeof userEvent.setup>) {await user.click(await screen.findByRole('button',{name:'Ver UTA-001'}));return screen.findByRole('heading',{name:'Solicitud UTA-001'});}
 async function elegir(user:ReturnType<typeof userEvent.setup>) {

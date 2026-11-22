@@ -14,7 +14,8 @@ builder.Services.AddInternalAccess();
 builder.Services.AddControllers(o=>o.Filters.Add<SolicitudesExceptionFilter>()).AddJsonOptions(o=>o.JsonSerializerOptions.UnmappedMemberHandling=System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow);
 builder.Services.AddProblemDetails();builder.Services.AddExceptionHandler<SolicitudesExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();builder.Services.AddSwaggerGen(o=>{
- o.SwaggerDoc("v1",new OpenApiInfo {Title="Solicitudes FISEI-UTA — HU-10 / Issue #38",Version="v1"});
+ o.SwaggerDoc("v1",new OpenApiInfo {Title="Solicitudes FISEI-UTA — HU-10, HU-12 y HU-24",Version="v1",
+  Description="El contexto interno de análisis es una lectura mínima sin datos personales: solo docentes asignados y, para revisar informes, Coordinación sobre solicitudes FISEI existentes. La generación del informe sigue reservada a docentes asignados."});
  o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,"Solicitudes.Api.xml"));
  o.AddSecurityDefinition("Bearer",new OpenApiSecurityScheme {Type=SecuritySchemeType.Http,Scheme="bearer"});
  o.AddSecurityRequirement(new OpenApiSecurityRequirement { [new OpenApiSecurityScheme {Reference=new OpenApiReference {Type=ReferenceType.SecurityScheme,Id="Bearer"}}]=[] });
