@@ -250,8 +250,11 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        // Rutas existentes más consulta y gestión de configuración HU-03.
-        Assert.Equal(40, paths.EnumerateObject().Count());
+        // HU-21 publica las rutas de agrupación; HU-12 publica carga, listado y descarga de adjuntos.
+        Assert.Contains(paths.EnumerateObject(), p => p.Name.Contains("/agrupaciones/"));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos/{adjuntoId}").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/configuracion").TryGetProperty("put", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/configuracion/historial").TryGetProperty("get", out _));
         Assert.Contains("Coordinador", paths.GetProperty("/api/homologaciones/configuracion").GetProperty("get").GetProperty("description").GetString());
@@ -262,6 +265,10 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.True(paths.GetProperty("/api/usuarios/{id}/rol").TryGetProperty("put", out _));
         Assert.True(paths.GetProperty("/api/usuarios/{id}/contrasena").TryGetProperty("put", out _));
         Assert.Contains("Administrador", paths.GetProperty("/api/usuarios").GetProperty("get").GetProperty("description").GetString());
+        // HU-12: adjuntos del expediente.
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos/{adjuntoId}").TryGetProperty("get", out _));
         // HU-23: generación y consulta del informe de homologación.
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("get", out _));

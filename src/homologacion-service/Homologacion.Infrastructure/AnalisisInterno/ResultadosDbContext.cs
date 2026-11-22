@@ -31,6 +31,7 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<ConfiguracionHomologacionVigente> ConfiguracionVigente => Set<ConfiguracionHomologacionVigente>();
     protected override void OnModelCreating(ModelBuilder model)
     {
+        Homologacion.Infrastructure.Agrupaciones.ModeloGruposHu21.Configurar(model);
         var r = model.Entity<RegistroResultado>();
         r.ToTable("AnalisisInternos");
         r.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId });
@@ -92,6 +93,22 @@ internal static class AlmacenPorPareja
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     public static async Task GuardarAsync<T>(DbContext db, DbSet<T> set, AnalisisGuardado resultado, CancellationToken ct) where T : class, IRegistroAnalisis, new()
+    {
+        if (db is not ResultadosDbContext contexto) throw new InvalidOperationException("Se requiere el contexto propio de Homologación.");
+        try
+        {
+            await new InformesHomologacionSql(contexto).ConCierreAsync(resultado.Analisis.SolicitudId, async () =>
+            {
+                var a = resultado.Analisis;
+                if (await contexto.Informes.AnyAsync(i => i.SolicitudId == a.SolicitudId, ct)) throw new Homologacion.Application.Informe.InformeYaGeneradoException();
+                await Homologacion.Infrastructure.Agrupaciones.ReservasOrigenSql.ExigirParejaAsync(contexto, a.SolicitudId, a.AsignaturaAprobadaId, a.AsignaturaReceptoraId, ct);
+                await GuardarParejaAsync(db, set, resultado, ct); return true;
+            }, ct);
+        }
+        catch (DbException) { throw new AlmacenAnalisisNoDisponibleException(); }
+        catch (DbUpdateException) { throw new AlmacenAnalisisNoDisponibleException(); }
+    }
+    private static async Task GuardarParejaAsync<T>(DbContext db, DbSet<T> set, AnalisisGuardado resultado, CancellationToken ct) where T : class, IRegistroAnalisis, new()
     {
         try
         {

@@ -1,0 +1,102 @@
+# HU-21 — Plan técnico borrador para Pablo y Leslie
+
+## Incremento local de Leslie — 21/11/2026
+
+T63/T64 implementados localmente sobre 3b8477c: entidad/composición, reservas
+transaccionales, ETag/API/OpenAPI, entrada desde Catálogo revisado, último análisis,
+revisiones docentes y consumo de grupos en informe/UI. Los archivos y contratos de
+EvaluarAgrupacion, RegistrarRevisionAgrupacion y GenerarInformeHomologacion de Pablo
+permanecen intactos. Coordinación registrada en la Draft PR antes de los puntos compartidos.
+
+Ver [evidencia T63/T64](evidencia-hu-21-t63-t64.md): 1004 pruebas correctas, seis
+omitidas de otras integraciones/modelo, 62 comprobaciones Docker/SQL reales y
+TypeScript/Vite correctos. Una repetición frontend fue necesaria por un timeout
+en una prueba existente; no se modificaron esa prueba ni sus límites.
+Commits locales pequeños; sin push ni merge. Faltan publicación autorizada, CI
+sobre esos commits, revisión de Edwin/Pablo y aceptación funcional de Shirley.
+No se declara HU-21 terminada ni se modifica la estimación por el trabajo verificado.
+
+El plan y acuerdos que siguen conservan la asignación original; esta sección
+registra el incremento real, sin convertir la estimación de siete horas en evidencia.
+
+**Base funcional:** [spec HU-21](hu-21-agrupacion-nm.md) · **Issue:** [#75](https://github.com/PabloToapanta/ProyectoHomologacion/issues/75)
+
+**Estado:** contrato técnico definido para revisión de Pablo y Leslie sobre el alcance funcional que Pablo comunicó como acordado por Shirley y el ingeniero el 21/11/2026. Estimación total indicada por Pablo: T62 2 h, T63 3 h, T64 2 h (7 h; Pablo 4 h y Leslie 3 h). Requiere verificar la implementación.
+**Rama de trabajo:** `feature/hu-21-agrupacion-nm` desde `develop`. La [Draft PR #91](https://github.com/PabloToapanta/ProyectoHomologacion/pull/91) apunta a `develop`; Pablo y Leslie harán commits en su rama.
+
+## Contrato funcional que guía el diseño
+
+1. Un caso puede contener varias parejas 1:1, un vínculo 1:N o una agrupación N:M. Presentar varias parejas 1:1 juntas no mezcla sus cantidades.
+2. Una agrupación identifica una solicitud, sus orígenes, sus receptoras y los vínculos origen–receptora. Un origen pertenece a una sola unidad de análisis dentro de la solicitud; puede vincularse a varias receptoras **dentro** de esa unidad.
+3. Cada vínculo declara horas y créditos atribuidos con hasta dos decimales. La suma atribuida desde un origen, en todas las receptoras del grupo, no supera sus horas ni sus créditos aprobados. `null` significa pendiente y `0` un aporte conocido de cero. No hay reparto automático ni conversiones.
+4. Un contenido o resultado de origen puede respaldar varias receptoras con evidencia revisada y vigente. Cada elemento receptor cuenta una sola vez en su propia cobertura.
+   La agrupación reutiliza únicamente las revisiones ya guardadas en el Catálogo; no crea ni aprueba correspondencias. El análisis conserva una fotografía de los vínculos y ubicaciones de evidencia usados.
+5. Se calculan cobertura, horas y créditos por receptora. La sugerencia única del grupo es «Homologable» si **todas** las receptoras alcanzan el umbral en los tres criterios; «No homologable» si los datos están completos y alguna no lo alcanza; «Información incompleta» si falta información necesaria de cualquiera. Se conserva la versión de HU-03 usada.
+6. Los dos docentes revisan la agrupación como una unidad; el informe conserva el detalle por receptora y la leyenda de regla pendiente de validación institucional.
+
+## Orden de implementación y entregables
+
+### Plan corto de Pablo antes de T62
+
+1. Añadir pruebas de aplicación para 1:N, N:M y varias parejas 1:1: reparto decimal, cobertura sin doble conteo, origen compartido con evidencia, unidades incompatibles y sugerencia global. Ejecutarlas en rojo primero.
+2. Implementar un evaluador de agrupaciones separado del contrato 1:1. Reutilizar `CoberturaAcademica` y `MotorEquivalencia`; conservar la versión de parámetros de HU-03 y el desglose por receptora. Pasar las pruebas nuevas y la regresión del motor actual.
+3. Para la parte de Pablo en T63, integrar el resultado grupal con el flujo de análisis/revisión/informe mediante contratos acordados con Leslie, sin editar simultáneamente persistencia, controladores ni archivos compartidos. Probar que una unidad grupal aparece una sola vez y que el informe histórico 1:1 sigue legible.
+
+La parte de Leslie sigue siendo identidad/persistencia/API del grupo y la interfaz. Un cambio en esos contratos se coordina en la Draft PR antes de modificar archivos compartidos.
+
+**Contrato de integración tras la parte de Pablo:** `EvaluarAgrupacion` recibe orígenes, receptoras y aportes con correspondencias revisadas; el servidor debe construir esa entrada desde la solicitud y el Catálogo, sin confiar en aprobación, evidencia ni veredicto enviados por el cliente. `IResultadosAgrupacionInforme` devuelve el último `AnalisisAgrupacionGuardado` por `grupoId` y solicitud. `IRevisionesAgrupacion` guarda una revisión por `(grupoId, docenteId)` y permite listarlas. Leslie conecta ambos almacenes y registra `RegistrarRevisionAgrupacion` y las dos fuentes grupales de `GenerarInformeHomologacion` en DI. Los guardados de revisión y la generación del informe deben compartir `IInformesHomologacion.ConCierreAsync`; la transacción y el bloqueo entre instancias son responsabilidad de la infraestructura. Los campos `Grupos` del informe son adicionales: los informes 1:1 anteriores se leen con una lista vacía.
+
+| Paso | Responsable inicial | Entregable | Dependencia |
+| --- | --- | --- | --- |
+| 0. Revisar contrato y capacidad | Pablo y Leslie; Shirley revisa compromiso; Edwin revisa contrato | Revisión de los contratos técnicos 1–7 y estimación de 7 h indicada por Pablo en #75 | Acuerdo funcional N:M comunicado por Pablo |
+| 1. Pruebas del motor | Pablo | Pruebas fallidas para 1:1 conjunto, 1:N, N:M, límites de asignación, cobertura y veredicto del grupo | Paso 0 |
+| 2. Motor determinista | Pablo | Modelo de grupo y cálculo por receptora; resultado único con desglose; pruebas verdes | Paso 1 |
+| 3. Persistencia y contratos de grupo | Leslie | Identidad del grupo, vínculos y aportes persistidos; API de consulta/registro con validación de pertenencia y exclusividad | Paso 0; integrar con 2 |
+| 4. Análisis docente e informe | Pablo y Leslie, con archivos asignados antes de editar | Dos revisiones por grupo, análisis guardado e informe de una sola unidad con desglose; migración compatible con parejas históricas | Pasos 2–3 |
+| 5. Interfaz | Leslie | Tabla de orígenes × receptoras: vínculos con revisión vigente, aportes por celda, sumas/saldos por fila, resultados por columna y revisión grupal | Contratos de 3–4 |
+| 6. Integración y evidencia | Pablo y Leslie; Edwin revisa | OpenAPI, pruebas de regresión, integración Docker Compose, evidencia por CA y revisión cruzada | Pasos 2–5 |
+
+## Separación inicial de archivos
+
+| Pablo | Leslie | Coordinación obligatoria |
+| --- | --- | --- |
+| `Homologacion.Application/Equivalencias` y pruebas del motor; agregación de resultados y política de veredicto | Contratos y persistencia de agrupaciones en `Homologacion.Infrastructure`; pantalla en `frontend/src/features/solicitudes` y sus pruebas | `AnalizarSolicitudInterna`, `GestionarAnalisisInterno`, `ResultadosDbContext`, `RegistrarRevisionDocente`, `GenerarInformeHomologacion`, controladores, `Program.cs`, Gateway y migraciones |
+
+Los archivos de coordinación tienen **un solo editor a la vez**. Antes del primer cambio compartido, acordar campos y nombres de endpoints en la Draft PR. El otro integrante revisa y consume ese contrato en su parte. Evitar commits simultáneos sobre `ResultadosDbContext`, controladores de informe/revisión y páginas que ensamblan los paneles.
+
+## Contrato HTTP de agrupaciones
+
+Mantener intactas las rutas actuales de parejas 1:1. Pablo confirmó rutas propias de agrupaciones bajo `/api/homologaciones/solicitudes/{id}/agrupaciones`. El detalle de cuerpos, respuestas y errores está en el contrato técnico 6 de la spec.
+
+| Operación propuesta | Función |
+| --- | --- |
+| `POST /` | Registrar un borrador con `origenes[]`, `receptoras[]` y `aportes[]`; devuelve `201` y `grupoId`. |
+| `GET /` y `GET /{grupoId}` | Consultar composición, aportes, estado y último análisis. |
+| `PUT /{grupoId}` y `DELETE /{grupoId}` | Corregir o eliminar un borrador antes de su primer análisis guardado. |
+| `POST /{grupoId}/analisis` | Ejecutar evaluación; devuelve resultado único y desglose por receptora. |
+| `GET /{grupoId}/revisiones` y `PUT /{grupoId}/revisiones` | Consultar ambas revisiones y registrar/corregir la del docente autenticado. |
+
+El detalle devuelve ETag; `PUT`, `DELETE` y `POST /{grupoId}/analisis` exigen `If-Match`. Versión obsoleta: 409 sin escritura; versión ausente: 428. El informe existente de la solicitud debe admitir unidades individuales y grupales sin reinterpretar los campos históricos `asignaturaAprobadaId`/`asignaturaReceptoraId`. Los nombres de clases y tablas se fijan en el paso 0 sin cambiar el contrato público descrito. La falta de evidencia académica produce un resultado «Información incompleta» con detalle.
+
+## Persistencia y compatibilidad propuestas
+
+- Crear un registro de grupo con `grupoId` estable y pertenencia a solicitud; tablas hijas para orígenes, receptoras y aportes origen–receptora. Guardar horas aportadas como `decimal(12,2)` y créditos aportados como `decimal(6,2)`; las horas aprobadas actuales son enteras, pero el reparto admite fracciones con dos decimales. Validar cada suma por origen sin redondear, y conservar la distinción entre `null` y `0`.
+- Guardar el último análisis por `grupoId` y una revisión por `(grupoId, docenteId)`, con el desglose por receptora. El docente puede corregir su revisión hasta que se genere el informe. No usar un ID de origen o receptora ficticio para encajar en la clave compuesta de las parejas existentes. El informe enumera unidades 1:1 y grupales, cada grupo una sola vez; sus registros históricos 1:1 permanecen legibles.
+- Mantener una tabla de reservas con clave única `(solicitudId, asignaturaAprobadaId)` y propietario (pareja o grupo). Serializar por solicitud y actualizar reservas/grupo en una sola transacción; una colisión devuelve 409 sin escritura parcial. Integrar la reserva en el primer guardado de análisis 1:1 y comprobar parejas históricas antes de agrupar. El borrador puede editarse o eliminarse con liberación transaccional hasta el primer análisis guardado; después su composición queda fija. Un intento con aportes `null` devuelve faltantes sin guardar el primer análisis. La migración conserva resultados e informes ya emitidos; no les inventa agrupaciones.
+- Para orígenes externos sin programa analítico registrado, mantener «Información incompleta» según D2 de HU-19. HU-21 no crea ese programa.
+
+## Pruebas que cierran los criterios
+
+- **T62:** porcentajes por receptora y tope 100 %; un elemento receptor con dos evidencias cuenta una vez; un elemento de origen puede respaldar dos receptoras con vínculos trazables; suma de horas/créditos por origen ≤ disponible; tres criterios por cada receptora; grupo con un fallo o un faltante; unidades distintas.
+- **T63:** pertenencia a solicitud y carrera, elegibilidad HU-15/HU-17, exclusividad del origen frente a otra agrupación o pareja, concurrencia, dos revisiones docentes por grupo, informe único con desglose, lectura de datos históricos 1:1.
+- **T64:** crear y consultar las tres situaciones, introducir aportes explícitos, mostrar faltantes/errores y la leyenda; prueba de integración de la pantalla con el contrato.
+- **Regresión:** rutas individuales, informe y configuración HU-03 continúan funcionando; OpenAPI y ejecución integrada con Docker Compose.
+
+## Coordinación de la Draft PR
+
+1. La spec y este plan están publicados en la Draft PR #91, enlazada con #75. La descripción distingue el acuerdo funcional comunicado, la validación institucional aún pendiente y el estado real de pruebas.
+2. Leslie revisa el contrato y comenta allí los campos/archivos de su parte. Pablo incorpora los acuerdos a la spec antes de iniciar TDD. Edwin revisa cambios sobre motor, revisión docente e informe; Shirley valida criterios y alcance.
+3. Cada uno trabaja en su checkout de **la misma rama remota**; antes de empezar un archivo compartido, sincroniza la rama y avisa qué archivo tomará. Commits pequeños con Conventional Commits en español y referencia a T62/T63/T64.
+4. Integrar los commits cada día, resolver conflictos de uno en uno y mantener la PR como Draft hasta pruebas, revisión y aceptación. No hacer merge ni declarar la historia terminada antes de la definición de hecho.
+
+**Capacidad:** Pablo fijó **7 h totales** para completar HU-21: T62 2 h (Pablo), T63 3 h (2 h Pablo / 1 h Leslie) y T64 2 h (Leslie). Queda una carga de **4 h Pablo / 3 h Leslie**. Los 8 PH del Product Backlog se conservan hasta que la PO los ajuste. El contrato N:M incluye nuevas entidades, reservas, API, motor, revisión, informe, interfaz y pruebas; la estimación de 7 h tiene riesgo alto de subestimación y no acredita avance ni definición de hecho. Si faltan criterios al agotar el tiempo, se registran como pendientes para decisión de Shirley.
