@@ -1,0 +1,11 @@
+export type ReceptoraEvaluada={asignaturaReceptora:string;compatibilidadAcademicaPct:number|null;compatibilidadHorariaPct:number|null;compatibilidadCreditosPct:number|null;estado:string|number;justificacion:string;informacionFaltante:string[];contenidosSinCobertura:string[];resultadosAprendizajeSinCobertura:string[]};
+export type EvaluacionGrupo={estado:string|number;justificacion:string;configuracionVersionId:string;receptoras:ReceptoraEvaluada[];evidencias:{asignaturaOrigenId:string;asignaturaReceptoraId:string;categoria:string;elementoOrigen:string;elementoReceptor:string;ubicacionOrigen:string;ubicacionReceptora:string}[]};
+export const estadoGrupo=(v:string|number)=>typeof v==='number'?['InformacionIncompleta','NoHomologable','Homologable'][v]??'Información incompleta':v;
+const pct=(v:number|null)=>v==null?'Sin dato':`${v.toLocaleString('es-EC',{maximumFractionDigits:2})} %`;
+export function ResultadoAgrupacion({evaluacion,nombre}:{evaluacion:EvaluacionGrupo;nombre:(id:string)=>string}){
+ return <section aria-label="Resultado de agrupación"><h4>Sugerencia única: {estadoGrupo(evaluacion.estado)}</h4><p>{evaluacion.justificacion}</p>
+  <p>Versión de parámetros: {evaluacion.configuracionVersionId}</p><table><caption>Tres criterios por receptora</caption><thead><tr><th>Receptora</th><th>Contenido</th><th>Horas</th><th>Créditos</th><th>Estado y faltantes</th></tr></thead>
+   <tbody>{evaluacion.receptoras.map(r=><tr key={r.asignaturaReceptora}><td>{nombre(r.asignaturaReceptora)}</td><td>{pct(r.compatibilidadAcademicaPct)}</td><td>{pct(r.compatibilidadHorariaPct)}</td><td>{pct(r.compatibilidadCreditosPct)}</td><td>{estadoGrupo(r.estado)} · {r.justificacion}<ul>{r.informacionFaltante.map(f=><li key={f}>{f}</li>)}{r.contenidosSinCobertura.map(f=><li key={`c${f}`}>Contenido sin cobertura: {f}</li>)}{r.resultadosAprendizajeSinCobertura.map(f=><li key={`r${f}`}>Resultado sin cobertura: {f}</li>)}</ul></td></tr>)}</tbody></table>
+  <h4>Evidencias utilizadas</h4>{evaluacion.evidencias.length?<ul>{evaluacion.evidencias.map((e,i)=><li key={i}>{nombre(e.asignaturaOrigenId)} → {nombre(e.asignaturaReceptoraId)} · {e.categoria}: {e.elementoOrigen} [{e.ubicacionOrigen}] → {e.elementoReceptor} [{e.ubicacionReceptora}]</li>)}</ul>:<p>No hay evidencia acreditada.</p>}
+ </section>;
+}

@@ -71,6 +71,7 @@ public partial class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
+            options.OperationFilter<Homologacion.Api.Controllers.AgrupacionesOpenApi>();
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Homologación FISEI-UTA — HU-14, HU-15 y HU-16 / Issues #5, #6 y #7", Version = "v1",
                 Description = "Equivalencia: tres criterios, contenidos y resultados combinados por elemento, horas y créditos. Múltiples orígenes no suman horas ni créditos sin regla aprobada. Antigüedad: aprobación y máximo diez años inclusive. Requisitos: mínimos de cambio interno y externo. Son evaluaciones independientes, no una resolución oficial." });
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

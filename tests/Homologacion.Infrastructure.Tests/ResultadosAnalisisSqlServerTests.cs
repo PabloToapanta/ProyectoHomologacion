@@ -90,7 +90,7 @@ public class ResultadosAnalisisSqlServerTests
     private static async Task<T> EnBaseTemporal<T>(Func<DbContextOptions<ResultadosDbContext>, Task<T>> prueba)
     {
         var connection = new SqlConnectionStringBuilder(Environment.GetEnvironmentVariable("HU20_TEST_SQL"))
-            { InitialCatalog = "Hu20Tests_" + Guid.NewGuid().ToString("N") };
+        { InitialCatalog = "Hu20Tests_" + Guid.NewGuid().ToString("N") };
         var options = new DbContextOptionsBuilder<ResultadosDbContext>().UseSqlServer(connection.ConnectionString).Options;
         await using var admin = new ResultadosDbContext(options);
         try
@@ -114,7 +114,8 @@ public class ResultadosAnalisisSqlServerTests
         {
             var repo = new ResultadosAnalisisSql(db);
             await repo.GuardarAsync(Resultado(a, aprobada, receptora, "Completo", antes), default);
-            await repo.GuardarAsync(Resultado(a, aprobada, Guid.NewGuid(), "Incompleto", antes.AddMinutes(5)), default);
+            // HU-21: unidades nuevas usan orígenes diferentes; el legado repetido se verifica en AgrupacionesSqlServerTests.
+            await repo.GuardarAsync(Resultado(a, Guid.NewGuid(), Guid.NewGuid(), "Incompleto", antes.AddMinutes(5)), default);
             await repo.GuardarAsync(Resultado(b, aprobada, receptora, "Fallido", antes), default);
         }
         // Contexto y conexión nuevos: lo leído proviene de SQL Server, no del seguimiento de EF.
@@ -161,7 +162,7 @@ public class ResultadosAnalisisSqlServerTests
         // Varias rondas para aumentar la probabilidad de que dos peticiones vean la pareja ausente a la vez.
         for (var ronda = 0; ronda < 5; ronda++)
         {
-            var pareja = r with { Analisis = r.Analisis with { AsignaturaReceptoraId = Guid.NewGuid() } };
+            var pareja = r with { Analisis = r.Analisis with { AsignaturaAprobadaId = Guid.NewGuid(), AsignaturaReceptoraId = Guid.NewGuid() } };
             async Task<Exception?> Guardar()
             {
                 await using var db = new ResultadosDbContext(options);

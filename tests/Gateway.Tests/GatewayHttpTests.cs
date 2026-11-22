@@ -251,7 +251,8 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
         // Rutas existentes más consulta y gestión de configuración HU-03.
-        Assert.Equal(40, paths.EnumerateObject().Count());
+        Assert.Equal(41, paths.EnumerateObject().Count());
+        Assert.Contains(paths.EnumerateObject(),p=>p.Name.Contains("/agrupaciones/"));
         Assert.True(paths.GetProperty("/api/homologaciones/configuracion").TryGetProperty("put", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/configuracion/historial").TryGetProperty("get", out _));
         Assert.Contains("Coordinador", paths.GetProperty("/api/homologaciones/configuracion").GetProperty("get").GetProperty("description").GetString());
