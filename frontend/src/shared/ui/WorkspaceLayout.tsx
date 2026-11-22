@@ -24,7 +24,9 @@ export function WorkspaceLayout({ children }: { children: ReactNode }) {
         {session?.role === 'Administrador' && <><NavLink to="/panel" end><span aria-hidden="true">⌂</span>Panel</NavLink>
         <Link to="/admin/carreras" className={catalogo && !asignaturas ? 'active' : undefined} aria-current={catalogo && !asignaturas ? 'page' : undefined}><span aria-hidden="true">▤</span>Carreras</Link>
         <Link to="/admin/carreras?seccion=asignaturas" className={catalogo && asignaturas ? 'active' : undefined} aria-current={catalogo && asignaturas ? 'page' : undefined}><span aria-hidden="true">▥</span>Asignaturas</Link></>}
+        {session?.role === 'Administrador' && <NavLink to="/admin/usuarios"><span aria-hidden="true">♙</span>Usuarios</NavLink>}
         {session?.role === 'Coordinador' && <NavLink to="/solicitudes"><span aria-hidden="true">▤</span>Solicitudes</NavLink>}
+        {session?.role === 'Coordinador' && <NavLink to="/configuracion"><span aria-hidden="true">⚙</span>Configuración</NavLink>}
         {session?.role === 'Docente' && <NavLink to="/docente/solicitudes"><span aria-hidden="true">▤</span>Mis solicitudes</NavLink>}
         <NavLink to="/validaciones"><span aria-hidden="true">✓</span>Validaciones académicas</NavLink>
       </nav>

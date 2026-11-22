@@ -13,18 +13,21 @@ Toda tarea debe estar vinculada a un Issue de GitHub y a sus criterios de acepta
 - HU-15: validación de aprobación y antigüedad.
 - HU-16: mínimos de cambio interno y externo.
 
-El Sprint 1 fue entregado según confirmación de Edwin. Conservar sus reglas y pruebas. El alcance activo es Sprint 2 según la sección siguiente; los informes siguen fuera del compromiso y HU-08 queda condicionada al acuerdo de contrato y alcance indicado allí.
+El Sprint 1 fue entregado según confirmación de Edwin y el Sprint 2 está en `develop` (cierre en PR #78–#80). Conservar sus reglas y pruebas. El alcance activo es el Sprint 3 según la sección siguiente.
 
-## Sprint 2 activo — planificación ajustada
-- Consultar `docs/sprint-2/planificacion-detallada.md` y su Word de referencia. Issue de planificación #8; vincular cada implementación a un Issue específico de su HU.
-- Calendario: 22–30 de octubre y 4 de noviembre de 2026; no contar fines de semana ni 2/3 de noviembre. Desarrollo principal hasta el 30; 4 de noviembre para integración y Review. Capacidad supuesta: 4 × 3 h × 8 × 0,8 = 76,8 h; compromiso original 40 PH/69 h. Confirmar disponibilidad real, no inventar avance de días pasados.
-- Pablo/Leslie: HU-34 HTTPS, HU-35 JWT firmado/cifrado, HU-36 clave interna y HU-18 agente interno. Edwin/Shirley: HU-10 solicitudes, HU-11 aprobadas, HU-29 dos docentes, HU-30 vista docente, HU-19 externo y HU-20 persistencia. El apoyo de 2 h en T37 es propuesta pendiente de acuerdo.
-- Shirley conserva Product Owner y aceptación; ayudar al desarrollo no autoriza aceptar cambios propios sin revisión cruzada.
-- HU-08 carga masiva se mantiene en Sprint 2 por indicación del 01/11/2026, pendiente de confirmación de la PO: compromiso propuesto 45 PH/81 h, sobre la capacidad supuesta. Solo programas FISEI con revisión humana; codificar tras acordar `docs/sprint-2/propuesta-contrato-hu-08.md`.
-- Fuera: HU-31 revisión docente, informes/remisión/finalización. No implementar HU adicionales por inferencia.
-- Motor determinista conserva las tres dimensiones y el veredicto; agente con JSON validado, sin inventar evidencia. Los agentes sí están autorizados dentro de HU-18/19.
-- Seguridad: contraseñas con hash; HTTPS; token firmado y cifrado; claves solo en servidores. La clave interna cubre Auth/Catálogo/Homologación/Solicitudes y complementa JWT y autorización. Contratos y algoritmos se precisan por HU antes de codificar.
+## Sprint 3 activo — 5 al 25 de noviembre de 2026
+- Consultar `docs/sprint-3/planificacion-detallada.md` y `docs/sprint-3/decisiones-validacion-ingeniero.md`. Issue de planificación #8; Issues por HU #63–#77; vincular cada implementación a su Issue.
+- Calendario: desarrollo hasta el martes 24 (congelar al cierre); miércoles 25 integración, aceptación y Review. Al 20/11 quedan 3 jornadas (28,8 h efectivas supuestas) frente a unas 95 h sin código publicado; el equipo mantiene todas las historias y sigue el orden de prioridad del plan. Lo no aceptado el 24/11 vuelve al Product Backlog; no declarar avance no verificado.
+- Pablo/Leslie: HU-02 usuarios, HU-03 parámetros, HU-07 mallas, HU-09 consulta FISEI, HU-21 agrupación, E2E y CI (HU-27). Edwin/Shirley: HU-32 remitir, HU-33 finalizar, HU-17 RN-07, HU-12 adjuntos, HU-24 PDF, HU-25 auditoría, HU-22 ruta alternativa, HU-37 reutilización del análisis, plan de pruebas (HU-27) y HU-28.
+- Shirley conserva Product Owner y aceptación; ayudar al desarrollo no autoriza aceptar cambios propios sin revisión cruzada. HU-37 toca código de HU-18/20: acordar con Pablo y que él revise.
+- Reglas académicas (respuestas del ingeniero del 20/11, lectura de fuentes públicas, no pronunciamiento institucional): implementar solo los alcances acotados de `decisiones-validacion-ingeniero.md` y marcarlos como reglas de análisis del proyecto. HU-21 solo N:1; HU-22 solo alerta sin bloqueo; RN-07 excluye la asignatura, no la solicitud; antigüedad 10 años provisional (el instructivo UTA 2023 menciona 5) y parametrizable en HU-03.
+- Fuera: devolución y reapertura de informes, programa analítico de la universidad de origen (D2 de HU-19). No implementar HU adicionales por inferencia.
+- Motor determinista conserva las tres dimensiones y el veredicto; agente con JSON validado, sin inventar evidencia; ninguna historia del Sprint 3 delega decisiones al agente.
+- Seguridad: contraseñas con hash; HTTPS; token firmado y cifrado; claves solo en servidores; clave interna entre servicios además de JWT y autorización. Adjuntos y PDF no se versionan.
 - Conservar el flujo de rama feature/hu-XX-descripcion, Conventional Commits en español y PR a develop. No realizar merge ni release sin autorización.
+
+## Sprint 2 — histórico
+- Planificación en `docs/sprint-2/planificacion-detallada.md`: HU-08, 10, 11, 18, 19, 20, 29, 30, 34, 35 y 36, más HU-31 y HU-23 adelantadas. Conservar sus contratos y pruebas.
 
 ## Stack fijado por el proyecto
 - React, TypeScript, Vite; ASP.NET Core 8 Web API.

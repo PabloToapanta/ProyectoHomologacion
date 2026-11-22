@@ -39,7 +39,7 @@ adelantada por ahora.
 | Método | Ruta | Resultado |
 |---|---|---|
 | POST | `/api/homologaciones/solicitudes/{id}/informe` | 201 con el informe. 400 si no hay parejas o faltan análisis docentes; 404 si la solicitud no está asignada; 409 si ya existe; 503 si una fuente o la base no responde. |
-| GET | `/api/homologaciones/solicitudes/{id}/informe` | 200 con el informe; 404 si no está asignada o no se ha generado. |
+| GET | `/api/homologaciones/solicitudes/{id}/informe` | Para HU-23, 200 con el informe; 404 si el docente no está asignado o no se ha generado. HU-24 añade lectura para Coordinación en solicitudes FISEI existentes. |
 
 Persistencia: tabla `InformesHomologacion` (una fila por solicitud, contenido JSON, fecha y docente que lo generó)
 en `HomologacionAnalisis`. La clave primaria impide que dos generaciones simultáneas creen dos informes.

@@ -28,15 +28,20 @@ public sealed class RevisionesDocentesSql(ResultadosDbContext db) : IRevisionesD
     {
         try
         {
-            var fila = await db.RevisionesDocentes.FindAsync([r.SolicitudId, r.AsignaturaAprobadaId, r.AsignaturaReceptoraId, r.DocenteId], ct);
-            if (fila is null)
+            await new Homologacion.Infrastructure.Informe.InformesHomologacionSql(db).ConCierreAsync(r.SolicitudId, async () =>
             {
-                fila = new() { SolicitudId = r.SolicitudId, AprobadaId = r.AsignaturaAprobadaId, ReceptoraId = r.AsignaturaReceptoraId, DocenteId = r.DocenteId };
-                db.RevisionesDocentes.Add(fila);
-            }
-            fila.Docente = r.Docente; fila.Postura = r.Postura; fila.Decision = r.Decision; fila.Observacion = r.Observacion;
-            fila.EstadoAgente = r.EstadoAgente; fila.SugerenciaAgente = r.SugerenciaAgente; fila.Fecha = r.Fecha;
-            await db.SaveChangesAsync(ct);
+                if (await db.Informes.AnyAsync(i => i.SolicitudId == r.SolicitudId, ct)) throw new Homologacion.Application.Informe.InformeYaGeneradoException();
+                await Homologacion.Infrastructure.Agrupaciones.ReservasOrigenSql.ExigirParejaAsync(db, r.SolicitudId, r.AsignaturaAprobadaId, r.AsignaturaReceptoraId, ct);
+                var fila = await db.RevisionesDocentes.FindAsync([r.SolicitudId, r.AsignaturaAprobadaId, r.AsignaturaReceptoraId, r.DocenteId], ct);
+                if (fila is null)
+                {
+                    fila = new() { SolicitudId = r.SolicitudId, AprobadaId = r.AsignaturaAprobadaId, ReceptoraId = r.AsignaturaReceptoraId, DocenteId = r.DocenteId };
+                    db.RevisionesDocentes.Add(fila);
+                }
+                fila.Docente = r.Docente; fila.Postura = r.Postura; fila.Decision = r.Decision; fila.Observacion = r.Observacion;
+                fila.EstadoAgente = r.EstadoAgente; fila.SugerenciaAgente = r.SugerenciaAgente; fila.Fecha = r.Fecha;
+                await db.SaveChangesAsync(ct); return true;
+            }, ct);
         }
         catch (DbUpdateException) { throw new AlmacenAnalisisNoDisponibleException(); }
         catch (DbException) { throw new AlmacenAnalisisNoDisponibleException(); }

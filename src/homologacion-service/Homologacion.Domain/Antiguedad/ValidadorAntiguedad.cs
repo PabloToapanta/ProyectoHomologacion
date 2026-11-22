@@ -7,9 +7,17 @@ public sealed record ResultadoAntiguedad(EstadoAntiguedad Estado, string Motivo)
 
 public static class ValidadorAntiguedad
 {
+    private const int AntiguedadPredeterminadaAnios = 10;
+
     public static ResultadoAntiguedad Validar(EstadoAsignatura estado, DateOnly? fechaAprobacion,
-        DateOnly fechaEvaluacion)
+        DateOnly fechaEvaluacion) => Validar(estado, fechaAprobacion, fechaEvaluacion,
+            AntiguedadPredeterminadaAnios);
+
+    public static ResultadoAntiguedad Validar(EstadoAsignatura estado, DateOnly? fechaAprobacion,
+        DateOnly fechaEvaluacion, int antiguedadMaximaAnios)
     {
+        if (antiguedadMaximaAnios is < 1 or > 50)
+            throw new ArgumentOutOfRangeException(nameof(antiguedadMaximaAnios), "La antigüedad máxima debe estar entre 1 y 50 años.");
         if (!Enum.IsDefined(estado))
             throw new ArgumentException("Estado de asignatura desconocido.", nameof(estado));
         if (fechaAprobacion > fechaEvaluacion)
@@ -20,11 +28,11 @@ public static class ValidadorAntiguedad
             throw new ArgumentException("Información incompleta: falta la fecha de aprobación.", nameof(fechaAprobacion));
 
         // Evita desbordar DateOnly en los últimos años del calendario.
-        var dentroDelPlazo = fechaEvaluacion.Year - aprobacion.Year < 10
-            || fechaEvaluacion <= aprobacion.AddYears(10);
+        var dentroDelPlazo = fechaEvaluacion.Year - aprobacion.Year < antiguedadMaximaAnios
+            || fechaEvaluacion <= aprobacion.AddYears(antiguedadMaximaAnios);
         return dentroDelPlazo
-            ? new(EstadoAntiguedad.Elegible, "Asignatura aprobada con antigüedad de hasta diez años inclusive.")
+            ? new(EstadoAntiguedad.Elegible, $"Asignatura aprobada con antigüedad de hasta {antiguedadMaximaAnios} años inclusive.")
             : new(EstadoAntiguedad.RequiereValidacionConocimientos,
-                "La aprobación supera diez años; requiere validación de conocimientos.");
+                $"La aprobación supera {antiguedadMaximaAnios} años; requiere validación de conocimientos.");
     }
 }

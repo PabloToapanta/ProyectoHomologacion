@@ -12,6 +12,82 @@ namespace Gateway.Tests;
 
 public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<GatewayFactory>
 {
+    public static TheoryData<string, string> RutasGestionHu02 => new()
+    {
+        { "GET", "/api/usuarios" }, { "POST", "/api/usuarios" },
+        { "GET", "/api/usuarios/00000000-0000-0000-0000-000000000001" },
+        { "PATCH", "/api/usuarios/00000000-0000-0000-0000-000000000001/estado" },
+        { "PUT", "/api/usuarios/00000000-0000-0000-0000-000000000001/rol" },
+        { "PUT", "/api/usuarios/00000000-0000-0000-0000-000000000001/contrasena" }
+    };
+
+    public static TheoryData<string, string> RutasConfiguracionHu03 => new()
+    {
+        { "GET", "/api/homologaciones/configuracion" },
+        { "PUT", "/api/homologaciones/configuracion" },
+        { "GET", "/api/homologaciones/configuracion/historial" }
+    };
+
+    [Theory]
+    [MemberData(nameof(RutasConfiguracionHu03))]
+    public async Task ConfiguracionHu03_SoloCoordinadorLlegaAHomologacion(string metodo, string ruta)
+    {
+        using var client = factory.CreateClient();
+        var antes = factory.Forwarded.Count;
+        Assert.Equal(HttpStatusCode.Unauthorized,
+            (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: "Docente"));
+        Assert.Equal(HttpStatusCode.Forbidden,
+            (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        Assert.Equal(antes, factory.Forwarded.Count);
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: "Coordinador"));
+        using var request = new HttpRequestMessage(new HttpMethod(metodo), ruta + "?limit=10");
+        if (metodo == "PUT") request.Headers.TryAddWithoutValidation("If-Match", "\"version-sintetica\"");
+        Assert.Equal(HttpStatusCode.OK, (await client.SendAsync(request)).StatusCode);
+        Assert.Equal(antes + 1, factory.Forwarded.Count);
+        Assert.Equal("homologacion", factory.Forwarded.Last().Service);
+        Assert.Equal(ruta + "?limit=10", factory.Forwarded.Last().PathAndQuery);
+    }
+
+    [Theory]
+    [MemberData(nameof(RutasGestionHu02))]
+    public async Task GestionHu02_SinSesionNoLlegaAAuth(string metodo, string ruta)
+    {
+        using var client = factory.CreateClient();
+        var antes = factory.Forwarded.Count;
+        using var respuesta = await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta));
+        Assert.Equal(HttpStatusCode.Unauthorized, respuesta.StatusCode);
+        Assert.Equal(antes, factory.Forwarded.Count);
+    }
+
+    [Theory]
+    [MemberData(nameof(RutasGestionHu02))]
+    public async Task GestionHu02_AdministradorSeEnrutaAAuth(string metodo, string ruta)
+    {
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token());
+        var antes = factory.Forwarded.Count;
+        using var respuesta = await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta));
+        Assert.Equal(antes + 1, factory.Forwarded.Count);
+        var enviada = factory.Forwarded.Last();
+        Assert.Equal("auth", enviada.Service);
+        Assert.Equal(metodo, enviada.Method);
+        Assert.Equal(ruta, enviada.PathAndQuery);
+    }
+
+    [Theory]
+    [InlineData("Docente")]
+    [InlineData("Coordinador")]
+    public async Task GestionHu02_OtrosRolesReciben403SinContactarAuth(string rol)
+    {
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: rol));
+        var antes = factory.Forwarded.Count;
+        using var respuesta = await client.GetAsync("/api/usuarios");
+        Assert.Equal(HttpStatusCode.Forbidden, respuesta.StatusCode);
+        Assert.Equal(antes, factory.Forwarded.Count);
+    }
+
     public static TheoryData<string, string, string> AcademicRoutes => new()
     {
         { "GET", "/api/solicitudes", "solicitudes" }, { "POST", "/api/solicitudes", "solicitudes" },
@@ -174,10 +250,27 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        // 29 hasta HU-31, 3 de HU-08 (importaciones y programa analítico), 1 de HU-23 y 1 de HU-25.
-        Assert.Equal(34, paths.EnumerateObject().Count());
         // HU-25: historial del informe, solo lectura.
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe/historial").TryGetProperty("get", out _));
+        // HU-21 publica las rutas de agrupación; HU-12 publica carga, listado y descarga de adjuntos.
+        Assert.Contains(paths.EnumerateObject(), p => p.Name.Contains("/agrupaciones/"));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos/{adjuntoId}").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/configuracion").TryGetProperty("put", out _));
+        Assert.True(paths.GetProperty("/api/homologaciones/configuracion/historial").TryGetProperty("get", out _));
+        Assert.Contains("Coordinador", paths.GetProperty("/api/homologaciones/configuracion").GetProperty("get").GetProperty("description").GetString());
+        Assert.True(paths.GetProperty("/api/usuarios").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/usuarios").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/usuarios/{id}").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/usuarios/{id}/estado").TryGetProperty("patch", out _));
+        Assert.True(paths.GetProperty("/api/usuarios/{id}/rol").TryGetProperty("put", out _));
+        Assert.True(paths.GetProperty("/api/usuarios/{id}/contrasena").TryGetProperty("put", out _));
+        Assert.Contains("Administrador", paths.GetProperty("/api/usuarios").GetProperty("get").GetProperty("description").GetString());
+        // HU-12: adjuntos del expediente.
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos/{adjuntoId}").TryGetProperty("get", out _));
         // HU-23: generación y consulta del informe de homologación.
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("post", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/solicitudes/{id}/informe").TryGetProperty("get", out _));

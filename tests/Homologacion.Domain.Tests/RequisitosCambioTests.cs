@@ -1,4 +1,5 @@
 using Homologacion.Domain.RequisitosCambio;
+using Homologacion.Domain.Configuracion;
 using Xunit;
 
 namespace Homologacion.Domain.Tests;
@@ -45,5 +46,26 @@ public class RequisitosCambioTests
         Assert.Contains(resultado.Incumplimientos, x => x.Contains("períodos"));
         Assert.Contains(resultado.Incumplimientos, x => x.Contains("asignaturas"));
         Assert.Contains(resultado.Incumplimientos, x => x.Contains("previos"));
+    }
+
+    [Fact]
+    public void Usa_minimos_configurados_por_tipo_y_conserva_regla_de_cambios_previos()
+    {
+        var parametros = new ParametrosHomologacion(Guid.NewGuid(), 80, 10, 3, 4, 5, 6);
+
+        Assert.False(ValidadorRequisitosCambio.Validar(TipoCambio.Interno, 2, 4, 0, parametros).Cumple);
+        Assert.True(ValidadorRequisitosCambio.Validar(TipoCambio.Interno, 3, 4, 5, parametros).Cumple);
+        Assert.False(ValidadorRequisitosCambio.Validar(TipoCambio.Externo, 5, 6, 1, parametros).Cumple);
+        Assert.True(ValidadorRequisitosCambio.Validar(TipoCambio.Externo, 5, 6, 0, parametros).Cumple);
+    }
+
+    [Fact]
+    public void Configuracion_predeterminada_conserva_minimos_vigentes()
+    {
+        var parametros = ParametrosHomologacion.Predeterminados();
+
+        Assert.True(ValidadorRequisitosCambio.Validar(TipoCambio.Interno, 1, 1, 0, parametros).Cumple);
+        Assert.True(ValidadorRequisitosCambio.Validar(TipoCambio.Externo, 2, 2, 0, parametros).Cumple);
+        Assert.False(ValidadorRequisitosCambio.Validar(TipoCambio.Externo, 2, 2, 1, parametros).Cumple);
     }
 }

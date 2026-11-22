@@ -1,0 +1,93 @@
+{
+  "fechaLocal": "2026-11-21",
+  "zonaHoraria": "America/Guayaquil",
+  "baseSincronizada": "3b8477c",
+  "issue": 75,
+  "draftPR": 91,
+  "suites": [
+    {
+      "suite": "Homologacion.Infrastructure.Tests.dll",
+      "correctas": 68,
+      "fallidas": 0,
+      "omitidas": 1,
+      "trx": "TestResults/hu21/sql-real/hu21-sql-real_net8.0_20261121172654.trx"
+    },
+    {
+      "suite": "Solicitudes.Tests.dll",
+      "correctas": 141,
+      "fallidas": 0,
+      "omitidas": 5,
+      "trx": "TestResults/hu21/entrega/solicitudes-entrega_net8.0_20261121172001.trx"
+    },
+    {
+      "suite": "Homologacion.Domain.Tests.dll",
+      "correctas": 88,
+      "fallidas": 0,
+      "omitidas": 0,
+      "trx": "TestResults/hu21/entrega/regresion-final_net8.0_20261121172448.trx"
+    },
+    {
+      "suite": "Homologacion.Application.Tests.dll",
+      "correctas": 165,
+      "fallidas": 0,
+      "omitidas": 0,
+      "trx": "TestResults/hu21/entrega/regresion-final_net8.0_20261121172449.trx"
+    },
+    {
+      "suite": "Auth.Application.Tests.dll",
+      "correctas": 13,
+      "fallidas": 0,
+      "omitidas": 0,
+      "trx": "TestResults/hu21/entrega/regresion-final_net8.0_20261121172453.trx"
+    },
+    {
+      "suite": "Homologacion.Api.Tests.dll",
+      "correctas": 140,
+      "fallidas": 0,
+      "omitidas": 0,
+      "trx": "TestResults/hu21/entrega/api-contratos-final_net8.0_20261121172901.trx"
+    },
+    {
+      "suite": "AuthService.Tests.dll",
+      "correctas": 79,
+      "fallidas": 0,
+      "omitidas": 0,
+      "trx": "TestResults/hu21/entrega/regresion-final_net8.0_20261121172514.trx"
+    },
+    {
+      "suite": "Gateway.Tests.dll",
+      "correctas": 142,
+      "fallidas": 0,
+      "omitidas": 0,
+      "trx": "TestResults/hu21/entrega/regresion-final_net8.0_20261121172515.trx"
+    }
+  ],
+  "backend": {
+    "correctas": 836,
+    "fallidas": 0,
+    "omitidas": 6
+  },
+  "frontend": {
+    "archivos": 28,
+    "correctas": 168,
+    "fallidas": 0,
+    "concurrencia": 1
+  },
+  "typecheck": "correcto",
+  "vite": "correcto",
+  "comprobacionesDockerSql": 62,
+  "notas": [
+    "SQL de Homologacion aislado incluye las cuatro pruebas nuevas y regresion HU-20/HU-23/HU-31/HU-03.",
+    "Una prueba opcional de modelo real y cinco SQL de Solicitudes omitidas en sus suites; no se convierten en exitos por el smoke.",
+    "Timeout frontend intermedio registrado; repeticion secuencial correcta sin cambiar pruebas ni limites.",
+    "Sin ejecucion de navegador real ni nueva acreditacion HTTPS.",
+    "CI preparada sin ejecucion sobre commits locales; sin push ni merge; revision cruzada y aceptacion pendientes."
+  ],
+  "entorno": {
+    "sdkHost": "10.0.403",
+    "target": "net8.0",
+    "sdkRuntimeDocker": "8.0",
+    "node": "24.21.0",
+    "docker": "28.5.1"
+  }
+}

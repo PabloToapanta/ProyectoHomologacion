@@ -1,9 +1,12 @@
 using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Informe;
+using Homologacion.Application.Equivalencias;
 using Homologacion.Application.RevisionDocente;
 using Homologacion.Domain.Auditoria;
 using Homologacion.Domain.Equivalencias;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Xunit;
 
 namespace Homologacion.Application.Tests;
@@ -16,16 +19,21 @@ public class InformeHomologacionTests
     private static readonly Guid A3 = Guid.Parse("90000000-0000-0000-0000-0000000000a3");
     private static readonly Guid R1 = Guid.Parse("90000000-0000-0000-0000-0000000000b1");
     private static readonly Guid R2 = Guid.Parse("90000000-0000-0000-0000-0000000000b2");
+    private static readonly Guid Grupo = Guid.Parse("90000000-0000-0000-0000-0000000000c1");
+    private static readonly Guid VersionParametros = Guid.Parse("90000000-0000-0000-0000-0000000000c2");
     private static readonly Guid Carrera = Guid.Parse("90000000-0000-0000-0000-000000000004");
     private static readonly Guid Ana = Guid.Parse("90000000-0000-0000-0000-0000000000d1");
     private static readonly Guid Luis = Guid.Parse("90000000-0000-0000-0000-0000000000d2");
 
-    private sealed class Fuentes : ISolicitudesAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno, IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes
+    private sealed class Fuentes : ISolicitudesAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno,
+        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
     {
         public bool Asignada { get; set; } = true;
         public string Tipo { get; set; } = "Interno";
         public List<AnalisisGuardado> Agente { get; } = [];
         public List<RevisionDocenteRegistrada> Revisiones { get; } = [];
+        public List<AnalisisAgrupacionGuardado> AnalisisGrupos { get; } = [];
+        public List<RevisionAgrupacionRegistrada> RevisionesGrupos { get; } = [];
         public InformeHomologacion? Informe { get; set; }
         public bool AlmacenCaido { get; set; }
         public List<EventoInforme> Eventos { get; } = [];
@@ -50,6 +58,10 @@ public class InformeHomologacionTests
         public Task GuardarAsync(AnalisisGuardado resultado, CancellationToken ct) => Task.CompletedTask;
         Task<IReadOnlyList<AnalisisGuardado>> IResultadosAnalisisInterno.ListarAsync(Guid solicitudId, CancellationToken ct) => Task.FromResult<IReadOnlyList<AnalisisGuardado>>(Tipo == "Interno" ? Agente : []);
         Task<IReadOnlyList<AnalisisGuardado>> IResultadosAnalisisExterno.ListarAsync(Guid solicitudId, CancellationToken ct) => Task.FromResult<IReadOnlyList<AnalisisGuardado>>(Tipo == "Externo" ? Agente : []);
+        Task<IReadOnlyList<AnalisisAgrupacionGuardado>> IResultadosAgrupacionInforme.ListarAsync(Guid solicitudId, CancellationToken ct) =>
+            Task.FromResult<IReadOnlyList<AnalisisAgrupacionGuardado>>(AnalisisGrupos);
+        Task<IReadOnlyList<RevisionAgrupacionRegistrada>> IRevisionesAgrupacionInforme.ListarAsync(Guid solicitudId, CancellationToken ct) =>
+            Task.FromResult<IReadOnlyList<RevisionAgrupacionRegistrada>>(RevisionesGrupos);
         public async Task GuardarAsync(RevisionDocenteRegistrada r, CancellationToken ct)
         {
             if (PausaRevision is not null) { EnEscritura.TrySetResult(); await PausaRevision.Task; }
@@ -70,10 +82,23 @@ public class InformeHomologacionTests
                 "Completo", "Homologable", new DateTimeOffset(2026, 11, 4, 12, 0, 0, TimeSpan.Zero)));
         public void AnalisisAgente(Guid aprobada, Guid receptora) => Agente.Add(new(DateTimeOffset.UnixEpoch, new(Solicitud, aprobada, receptora, "Completo", "m",
             new ResumenAnalisisInterno(90, 85, 100, "Homologable", "j", []), new([], null, 90, 85, 100, 80, EstadoEquivalencia.Homologable, "", [], [], []), null, true, [])));
+        public void AnalisisGrupo()
+        {
+            var evaluacion = new ResultadoAgrupacion(
+                [new([A1.ToString(), A2.ToString()], R1.ToString(), 90, 90, 90, 80, EstadoEquivalencia.Homologable, "ok", [], [], []),
+                 new([A1.ToString(), A2.ToString()], R2.ToString(), 85, 85, 85, 80, EstadoEquivalencia.Homologable, "ok", [], [], [])],
+                80, EstadoEquivalencia.Homologable, "ok", [],
+                [new(A1.ToString(), R1.ToString(), 72, 2.5m)],
+                [new(A1.ToString(), R1.ToString(), "Contenido", "C1", "C1", "origen/C1", "receptora/C1")])
+            { ConfiguracionVersionId = VersionParametros };
+            AnalisisGrupos.Add(new(Solicitud, Grupo, [A1, A2], evaluacion, DateTimeOffset.UnixEpoch));
+        }
+        public void RevisionGrupo(Guid docente, string decision) => RevisionesGrupos.Add(new(Solicitud, Grupo, docente,
+            docente == Ana ? "docente.ana" : "docente.luis", "Ajuste", decision, "Observación sintética.", new DateTimeOffset(2026, 11, 4, 12, 0, 0, TimeSpan.Zero)));
     }
 
     private sealed class Reloj : TimeProvider { public override DateTimeOffset GetUtcNow() => new(2026, 11, 4, 20, 0, 0, TimeSpan.Zero); }
-    private static (GenerarInformeHomologacion, Fuentes) Caso() { var f = new Fuentes(); return (new GenerarInformeHomologacion(f, f, f, f, f, f, new Reloj(), f), f); }
+    private static (GenerarInformeHomologacion, Fuentes) Caso() { var f = new Fuentes(); return (new GenerarInformeHomologacion(f, f, f, f, f, f, new Reloj(), f, f, f), f); }
 
     [Fact]
     public async Task HU25_generar_registra_el_evento_con_fecha_y_usuario()
@@ -106,6 +131,76 @@ public class InformeHomologacionTests
         var historial = await new ConsultarHistorialInforme(f).EjecutarAsync(Solicitud, default);
         Assert.Equal([TipoEventoInforme.Generado, TipoEventoInforme.Remitido], historial.Select(e => e.Tipo));
         await Assert.ThrowsAsync<DatosAnalisisSolicitudException>(() => new ConsultarHistorialInforme(f).EjecutarAsync(Guid.Empty, default));
+    }
+
+    [Fact]
+    public async Task Grupo_con_dos_revisiones_aparece_una_vez_y_conserva_desglose_y_evidencia()
+    {
+        var (caso, f) = Caso();
+        f.AnalisisGrupo(); f.RevisionGrupo(Ana, "Homologable"); f.RevisionGrupo(Luis, "Homologable");
+
+        var informe = await caso.GenerarAsync(Solicitud, Ana, "docente.ana", default);
+
+        Assert.Empty(informe.Parejas);
+        var grupo = Assert.Single(informe.Grupos);
+        Assert.Equal(Grupo, grupo.GrupoId);
+        Assert.Equal(2, grupo.Receptoras.Count);
+        Assert.Equal(2, grupo.Docentes.Count);
+        Assert.Equal("Convalidar", grupo.SugerenciaFinal);
+        Assert.Equal(VersionParametros, grupo.ConfiguracionVersionId);
+        Assert.Equal("Homologación por agrupación — regla de análisis pendiente de validación institucional", grupo.Leyenda);
+        var restaurado = JsonSerializer.Deserialize<InformeHomologacion>(JsonSerializer.Serialize(informe));
+        Assert.Equal(VersionParametros, Assert.Single(restaurado!.Grupos).ConfiguracionVersionId);
+        Assert.Single(grupo.Evidencias);
+        Assert.Equal([A3], informe.AprobadasSinAnalisis);
+        Assert.Equal(1, informe.Convalidar);
+    }
+
+    [Fact]
+    public async Task Grupo_sin_revision_de_los_dos_docentes_impide_generar_informe()
+    {
+        var (caso, f) = Caso();
+        f.AnalisisGrupo(); f.RevisionGrupo(Ana, "Homologable");
+
+        await Assert.ThrowsAsync<DatosAnalisisSolicitudException>(() => caso.GenerarAsync(Solicitud, Ana, "ana", default));
+        Assert.Null(f.Informe);
+    }
+
+    [Fact]
+    public async Task Grupo_con_analisis_sin_revisiones_no_se_omite_del_informe()
+    {
+        var (caso, f) = Caso();
+        f.AnalisisGrupo();
+        f.Revision(Ana, A3, R1, "Homologable"); f.Revision(Luis, A3, R1, "Homologable");
+
+        await Assert.ThrowsAsync<DatosAnalisisSolicitudException>(() => caso.GenerarAsync(Solicitud, Ana, "ana", default));
+        Assert.Null(f.Informe);
+    }
+
+    [Fact]
+    public async Task Revision_grupal_sin_analisis_guardado_impide_generar_informe()
+    {
+        var (caso, f) = Caso();
+        f.RevisionGrupo(Ana, "Homologable"); f.RevisionGrupo(Luis, "Homologable");
+
+        await Assert.ThrowsAsync<FuenteAnalisisNoDisponibleException>(() => caso.GenerarAsync(Solicitud, Ana, "ana", default));
+        Assert.Null(f.Informe);
+    }
+
+    [Fact]
+    public async Task Informe_historico_sin_campo_grupos_sigue_siendo_legible()
+    {
+        var (caso, f) = Caso();
+        f.Revision(Ana, A1, R1, "Homologable"); f.Revision(Luis, A1, R1, "Homologable");
+        var informe = await caso.GenerarAsync(Solicitud, Ana, "ana", default);
+        var json = JsonNode.Parse(JsonSerializer.Serialize(informe))!.AsObject();
+        json.Remove(nameof(InformeHomologacion.Grupos));
+
+        var restaurado = JsonSerializer.Deserialize<InformeHomologacion>(json.ToJsonString());
+
+        Assert.NotNull(restaurado);
+        Assert.Empty(restaurado.Grupos);
+        Assert.Single(restaurado.Parejas);
     }
 
     [Fact]

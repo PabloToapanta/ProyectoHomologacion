@@ -1,0 +1,256 @@
+{
+  "proyecto": "hu21-check-324f6b06d7",
+  "casos": [
+    {
+      "caso": "modelo deshabilitado",
+      "resultado": "false"
+    },
+    {
+      "caso": "login JWE real",
+      "resultado": 5
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/auth/login",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/carreras",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas/fe42528a-ee1f-44b8-85cc-7d8917e78fc8/unidades",
+      "resultado": 201
+    },
+    {
+      "caso": "perfil sintetico",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/carreras",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas/46d450cf-8171-43f1-9e47-f7622c3fbcba/unidades",
+      "resultado": 201
+    },
+    {
+      "caso": "perfil sintetico",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/solicitudes",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/solicitudes/b9541a57-4a8e-4fc5-b83c-09ff7fc0ce7a/asignaturas-aprobadas",
+      "resultado": 201
+    },
+    {
+      "caso": "directorio docente real",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/solicitudes/b9541a57-4a8e-4fc5-b83c-09ff7fc0ce7a/docentes",
+      "resultado": 200
+    },
+    {
+      "caso": "/api/asignaturas",
+      "resultado": 201
+    },
+    {
+      "caso": "/api/asignaturas/f332ee11-a210-4996-97bb-a248f4968ff4/unidades",
+      "resultado": 201
+    },
+    {
+      "caso": "revision explicita 46d450cf-8171-43f1-9e47-f7622c3fbcba",
+      "resultado": 200
+    },
+    {
+      "caso": "revision explicita f332ee11-a210-4996-97bb-a248f4968ff4",
+      "resultado": 200
+    },
+    {
+      "caso": "sin JWT",
+      "resultado": 401
+    },
+    {
+      "caso": "otro rol",
+      "resultado": 403
+    },
+    {
+      "caso": "docente ajeno",
+      "resultado": 404
+    },
+    {
+      "caso": "opciones autorizadas",
+      "resultado": 200
+    },
+    {
+      "caso": "celdas revisadas habilitadas",
+      "resultado": true
+    },
+    {
+      "caso": "/api/homologaciones/solicitudes/b9541a57-4a8e-4fc5-b83c-09ff7fc0ce7a/agrupaciones",
+      "resultado": 201
+    },
+    {
+      "caso": "ETag fuerte opaco",
+      "resultado": true
+    },
+    {
+      "caso": "PUT sin version",
+      "resultado": 428
+    },
+    {
+      "caso": "DELETE version obsoleta",
+      "resultado": 409
+    },
+    {
+      "caso": "otro grupo mismo origen",
+      "resultado": 409
+    },
+    {
+      "caso": "pareja no roba reserva grupal",
+      "resultado": 409
+    },
+    {
+      "caso": "revision manual sin agente no roba reserva grupal",
+      "resultado": 409
+    },
+    {
+      "caso": "reemplazo pendiente",
+      "resultado": 200
+    },
+    {
+      "caso": "analisis pendiente HTTP",
+      "resultado": 200
+    },
+    {
+      "caso": "null no guarda ni congela",
+      "resultado": false
+    },
+    {
+      "caso": "completar borrador",
+      "resultado": 200
+    },
+    {
+      "caso": "motor agrupado real HTTP",
+      "resultado": 200
+    },
+    {
+      "caso": "primer analisis guardado",
+      "resultado": true
+    },
+    {
+      "caso": "dos receptoras separadas",
+      "resultado": 2
+    },
+    {
+      "caso": "sugerencia unica sin promediar",
+      "resultado": "NoHomologable"
+    },
+    {
+      "caso": "cobertura receptora uno",
+      "resultado": 100
+    },
+    {
+      "caso": "horas receptora uno",
+      "resultado": 60.0
+    },
+    {
+      "caso": "creditos receptora uno",
+      "resultado": 50.0
+    },
+    {
+      "caso": "horas receptora dos",
+      "resultado": 100
+    },
+    {
+      "caso": "creditos receptora dos",
+      "resultado": 100
+    },
+    {
+      "caso": "version HU03 fotografiada",
+      "resultado": true
+    },
+    {
+      "caso": "evidencia fotografiada",
+      "resultado": 4
+    },
+    {
+      "caso": "composicion congelada",
+      "resultado": 409
+    },
+    {
+      "caso": "revision primer docente",
+      "resultado": 200
+    },
+    {
+      "caso": "correccion misma revision",
+      "resultado": 200
+    },
+    {
+      "caso": "una revision no genera informe",
+      "resultado": 400
+    },
+    {
+      "caso": "revision segundo docente",
+      "resultado": 200
+    },
+    {
+      "caso": "informe real con grupo",
+      "resultado": 201
+    },
+    {
+      "caso": "grupo aparece una vez",
+      "resultado": 1
+    },
+    {
+      "caso": "dos docentes por grupo",
+      "resultado": 2
+    },
+    {
+      "caso": "revision cerrada tras informe",
+      "resultado": 409
+    },
+    {
+      "caso": "reanalisis cerrado tras informe",
+      "resultado": 409
+    },
+    {
+      "caso": "ultimo analisis durable",
+      "resultado": "165d221b-32c2-47ec-9a2b-da5312012278"
+    },
+    {
+      "caso": "informe durable",
+      "resultado": 1
+    },
+    {
+      "caso": "migracion historicos concurrencia y rollback SQL",
+      "resultado": true
+    }
+  ],
+  "datos": "sinteticos",
+  "motor": "EvaluarAgrupacion real, sin LLM",
+  "transporte": "HTTP local aislado, no acredita HTTPS"
+}

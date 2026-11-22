@@ -28,6 +28,10 @@ public class AnalisisExternoRouteTests
     [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe/historial", "homologacion")]
+    // HU-12: adjuntos del expediente (subir, listar y descargar).
+    [InlineData("POST", "/api/solicitudes/{0}/adjuntos", "solicitudes")]
+    [InlineData("GET", "/api/solicitudes/{0}/adjuntos", "solicitudes")]
+    [InlineData("GET", "/api/solicitudes/{0}/adjuntos/3f2c1b7e-0000-4000-8000-000000000012", "solicitudes")]
     public async Task Enruta_al_servicio_dueno_conservando_Bearer(string metodo, string plantilla, string servicio)
     {
         using var f = new GatewayFactory(); using var c = await Autenticado(f);
