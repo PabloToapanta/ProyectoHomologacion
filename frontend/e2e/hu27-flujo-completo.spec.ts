@@ -20,7 +20,7 @@ test.afterEach(async ({}, testInfo) => {
 async function login(browser: Browser, username: string, password: string): Promise<Page> {
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(baseURL);
+  await page.goto(`${baseURL}/login`);
   await page.getByLabel('Usuario', { exact: true }).fill(username);
   await page.getByLabel('Contraseña', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
@@ -36,7 +36,6 @@ async function close(page: Page) {
 test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado persistente', async ({ browser }) => {
   test.setTimeout(180_000);
   const coordinator = await login(browser, env('E2E_COORD_USERNAME'), env('E2E_COORD_PASSWORD'));
-  await coordinator.goto(`${baseURL}/solicitudes`);
   await coordinator.getByRole('button', { name: 'Nueva solicitud' }).click();
   const solicitudDialog = coordinator.getByRole('dialog', { name: 'Registrar solicitud' });
   const numero = `HU27-${runId}`;
@@ -70,7 +69,6 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
   for (const username of [env('E2E_DOC1_USERNAME'), env('E2E_DOC2_USERNAME')]) {
     const password = username === env('E2E_DOC1_USERNAME') ? env('E2E_DOC1_PASSWORD') : env('E2E_DOC2_PASSWORD');
     const teacher = await login(browser, username, password);
-    await teacher.goto(`${baseURL}/docente/solicitudes`);
     await teacher.getByRole('button', { name: `Ver ${numero}` }).click();
     const assigned = teacher.getByRole('dialog', { name: `Solicitud ${numero}` });
     await assigned.getByRole('button', { name: 'Consultar análisis interno' }).click();
@@ -87,7 +85,6 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
   }
 
   const reporter = await login(browser, env('E2E_DOC1_USERNAME'), env('E2E_DOC1_PASSWORD'));
-  await reporter.goto(`${baseURL}/docente/solicitudes`);
   await reporter.getByRole('button', { name: `Ver ${numero}` }).click();
   const reportDetail = reporter.getByRole('dialog', { name: `Solicitud ${numero}` });
   const report = reportDetail.getByRole('region', { name: 'Informe de homologación' });
@@ -101,7 +98,6 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
   await close(reporter);
 
   const finalCoordinator = await login(browser, env('E2E_COORD_USERNAME'), env('E2E_COORD_PASSWORD'));
-  await finalCoordinator.goto(`${baseURL}/solicitudes`);
   await finalCoordinator.getByRole('button', { name: `Ver ${numero}` }).click();
   const finalDetail = finalCoordinator.getByRole('dialog', { name: `Solicitud ${numero}` });
   await expect(finalDetail.getByRole('heading', { name: 'Revisión del informe y finalización' })).toBeVisible();
@@ -111,7 +107,6 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
   await close(finalCoordinator);
 
   const verifier = await login(browser, env('E2E_COORD_USERNAME'), env('E2E_COORD_PASSWORD'));
-  await verifier.goto(`${baseURL}/solicitudes`);
   await verifier.getByRole('button', { name: `Ver ${numero}` }).click();
   const reopened = verifier.getByRole('dialog', { name: `Solicitud ${numero}` });
   await expect(reopened.getByText('Finalizada', { exact: true })).toBeVisible();
