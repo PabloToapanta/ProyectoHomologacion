@@ -58,11 +58,23 @@ public class ContextoAnalisisInternoTests
     [Theory]
     [InlineData(null, 401)]
     [InlineData("Administrador", 403)]
-    [InlineData("Coordinador", 403)]
     public async Task Otros_roles_no_obtienen_contexto(string? role, int esperado)
     {
         using var f = new SolicitudesFactory(); using var client = f.Client(role, Guid.NewGuid().ToString());
         Assert.Equal(esperado, (int)(await client.GetAsync(Ruta(Guid.NewGuid()))).StatusCode);
+    }
+    [Fact]
+    public async Task Coordinador_consulta_contexto_minimo_de_solicitud_fisei_existente()
+    {
+        using var f = new SolicitudesFactory(); var id = await Crear(f);
+        using var coordinador = f.Client("Coordinador", Guid.NewGuid().ToString());
+        using var response = await coordinador.GetAsync(Ruta(id));
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync(); using var json = JsonDocument.Parse(body);
+        Assert.Equal(id, json.RootElement.GetProperty("id").GetGuid());
+        foreach (var key in new[] { "numeroQuipux", "identificacionEstudiante", "nombreEstudiante", "numeroMatricula", "docentesAsignados" })
+            Assert.DoesNotContain(key, body);
+        Assert.Equal(HttpStatusCode.NotFound, (await coordinador.GetAsync(Ruta(Guid.NewGuid()))).StatusCode);
     }
     [Fact]
     public async Task Docente_sin_identificador_valido_no_accede()

@@ -13,6 +13,15 @@ public static class ConsultarContextoAnalisisInterno
     {
         if (docenteId == Guid.Empty || !(await repository.DocentesDe(solicitudId, ct)).Any(d => d.DocenteId == docenteId))
             return null;
+        return await ConstruirAsync(repository, solicitudId, ct);
+    }
+
+    /// <summary>La PO autoriza a todo coordinador a revisar solicitudes cuyo destino se validó en el catálogo FISEI al registrarlas.</summary>
+    public static Task<SolicitudContextoInterno?> EjecutarParaCoordinadorAsync(ISolicitudRepository repository, Guid solicitudId, CancellationToken ct) =>
+        ConstruirAsync(repository, solicitudId, ct);
+
+    private static async Task<SolicitudContextoInterno?> ConstruirAsync(ISolicitudRepository repository, Guid solicitudId, CancellationToken ct)
+    {
         var solicitud = await repository.Obtener(solicitudId, ct);
         if (solicitud is null) return null;
         var materias = await repository.AsignaturasDe(solicitudId, ct);
