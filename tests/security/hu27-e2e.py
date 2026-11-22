@@ -155,9 +155,16 @@ def main():
                 "E2E_ASIGNATURA_ORIGEN_ID": subjects[0][1], "E2E_ASIGNATURA_RECEPTORA_ID": subjects[1][1],
                 "E2E_RUN_ID": project,
             }
-            checked_run(["npm", "--prefix", "frontend", "run", "test:e2e", "--", "hu27-flujo-completo.spec.ts",
-                         "--trace", "off"],
-                environment=playwright_env, secrets_to_hide=private, timeout=600)
+            try:
+                checked_run(["npm", "--prefix", "frontend", "run", "test:e2e", "--", "hu27-flujo-completo.spec.ts",
+                             "--trace", "off"],
+                    environment=playwright_env, secrets_to_hide=private, timeout=600)
+            except RuntimeError as error:
+                contexts = list((ROOT / "frontend/test-results").glob("**/error-context.md"))
+                detail = "\n".join(item.read_text(encoding="utf-8", errors="replace") for item in contexts)
+                for value in private:
+                    detail = detail.replace(value, "[oculto]")
+                raise RuntimeError(f"{error}\nContexto UI Playwright (sintético):\n{detail[-9000:]}") from error
             print("PASS: T66 Playwright completo", flush=True)
         finally:
             cleanup = subprocess.run(compose + ["down", "--volumes", "--remove-orphans"],
