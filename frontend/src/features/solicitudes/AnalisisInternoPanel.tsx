@@ -4,7 +4,9 @@ import {RevisionDocentePanel} from './RevisionDocentePanel';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Aprobada={id:string;nombreAsignatura:string};
 type Receptora={id:string;codigo:string;nombre:string;nivel:number};
-type Resultado=Analisis&{asignaturaAprobadaId:string;asignaturaReceptoraId:string;advertencias:string[]};
+/** HU-37: origen de la explicación del agente; null en Incompleto/Fallido o en análisis guardados antes de HU-37. */
+type AgenteAnalisis={explicacionId:string;reutilizada:boolean;explicacionOriginalId:string|null;fechaOriginal:string|null;modelo:string;versionPlantilla:string};
+type Resultado=Analisis&{asignaturaAprobadaId:string;asignaturaReceptoraId:string;advertencias:string[];agente?:AgenteAnalisis|null};
 type Guardado={fecha:string;analisis:Resultado};
 /** HU-19: RN-05 externo calculado por Homologación con los análisis guardados. */
 type Requisitos={estado:'Cumple'|'NoCumple'|'Incompleto';periodosCursados:number|null;cambiosPreviosCarrera:number|null;asignaturasAprobadas:number;
@@ -31,6 +33,8 @@ export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo
  const [abierto,setAbierto]=useState(false),[ocupado,setOcupado]=useState(false),[error,setError]=useState('');
  const [receptoras,setReceptoras]=useState<Receptora[]>([]),[guardados,setGuardados]=useState<Guardado[]>([]),[requisitos,setRequisitos]=useState<Requisitos|null>(null);
  const [aprobada,setAprobada]=useState(''),[receptora,setReceptora]=useState(''),[resultado,setResultado]=useState<Resultado|null>(null),[confirmado,setConfirmado]=useState(false);
+ const [forzar,setForzar]=useState(false),[motivo,setMotivo]=useState('');
+ const faltaMotivo=forzar&&motivo.trim().length===0;
  async function leer<T>(path:string,init?:RequestInit):Promise<T> {
   const response=await request(path,init);
   if(!response.ok){let texto='No fue posible consultar o guardar el análisis.';try{const p=await response.json();texto=p.detail??p.title??texto;}catch{/* sin cuerpo */}throw new Error(texto);}
@@ -51,9 +55,12 @@ export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo
   }catch(e){setError(e instanceof Error?e.message:'No se pudo consultar el análisis.');}finally{setOcupado(false);}
  }
  async function ejecutar(){
-  if(ocupado||!aprobada||!receptora)return;setOcupado(true);setError('');setConfirmado(false);setResultado(null);
-  try{const r=await leer<Resultado>(ruta,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({asignaturaAprobadaId:aprobada,asignaturaReceptoraId:receptora})});
-   setResultado(r);setConfirmado(true);
+  if(ocupado||!aprobada||!receptora||faltaMotivo)return;setOcupado(true);setError('');setConfirmado(false);setResultado(null);
+  const ids={asignaturaAprobadaId:aprobada,asignaturaReceptoraId:receptora};
+  // HU-37: sin forzar, el servidor reutiliza la explicación del agente si la clave coincide; el motor se ejecuta siempre.
+  const cuerpo=forzar&&!externo?{...ids,forzarNuevo:true,motivo:motivo.trim()}:ids;
+  try{const r=await leer<Resultado>(ruta,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cuerpo)});
+   setResultado(r);setConfirmado(true);setForzar(false);setMotivo('');
    setGuardados(prev=>[{fecha:new Date().toISOString(),analisis:r},...prev.filter(x=>x.analisis.asignaturaAprobadaId!==r.asignaturaAprobadaId||x.analisis.asignaturaReceptoraId!==r.asignaturaReceptoraId)]);
    // RN-05 depende de los análisis guardados; un fallo al refrescarlo no anula el guardado confirmado.
    if(externo)leer<Requisitos>(base+'/requisitos-externos').then(setRequisitos).catch(()=>setRequisitos(null));
@@ -69,12 +76,18 @@ export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo
     :'El motor calcula la equivalencia y qwen3:4b explica las evidencias. Cada pareja conserva su último intento. No es una aprobación oficial.'}</p>
    <label>Asignatura aprobada<select value={aprobada} disabled={ocupado} onChange={e=>cambiar(setAprobada,e.target.value)}><option value="">Seleccione</option>{aprobadas.map(a=><option key={a.id} value={a.id}>{a.nombreAsignatura}</option>)}</select></label>
    <label>Asignatura receptora<select value={receptora} disabled={ocupado} onChange={e=>cambiar(setReceptora,e.target.value)}><option value="">Seleccione</option>{receptoras.map(a=><option key={a.id} value={a.id}>Nivel {a.nivel} · {a.codigo} · {a.nombre}</option>)}</select></label>
-   <button className="app-button" disabled={ocupado||!aprobada||!receptora} onClick={ejecutar}>Ejecutar análisis y guardar</button>
+   {!externo&&<fieldset>
+    <label><input type="checkbox" checked={forzar} disabled={ocupado} onChange={e=>setForzar(e.target.checked)}/>Forzar un análisis nuevo</label>
+    {forzar&&<label>Motivo<textarea value={motivo} maxLength={500} required disabled={ocupado} onChange={e=>setMotivo(e.target.value)}/></label>}
+    <p>Si los programas, las correspondencias, los parámetros y el modelo no cambiaron, se reutiliza la explicación anterior del agente. Al forzar, la anterior se conserva.</p>
+   </fieldset>}
+   <button className="app-button" disabled={ocupado||!aprobada||!receptora||faltaMotivo} onClick={ejecutar}>Ejecutar análisis y guardar</button>
    {guardados.length>0&&<ul aria-label="Análisis guardados por pareja">{guardados.map(x=><li key={`${x.analisis.asignaturaAprobadaId}/${x.analisis.asignaturaReceptoraId}`}>
     <button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>{setResultado(x.analisis);setAprobada(x.analisis.asignaturaAprobadaId);setReceptora(x.analisis.asignaturaReceptoraId);setConfirmado(false);}}>Ver {aprobadas.find(a=>a.id===x.analisis.asignaturaAprobadaId)?.nombreAsignatura??'Asignatura histórica'} → {receptoras.find(a=>a.id===x.analisis.asignaturaReceptoraId)?.nombre??'Receptora histórica'} ({x.analisis.estado})</button>
    </li>)}</ul>}
   </>}
   {confirmado&&<p role="status">Análisis guardado.</p>}
+  {resultado?.agente?.reutilizada&&<p>{`Reutilizado · ${resultado.agente.fechaOriginal?new Date(resultado.agente.fechaOriginal).toLocaleString('es-EC'):'fecha no registrada'} · análisis ${resultado.agente.explicacionOriginalId??resultado.agente.explicacionId}`}</p>}
   <AnalisisSolicitud analisis={resultado??(abierto?pendiente:inicial)}/>
   {resultado?.advertencias?.map(a=><p key={a}>{a}</p>)}
   {/* HU-31: el docente registra su análisis sobre la pareja seleccionada, haya o no sugerencia del agente. */}

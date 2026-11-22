@@ -24,7 +24,7 @@ internal sealed class EscenarioInterno : ISolicitudesAnalisisInterno, ICatalogoA
     private static readonly Guid ResultadoO = Guid.Parse("10000000-0000-0000-0000-000000000009");
     private static readonly Guid ResultadoR = Guid.Parse("10000000-0000-0000-0000-000000000010");
     public SolicitudParaAnalisis? Solicitud { get; set; } = new(SolicitudId, "Interno", CarreraOrigen, CarreraReceptora,
-        [new(AprobadaId, OrigenId, 8, 80, "Aprobada", new DateOnly(2025, 1, 1))]);
+        [new(AprobadaId, OrigenId, 8, 80, "Aprobada", new DateOnly(2025, 1, 1)) { IntentoMatricula = 1 }]);
     public Dictionary<Guid, AsignaturaParaAnalisis> Materias { get; } = new()
     {
         [OrigenId] = new(OrigenId, CarreraOrigen, "FISEI", true, 8, 80, "plan-sintetico-O", "hora-reloj", "sistema-sintetico", true,

@@ -28,12 +28,19 @@ public sealed class AnalisisInternoController(GestionarAnalisisInterno service, 
         return (await receptoras.ListarAsync(solicitud.CarreraReceptoraId, ct)).OrderBy(x => x.Nivel).ThenBy(x => x.Codigo).ToArray();
     });
     /// <summary>Evalúa una asignatura registrada contra una receptora, con autorización del docente en Solicitudes.</summary>
-    /// <remarks>El motor conserva porcentajes y sugerencia. Guarda el último intento por pareja. El resultado nulo con estado Incompleto/Fallido no es una recomendación exitosa. No evalúa mínimos globales sin datos.</remarks>
+    /// <remarks>El motor conserva porcentajes y sugerencia y se ejecuta siempre. HU-37: reutiliza la explicación del agente con la misma clave
+    /// (programas, correspondencias, parámetros, modelo, plantilla y contexto) salvo con <c>forzarNuevo</c> y motivo. Guarda el último intento por pareja. El resultado nulo con estado Incompleto/Fallido no es una recomendación exitosa. No evalúa mínimos globales sin datos.</remarks>
     [HttpPost, RequestSizeLimit(4096), ProducesResponseType(typeof(AnalisisInternoResponse), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 400), ProducesResponseType(401), ProducesResponseType(403)]
     [ProducesResponseType(typeof(ProblemDetails), 404), ProducesResponseType(typeof(ProblemDetails), 503)]
-    public Task<IActionResult> Analizar(Guid id, AnalisisInternoRequest input, CancellationToken ct) =>
-        Responder(async () => AnalisisInternoResponse.Desde(await service.EjecutarAsync(id, input.AsignaturaAprobadaId, input.AsignaturaReceptoraId, ct)));
+    public Task<IActionResult> Analizar(Guid id, AnalisisInternoRequest input, CancellationToken ct) => Responder(async () =>
+    {
+        // HU-37 / CA4: el motivo se valida antes de consultar fuentes; la asignación se comprueba en Solicitudes como siempre.
+        if (!input.ForzarNuevo && input.Motivo is not null)
+            throw new DatosAnalisisSolicitudException("El motivo solo se indica al forzar un análisis nuevo.");
+        var forzar = input.ForzarNuevo ? ForzarAnalisis.Crear(Guid.Parse(User.FindFirst("sub")!.Value), input.Motivo) : null;
+        return AnalisisInternoResponse.Desde(await service.EjecutarAsync(id, input.AsignaturaAprobadaId, input.AsignaturaReceptoraId, forzar, ct));
+    });
 
     private async Task<IActionResult> Responder(Func<Task<object>> accion)
     {

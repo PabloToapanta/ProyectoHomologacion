@@ -2,6 +2,8 @@ using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Equivalencias;
 using Homologacion.Application.RevisionDocente;
+using Homologacion.Domain.TerceraMatricula;
+using Homologacion.Domain.Auditoria;
 using Homologacion.Application.Configuracion;
 using Homologacion.Domain.Configuracion;
 
@@ -9,9 +11,10 @@ namespace Homologacion.Application.Informe;
 
 public sealed record AgenteEnInforme(string Estado, string? Sugerencia, decimal? PorcentajeAcademico, decimal? PorcentajeHoras, decimal? PorcentajeCreditos);
 public sealed record DocenteEnInforme(Guid DocenteId, string Docente, string Postura, string Decision, string? Observacion, DateTimeOffset Fecha);
-/// <summary>SugerenciaFinal: Convalidar, NoConvalidar o SinAcuerdo (decide el coordinador).</summary>
+/// <summary>SugerenciaFinal: Convalidar, NoConvalidar o SinAcuerdo (decide el coordinador).
+/// Exclusion: motivo de una regla que impide convalidar (HU-17 / RN-07); null si no aplica. Los informes anteriores no lo incluyen.</summary>
 public sealed record ParejaEnInforme(Guid AsignaturaAprobadaId, Guid AsignaturaReceptoraId, string? ReceptoraCodigo, string? ReceptoraNombre,
-    AgenteEnInforme Agente, IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal);
+    AgenteEnInforme Agente, IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal, string? Exclusion = null);
 public sealed record GrupoEnInforme(Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas,
     IReadOnlyList<EvaluacionEquivalencia> Receptoras, string EstadoAnalisis, string? Sugerencia,
     IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal,
@@ -52,7 +55,8 @@ public interface IInformesHomologacion
 public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solicitudes, IReceptorasAnalisisInterno receptoras,
     IResultadosAnalisisInterno internos, IResultadosAnalisisExterno externos, IRevisionesDocentes revisiones, IInformesHomologacion informes,
     TimeProvider reloj, IResultadosAgrupacionInforme? analisisGrupales = null, IRevisionesAgrupacionInforme? revisionesGrupales = null,
-    IParametrosHomologacionProvider? parametrosProvider = null, ISolicitudesAnalisisExterno? solicitudesExternas = null)
+    IAuditoriaInformes? auditoria = null, IParametrosHomologacionProvider? parametrosProvider = null,
+    ISolicitudesAnalisisExterno? solicitudesExternas = null)
 {
     public const int DocentesAsignados = 2;
 
@@ -97,6 +101,7 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
             || revisionesGrupo.Any(g => !analisisGrupo.Any(a => a.GrupoId == g.Key)))
             throw new FuenteAnalisisNoDisponibleException();
         var agente = solicitud.TipoCambio == "Externo" ? await externos.ListarAsync(solicitudId, ct) : await internos.ListarAsync(solicitudId, ct);
+        var excluidas = solicitud.AsignaturasAprobadas.Where(a => ReglaTerceraMatricula.Excluye(a.IntentoMatricula)).Select(a => a.Id).ToHashSet();
         var lista = parejas.Select(p =>
         {
             var a = agente.Where(g => g.Analisis.SolicitudId == solicitudId && g.Analisis.AsignaturaAprobadaId == p.Key.AsignaturaAprobadaId
@@ -104,12 +109,13 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
             var docentes = p.OrderBy(r => r.Docente, StringComparer.Ordinal)
                 .Select(r => new DocenteEnInforme(r.DocenteId, r.Docente, r.Postura, r.Decision, r.Observacion, r.Fecha)).ToArray();
             var decisiones = docentes.Select(d => d.Decision).Distinct().ToArray();
-            var final = decisiones.Length > 1 ? "SinAcuerdo" : decisiones[0] == "Homologable" ? "Convalidar" : "NoConvalidar";
+            var excluida = excluidas.Contains(p.Key.AsignaturaAprobadaId);
+            var final = excluida ? "NoConvalidar" : decisiones.Length > 1 ? "SinAcuerdo" : decisiones[0] == "Homologable" ? "Convalidar" : "NoConvalidar";
             catalogo.TryGetValue(p.Key.AsignaturaReceptoraId, out var receptora);
             return new ParejaEnInforme(p.Key.AsignaturaAprobadaId, p.Key.AsignaturaReceptoraId, receptora?.Codigo, receptora?.Nombre,
                 new(a?.Estado ?? "SinAnalisis", a?.Estado == "Completo" ? a.Resultado?.Sugerencia : null,
                     a?.Evaluacion.CompatibilidadAcademicaPct, a?.Evaluacion.CompatibilidadHorariaPct, a?.Evaluacion.CompatibilidadCreditosPct),
-                docentes, final);
+                docentes, final, excluida ? ReglaTerceraMatricula.Motivo : null);
         }).OrderBy(p => p.ReceptoraCodigo ?? p.AsignaturaReceptoraId.ToString(), StringComparer.Ordinal).ThenBy(p => p.AsignaturaAprobadaId).ToArray();
         var grupos = revisionesGrupo.Select(g =>
         {
@@ -130,6 +136,8 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
         var sinAcuerdo = lista.Count(p => p.SugerenciaFinal == "SinAcuerdo") + grupos.Count(g => g.SugerenciaFinal == "SinAcuerdo");
         var advertencias = new List<string> { "Informe técnico para el coordinador de carrera; no es una resolución oficial." };
         if (sinAcuerdo > 0) advertencias.Add("Hay análisis sin acuerdo entre los docentes: decide el coordinador de carrera.");
+        if (lista.Any(p => p.Exclusion is not null))
+            advertencias.Add("Hay asignaturas aprobadas en tercera matrícula: RN-07 las excluye y su sugerencia final es «No convalidar»; las demás se evalúan normalmente.");
         if (sinAnalisis.Length > 0) advertencias.Add("Hay asignaturas aprobadas sin análisis docente; no tienen sugerencia.");
         ParametrosHomologacion? parametros;
         try { parametros = parametrosProvider is null ? ParametrosHomologacion.Predeterminados() : await parametrosProvider.ObtenerVigentesAsync(ct); }
@@ -184,6 +192,13 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
             lista.Count(p => p.SugerenciaFinal == "NoConvalidar") + grupos.Count(g => g.SugerenciaFinal == "NoConvalidar"), sinAcuerdo, advertencias)
         { Grupos = grupos };
         await informes.GuardarAsync(informe, ct);
+        // HU-25: dentro del mismo cierre y transacción que el informe; si el evento falla, el informe no se confirma.
+        if (auditoria is not null)
+        {
+            var evento = HistorialInforme.Crear(solicitudId, TipoEventoInforme.Generado, informe.Fecha, docenteId, informe.GeneradoPor, "Docente");
+            HistorialInforme.ValidarSiguiente((await auditoria.ListarAsync(solicitudId, ct)).ToArray(), evento.Tipo);
+            await auditoria.RegistrarAsync(evento, ct);
+        }
         return informe;
     }
 

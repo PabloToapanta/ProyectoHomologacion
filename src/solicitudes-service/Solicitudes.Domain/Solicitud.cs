@@ -3,6 +3,7 @@ namespace Solicitudes.Domain;
 public sealed class SolicitudException(string message) : Exception(message);
 public sealed class DatosExternosNoEditablesException() : Exception("Los datos del cambio externo solo se corrigen antes de asignar docentes.");
 public sealed class QuipuxDuplicadoException() : Exception("Ya existe una solicitud con ese número de trámite Quipux.");
+public sealed class EstadoSolicitudNoPermiteException(string message) : Exception(message);
 public sealed class Solicitud
 {
  public Guid Id {get; private set;}
@@ -56,6 +57,24 @@ public sealed class Solicitud
   PeriodosCursados=periodos;CambiosPreviosCarrera=cambios;
  }
  internal void MarcarDocentesAsignados() {Estado=DocenteAsignado.EstadoAsignada;}
+ public const string EstadoRemitida="Remitida";
+ /// <summary>HU-32: «Docentes asignados» → «Remitida». Repetir no cambia nada (false) para que Homologación pueda reintentar.</summary>
+ public bool MarcarRemitida() {
+  if(Estado==EstadoRemitida) return false;
+  if(Estado!=DocenteAsignado.EstadoAsignada) throw new EstadoSolicitudNoPermiteException($"La solicitud en estado «{Estado}» no puede remitirse.");
+  Estado=EstadoRemitida;return true;
+ }
+ public const string EstadoFinalizada="Finalizada";
+ /// <summary>HU-33: «Remitida» → «Finalizada». Repetir no cambia nada (false) para que Homologación pueda reintentar.</summary>
+ public bool MarcarFinalizada() {
+  if(Estado==EstadoFinalizada) return false;
+  if(Estado!=EstadoRemitida) throw new EstadoSolicitudNoPermiteException($"La solicitud en estado «{Estado}» no puede finalizarse.");
+  Estado=EstadoFinalizada;return true;
+ }
+ /// <summary>HU-33: una solicitud finalizada no admite la edición ordinaria.</summary>
+ public void ValidarEditable() {
+  if(Estado==EstadoFinalizada) throw new EstadoSolicitudNoPermiteException("La solicitud está finalizada y no admite cambios.");
+ }
  internal static string Limpiar(string? value,string campo,int max) {
   if(string.IsNullOrWhiteSpace(value)) throw new SolicitudException($"{campo} es obligatorio.");
   string text;

@@ -38,7 +38,7 @@ public class ContextoAnalisisInternoTests
         Assert.Equal(3, aprobada.GetProperty("creditos").GetDecimal());
         Assert.Equal(144, aprobada.GetProperty("horas").GetInt32());
         Assert.Equal("2026-06-01", aprobada.GetProperty("fechaAprobacion").GetString());
-        Assert.Equal(1, aprobada.GetProperty("intentoMatricula").GetInt32());
+        Assert.Equal(1, aprobada.GetProperty("intentoMatricula").GetInt32()); // HU-17 / RN-07
         Assert.DoesNotContain("MATRICULA-SINTETICA-HU18", body);
         foreach (var key in new[] { "numeroQuipux", "identificacionEstudiante", "nombreEstudiante", "numeroMatricula", "docentesAsignados" })
             Assert.DoesNotContain(key, body);

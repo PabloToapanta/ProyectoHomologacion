@@ -168,6 +168,101 @@ internal static class ModeloInformes
     }
 }
 [DbContext(typeof(ResultadosDbContext))]
+[Migration("20261120000100_EventosInformeHu25")]
+public sealed class EventosInformeHu25 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.CreateTable(
+            name: "EventosInforme",
+            columns: table => new
+            {
+                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Tipo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Usuario = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                Rol = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false)
+            },
+            constraints: table => table.PrimaryKey("PK_EventosInforme", x => x.Id));
+        migrationBuilder.CreateIndex(name: "IX_EventosInforme_SolicitudId_Tipo", table: "EventosInforme",
+            columns: ["SolicitudId", "Tipo"], unique: true);
+        // CA3: la aplicación no modifica ni elimina eventos y, en SQL Server, la base también lo impide.
+        if (migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.SqlServer")
+            migrationBuilder.Sql(@"CREATE TRIGGER TR_EventosInforme_SoloInsercion ON EventosInforme INSTEAD OF UPDATE, DELETE AS
+BEGIN
+    THROW 50025, N'El historial del informe es de solo inserción.', 1;
+END");
+    }
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("EventosInforme");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloEventosInforme.Construir(modelBuilder);
+}
+
+internal static class ModeloEventosInforme
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloInformes.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroEventoInforme", b =>
+        {
+            b.Property<Guid>("Id").HasColumnType("uniqueidentifier");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<string>("Rol").IsRequired().HasMaxLength(30).HasColumnType("nvarchar(30)");
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Tipo").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+            b.Property<string>("Usuario").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+            b.Property<Guid>("UsuarioId").HasColumnType("uniqueidentifier");
+            b.HasKey("Id");
+            b.HasIndex("SolicitudId", "Tipo").IsUnique();
+            b.ToTable("EventosInforme");
+        });
+    }
+}
+[DbContext(typeof(ResultadosDbContext))]
+[Migration("20261123000100_DecisionesCoordinadorHu33")]
+public sealed class DecisionesCoordinadorHu33 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(
+        name: "DecisionesCoordinador",
+        columns: table => new
+        {
+            SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            AprobadaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            ReceptoraId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Resultado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+            Justificacion = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+            CoordinadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Coordinador = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+            Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+        },
+        constraints: table => table.PrimaryKey("PK_DecisionesCoordinador", x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId }));
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("DecisionesCoordinador");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloDecisionesCoordinador.Construir(modelBuilder);
+}
+
+// Snapshot vigente: modelo de HU-25 más la tabla de HU-33.
+internal static class ModeloDecisionesCoordinador
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloEventosInforme.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroDecisionCoordinador", b =>
+        {
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("AprobadaId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("ReceptoraId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Coordinador").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+            b.Property<Guid>("CoordinadorId").HasColumnType("uniqueidentifier");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<string>("Justificacion").IsRequired().HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+            b.Property<string>("Resultado").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+            b.HasKey("SolicitudId", "AprobadaId", "ReceptoraId");
+            b.ToTable("DecisionesCoordinador");
+        });
+    }
+}
+[DbContext(typeof(ResultadosDbContext))]
 [Migration("20261121000100_ParametrosHomologacionHu03")]
 public sealed class ParametrosHomologacionHu03 : Migration
 {
@@ -301,6 +396,64 @@ internal static class ModeloAuditoriaHu03
             b.HasIndex("VersionAnteriorId");
             b.HasOne("Homologacion.Infrastructure.Configuracion.RegistroConfiguracionHomologacion", null)
                 .WithMany().HasForeignKey("VersionAnteriorId").OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+}
+
+[DbContext(typeof(ResultadosDbContext))]
+[Migration("20261124000100_ExplicacionesAgenteHu37")]
+public sealed class ExplicacionesAgenteHu37 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.CreateTable(
+            name: "ExplicacionesAgente",
+            columns: table => new
+            {
+                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Clave = table.Column<string>(type: "char(64)", unicode: false, fixedLength: true, maxLength: 64, nullable: false),
+                Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                Modelo = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                VersionPlantilla = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                VersionParametros = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Explicacion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                ForzadoPorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                Motivo = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+            },
+            constraints: table => table.PrimaryKey("PK_ExplicacionesAgente", x => x.Id));
+        // Índice no único: dos análisis simultáneos pueden guardar la misma clave.
+        migrationBuilder.CreateIndex(name: "IX_ExplicacionesAgente_Clave", table: "ExplicacionesAgente", column: "Clave");
+        // CA4: forzar no borra la explicación anterior; en SQL Server la base también impide modificarla o eliminarla.
+        if (migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.SqlServer")
+            migrationBuilder.Sql(@"CREATE TRIGGER TR_ExplicacionesAgente_SoloInsercion ON ExplicacionesAgente INSTEAD OF UPDATE, DELETE AS
+BEGIN
+    THROW 50037, N'Las explicaciones del agente son de solo inserción.', 1;
+END");
+    }
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("ExplicacionesAgente");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloExplicacionesAgente.Construir(modelBuilder);
+}
+
+// HU-37: modelo de HU-33 más la tabla de explicaciones; el snapshot vigente reúne todas las tablas.
+internal static class ModeloExplicacionesAgente
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloDecisionesCoordinador.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.AnalisisInterno.RegistroExplicacionAgente", b =>
+        {
+            b.Property<Guid>("Id").HasColumnType("uniqueidentifier");
+            b.Property<string>("Clave").IsRequired().HasMaxLength(64).IsUnicode(false).HasColumnType("char(64)").IsFixedLength();
+            b.Property<string>("Explicacion").IsRequired().HasColumnType("nvarchar(max)");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<Guid?>("ForzadoPorId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Modelo").IsRequired().HasMaxLength(128).HasColumnType("nvarchar(128)");
+            b.Property<string>("Motivo").HasMaxLength(500).HasColumnType("nvarchar(500)");
+            b.Property<Guid>("VersionParametros").HasColumnType("uniqueidentifier");
+            b.Property<string>("VersionPlantilla").IsRequired().HasMaxLength(32).HasColumnType("nvarchar(32)");
+            b.HasKey("Id");
+            b.HasIndex("Clave");
+            b.ToTable("ExplicacionesAgente");
         });
     }
 }

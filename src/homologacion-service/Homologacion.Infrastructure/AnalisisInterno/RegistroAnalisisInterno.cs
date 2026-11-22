@@ -40,7 +40,14 @@ public static class RegistroAnalisisInterno
                     new(new Uri(config.OllamaUrl), config.Modelo, TimeSpan.FromSeconds(config.TimeoutSegundos)))
                 : new AgenteNoConfigurado();
         });
-        services.AddScoped<AsistirEvaluacionInterna>();
+        // HU-37: reutilización de la explicación del agente; solo un agente que se describe (Ollama) se reutiliza.
+        services.AddScoped<IExplicacionesAgente, ExplicacionesAgenteSql>();
+        services.AddScoped(p =>
+        {
+            var agente = p.GetRequiredService<IAgenteAnalisisInterno>();
+            return new AsistirEvaluacionInterna(p.GetRequiredService<Homologacion.Application.Equivalencias.EvaluarEquivalencia>(), agente,
+                agente is IDescripcionAgente ? p.GetRequiredService<IExplicacionesAgente>() : null, p.GetRequiredService<TimeProvider>());
+        });
         services.AddScoped<AnalizarSolicitudInterna>();
         services.AddDbContext<ResultadosDbContext>((p, options) => options.UseSqlServer(
             p.GetRequiredService<IConfiguration>().GetConnectionString("Homologacion")
@@ -64,7 +71,16 @@ public static class RegistroAnalisisInterno
         services.AddScoped(p => new RegistrarRevisionDocente(p.GetRequiredService<ISolicitudesAnalisisInterno>(), p.GetRequiredService<ICatalogoAnalisisInterno>(),
             p.GetRequiredService<IResultadosAnalisisInterno>(), p.GetRequiredService<IResultadosAnalisisExterno>(), p.GetRequiredService<IRevisionesDocentes>(),
             p.GetRequiredService<TimeProvider>(), p.GetRequiredService<IInformesHomologacion>()));
+        // HU-25: el evento «Generado» se registra en la misma transacción que el informe.
+        services.AddScoped<IAuditoriaInformes, EventosInformeSql>();
         services.AddScoped<GenerarInformeHomologacion>();
+        services.AddScoped<ConsultarHistorialInforme>();
+        // HU-32: Solicitudes es dueño del estado; la remisión y el evento «Remitido» se confirman juntos.
+        services.AddScoped<IEstadoSolicitudes>(p => p.GetRequiredService<FuentesAnalisisHttp>());
+        services.AddScoped<RemitirInformeHomologacion>();
+        // HU-33: decisión del coordinador en «Sin acuerdo» y finalización.
+        services.AddScoped<IDecisionesCoordinador, DecisionesCoordinadorSql>();
+        services.AddScoped<RevisionCoordinadorInforme>();
         services.AddScoped<Homologacion.Application.Equivalencias.EvaluarAgrupacion>();
         services.AddScoped<Homologacion.Application.Agrupaciones.PrepararAgrupacion>();
         services.AddScoped<Homologacion.Application.Agrupaciones.GestionarAgrupaciones>();

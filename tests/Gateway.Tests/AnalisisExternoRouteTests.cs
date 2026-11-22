@@ -27,6 +27,12 @@ public class AnalisisExternoRouteTests
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/revisiones-docentes", "homologacion")]
     [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
+    [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe/historial", "homologacion")]
+    [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe/remision", "homologacion")]
+    // HU-33: revisión del coordinador, decisión en «Sin acuerdo» y finalización.
+    [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe/revision", "homologacion")]
+    [InlineData("PUT", "/api/homologaciones/solicitudes/{0}/informe/decisiones", "homologacion")]
+    [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe/finalizacion", "homologacion")]
     // HU-12: adjuntos del expediente (subir, listar y descargar).
     [InlineData("POST", "/api/solicitudes/{0}/adjuntos", "solicitudes")]
     [InlineData("GET", "/api/solicitudes/{0}/adjuntos", "solicitudes")]
@@ -52,6 +58,25 @@ public class AnalisisExternoRouteTests
         using var response = await c.GetAsync($"/api/solicitudes/{Guid.NewGuid()}/contexto-analisis-externo");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.DoesNotContain(f.Forwarded, x => x.PathAndQuery.Contains("contexto-analisis-externo", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task HU32_la_remision_interna_de_Solicitudes_no_se_publica()
+    {
+        // Solo Homologación cambia el estado a «Remitida», después de comprobar el informe.
+        using var f = new GatewayFactory(); using var c = await Autenticado(f);
+        using var response = await c.PostAsync($"/api/solicitudes/{Guid.NewGuid()}/remision", JsonContent.Create(new { }));
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.DoesNotContain(f.Forwarded, x => x.PathAndQuery.EndsWith("/remision", StringComparison.Ordinal) && x.Service == "solicitudes");
+    }
+
+    [Fact]
+    public async Task HU33_la_finalizacion_interna_de_Solicitudes_no_se_publica()
+    {
+        using var f = new GatewayFactory(); using var c = await Autenticado(f);
+        using var response = await c.PostAsync($"/api/solicitudes/{Guid.NewGuid()}/finalizacion", JsonContent.Create(new { }));
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.DoesNotContain(f.Forwarded, x => x.PathAndQuery.EndsWith("/finalizacion", StringComparison.Ordinal) && x.Service == "solicitudes");
     }
 
     [Fact]

@@ -5,6 +5,7 @@ namespace Homologacion.Application.AnalisisInterno;
 
 public sealed record AprobadaParaAnalisis(Guid Id, Guid? AsignaturaOrigenId, decimal Creditos, int Horas, string Estado, DateOnly FechaAprobacion)
 {
+    /// <summary>HU-17 / RN-07; null = Solicitudes no lo informó (no se asume primera matrícula).</summary>
     public int? IntentoMatricula { get; init; }
 }
 public sealed record SolicitudParaAnalisis(Guid Id, string TipoCambio, Guid? CarreraOrigenId, Guid CarreraReceptoraId, IReadOnlyList<AprobadaParaAnalisis> AsignaturasAprobadas);
@@ -27,7 +28,11 @@ public sealed record ResumenAnalisisInterno(decimal? PorcentajeAcademico, decima
     string Sugerencia, string Justificacion, IReadOnlyList<string> Evidencias);
 public sealed record ResultadoInternoSolicitud(Guid SolicitudId, Guid AsignaturaAprobadaId, Guid AsignaturaReceptoraId,
     string Estado, string Mensaje, ResumenAnalisisInterno? Resultado, EvaluacionEquivalencia Evaluacion,
-    ResultadoAntiguedad? Antiguedad, bool DatosSinteticos, IReadOnlyList<string> Advertencias);
+    ResultadoAntiguedad? Antiguedad, bool DatosSinteticos, IReadOnlyList<string> Advertencias)
+{
+    /// <summary>HU-37: origen de la explicación del agente; null en «Incompleto», «Fallido» y en análisis guardados antes de HU-37.</summary>
+    public AgenteAnalisis? Agente { get; init; }
+}
 public sealed class SolicitudAnalisisNoEncontradaException() : Exception("Solicitud no encontrada entre sus asignaciones.");
 public sealed class DatosAnalisisSolicitudException(string message) : Exception(message);
 public sealed class FuenteAnalisisNoDisponibleException() : Exception("No fue posible verificar los datos académicos autorizados. Intente nuevamente.");

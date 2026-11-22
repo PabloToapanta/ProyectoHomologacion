@@ -6,6 +6,8 @@ import type {AsignaturaAprobada,AsignaturaAprobadaInput,AsignaturaCatalogo} from
 import {DocentesAsignados} from './DocentesAsignados';
 import type {DocenteAsignado,DocenteDisponible} from './DocentesAsignados';
 import {DatosCambioExterno} from './DatosCambioExterno';
+import {HistorialInforme} from './HistorialInforme';
+import {RevisionInformeCoordinador} from './RevisionInformeCoordinador';
 import type {DatosExternos} from './DatosCambioExterno';
 import {InformePanel} from './InformePanel';
 import {AdjuntosSolicitud} from './AdjuntosSolicitud';
@@ -63,6 +65,8 @@ export function SolicitudesPage({request}:{request:Request}) {
    setDetalle(saved);setItems(old=>old.map(s=>s.id===saved.id?{...s,estado:saved.estado}:s));
   }finally{setOcupado(false);}
  }
+ // HU-33: la finalización cambia el estado en el detalle y en la lista sin recargar.
+ function marcarEstado(id:string,estado:string){setDetalle(actual=>actual&&actual.id===id?{...actual,estado}:actual);setItems(old=>old.map(s=>s.id===id?{...s,estado}:s));}
  const nombreCarrera=(id:string|null)=>carreras.find(c=>c.id===id)?.nombre??id??'Sin referencia';
  return <section className="catalogo-section" aria-labelledby="solicitudes-title">
   <p className="eyebrow">COORDINACIÓN / SOLICITUDES</p><h1 id="solicitudes-title">Solicitudes de homologación</h1>
@@ -88,6 +92,6 @@ export function SolicitudesPage({request}:{request:Request}) {
   </form></FormDialog>}
   {detalle&&<FormDialog title={`Solicitud ${detalle.numeroQuipux}`} titleId="detalle-solicitud" busy={ocupado} onDismiss={()=>setDetalle(null)}><dl>
    <dt>Estudiante</dt><dd>{detalle.nombreEstudiante} · {detalle.identificacionEstudiante}</dd><dt>Tipo de cambio</dt><dd>{detalle.tipoCambio}</dd><dt>Origen</dt><dd>{detalle.tipoCambio==='Interno'?nombreCarrera(detalle.carreraOrigenId):`${detalle.institucionOrigen} · ${detalle.carreraOrigenExterna}`}</dd><dt>Carrera receptora</dt><dd>{nombreCarrera(detalle.carreraReceptoraId)}</dd><dt>Estado</dt><dd>{detalle.estado}</dd><dt>Fecha de registro</dt><dd>{new Date(detalle.fechaRegistro).toLocaleString('es-EC')}</dd>
-  </dl>{detalle.tipoCambio==='Externo'&&<DatosCambioExterno key={`${detalle.id}/${detalle.estado}`} datos={{periodosCursados:detalle.periodosCursados??null,cambiosPreviosCarrera:detalle.cambiosPreviosCarrera??null}} editable={detalle.estado==='Registrada'} ocupado={ocupado} guardar={guardarDatosExternos}/>}<DocentesAsignados estado={detalle.estado} docentes={detalle.docentesAsignados??[]} ocupado={ocupado} cargarDisponibles={()=>leer<DocenteDisponible[]>(`/api/solicitudes/${detalle.id}/docentes-disponibles`)} asignar={asignarDocentes}/><AsignaturasAprobadas tipoCambio={detalle.tipoCambio} asignaturas={detalle.asignaturasAprobadas??[]} ocupado={ocupado} cargarOrigen={()=>leer<AsignaturaCatalogo[]>(`/api/solicitudes/${detalle.id}/asignaturas-origen`)} registrar={registrarAsignatura}/><AdjuntosSolicitud solicitudId={detalle.id} request={request} puedeSubir finalizada={detalle.estado==='Finalizada'}/>{(detalle.tipoCambio==='Interno'||detalle.tipoCambio==='Externo')&&<InformePanel key={`informe-${detalle.id}`} request={request} solicitudId={detalle.id} aprobadas={detalle.asignaturasAprobadas??[]} puedeGenerar={false}/>}<button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>setDetalle(null)}>Cerrar detalle</button></FormDialog>}
+  </dl>{detalle.tipoCambio==='Externo'&&<DatosCambioExterno key={`${detalle.id}/${detalle.estado}`} datos={{periodosCursados:detalle.periodosCursados??null,cambiosPreviosCarrera:detalle.cambiosPreviosCarrera??null}} editable={detalle.estado==='Registrada'} ocupado={ocupado} guardar={guardarDatosExternos}/>}<DocentesAsignados estado={detalle.estado} docentes={detalle.docentesAsignados??[]} ocupado={ocupado} cargarDisponibles={()=>leer<DocenteDisponible[]>(`/api/solicitudes/${detalle.id}/docentes-disponibles`)} asignar={asignarDocentes}/><AsignaturasAprobadas tipoCambio={detalle.tipoCambio} asignaturas={detalle.asignaturasAprobadas??[]} ocupado={ocupado} cargarOrigen={()=>leer<AsignaturaCatalogo[]>(`/api/solicitudes/${detalle.id}/asignaturas-origen`)} registrar={registrarAsignatura}/><AdjuntosSolicitud solicitudId={detalle.id} request={request} puedeSubir finalizada={detalle.estado==='Finalizada'}/>{(detalle.tipoCambio==='Interno'||detalle.tipoCambio==='Externo')&&<InformePanel key={`informe-${detalle.id}`} request={request} solicitudId={detalle.id} aprobadas={detalle.asignaturasAprobadas??[]} puedeGenerar={false}/>}<HistorialInforme key={`${detalle.id}/${detalle.estado}`} request={request} solicitudId={detalle.id}/>{(detalle.estado==='Remitida'||detalle.estado==='Finalizada')&&<RevisionInformeCoordinador key={detalle.id} request={request} solicitudId={detalle.id} aprobadas={detalle.asignaturasAprobadas??[]} onFinalizada={estado=>marcarEstado(detalle.id,estado)}/>}<button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>setDetalle(null)}>Cerrar detalle</button></FormDialog>}
  </section>;
 }

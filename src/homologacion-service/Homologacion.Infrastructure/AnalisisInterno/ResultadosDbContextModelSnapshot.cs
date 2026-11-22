@@ -163,6 +163,52 @@ namespace Homologacion.Infrastructure.AnalisisInterno
                     b.ToTable("AnalisisExternos", (string)null);
                 });
 
+            modelBuilder.Entity("Homologacion.Infrastructure.AnalisisInterno.RegistroExplicacionAgente", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Clave")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("char(64)")
+                        .IsFixedLength();
+
+                    b.Property<string>("Explicacion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("Fecha")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ForzadoPorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Modelo")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Motivo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("VersionParametros")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("VersionPlantilla")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Clave");
+
+                    b.ToTable("ExplicacionesAgente", (string)null);
+                });
+
             modelBuilder.Entity("Homologacion.Infrastructure.AnalisisInterno.RegistroResultado", b =>
                 {
                     b.Property<Guid>("SolicitudId")
@@ -275,6 +321,34 @@ namespace Homologacion.Infrastructure.AnalisisInterno
                     b.HasKey("SolicitudId");
 
                     b.ToTable("InformesHomologacion", (string)null);
+                });
+
+            modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroEventoInforme", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uniqueidentifier");
+                    b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+                    b.Property<string>("Rol").IsRequired().HasMaxLength(30).HasColumnType("nvarchar(30)");
+                    b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+                    b.Property<string>("Tipo").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+                    b.Property<string>("Usuario").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+                    b.Property<Guid>("UsuarioId").HasColumnType("uniqueidentifier");
+                    b.HasKey("Id");
+                    b.HasIndex("SolicitudId", "Tipo").IsUnique();
+                    b.ToTable("EventosInforme", (string)null);
+                });
+
+            modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroDecisionCoordinador", b =>
+                {
+                    b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("AprobadaId").HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ReceptoraId").HasColumnType("uniqueidentifier");
+                    b.Property<string>("Coordinador").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+                    b.Property<Guid>("CoordinadorId").HasColumnType("uniqueidentifier");
+                    b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+                    b.Property<string>("Justificacion").IsRequired().HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+                    b.Property<string>("Resultado").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+                    b.HasKey("SolicitudId", "AprobadaId", "ReceptoraId");
+                    b.ToTable("DecisionesCoordinador", (string)null);
                 });
 
             modelBuilder.Entity("Homologacion.Infrastructure.RevisionDocente.RegistroRevisionDocente", b =>

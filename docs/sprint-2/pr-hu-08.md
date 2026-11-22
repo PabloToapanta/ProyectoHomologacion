@@ -12,7 +12,7 @@ recupera mediante una ruta autenticada. Los códigos existentes devuelven 409 y 
 se sobrescriben.
 
 Incluye migración de Catálogo, tres rutas del Gateway, pantalla de carga y ajuste
-del límite de nginx. Límites: 20 archivos, 5 MB por PDF y 25 MB por petición.
+del límite de nginx. Límites: 50 archivos, 5 MB por PDF y 25 MB por petición.
 No incluye OCR, programas externos ni comparación de asignaturas.
 
 ## Correcciones de la revisión

@@ -1,6 +1,8 @@
 using Homologacion.Application.Antiguedad;
 using Homologacion.Application.Equivalencias;
+using Homologacion.Application.TerceraMatricula;
 using Homologacion.Domain.Antiguedad;
+using Homologacion.Domain.TerceraMatricula;
 using Homologacion.Application.Configuracion;
 using Homologacion.Domain.Configuracion;
 
@@ -9,7 +11,12 @@ namespace Homologacion.Application.AnalisisInterno;
 public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicitudes, ICatalogoAnalisisInterno catalogo,
     AsistirEvaluacionInterna asistencia, TimeProvider reloj, IParametrosHomologacionProvider? parametrosProvider = null)
 {
-    public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitudId, Guid aprobadaId, Guid receptoraId, CancellationToken ct)
+    public Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitudId, Guid aprobadaId, Guid receptoraId, CancellationToken ct) =>
+        EjecutarAsync(solicitudId, aprobadaId, receptoraId, null, ct);
+
+    /// <summary>HU-37: con <paramref name="forzar"/> se llama siempre al agente; sin él se reutiliza la explicación de la misma clave.</summary>
+    public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitudId, Guid aprobadaId, Guid receptoraId, ForzarAnalisis? forzar,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         var parametros = parametrosProvider is null ? ParametrosHomologacion.Predeterminados() : await parametrosProvider.ObtenerVigentesAsync(ct);
@@ -44,6 +51,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         if (!Enum.TryParse<EstadoAsignatura>(aprobada.Estado, out var estado) || !Enum.IsDefined(estado)
             || aprobada.Estado != estado.ToString())
             throw new FuenteAnalisisNoDisponibleException();
+        var terceraMatricula = ExclusionTerceraMatricula.Evaluar(aprobada.IntentoMatricula);
         var hoy = DateOnly.FromDateTime(reloj.GetUtcNow().ToOffset(TimeSpan.FromHours(-5)).DateTime);
         ResultadoAntiguedad? antiguedad = null;
         if (aprobada.FechaAprobacion == default || aprobada.FechaAprobacion > hoy)
@@ -53,6 +61,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             antiguedad = new ValidarAntiguedad().Ejecutar(new(estado, aprobada.FechaAprobacion, hoy), parametros);
             if (antiguedad.Estado != EstadoAntiguedad.Elegible) faltantes.Add(antiguedad.Motivo);
         }
+        if (terceraMatricula == ResultadoTerceraMatricula.IntentoDesconocido) faltantes.Add(ReglaTerceraMatricula.FaltaIntento);
         var revision = await catalogo.ObtenerRevisionAsync(origenId, receptoraId, ct);
         if (!revision.Registrada || !revision.Vigente) faltantes.Add("faltan correspondencias explícitas revisadas y vigentes de ambos programas");
         else if (revision.Contenidos is null || revision.Resultados is null
@@ -61,8 +70,22 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             revision.Registrada && revision.Vigente ? Vinculos(origenId, revision.Contenidos) : null,
             revision.Registrada && revision.Vigente ? Vinculos(origenId, revision.Resultados) : null);
         var textos = Textos(origen).Concat(Textos(receptora)).ToArray();
+        var advertencias = new[]
+        {
+            "Los mínimos globales del cambio interno no están evaluados: faltan períodos cursados y el cómputo completo de la solicitud. No es una aprobación oficial.",
+            "Se consultó el catálogo actual; su versión histórica debe confirmarse durante la revisión académica."
+        };
+        if (terceraMatricula == ResultadoTerceraMatricula.Excluida)
+        {
+            EvaluacionEquivalencia motor;
+            try { motor = asistencia.EvaluarSinAgente(datos); }
+            catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
+            return ExclusionTerceraMatricula.Resultado(solicitudId, aprobadaId, receptoraId, motor, antiguedad,
+                origen.EsSintetico || receptora.EsSintetico, advertencias);
+        }
         AnalisisAsistido resultado;
-        try { resultado = await asistencia.EjecutarAsync(datos, textos, faltantes, parametros, ct); }
+        var reutilizacion = new ReutilizacionAgente(FirmaPareja(origen, receptora, aprobada, revision), forzar);
+        try { resultado = await asistencia.EjecutarAsync(datos, textos, faltantes, parametros, reutilizacion, ct); }
         catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
         var estadoAnalisis = resultado.Estado switch
         {
@@ -78,10 +101,23 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         };
         var resumen = estadoAnalisis == "Completo" ? Resumen(resultado) : null;
         return new(solicitudId, aprobadaId, receptoraId, estadoAnalisis, mensaje, resumen, resultado.Evaluacion, antiguedad,
-            origen.EsSintetico || receptora.EsSintetico,
-            ["Los mínimos globales del cambio interno no están evaluados: faltan períodos cursados y el cómputo completo de la solicitud. No es una aprobación oficial.",
-                "Se consultó el catálogo actual; su versión histórica debe confirmarse durante la revisión académica."]);
+            origen.EsSintetico || receptora.EsSintetico, advertencias) { Agente = resultado.Agente };
     }
+
+    /// <summary>HU-37 (A1): Homologación firma los programas con los datos que evalúa; el origen lleva horas y créditos de la aprobada.</summary>
+    private static string FirmaPareja(AsignaturaParaAnalisis origen, AsignaturaParaAnalisis receptora, AprobadaParaAnalisis aprobada,
+        RevisionParaAnalisis revision) => HuellaReutilizacion.De(new
+        {
+            origenId = origen.Id,
+            receptoraId = receptora.Id,
+            firmaOrigen = FirmaPrograma(origen with { Horas = aprobada.Horas, Creditos = aprobada.Creditos }),
+            firmaReceptora = FirmaPrograma(receptora),
+            firmaCorrespondencias = HuellaReutilizacion.De(new { revision.Registrada, revision.Vigente, revision.Contenidos, revision.Resultados })
+        });
+    private static string FirmaPrograma(AsignaturaParaAnalisis a) => HuellaReutilizacion.De(new
+    {
+        a.PlanAnalitico, a.Horas, a.UnidadHoras, a.Creditos, a.SistemaCreditos, a.Contenidos, a.Resultados
+    });
 
     private static DatosAsignatura Datos(AsignaturaParaAnalisis a) => new(a.Id.ToString(), a.PlanAnalitico, a.Horas,
         a.UnidadHoras, a.Creditos, a.SistemaCreditos, a.Contenidos.Select(e => e.Id.ToString()).ToArray(), a.Resultados.Select(e => e.Id.ToString()).ToArray());

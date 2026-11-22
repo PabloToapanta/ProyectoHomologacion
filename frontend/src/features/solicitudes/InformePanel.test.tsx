@@ -70,6 +70,58 @@ it('si faltan análisis docentes muestra el motivo y no un informe',async()=>{
  expect(screen.queryByRole('table')).not.toBeInTheDocument();
 });
 
+it('HU-17: una pareja excluida por tercera matrícula muestra el motivo RN-07 junto a la sugerencia final',async()=>{
+ const motivo='Excluida por tercera matrícula (RN-07): la asignatura aprobada en tercera matrícula no se homologa; las demás asignaturas de la solicitud se evalúan normalmente.';
+ const excluido={...informe,parejas:[{...informe.parejas[0],sugerenciaFinal:'NoConvalidar',exclusion:motivo}],convalidar:0,noConvalidar:1,sinAcuerdo:0};
+ render(<InformePanel request={vi.fn(async()=>json(excluido))} solicitudId="sol-a" aprobadas={aprobadas}/>);
+ const tabla=await screen.findByRole('table',{name:'Informe de homologación por pareja'});
+ const fila=within(tabla).getByRole('row',{name:/Álgebra sintética/});
+ expect(fila).toHaveTextContent('No convalidar');
+ expect(fila).toHaveTextContent('RN-07');
+});
+
+// HU-32: remisión del informe al coordinador de carrera.
+const remision='/api/homologaciones/solicitudes/sol-a/informe/remision';
+it('HU-32: con el informe generado remite al coordinador una sola vez y avisa el nuevo estado',async()=>{
+ const user=userEvent.setup();const onRemitida=vi.fn();
+ const request=vi.fn(async(path:string,init?:RequestInit)=>path===remision&&init?.method==='POST'
+  ?json({solicitudId:'sol-a',fecha:'2026-11-21T15:00:00Z',remitidoPorId:'d2',remitidoPor:'docente.luis'})
+  :path===ruta?json(informe):json({},500));
+ render(<InformePanel request={request} solicitudId="sol-a" aprobadas={aprobadas} estadoSolicitud="Docentes asignados" onRemitida={onRemitida}/>);
+ await user.click(await screen.findByRole('button',{name:'Remitir al coordinador'}));
+ expect(await screen.findByText(/Informe remitido al coordinador de carrera por docente\.luis/)).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Remitir al coordinador'})).not.toBeInTheDocument();
+ expect(onRemitida).toHaveBeenCalledWith('Remitida');
+ expect(request.mock.calls.filter(c=>c[0]===remision)).toHaveLength(1);
+});
+
+it('HU-32: una solicitud ya remitida no ofrece remitir otra vez',async()=>{
+ render(<InformePanel request={vi.fn(async()=>json(informe))} solicitudId="sol-a" aprobadas={aprobadas} estadoSolicitud="Remitida"/>);
+ expect(await screen.findByText('Informe remitido al coordinador de carrera.')).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Remitir al coordinador'})).not.toBeInTheDocument();
+});
+
+it('HU-33: una solicitud finalizada no ofrece remitir y lo indica',async()=>{
+ render(<InformePanel request={vi.fn(async()=>json(informe))} solicitudId="sol-a" aprobadas={aprobadas} estadoSolicitud="Finalizada"/>);
+ expect(await screen.findByText('Solicitud finalizada por el coordinador de carrera.')).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Remitir al coordinador'})).not.toBeInTheDocument();
+});
+
+it('HU-32: sin informe generado no se ofrece remitir',async()=>{
+ render(<InformePanel request={vi.fn(async()=>json({title:'El informe de esta solicitud aún no se ha generado.'},404))} solicitudId="sol-a" aprobadas={aprobadas} estadoSolicitud="Docentes asignados"/>);
+ expect(await screen.findByText(/aún no se ha generado/)).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Remitir al coordinador'})).not.toBeInTheDocument();
+});
+
+it('HU-32: si el servidor rechaza la remisión muestra el motivo y conserva el botón',async()=>{
+ const user=userEvent.setup();const onRemitida=vi.fn();
+ const request=vi.fn(async(path:string)=>path===remision?json({title:'El informe ya fue remitido al coordinador de carrera; la remisión registrada no cambia.'},409):json(informe));
+ render(<InformePanel request={request} solicitudId="sol-a" aprobadas={aprobadas} estadoSolicitud="Docentes asignados" onRemitida={onRemitida}/>);
+ await user.click(await screen.findByRole('button',{name:'Remitir al coordinador'}));
+ expect(await screen.findByRole('alert')).toHaveTextContent('ya fue remitido');
+ expect(onRemitida).not.toHaveBeenCalled();
+});
+
 it('muestra error en vez de romper si la API devuelve un informe con estructura inválida',async()=>{
  render(<InformePanel request={vi.fn(async()=>json([]))} solicitudId="sol-a" aprobadas={aprobadas}/>);
  expect(await screen.findByRole('alert')).toHaveTextContent('formato no válido');

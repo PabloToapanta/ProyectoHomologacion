@@ -6,7 +6,7 @@ type Aprobada={id:string;nombreAsignatura:string};
 type DocenteEnInforme={docenteId:string;docente:string;postura:'DeAcuerdo'|'Ajuste';decision:'Homologable'|'NoHomologable';observacion:string|null;fecha:string};
 type Pareja={asignaturaAprobadaId:string;asignaturaReceptoraId:string;receptoraCodigo:string|null;receptoraNombre:string|null;
  agente:{estado:string;sugerencia:string|null;porcentajeAcademico:number|null;porcentajeHoras:number|null;porcentajeCreditos:number|null};
- docentes:DocenteEnInforme[];sugerenciaFinal:'Convalidar'|'NoConvalidar'|'SinAcuerdo'};
+ docentes:DocenteEnInforme[];sugerenciaFinal:'Convalidar'|'NoConvalidar'|'SinAcuerdo';exclusion?:string|null};
 type Informe={solicitudId:string;tipoCambio:string;fecha:string;generadoPor:string;parejas:Pareja[];aprobadasSinAnalisis:string[];
  convalidar:number;noConvalidar:number;sinAcuerdo:number;advertencias:string[];grupos?:GrupoInforme[]};
 function esInforme(value:unknown):value is Informe {
@@ -22,11 +22,14 @@ const decisiones={Homologable:'Homologable',NoHomologable:'No homologable'} as c
 const finales={Convalidar:'Convalidar',NoConvalidar:'No convalidar',SinAcuerdo:'Sin acuerdo'} as const;
 const pct=(v:number|null)=>v===null?'—':`${v.toLocaleString('es-EC',{maximumFractionDigits:2})} %`;
 
-/** HU-23: informe fijo de la solicitud; cualquiera de los dos docentes asignados lo genera. No remite al coordinador (HU-32). */
-export function InformePanel({request,solicitudId,aprobadas,puedeGenerar=true}:{request:Request;solicitudId:string;aprobadas:Aprobada[];puedeGenerar?:boolean}) {
+type Remision={solicitudId:string;fecha:string;remitidoPorId:string;remitidoPor:string};
+
+/** HU-23: informe fijo; HU-32 añade la remisión del docente asignado; puede deshabilitarse para la vista del coordinador. */
+export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRemitida,puedeGenerar=true}:{request:Request;solicitudId:string;aprobadas:Aprobada[];
+ estadoSolicitud?:string;onRemitida?:(estado:'Remitida')=>void;puedeGenerar?:boolean}) {
  const ruta=`/api/homologaciones/solicitudes/${solicitudId}/informe`;
  const [informe,setInforme]=useState<Informe|null>(null),[pendiente,setPendiente]=useState(false),[cargando,setCargando]=useState(true);
- const [ocupado,setOcupado]=useState(false),[error,setError]=useState('');
+ const [ocupado,setOcupado]=useState(false),[error,setError]=useState(''),[remision,setRemision]=useState<Remision|null>(null);
  async function motivo(r:Response,defecto:string){try{const p=await r.json();return p.detail??p.title??defecto;}catch{return defecto;}}
  useEffect(()=>{
   const controller=new AbortController();setCargando(true);setError('');setInforme(null);setPendiente(false);
@@ -50,6 +53,15 @@ export function InformePanel({request,solicitudId,aprobadas,puedeGenerar=true}:{
    setInforme(body);setPendiente(false);
   }catch(e){setError(e instanceof Error?e.message:'No se pudo generar el informe.');}finally{setOcupado(false);}
  }
+ async function remitir(){
+  if(ocupado)return;setOcupado(true);setError('');
+  try{
+   const r=await request(`${ruta}/remision`,{method:'POST'});
+   if(!r.ok)throw new Error(await motivo(r,'No se pudo remitir el informe.'));
+   setRemision(await r.json() as Remision);onRemitida?.('Remitida');
+  }catch(e){setError(e instanceof Error?e.message:'No se pudo remitir el informe.');}finally{setOcupado(false);}
+ }
+ const remitida=remision!==null||estadoSolicitud==='Remitida';
  const nombre=(id:string)=>aprobadas.find(a=>a.id===id)?.nombreAsignatura??'Asignatura sin nombre registrado';
  return <section className="informe-pdf" aria-labelledby="informe-titulo">
   <h3 id="informe-titulo">Informe de homologación</h3>
@@ -75,11 +87,18 @@ export function InformePanel({request,solicitudId,aprobadas,puedeGenerar=true}:{
      <td>{p.agente.estado}{p.agente.sugerencia?` · ${p.agente.sugerencia}`:''}</td>
      <td>{pct(p.agente.porcentajeAcademico)} · {pct(p.agente.porcentajeHoras)} · {pct(p.agente.porcentajeCreditos)}</td>
      <td><ul>{p.docentes.map(d=><li key={d.docenteId}>{`${d.docente}: ${posturas[d.postura]} · ${decisiones[d.decision]}${d.observacion?` · ${d.observacion}`:''}`}</li>)}</ul></td>
-     <td><strong>{finales[p.sugerenciaFinal]}</strong></td>
+     <td><strong>{finales[p.sugerenciaFinal]}</strong>{p.exclusion&&<p>{p.exclusion}</p>}</td>
     </tr>)}</tbody></table></div>
    {!!informe.grupos?.length&&<GruposInforme grupos={informe.grupos} nombre={nombre}/>}
    {informe.aprobadasSinAnalisis.length>0&&<p>Sin análisis docente: {informe.aprobadasSinAnalisis.map(nombre).join(', ')}.</p>}
    {informe.advertencias.map(a=><p key={a}>{a}</p>)}
+   {remision?<p role="status">{`Informe remitido al coordinador de carrera por ${remision.remitidoPor} el ${new Date(remision.fecha).toLocaleString('es-EC')}.`}</p>
+    :estadoSolicitud==='Finalizada'?<p role="status">Solicitud finalizada por el coordinador de carrera.</p>
+    :remitida?<p role="status">Informe remitido al coordinador de carrera.</p>
+    :estadoSolicitud!==undefined&&<>
+     <p>Remita el informe al coordinador de carrera cuando esté listo. Se remite una sola vez; las parejas «Sin acuerdo» las decide el coordinador.</p>
+     <button className="app-button" disabled={ocupado} onClick={remitir}>{ocupado?'Remitiendo…':'Remitir al coordinador'}</button>
+    </>}
    </div>
   </>}
  </section>;
