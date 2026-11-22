@@ -120,3 +120,58 @@ describe('HU-01 / T3 — acceso al panel', () => {
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument());
   });
 });
+
+describe('HU-02 / T55 — acceso a usuarios', () => {
+  it('redirige la ruta de usuarios sin sesión al login', () => {
+    mount('/admin/usuarios');
+    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
+  });
+
+  it('permite al administrador navegar del panel a usuarios usando el JWT', async () => {
+    const request = vi.fn(async (path: string, _init?: RequestInit) => new Response(JSON.stringify(path === '/api/auth/login'
+      ? loginResponse({ role: 'Administrador' }) : []), { status: 200 }));
+    vi.stubGlobal('fetch', request);
+    mount();
+    const user = await fillLogin();
+    await user.click(screen.getByRole('button', { name: 'Ingresar' }));
+    await user.click(await screen.findByRole('link', { name: 'Gestionar usuarios' }));
+    expect(await screen.findByRole('heading', { name: 'Gestión de usuarios y roles' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Usuarios/ })).toBeInTheDocument();
+    const listado = request.mock.calls.find(([path]) => path === '/api/usuarios');
+    expect(listado).toBeDefined();
+    expect(new Headers(listado?.[1]?.headers).get('Authorization')).toMatch(/^Bearer /);
+  });
+
+  it.each(['Docente', 'Coordinador'])('no ofrece gestión de usuarios a %s', async role => {
+    vi.stubGlobal('fetch', vi.fn(async (path: string) => new Response(JSON.stringify(path === '/api/auth/login'
+      ? loginResponse({ role }) : []), { status: 200 })));
+    mount();
+    const user = await fillLogin();
+    await user.click(screen.getByRole('button', { name: 'Ingresar' }));
+    await screen.findByRole('heading', { name: role === 'Docente' ? 'Mis solicitudes asignadas' : 'Solicitudes de homologación' });
+    expect(screen.queryByRole('link', { name: /Usuarios/ })).not.toBeInTheDocument();
+  });
+});
+
+describe('HU-03 / T58 — acceso a configuración', () => {
+  it('redirige sin sesión y permite entrar solo al Coordinador', async () => {
+    mount('/configuracion');
+    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
+  });
+
+  it('muestra la navegación de configuración al Coordinador', async () => {
+    const parametros = { versionId: '11111111-1111-1111-1111-111111111111', umbralPct: 80,
+      antiguedadMaximaAnios: 10, periodosMinimosInterno: 1, asignaturasHomologablesMinimasInterno: 1,
+      periodosMinimosExterno: 2, asignaturasHomologablesMinimasExterno: 2 };
+    vi.stubGlobal('fetch', vi.fn(async (path: string) => new Response(JSON.stringify(
+      path === '/api/auth/login' ? loginResponse({ role: 'Coordinador' })
+        : path.startsWith('/api/homologaciones/configuracion/historial') ? { entradas: [], cursorSiguiente: null }
+          : path === '/api/homologaciones/configuracion' ? parametros : []),
+    { status: 200, headers: path === '/api/homologaciones/configuracion' ? { ETag: `"${parametros.versionId}"` } : {} })));
+    mount();
+    const user = await fillLogin();
+    await user.click(screen.getByRole('button', { name: 'Ingresar' }));
+    await user.click(await screen.findByRole('link', { name: /Configuración/ }));
+    expect(await screen.findByRole('heading', { name: 'Parámetros de homologación' })).toBeInTheDocument();
+  });
+});

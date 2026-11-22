@@ -2,6 +2,7 @@ using Homologacion.Application.AnalisisInterno;
 using Homologacion.Infrastructure.AnalisisExterno;
 using Homologacion.Infrastructure.RevisionDocente;
 using Homologacion.Infrastructure.Informe;
+using Homologacion.Infrastructure.Configuracion;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Text.Json;
@@ -26,8 +27,11 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<RegistroRevisionDocente> RevisionesDocentes => Set<RegistroRevisionDocente>();
     /// <summary>HU-23: un informe fijo por solicitud.</summary>
     public DbSet<RegistroInforme> Informes => Set<RegistroInforme>();
+    public DbSet<RegistroConfiguracionHomologacion> Configuraciones => Set<RegistroConfiguracionHomologacion>();
+    public DbSet<ConfiguracionHomologacionVigente> ConfiguracionVigente => Set<ConfiguracionHomologacionVigente>();
     protected override void OnModelCreating(ModelBuilder model)
     {
+        Homologacion.Infrastructure.Agrupaciones.ModeloGruposHu21.Configurar(model);
         var r = model.Entity<RegistroResultado>();
         r.ToTable("AnalisisInternos");
         r.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId });
@@ -51,6 +55,21 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
         i.HasKey(x => x.SolicitudId);
         i.Property(x => x.SolicitudId).ValueGeneratedNever();
         i.Property(x => x.Contenido).IsRequired();
+        var c = model.Entity<RegistroConfiguracionHomologacion>();
+        c.ToTable("ConfiguracionesHomologacion");
+        c.HasKey(x => x.VersionId);
+        c.HasOne<RegistroConfiguracionHomologacion>().WithMany()
+            .HasForeignKey(x => x.VersionAnteriorId).OnDelete(DeleteBehavior.Restrict);
+        c.Property(x => x.Motivo).HasMaxLength(500).IsRequired();
+        c.Property(x => x.Respaldo).HasMaxLength(2000).IsRequired();
+        c.Property(x => x.RowVersion).IsRequired().IsRowVersion();
+        var vigente = model.Entity<ConfiguracionHomologacionVigente>();
+        vigente.ToTable("ConfiguracionHomologacionVigente");
+        vigente.HasKey(x => x.Id);
+        vigente.Property(x => x.Id).ValueGeneratedNever();
+        vigente.Property(x => x.VersionId).IsRequired();
+        vigente.HasOne<RegistroConfiguracionHomologacion>().WithMany()
+            .HasForeignKey(x => x.VersionId).OnDelete(DeleteBehavior.Restrict);
     }
 }
 public sealed class ResultadosAnalisisSql(ResultadosDbContext db) : IResultadosAnalisisInterno
@@ -74,6 +93,22 @@ internal static class AlmacenPorPareja
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     public static async Task GuardarAsync<T>(DbContext db, DbSet<T> set, AnalisisGuardado resultado, CancellationToken ct) where T : class, IRegistroAnalisis, new()
+    {
+        if (db is not ResultadosDbContext contexto) throw new InvalidOperationException("Se requiere el contexto propio de Homologación.");
+        try
+        {
+            await new InformesHomologacionSql(contexto).ConCierreAsync(resultado.Analisis.SolicitudId, async () =>
+            {
+                var a = resultado.Analisis;
+                if (await contexto.Informes.AnyAsync(i => i.SolicitudId == a.SolicitudId, ct)) throw new Homologacion.Application.Informe.InformeYaGeneradoException();
+                await Homologacion.Infrastructure.Agrupaciones.ReservasOrigenSql.ExigirParejaAsync(contexto, a.SolicitudId, a.AsignaturaAprobadaId, a.AsignaturaReceptoraId, ct);
+                await GuardarParejaAsync(db, set, resultado, ct); return true;
+            }, ct);
+        }
+        catch (DbException) { throw new AlmacenAnalisisNoDisponibleException(); }
+        catch (DbUpdateException) { throw new AlmacenAnalisisNoDisponibleException(); }
+    }
+    private static async Task GuardarParejaAsync<T>(DbContext db, DbSet<T> set, AnalisisGuardado resultado, CancellationToken ct) where T : class, IRegistroAnalisis, new()
     {
         try
         {

@@ -21,9 +21,11 @@ public class InformeEndpointTests
     private static readonly Guid Carrera = Guid.Parse("a0000000-0000-0000-0000-000000000004");
 
     private sealed class Fuentes : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno,
-        IRevisionesDocentes, IInformesHomologacion
+        IRevisionesDocentes, IInformesHomologacion, IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
     {
         public bool Asignada { get; set; } = true;
+        Task<IReadOnlyList<AnalisisAgrupacionGuardado>> IResultadosAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<AnalisisAgrupacionGuardado>>([]);
+        Task<IReadOnlyList<RevisionAgrupacionRegistrada>> IRevisionesAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<RevisionAgrupacionRegistrada>>([]);
         public int Consultas { get; private set; }
         public List<RevisionDocenteRegistrada> Revisiones { get; } = [];
         public InformeHomologacion? Informe { get; set; }
@@ -64,6 +66,8 @@ public class InformeEndpointTests
             s.RemoveAll<IResultadosAnalisisExterno>(); s.AddSingleton<IResultadosAnalisisExterno>(e);
             s.RemoveAll<IRevisionesDocentes>(); s.AddSingleton<IRevisionesDocentes>(e);
             s.RemoveAll<IInformesHomologacion>(); s.AddSingleton<IInformesHomologacion>(e);
+            s.RemoveAll<IResultadosAgrupacionInforme>();s.AddSingleton<IResultadosAgrupacionInforme>(e);
+            s.RemoveAll<IRevisionesAgrupacionInforme>();s.AddSingleton<IRevisionesAgrupacionInforme>(e);
             s.RemoveAll<TimeProvider>(); s.AddSingleton<TimeProvider>(new RelojAnalisis());
         });
     });

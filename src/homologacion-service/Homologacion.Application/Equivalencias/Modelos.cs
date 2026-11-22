@@ -18,5 +18,6 @@ public sealed record EvaluacionEquivalencia(IReadOnlyList<string> AsignaturasOri
     IReadOnlyList<string> ResultadosAprendizajeSinCobertura, IReadOnlyList<string> InformacionFaltante)
 {
     public bool Homologable => Estado == EstadoEquivalencia.Homologable;
+    public Guid? ConfiguracionVersionId { get; init; }
 }
 public sealed class DatosEvaluacionInvalidosException(string mensaje) : Exception(mensaje);

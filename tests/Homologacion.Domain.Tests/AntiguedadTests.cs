@@ -50,4 +50,23 @@ public class AntiguedadTests
     public void Anios_finales_del_calendario_no_desbordan()
         => Assert.Equal(EstadoAntiguedad.Elegible, ValidadorAntiguedad.Validar(
             EstadoAsignatura.Aprobada, new DateOnly(9998, 1, 1), new DateOnly(9999, 1, 1)).Estado);
+
+    [Fact]
+    public void Usa_antiguedad_maxima_configurada_con_limite_inclusivo()
+    {
+        var aprobacion = new DateOnly(2020, 6, 15);
+        Assert.Equal(EstadoAntiguedad.Elegible,
+            ValidadorAntiguedad.Validar(EstadoAsignatura.Aprobada, aprobacion,
+                new DateOnly(2025, 6, 15), 5).Estado);
+        Assert.Equal(EstadoAntiguedad.RequiereValidacionConocimientos,
+            ValidadorAntiguedad.Validar(EstadoAsignatura.Aprobada, aprobacion,
+                new DateOnly(2025, 6, 16), 5).Estado);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(51)]
+    public void Rechaza_antiguedad_maxima_fuera_de_rango(int anios)
+        => Assert.Throws<ArgumentOutOfRangeException>(() => ValidadorAntiguedad.Validar(
+            EstadoAsignatura.Aprobada, new DateOnly(2020, 1, 1), new DateOnly(2020, 1, 1), anios));
 }

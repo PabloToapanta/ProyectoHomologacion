@@ -1,4 +1,5 @@
 import {useEffect,useState} from 'react';
+import {GruposInforme,type GrupoInforme} from './GruposInforme';
 import './InformePanel.css';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Aprobada={id:string;nombreAsignatura:string};
@@ -7,13 +8,14 @@ type Pareja={asignaturaAprobadaId:string;asignaturaReceptoraId:string;receptoraC
  agente:{estado:string;sugerencia:string|null;porcentajeAcademico:number|null;porcentajeHoras:number|null;porcentajeCreditos:number|null};
  docentes:DocenteEnInforme[];sugerenciaFinal:'Convalidar'|'NoConvalidar'|'SinAcuerdo'};
 type Informe={solicitudId:string;tipoCambio:string;fecha:string;generadoPor:string;parejas:Pareja[];aprobadasSinAnalisis:string[];
- convalidar:number;noConvalidar:number;sinAcuerdo:number;advertencias:string[]};
+ convalidar:number;noConvalidar:number;sinAcuerdo:number;advertencias:string[];grupos?:GrupoInforme[]};
 function esInforme(value:unknown):value is Informe {
  if(typeof value!=='object'||value===null)return false;
  const x=value as Partial<Informe>;
  return typeof x.solicitudId==='string'&&typeof x.tipoCambio==='string'&&typeof x.fecha==='string'&&typeof x.generadoPor==='string'&&
   Array.isArray(x.parejas)&&Array.isArray(x.aprobadasSinAnalisis)&&Array.isArray(x.advertencias)&&
-  Number.isFinite(x.convalidar)&&Number.isFinite(x.noConvalidar)&&Number.isFinite(x.sinAcuerdo);
+  Number.isFinite(x.convalidar)&&Number.isFinite(x.noConvalidar)&&Number.isFinite(x.sinAcuerdo)&&
+  (x.grupos===undefined||Array.isArray(x.grupos));
 }
 const posturas={DeAcuerdo:'De acuerdo',Ajuste:'Ajuste'} as const;
 const decisiones={Homologable:'Homologable',NoHomologable:'No homologable'} as const;
@@ -75,6 +77,7 @@ export function InformePanel({request,solicitudId,aprobadas,puedeGenerar=true}:{
      <td><ul>{p.docentes.map(d=><li key={d.docenteId}>{`${d.docente}: ${posturas[d.postura]} · ${decisiones[d.decision]}${d.observacion?` · ${d.observacion}`:''}`}</li>)}</ul></td>
      <td><strong>{finales[p.sugerenciaFinal]}</strong></td>
     </tr>)}</tbody></table></div>
+   {!!informe.grupos?.length&&<GruposInforme grupos={informe.grupos} nombre={nombre}/>}
    {informe.aprobadasSinAnalisis.length>0&&<p>Sin análisis docente: {informe.aprobadasSinAnalisis.map(nombre).join(', ')}.</p>}
    {informe.advertencias.map(a=><p key={a}>{a}</p>)}
    </div>
