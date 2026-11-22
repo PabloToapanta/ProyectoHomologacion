@@ -46,7 +46,7 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
   await solicitudDialog.getByLabel('Carrera de origen').selectOption(env('E2E_CARRERA_ORIGEN_ID'));
   await solicitudDialog.getByLabel('Carrera receptora').selectOption(env('E2E_CARRERA_RECEPTORA_ID'));
   await solicitudDialog.getByRole('button', { name: 'Registrar solicitud' }).click();
-  await expect(coordinator.getByRole('status')).toContainText('Solicitud registrada correctamente');
+  await expect(coordinator.getByText('Solicitud registrada correctamente.')).toBeVisible();
   await coordinator.getByRole('button', { name: `Ver ${numero}` }).click();
   const detail = coordinator.getByRole('dialog', { name: `Solicitud ${numero}` });
 
@@ -57,13 +57,13 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
   await detail.getByLabel('Número de matrícula').fill(`MAT-${runId}`);
   await detail.getByLabel('Intento de matrícula').selectOption('1');
   await detail.getByRole('button', { name: 'Registrar asignatura' }).click();
-  await expect(detail.getByRole('status')).toContainText('Asignatura registrada');
+  await expect(detail.getByText('Asignatura registrada.')).toBeVisible();
 
   await detail.getByRole('button', { name: 'Asignar docentes' }).click();
   await detail.getByLabel('Primer docente').selectOption({ label: env('E2E_DOC1_USERNAME') });
   await detail.getByLabel('Segundo docente').selectOption({ label: env('E2E_DOC2_USERNAME') });
   await detail.getByRole('button', { name: 'Guardar asignación' }).click();
-  await expect(detail.getByRole('status')).toContainText('Docentes asignados correctamente');
+  await expect(detail.getByText('Docentes asignados correctamente.')).toBeVisible();
   await close(coordinator);
 
   for (const username of [env('E2E_DOC1_USERNAME'), env('E2E_DOC2_USERNAME')]) {
@@ -75,11 +75,11 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
     await assigned.getByLabel('Asignatura aprobada').selectOption({ label: 'HU27-O · Asignatura sintética O' });
     await assigned.getByLabel('Asignatura receptora').selectOption({ label: 'Nivel 1 · HU27-R · Asignatura sintética R' });
     await assigned.getByRole('button', { name: 'Ejecutar análisis y guardar' }).click();
-    await expect(assigned.getByRole('status')).toContainText('Análisis guardado');
+    await expect(assigned.getByText('Análisis guardado.')).toBeVisible();
     await expect(assigned.getByRole('heading', { name: 'Resultado del análisis automatizado' })).toBeVisible();
     await assigned.getByLabel('De acuerdo con el agente').check();
     await assigned.getByRole('button', { name: 'Guardar mi análisis' }).click();
-    await expect(assigned.getByRole('status')).toContainText('Su análisis quedó registrado');
+    await expect(assigned.getByText('Su análisis quedó registrado.')).toBeVisible();
     await teacher.getByRole('button', { name: 'Cerrar detalle' }).click();
     await close(teacher);
   }
@@ -94,15 +94,16 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
   await expect(reportTable.getByText(/doc1\.hu27/)).toBeVisible();
   await expect(reportTable.getByText(/doc2\.hu27/)).toBeVisible();
   await report.getByRole('button', { name: 'Remitir al coordinador' }).click();
-  await expect(report.getByRole('status')).toContainText('Informe remitido al coordinador');
+  await expect(report.getByText(/Informe remitido al coordinador de carrera por/)).toBeVisible();
   await close(reporter);
 
   const finalCoordinator = await login(browser, env('E2E_COORD_USERNAME'), env('E2E_COORD_PASSWORD'));
   await finalCoordinator.getByRole('button', { name: `Ver ${numero}` }).click();
   const finalDetail = finalCoordinator.getByRole('dialog', { name: `Solicitud ${numero}` });
+  await expect(finalDetail.getByText('Remitida', { exact: true })).toBeVisible();
   await expect(finalDetail.getByRole('heading', { name: 'Revisión del informe y finalización' })).toBeVisible();
   await finalDetail.getByRole('button', { name: 'Finalizar solicitud' }).click();
-  await expect(finalDetail.getByRole('status')).toContainText('Solicitud finalizada');
+  await expect(finalDetail.getByText(/Solicitud finalizada por/)).toBeVisible();
   await finalCoordinator.getByRole('button', { name: 'Cerrar detalle' }).click();
   await close(finalCoordinator);
 
