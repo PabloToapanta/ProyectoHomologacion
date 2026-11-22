@@ -20,6 +20,10 @@ export function AdminPanel() {
           <h3>Validaciones académicas</h3><p>Evalúa equivalencias, aprobación, antigüedad y requisitos de cambio de carrera.</p>
           <Link to="/validaciones" className="app-button app-button--secondary">Abrir validaciones</Link>
         </article>
+        <article className="module-card"><span className="module-icon" aria-hidden="true">♙</span>
+          <h3>Usuarios y roles</h3><p>Administra las cuentas de docentes y coordinadores.</p>
+          <Link to="/admin/usuarios" className="app-button app-button--secondary">Gestionar usuarios</Link>
+        </article>
       </div>
     </section>
     <aside className="academic-note"><strong>Apoyo al análisis académico</strong><p>Los resultados orientan la revisión. La decisión académica final corresponde a las autoridades competentes.</p></aside>

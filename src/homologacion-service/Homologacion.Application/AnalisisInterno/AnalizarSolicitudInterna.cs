@@ -3,15 +3,18 @@ using Homologacion.Application.Equivalencias;
 using Homologacion.Application.TerceraMatricula;
 using Homologacion.Domain.Antiguedad;
 using Homologacion.Domain.TerceraMatricula;
+using Homologacion.Application.Configuracion;
+using Homologacion.Domain.Configuracion;
 
 namespace Homologacion.Application.AnalisisInterno;
 
 public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicitudes, ICatalogoAnalisisInterno catalogo,
-    AsistirEvaluacionInterna asistencia, TimeProvider reloj)
+    AsistirEvaluacionInterna asistencia, TimeProvider reloj, IParametrosHomologacionProvider? parametrosProvider = null)
 {
     public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitudId, Guid aprobadaId, Guid receptoraId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
+        var parametros = parametrosProvider is null ? ParametrosHomologacion.Predeterminados() : await parametrosProvider.ObtenerVigentesAsync(ct);
         if (solicitudId == Guid.Empty || aprobadaId == Guid.Empty || receptoraId == Guid.Empty)
             throw new DatosAnalisisSolicitudException("Seleccione la solicitud y ambas asignaturas.");
         var solicitud = await solicitudes.ObtenerSolicitudAsync(solicitudId, ct) ?? throw new SolicitudAnalisisNoEncontradaException();
@@ -50,7 +53,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             faltantes.Add("fecha de aprobación ausente o futura: requiere revisión");
         else
         {
-            antiguedad = new ValidarAntiguedad().Ejecutar(new(estado, aprobada.FechaAprobacion, hoy));
+            antiguedad = new ValidarAntiguedad().Ejecutar(new(estado, aprobada.FechaAprobacion, hoy), parametros);
             if (antiguedad.Estado != EstadoAntiguedad.Elegible) faltantes.Add(antiguedad.Motivo);
         }
         if (terceraMatricula == ResultadoTerceraMatricula.IntentoDesconocido) faltantes.Add(ReglaTerceraMatricula.FaltaIntento);
@@ -76,7 +79,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
                 origen.EsSintetico || receptora.EsSintetico, advertencias);
         }
         AnalisisAsistido resultado;
-        try { resultado = await asistencia.EjecutarAsync(datos, textos, faltantes, ct); }
+        try { resultado = await asistencia.EjecutarAsync(datos, textos, faltantes, parametros, ct); }
         catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
         var estadoAnalisis = resultado.Estado switch
         {

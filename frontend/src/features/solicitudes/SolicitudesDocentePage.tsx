@@ -1,7 +1,9 @@
 import {useEffect,useState} from 'react';
 import {FormDialog} from '../../shared/ui/FormDialog';
+import {AgrupacionesPanel} from './AgrupacionesPanel';
 import {AnalisisInternoPanel} from './AnalisisInternoPanel';
 import {InformePanel} from './InformePanel';
+import {AdjuntosSolicitud} from './AdjuntosSolicitud';
 import type {DocenteAsignado} from './DocentesAsignados';
 import '../catalogo/catalogo.css';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
@@ -61,7 +63,10 @@ export function SolicitudesDocentePage({request}:{request:Request}) {
    <h3>Docentes asignados</h3><ul aria-label="Docentes asignados">{s.docentesAsignados.map(d=><li key={d.id}>{d.nombreUsuario}</li>)}</ul>
    <h3>Asignaturas aprobadas</h3>{s.asignaturasAprobadas.length?<ul>{s.asignaturasAprobadas.map(a=><li key={a.id}>{a.nombreAsignatura} · {a.creditos} créditos · {a.horas} horas · nota {a.nota} ({a.estado})</li>)}</ul>:<p>Sin asignaturas aprobadas registradas.</p>}
    {s.tipoCambio==='Interno'||s.tipoCambio==='Externo'?<AnalisisInternoPanel key={s.id} tipo={s.tipoCambio} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas} inicial={detalle.analisis}/>:<AnalisisSolicitud analisis={detalle.analisis}/>}
-   {(s.tipoCambio==='Interno'||s.tipoCambio==='Externo')&&<InformePanel key={`informe-${s.id}`} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas}/>}
+   <AdjuntosSolicitud solicitudId={s.id} request={request} puedeSubir={false} finalizada={s.estado==='Finalizada'}/>
+    {(s.tipoCambio==='Interno'||s.tipoCambio==='Externo')&&<InformePanel key={`informe-${s.id}`} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas} estadoSolicitud={s.estado}
+     onRemitida={estado=>{setDetalle(d=>d&&{...d,solicitud:{...d.solicitud,estado}});setItems(old=>old.map(x=>x.id===s.id?{...x,estado}:x));}}/>}
+   {(s.tipoCambio==='Interno'||s.tipoCambio==='Externo')&&<AgrupacionesPanel key={`grupos-${s.id}`} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas}/>}
    <button className="app-button app-button--secondary" onClick={()=>setDetalle(null)}>Cerrar detalle</button>
   </FormDialog>}
  </section>;

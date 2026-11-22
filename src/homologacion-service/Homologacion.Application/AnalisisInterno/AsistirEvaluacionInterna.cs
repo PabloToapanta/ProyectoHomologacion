@@ -1,5 +1,6 @@
 using Homologacion.Application.Equivalencias;
 using Homologacion.Domain.Equivalencias;
+using Homologacion.Domain.Configuracion;
 
 namespace Homologacion.Application.AnalisisInterno;
 
@@ -13,9 +14,13 @@ public sealed class AsistirEvaluacionInterna(EvaluarEquivalencia motor, IAgenteA
 
     public async Task<AnalisisAsistido> EjecutarAsync(SolicitudEquivalencia datos, IReadOnlyList<TextoElementoAnalisis> textos,
         IReadOnlyList<string> faltantesExternos, CancellationToken cancellationToken)
+        => await EjecutarAsync(datos, textos, faltantesExternos, null, cancellationToken);
+
+    public async Task<AnalisisAsistido> EjecutarAsync(SolicitudEquivalencia datos, IReadOnlyList<TextoElementoAnalisis> textos,
+        IReadOnlyList<string> faltantesExternos, ParametrosHomologacion? parametros, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var evaluacion = motor.Ejecutar(datos);
+        var evaluacion = parametros is null ? motor.Ejecutar(datos) : motor.Ejecutar(datos, parametros);
         if (faltantesExternos.Count > 0)
         {
             var faltantes = evaluacion.InformacionFaltante.Concat(faltantesExternos).Distinct().ToArray();

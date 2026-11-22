@@ -1,5 +1,7 @@
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Equivalencias;
+using Homologacion.Application.Configuracion;
+using Homologacion.Domain.Configuracion;
 using Xunit;
 
 namespace Homologacion.Application.Tests;
@@ -17,7 +19,7 @@ internal sealed class EscenarioInterno : ISolicitudesAnalisisInterno, ICatalogoA
     private static readonly Guid ResultadoO = Guid.Parse("10000000-0000-0000-0000-000000000009");
     private static readonly Guid ResultadoR = Guid.Parse("10000000-0000-0000-0000-000000000010");
     public SolicitudParaAnalisis? Solicitud { get; set; } = new(SolicitudId, "Interno", CarreraOrigen, CarreraReceptora,
-        [new(AprobadaId, OrigenId, 8, 80, "Aprobada", new DateOnly(2025, 1, 1), 1)]);
+        [new(AprobadaId, OrigenId, 8, 80, "Aprobada", new DateOnly(2025, 1, 1)) { IntentoMatricula = 1 }]);
     public Dictionary<Guid, AsignaturaParaAnalisis> Materias { get; } = new()
     {
         [OrigenId] = new(OrigenId, CarreraOrigen, "FISEI", true, 8, 80, "plan-sintetico-O", "hora-reloj", "sistema-sintetico", true,
@@ -57,6 +59,25 @@ internal sealed class UmbralAnalisis : IUmbralEquivalencia { public decimal Valo
 public class AnalizarSolicitudInternaTests
 {
     private static AnalizarSolicitudInterna Caso(EscenarioInterno e) => new(e, e, new(new EvaluarEquivalencia(new UmbralAnalisis()), e), new RelojAnalisis());
+    private sealed class Proveedor(ParametrosHomologacion parametros) : IParametrosHomologacionProvider
+    {
+        public int Lecturas { get; private set; }
+        public Task<ParametrosHomologacion> ObtenerVigentesAsync(CancellationToken ct)
+        { Lecturas++; return Task.FromResult(parametros); }
+    }
+
+    [Fact]
+    public async Task Analisis_interno_usa_una_version_y_la_incluye_en_el_resultado()
+    {
+        var e = new EscenarioInterno();
+        var p = new ParametrosHomologacion(Guid.NewGuid(), 85, 10, 1, 1, 2, 2);
+        var proveedor = new Proveedor(p);
+        var caso = new AnalizarSolicitudInterna(e, e, new(new EvaluarEquivalencia(new UmbralAnalisis()), e), new RelojAnalisis(), proveedor);
+        var r = await caso.EjecutarAsync(EscenarioInterno.SolicitudId, EscenarioInterno.AprobadaId, EscenarioInterno.ReceptoraId, default);
+        Assert.Equal(1, proveedor.Lecturas);
+        Assert.Equal(p.VersionId, r.Evaluacion.ConfiguracionVersionId);
+        Assert.Equal(85, r.Evaluacion.UmbralPct);
+    }
     [Theory]
     [InlineData("estado")]
     [InlineData("aprobada-nula")]

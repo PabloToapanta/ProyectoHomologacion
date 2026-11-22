@@ -1,6 +1,8 @@
 using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
+using Homologacion.Application.Configuracion;
 using Homologacion.Infrastructure.AnalisisExterno;
+using Homologacion.Infrastructure.Configuracion;
 using Homologacion.Application.RevisionDocente;
 using Homologacion.Infrastructure.RevisionDocente;
 using Homologacion.Application.Informe;
@@ -43,6 +45,10 @@ public static class RegistroAnalisisInterno
         services.AddDbContext<ResultadosDbContext>((p, options) => options.UseSqlServer(
             p.GetRequiredService<IConfiguration>().GetConnectionString("Homologacion")
             ?? throw new InvalidOperationException("Configure ConnectionStrings:Homologacion para guardar análisis.")));
+        services.AddScoped<ParametrosHomologacionSql>();
+        services.AddScoped<IParametrosHomologacionProvider>(p => p.GetRequiredService<ParametrosHomologacionSql>());
+        services.AddScoped<IConfiguracionHomologacionStore>(p => p.GetRequiredService<ParametrosHomologacionSql>());
+        services.AddScoped<GestionarConfiguracionHomologacion>();
         services.AddScoped<IResultadosAnalisisInterno, ResultadosAnalisisSql>();
         services.AddScoped<GestionarAnalisisInterno>();
         services.AddScoped<IReceptorasAnalisisInterno>(p => p.GetRequiredService<FuentesAnalisisHttp>());
@@ -58,7 +64,25 @@ public static class RegistroAnalisisInterno
         services.AddScoped(p => new RegistrarRevisionDocente(p.GetRequiredService<ISolicitudesAnalisisInterno>(), p.GetRequiredService<ICatalogoAnalisisInterno>(),
             p.GetRequiredService<IResultadosAnalisisInterno>(), p.GetRequiredService<IResultadosAnalisisExterno>(), p.GetRequiredService<IRevisionesDocentes>(),
             p.GetRequiredService<TimeProvider>(), p.GetRequiredService<IInformesHomologacion>()));
+        // HU-25: el evento «Generado» se registra en la misma transacción que el informe.
+        services.AddScoped<IAuditoriaInformes, EventosInformeSql>();
         services.AddScoped<GenerarInformeHomologacion>();
+        services.AddScoped<ConsultarHistorialInforme>();
+        // HU-32: Solicitudes es dueño del estado; la remisión y el evento «Remitido» se confirman juntos.
+        services.AddScoped<IEstadoSolicitudes>(p => p.GetRequiredService<FuentesAnalisisHttp>());
+        services.AddScoped<RemitirInformeHomologacion>();
+        // HU-33: decisión del coordinador en «Sin acuerdo» y finalización.
+        services.AddScoped<IDecisionesCoordinador, DecisionesCoordinadorSql>();
+        services.AddScoped<RevisionCoordinadorInforme>();
+        services.AddScoped<Homologacion.Application.Equivalencias.EvaluarAgrupacion>();
+        services.AddScoped<Homologacion.Application.Agrupaciones.PrepararAgrupacion>();
+        services.AddScoped<Homologacion.Application.Agrupaciones.GestionarAgrupaciones>();
+        services.AddScoped<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>();
+        services.AddScoped<Homologacion.Application.Agrupaciones.IGruposAgrupacion>(p => p.GetRequiredService<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>());
+        services.AddScoped<IResultadosAgrupacionInforme>(p => p.GetRequiredService<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>());
+        services.AddScoped<IRevisionesAgrupacion>(p => p.GetRequiredService<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>());
+        services.AddScoped<IRevisionesAgrupacionInforme>(p => p.GetRequiredService<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>());
+        services.AddScoped<RegistrarRevisionAgrupacion>();
         return services;
     }
 

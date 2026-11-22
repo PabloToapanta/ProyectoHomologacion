@@ -3,6 +3,7 @@ using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Equivalencias;
 using Homologacion.Domain.Antiguedad;
+using Homologacion.Domain.Configuracion;
 using Xunit;
 
 namespace Homologacion.Application.Tests;
@@ -186,6 +187,10 @@ public class GestionarAnalisisExternoTests
     }
     private static GestionarAnalisisExterno Caso(EscenarioExterno e, Almacen a) =>
         new(new(e, e, new EvaluarEquivalencia(new UmbralAnalisis()), new RelojAnalisis()), e, a, new RelojAnalisis());
+    private static GestionarAnalisisExterno Caso(EscenarioExterno e, Almacen a, ParametrosHomologacion p) =>
+        new(new(e, e, new EvaluarEquivalencia(new UmbralAnalisis()), new RelojAnalisis()), e, a, new RelojAnalisis(), new Proveedor(p));
+    private sealed class Proveedor(ParametrosHomologacion p) : Homologacion.Application.Configuracion.IParametrosHomologacionProvider
+    { public Task<ParametrosHomologacion> ObtenerVigentesAsync(CancellationToken ct) => Task.FromResult(p); }
     private static AnalisisGuardado Guardado(Guid aprobada, string estado, string? sugerencia) => new(DateTimeOffset.UnixEpoch,
         new(EscenarioExterno.SolicitudId, aprobada, Guid.NewGuid(), estado, "sintético",
             sugerencia is null ? null : new(100, 100, 100, sugerencia, "sintético", []),
@@ -200,6 +205,19 @@ public class GestionarAnalisisExternoTests
         var r = Assert.Single(await caso.ConsultarAsync(EscenarioExterno.SolicitudId, default));
         Assert.Equal("Incompleto", r.Analisis.Estado);
         Assert.Null(r.Analisis.Resultado);
+    }
+
+    [Fact]
+    public async Task Analisis_externo_guarda_la_version_capturada()
+    {
+        var e = new EscenarioExterno(); var a = new Almacen();
+        var p = new ParametrosHomologacion(Guid.NewGuid(), 85, 10, 1, 1, 2, 2);
+        var analisis = new AnalizarSolicitudExterna(e, e, new EvaluarEquivalencia(new UmbralAnalisis()), new RelojAnalisis(), new Proveedor(p));
+        var caso = new GestionarAnalisisExterno(analisis, e, a, new RelojAnalisis(), new Proveedor(p));
+        await caso.EjecutarAsync(EscenarioExterno.SolicitudId, EscenarioExterno.AprobadaId, EscenarioExterno.ReceptoraId, default);
+        var guardado = Assert.Single(a.Datos);
+        Assert.Equal(p.VersionId, guardado.Analisis.Evaluacion.ConfiguracionVersionId);
+        Assert.Equal(85, guardado.Analisis.Evaluacion.UmbralPct);
     }
 
     [Fact]
@@ -270,5 +288,44 @@ public class GestionarAnalisisExternoTests
     {
         var e = new EscenarioExterno(); e.Solicitud = e.Solicitud! with { TipoCambio = "Interno" };
         await Assert.ThrowsAsync<DatosAnalisisSolicitudException>(() => Caso(e, new Almacen()).RequisitosAsync(EscenarioExterno.SolicitudId, default));
+    }
+
+    [Fact]
+    public async Task Requisitos_externos_usan_minimos_vigentes_en_lugar_de_los_predeterminados()
+    {
+        var e = new EscenarioExterno();
+        e.Solicitud = e.Solicitud! with { PeriodosCursados = 1 };
+        var p = new ParametrosHomologacion(Guid.NewGuid(), 80, 10, 1, 1, 1, 1);
+        var r = await Caso(e, new Almacen(), p).RequisitosAsync(EscenarioExterno.SolicitudId, default);
+        Assert.Equal("Incompleto", r.Estado);
+        Assert.Empty(r.Incumplimientos);
+        Assert.Contains(r.Faltantes, f => f.Contains("análisis completos", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task Minimo_externo_de_una_homologable_cumple_con_evidencia_aunque_quede_otra_pendiente()
+    {
+        var e = new EscenarioExterno();
+        e.Solicitud = e.Solicitud! with { PeriodosCursados = 1 };
+        var a = new Almacen();
+        a.Datos.Add(Guardado(EscenarioExterno.AprobadaId, "Completo", "Homologable"));
+        var p = new ParametrosHomologacion(Guid.NewGuid(), 80, 10, 1, 1, 1, 1);
+        var r = await Caso(e, a, p).RequisitosAsync(EscenarioExterno.SolicitudId, default);
+        Assert.Equal("Cumple", r.Estado);
+        Assert.Empty(r.Faltantes);
+        Assert.Empty(r.Incumplimientos);
+    }
+
+    [Fact]
+    public async Task Minimo_externo_de_tres_homologables_incumple_tras_analizar_todas()
+    {
+        var e = new EscenarioExterno(); var a = new Almacen();
+        a.Datos.Add(Guardado(EscenarioExterno.AprobadaId, "Completo", "Homologable"));
+        a.Datos.Add(Guardado(EscenarioExterno.OtraAprobadaId, "Completo", "Homologable"));
+        var p = new ParametrosHomologacion(Guid.NewGuid(), 80, 10, 1, 1, 2, 3);
+        var r = await Caso(e, a, p).RequisitosAsync(EscenarioExterno.SolicitudId, default);
+        Assert.Equal("NoCumple", r.Estado);
+        Assert.Equal(["Se requieren al menos 3 asignaturas homologables."], r.Incumplimientos);
+        Assert.Empty(r.Faltantes);
     }
 }

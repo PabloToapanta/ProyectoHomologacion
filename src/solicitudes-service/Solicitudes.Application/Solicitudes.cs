@@ -22,6 +22,9 @@ public interface ISolicitudRepository {
  Task<IReadOnlyList<Solicitud>> ListarAsignadasA(Guid docenteId,CancellationToken ct);
  Task<bool> EstaAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct);
  Task GuardarCambios(CancellationToken ct);
+ Task<IReadOnlyList<AdjuntoSolicitudMetadata>> ListarAdjuntos(Guid solicitudId,CancellationToken ct);
+ Task<AdjuntoSolicitud?> ObtenerAdjunto(Guid solicitudId,Guid adjuntoId,CancellationToken ct);
+ Task GuardarAdjunto(AdjuntoSolicitud adjunto,CancellationToken ct);
 }
 public sealed record AsignaturaAprobadaInput(Guid? AsignaturaOrigenId,string? NombreAsignatura,decimal? Creditos,string? SistemaCreditos,int? Horas,string? UnidadHoras,string? ReferenciaPrograma,decimal Nota,decimal? NotaMaximaEscala,decimal? NotaMinimaAprobacion,DateOnly FechaAprobacion,string NumeroMatricula,int IntentoMatricula);
 public sealed record SolicitudDetalle(Guid Id,string NumeroQuipux,string IdentificacionEstudiante,string NombreEstudiante,string TipoCambio,Guid? CarreraOrigenId,string? InstitucionOrigen,string? CarreraOrigenExterna,Guid CarreraReceptoraId,string Estado,DateTime FechaRegistro,IReadOnlyList<AsignaturaAprobada> AsignaturasAprobadas,IReadOnlyList<DocenteAsignado> DocentesAsignados,int? PeriodosCursados,int? CambiosPreviosCarrera);
@@ -32,7 +35,12 @@ public sealed record AnalisisSolicitud(string Estado,string Mensaje,ResultadoAna
  public static AnalisisSolicitud Pendiente {get;}=new("Pendiente","El análisis automatizado aún no se ha ejecutado para esta solicitud.",null);
 }
 public sealed record SolicitudAsignada(SolicitudDetalle Solicitud,AnalisisSolicitud Analisis);
+public sealed record AdjuntoSolicitudInput(string Tipo,string NombreArchivo,string ContentType,byte[] Contenido,string SubidoPor,string SubidoPorNombre);
+public sealed record AdjuntoSolicitudMetadata(Guid Id,Guid SolicitudId,string Tipo,string NombreArchivo,long TamanoBytes,string HuellaSha256,string SubidoPor,DateTime FechaSubidaUtc,string SubidoPorNombre);
+public sealed class SolicitudFinalizadaException() : Exception("No se pueden adjuntar archivos a una solicitud finalizada.");
+public sealed class AdjuntoNoEncontradoException() : Exception("El adjunto no existe en esta solicitud.");
 public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCarreras catalogo,IDirectorioDocentes directorio,TimeProvider reloj) {
+ public const long TamanoMaximoAdjuntoBytes=20L*1024*1024;
  // Ecuador continental no aplica horario de verano; la fecha académica no depende de UTC ni del contenedor.
  static readonly TimeSpan OffsetEcuador=TimeSpan.FromHours(-5);
  public async Task<Solicitud> Crear(SolicitudInput input,CancellationToken ct) {
@@ -51,6 +59,7 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
  }
  public async Task<AsignaturaAprobada> RegistrarAsignatura(Guid solicitudId,AsignaturaAprobadaInput input,CancellationToken ct) {
   var solicitud=await repository.Obtener(solicitudId,ct)??throw new SolicitudNoEncontradaException();
+  solicitud.ValidarEditable();
   var hoy=DateOnly.FromDateTime(reloj.GetUtcNow().ToOffset(OffsetEcuador).DateTime);
   var asignatura=solicitud.CarreraOrigenId is Guid carreraOrigen?await Interna(solicitudId,carreraOrigen,input,hoy,ct):Externa(solicitudId,input,hoy);
   await repository.AgregarAsignatura(asignatura,ct);return asignatura;
@@ -84,6 +93,22 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   await repository.GuardarCambios(ct);
   return (await Obtener(solicitudId,ct))!;
  }
+ /// <summary>HU-32: lo invoca Homologación al remitir el informe; solo un docente asignado; si no existe o no está asignada, «no encontrada».</summary>
+ public async Task MarcarRemitida(Guid solicitudId,Guid docenteId,CancellationToken ct) {
+  if(!await repository.EstaAsignada(solicitudId,docenteId,ct)) throw new SolicitudNoEncontradaException();
+  var solicitud=await repository.ObtenerParaActualizar(solicitudId,ct)??throw new SolicitudNoEncontradaException();
+  if(!solicitud.MarcarRemitida()) return;
+  try {await repository.GuardarCambios(ct);}
+  // Estado es token de concurrencia: si otra petición lo cambió antes, se rechaza en vez de sobrescribir.
+  catch(DatosExternosNoEditablesException) {throw new EstadoSolicitudNoPermiteException("El estado de la solicitud cambió durante la remisión. Intente nuevamente.");}
+ }
+ /// <summary>HU-33: lo invoca Homologación al finalizar el coordinador, después de comprobar el informe remitido y las decisiones.</summary>
+ public async Task MarcarFinalizada(Guid solicitudId,CancellationToken ct) {
+  var solicitud=await repository.ObtenerParaActualizar(solicitudId,ct)??throw new SolicitudNoEncontradaException();
+  if(!solicitud.MarcarFinalizada()) return;
+  try {await repository.GuardarCambios(ct);}
+  catch(DatosExternosNoEditablesException) {throw new EstadoSolicitudNoPermiteException("El estado de la solicitud cambió durante la finalización. Intente nuevamente.");}
+ }
  public Task<IReadOnlyList<Solicitud>> ListarAsignadas(Guid docenteId,CancellationToken ct)=>repository.ListarAsignadasA(docenteId,ct);
  /// <summary>Null si no existe o el docente no figura entre los asignados: no se distingue para no revelar solicitudes ajenas.</summary>
  public async Task<SolicitudAsignada?> ObtenerAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct) {
@@ -94,5 +119,34 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
  public async Task<IReadOnlyList<DocenteDisponible>> DocentesDisponibles(Guid solicitudId,CancellationToken ct) {
   if(await repository.Obtener(solicitudId,ct) is null) throw new SolicitudNoEncontradaException();
   return await directorio.Listar(ct);
+ }
+ public async Task<AdjuntoSolicitudMetadata> SubirAdjunto(Guid solicitudId,AdjuntoSolicitudInput input,CancellationToken ct) {
+  var nombre=Path.GetFileName((input.NombreArchivo??"").Replace('\\','/')).Trim();
+  if(input.Contenido is not { Length: > 0 } || input.Contenido.LongLength>TamanoMaximoAdjuntoBytes)
+   throw new SolicitudException("El archivo PDF debe tener contenido y no superar 20 MiB.");
+  var firmaPdf=EsFirmaPdf(input.Contenido);
+  if(!string.Equals(Path.GetExtension(nombre),".pdf",StringComparison.OrdinalIgnoreCase) ||
+     !string.Equals(input.ContentType,"application/pdf",StringComparison.OrdinalIgnoreCase) || !firmaPdf)
+   throw new SolicitudException("El archivo debe ser un PDF válido (.pdf).");
+  var adjunto=new AdjuntoSolicitud(solicitudId,input.Tipo,nombre,input.SubidoPor,input.SubidoPorNombre,reloj.GetUtcNow().UtcDateTime,input.Contenido);
+  await repository.GuardarAdjunto(adjunto,ct);
+  return Metadata(adjunto);
+ }
+ public async Task<IReadOnlyList<AdjuntoSolicitudMetadata>> ListarAdjuntos(Guid solicitudId,Guid? docenteId,CancellationToken ct) {
+  if(!await AccesoAdjuntos(solicitudId,docenteId,ct)) throw new SolicitudNoEncontradaException();
+  return await repository.ListarAdjuntos(solicitudId,ct);
+ }
+ public async Task<AdjuntoSolicitud> ObtenerAdjunto(Guid solicitudId,Guid adjuntoId,Guid? docenteId,CancellationToken ct) {
+  if(!await AccesoAdjuntos(solicitudId,docenteId,ct)) throw new SolicitudNoEncontradaException();
+  return await repository.ObtenerAdjunto(solicitudId,adjuntoId,ct)??throw new AdjuntoNoEncontradoException();
+ }
+ async Task<bool> AccesoAdjuntos(Guid solicitudId,Guid? docenteId,CancellationToken ct) {
+  if(await repository.Obtener(solicitudId,ct) is null) return false;
+  return docenteId is null || await repository.EstaAsignada(solicitudId,docenteId.Value,ct);
+ }
+ static AdjuntoSolicitudMetadata Metadata(AdjuntoSolicitud a)=>new(a.Id,a.SolicitudId,a.Tipo,a.NombreArchivo,a.TamanoBytes,a.HuellaSha256,a.SubidoPor,a.FechaSubidaUtc,a.SubidoPorNombre);
+ static bool EsFirmaPdf(byte[] contenido) {
+  var header=contenido.AsSpan();
+  return header.Length>=8 && header[..5].SequenceEqual("%PDF-"u8) && char.IsAsciiDigit((char)header[5]) && header[6]==(byte)'.' && char.IsAsciiDigit((char)header[7]);
  }
 }

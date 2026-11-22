@@ -3,9 +3,11 @@ using Homologacion.Domain.Antiguedad;
 
 namespace Homologacion.Application.AnalisisInterno;
 
-/// <summary>IntentoMatricula: HU-17 / RN-07; null = Solicitudes no lo informó (no se asume primera matrícula).</summary>
-public sealed record AprobadaParaAnalisis(Guid Id, Guid? AsignaturaOrigenId, decimal Creditos, int Horas, string Estado, DateOnly FechaAprobacion,
-    int? IntentoMatricula = null);
+public sealed record AprobadaParaAnalisis(Guid Id, Guid? AsignaturaOrigenId, decimal Creditos, int Horas, string Estado, DateOnly FechaAprobacion)
+{
+    /// <summary>HU-17 / RN-07; null = Solicitudes no lo informó (no se asume primera matrícula).</summary>
+    public int? IntentoMatricula { get; init; }
+}
 public sealed record SolicitudParaAnalisis(Guid Id, string TipoCambio, Guid? CarreraOrigenId, Guid CarreraReceptoraId, IReadOnlyList<AprobadaParaAnalisis> AsignaturasAprobadas);
 public sealed record ElementoParaAnalisis(Guid Id, string Texto);
 public sealed record AsignaturaParaAnalisis(Guid Id, Guid CarreraId, string Facultad, bool CarreraVigente, decimal Creditos, int Horas,

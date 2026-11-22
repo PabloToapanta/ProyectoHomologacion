@@ -168,7 +168,234 @@ internal static class ModeloInformes
     }
 }
 [DbContext(typeof(ResultadosDbContext))]
-public sealed class ResultadosDbContextModelSnapshot : ModelSnapshot
+[Migration("20261120000100_EventosInformeHu25")]
+public sealed class EventosInformeHu25 : Migration
 {
-    protected override void BuildModel(ModelBuilder modelBuilder) => ModeloInformes.Construir(modelBuilder);
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.CreateTable(
+            name: "EventosInforme",
+            columns: table => new
+            {
+                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Tipo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Usuario = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                Rol = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false)
+            },
+            constraints: table => table.PrimaryKey("PK_EventosInforme", x => x.Id));
+        migrationBuilder.CreateIndex(name: "IX_EventosInforme_SolicitudId_Tipo", table: "EventosInforme",
+            columns: ["SolicitudId", "Tipo"], unique: true);
+        // CA3: la aplicación no modifica ni elimina eventos y, en SQL Server, la base también lo impide.
+        if (migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.SqlServer")
+            migrationBuilder.Sql(@"CREATE TRIGGER TR_EventosInforme_SoloInsercion ON EventosInforme INSTEAD OF UPDATE, DELETE AS
+BEGIN
+    THROW 50025, N'El historial del informe es de solo inserción.', 1;
+END");
+    }
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("EventosInforme");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloEventosInforme.Construir(modelBuilder);
+}
+
+internal static class ModeloEventosInforme
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloInformes.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroEventoInforme", b =>
+        {
+            b.Property<Guid>("Id").HasColumnType("uniqueidentifier");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<string>("Rol").IsRequired().HasMaxLength(30).HasColumnType("nvarchar(30)");
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Tipo").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+            b.Property<string>("Usuario").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+            b.Property<Guid>("UsuarioId").HasColumnType("uniqueidentifier");
+            b.HasKey("Id");
+            b.HasIndex("SolicitudId", "Tipo").IsUnique();
+            b.ToTable("EventosInforme");
+        });
+    }
+}
+[DbContext(typeof(ResultadosDbContext))]
+[Migration("20261123000100_DecisionesCoordinadorHu33")]
+public sealed class DecisionesCoordinadorHu33 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(
+        name: "DecisionesCoordinador",
+        columns: table => new
+        {
+            SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            AprobadaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            ReceptoraId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Resultado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+            Justificacion = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+            CoordinadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Coordinador = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+            Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+        },
+        constraints: table => table.PrimaryKey("PK_DecisionesCoordinador", x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId }));
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("DecisionesCoordinador");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloDecisionesCoordinador.Construir(modelBuilder);
+}
+
+// Snapshot vigente: modelo de HU-25 más la tabla de HU-33.
+internal static class ModeloDecisionesCoordinador
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloEventosInforme.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroDecisionCoordinador", b =>
+        {
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("AprobadaId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("ReceptoraId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Coordinador").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+            b.Property<Guid>("CoordinadorId").HasColumnType("uniqueidentifier");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<string>("Justificacion").IsRequired().HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+            b.Property<string>("Resultado").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+            b.HasKey("SolicitudId", "AprobadaId", "ReceptoraId");
+            b.ToTable("DecisionesCoordinador");
+        });
+    }
+}
+[DbContext(typeof(ResultadosDbContext))]
+[Migration("20261121000100_ParametrosHomologacionHu03")]
+public sealed class ParametrosHomologacionHu03 : Migration
+{
+    private static readonly Guid VersionInicial = Guid.Parse("9e0ce28d-e93a-4cad-b650-48ad9b260301");
+
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.CreateTable(
+            name: "ConfiguracionesHomologacion",
+            columns: table => new
+            {
+                VersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                UmbralPct = table.Column<int>(type: "int", nullable: false),
+                AntiguedadMaximaAnios = table.Column<int>(type: "int", nullable: false),
+                PeriodosMinimosInterno = table.Column<int>(type: "int", nullable: false),
+                AsignaturasHomologablesMinimasInterno = table.Column<int>(type: "int", nullable: false),
+                PeriodosMinimosExterno = table.Column<int>(type: "int", nullable: false),
+                AsignaturasHomologablesMinimasExterno = table.Column<int>(type: "int", nullable: false),
+                ActorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                FechaHoraUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                Motivo = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                Respaldo = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+            },
+            constraints: table => table.PrimaryKey("PK_ConfiguracionesHomologacion", x => x.VersionId));
+
+        migrationBuilder.CreateTable(
+            name: "ConfiguracionHomologacionVigente",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "int", nullable: false),
+                VersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_ConfiguracionHomologacionVigente", x => x.Id);
+                table.ForeignKey("FK_ConfiguracionHomologacionVigente_ConfiguracionesHomologacion_VersionId",
+                    x => x.VersionId, "ConfiguracionesHomologacion", "VersionId", onDelete: ReferentialAction.Restrict);
+            });
+        migrationBuilder.CreateIndex("IX_ConfiguracionHomologacionVigente_VersionId",
+            "ConfiguracionHomologacionVigente", "VersionId");
+
+        migrationBuilder.InsertData("ConfiguracionesHomologacion",
+            ["VersionId", "UmbralPct", "AntiguedadMaximaAnios", "PeriodosMinimosInterno",
+             "AsignaturasHomologablesMinimasInterno", "PeriodosMinimosExterno",
+             "AsignaturasHomologablesMinimasExterno", "ActorId", "FechaHoraUtc", "Motivo", "Respaldo"],
+            [VersionInicial, 80, 10, 1, 1, 2, 2, Guid.Empty,
+             new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
+             "Configuración predeterminada inicial de HU-03", "Inicialización del sistema"]);
+        migrationBuilder.InsertData("ConfiguracionHomologacionVigente", ["Id", "VersionId"], [1, VersionInicial]);
+    }
+
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropTable("ConfiguracionHomologacionVigente");
+        migrationBuilder.DropTable("ConfiguracionesHomologacion");
+    }
+
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloParametrosHu03.Construir(modelBuilder);
+}
+
+internal static class ModeloParametrosHu03
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloInformes.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Configuracion.RegistroConfiguracionHomologacion", b =>
+        {
+            b.Property<Guid>("VersionId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("ActorId").HasColumnType("uniqueidentifier");
+            b.Property<int>("AntiguedadMaximaAnios").HasColumnType("int");
+            b.Property<int>("AsignaturasHomologablesMinimasExterno").HasColumnType("int");
+            b.Property<int>("AsignaturasHomologablesMinimasInterno").HasColumnType("int");
+            b.Property<DateTimeOffset>("FechaHoraUtc").HasColumnType("datetimeoffset");
+            b.Property<string>("Motivo").IsRequired().HasMaxLength(500).HasColumnType("nvarchar(500)");
+            b.Property<int>("PeriodosMinimosExterno").HasColumnType("int");
+            b.Property<int>("PeriodosMinimosInterno").HasColumnType("int");
+            b.Property<string>("Respaldo").IsRequired().HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+            b.Property<byte[]>("RowVersion").IsRequired().IsConcurrencyToken().ValueGeneratedOnAddOrUpdate().HasColumnType("rowversion");
+            b.Property<int>("UmbralPct").HasColumnType("int");
+            b.HasKey("VersionId");
+            b.ToTable("ConfiguracionesHomologacion");
+        });
+        modelBuilder.Entity("Homologacion.Infrastructure.Configuracion.ConfiguracionHomologacionVigente", b =>
+        {
+            b.Property<int>("Id").ValueGeneratedNever().HasColumnType("int");
+            b.Property<Guid>("VersionId").HasColumnType("uniqueidentifier");
+            b.HasKey("Id");
+            b.HasIndex("VersionId");
+            b.ToTable("ConfiguracionHomologacionVigente");
+        });
+        modelBuilder.Entity("Homologacion.Infrastructure.Configuracion.ConfiguracionHomologacionVigente", b =>
+        {
+            b.HasOne("Homologacion.Infrastructure.Configuracion.RegistroConfiguracionHomologacion", null)
+                .WithMany().HasForeignKey("VersionId").OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+}
+
+[DbContext(typeof(ResultadosDbContext))]
+[Migration("20261121000200_AuditoriaConfiguracionHu03")]
+public sealed class AuditoriaConfiguracionHu03 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.AddColumn<Guid>("VersionAnteriorId", "ConfiguracionesHomologacion", "uniqueidentifier", nullable: true);
+        migrationBuilder.CreateIndex("IX_ConfiguracionesHomologacion_VersionAnteriorId", "ConfiguracionesHomologacion", "VersionAnteriorId");
+        migrationBuilder.AddForeignKey("FK_ConfiguracionesHomologacion_ConfiguracionesHomologacion_VersionAnteriorId",
+            "ConfiguracionesHomologacion", "VersionAnteriorId", "ConfiguracionesHomologacion", principalColumn: "VersionId",
+            onDelete: ReferentialAction.Restrict);
+    }
+
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropForeignKey("FK_ConfiguracionesHomologacion_ConfiguracionesHomologacion_VersionAnteriorId", "ConfiguracionesHomologacion");
+        migrationBuilder.DropIndex("IX_ConfiguracionesHomologacion_VersionAnteriorId", "ConfiguracionesHomologacion");
+        migrationBuilder.DropColumn("VersionAnteriorId", "ConfiguracionesHomologacion");
+    }
+
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloAuditoriaHu03.Construir(modelBuilder);
+}
+
+internal static class ModeloAuditoriaHu03
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloParametrosHu03.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Configuracion.RegistroConfiguracionHomologacion", b =>
+        {
+            b.Property<Guid?>("VersionAnteriorId").HasColumnType("uniqueidentifier");
+            b.HasIndex("VersionAnteriorId");
+            b.HasOne("Homologacion.Infrastructure.Configuracion.RegistroConfiguracionHomologacion", null)
+                .WithMany().HasForeignKey("VersionAnteriorId").OnDelete(DeleteBehavior.Restrict);
+        });
+    }
 }

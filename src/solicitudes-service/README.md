@@ -46,6 +46,15 @@ Cuatro capas; Domain y Application no dependen de HTTP ni EF. Infrastructure imp
 
 `GET /api/carreras-solicitudes` es una consulta nueva y mínima del catálogo para Coordinador: solo id/nombre de FISEI vigentes. No cambia permisos de edición del catálogo. El servicio reenvía el JWT del coordinador al catálogo con timeout de 10 s y sin redirecciones de HTTP; no guarda ni registra ese token.
 
+### HU-12 — adjuntos del expediente
+
+- `POST /api/solicitudes/{id}/adjuntos`: solo Coordinador; `multipart/form-data` con `tipo` (`Historial académico` o `Sílabo`) y `archivo`. Se acepta PDF con extensión `.pdf`, MIME `application/pdf` y cabecera PDF válida, hasta 20 MiB. Responde 201 con metadatos y `Location`; errores de validación 400, solicitud inexistente 404 y solicitud finalizada 409.
+- `GET /api/solicitudes/{id}/adjuntos`: Coordinador o docente asignado; devuelve metadatos, nunca el BLOB.
+- `GET /api/solicitudes/{id}/adjuntos/{adjuntoId}`: Coordinador o docente asignado; descarga el PDF. Solicitud inexistente, adjunto ajeno a la solicitud o docente no asignado devuelve 404.
+- Se persisten bytes y metadatos (nombre, tamaño, SHA-256, `sub` del JWT y fecha UTC) en la base lógica `HomologacionSolicitudes`; los PDFs no se guardan en Git.
+- La interfaz `/solicitudes` permite subir y consultar; el panel del docente asignado permite descargar. La verificación transaccional para no adjuntar tras finalizar se coordina con HU-33.
+- Estado de implementación y verificaciones: [`docs/sprint-3/evidencia-hu-12.md`](../../docs/sprint-3/evidencia-hu-12.md). La presencia del código no equivale a aceptación de la historia.
+
 Esta rama conserva el contrato JWT vigente de develop. Pablo/Leslie deben incluir Solicitudes y su llamada al catálogo al integrar HU-35 (cifrado) y HU-36 (clave interna); esas historias no se declaran terminadas aquí. Propuesta de integración: `docs/sprint-2/propuesta-contrato-hu-10.md`.
 
 ## Ejecutar

@@ -68,7 +68,7 @@ public class RegistrarRevisionDocenteTests
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct) =>
             Task.FromResult(id == Solicitud && Asignados.Contains(DocenteActual)
                 ? new SolicitudParaAnalisis(Solicitud, Tipo, Tipo == "Interno" ? Guid.NewGuid() : null, Carrera,
-                    [new(Aprobada, Tipo == "Interno" ? Guid.NewGuid() : null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1), Intento)])
+                    [new(Aprobada, Tipo == "Interno" ? Guid.NewGuid() : null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1)) { IntentoMatricula = Intento }])
                 : null);
         public Task<AsignaturaParaAnalisis?> ObtenerAsignaturaAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Receptora
             ? new AsignaturaParaAnalisis(Receptora, Carrera, "FISEI", true, 3, 144, "plan", "h", "c", true, [], [])

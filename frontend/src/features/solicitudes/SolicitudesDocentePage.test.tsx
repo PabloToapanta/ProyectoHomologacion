@@ -11,6 +11,7 @@ function servidor(analisis:unknown=pendiente,detalleStatus=200) {
  return vi.fn(async(path:string,_init?:RequestInit)=>path==='/api/solicitudes/asignadas'?json([solicitud]):path==='/api/solicitudes/asignadas/sol-a'?(detalleStatus===200?json({solicitud:detalle,analisis}):json({title:'Solicitud no encontrada entre sus asignaciones.'},detalleStatus)):
   path==='/api/homologaciones/solicitudes/sol-a/analisis-interno'?json([{fecha:'2026-11-03T12:00:00Z',analisis}]):
   // HU-23: el detalle consulta el informe; sin generar responde 404.
+  path==='/api/solicitudes/sol-a/adjuntos'?json([]):
   path==='/api/homologaciones/solicitudes/sol-a/informe'?json({title:'El informe de esta solicitud aún no se ha generado.'},404):json({title:'Ruta no esperada'},500));
 }
 async function abrir(user:ReturnType<typeof userEvent.setup>) {
@@ -24,7 +25,7 @@ it('lista solo lo que devuelve la API de asignadas y consulta el detalle con su 
  expect(within(dialogo).getByText('docente.ana')).toBeInTheDocument();expect(within(dialogo).getByText(/Álgebra sintética/)).toBeInTheDocument();
  expect(within(dialogo).getByRole('heading',{name:'Análisis pendiente'})).toBeInTheDocument();
  expect(within(dialogo).queryByText(/Sugerencia/)).not.toBeInTheDocument();
- await waitFor(()=>expect(request.mock.calls.map(c=>c[0])).toEqual(['/api/solicitudes/asignadas','/api/solicitudes/asignadas/sol-a','/api/homologaciones/solicitudes/sol-a/analisis-interno','/api/homologaciones/solicitudes/sol-a/informe']));
+ await waitFor(()=>expect(request.mock.calls.map(c=>c[0])).toEqual(['/api/solicitudes/asignadas','/api/solicitudes/asignadas/sol-a','/api/homologaciones/solicitudes/sol-a/analisis-interno','/api/solicitudes/sol-a/adjuntos','/api/homologaciones/solicitudes/sol-a/informe']));
 });
 it.each([
  ['Fallido',{estado:'Fallido',mensaje:'El agente no respondió.',resultado:null},'El análisis falló'],
@@ -43,11 +44,11 @@ it('análisis completo muestra porcentajes, sugerencia, justificación y evidenc
  expect(within(dialogo).getByText('Homologable')).toBeInTheDocument();expect(within(dialogo).getByText('Los contenidos sintéticos coinciden.')).toBeInTheDocument();expect(within(dialogo).getByText('R1 ↔ O1: Matrices')).toBeInTheDocument();
  expect(within(dialogo).getByText(/no es la decisión final/)).toBeInTheDocument();
 });
-// HU-23 añade «Generar informe» a petición del docente; sigue sin remisión al coordinador (HU-32) ni escrituras automáticas.
+// HU-23 añade «Generar informe» a petición del docente; sin informe no se ofrece remitir (HU-32) ni hay escrituras automáticas.
 it('al abrir no escribe nada: sin remisión y el informe solo se genera a petición',async()=>{
  const user=userEvent.setup();const request=servidor({estado:'Completo',mensaje:'',resultado});render(<SolicitudesDocentePage request={request}/>);const dialogo=await abrir(user);
  await within(dialogo).findByRole('button',{name:'Generar informe'});
- expect(within(dialogo).getAllByRole('button').map(b=>b.getAttribute('aria-label')??b.textContent)).toEqual(['Cerrar ventana','Consultar análisis interno','Generar informe','Cerrar detalle']);
+ expect(within(dialogo).getAllByRole('button').map(b=>b.getAttribute('aria-label')??b.textContent)).toEqual(['Cerrar ventana','Consultar análisis interno','Generar informe','Abrir agrupaciones','Cerrar detalle']);
  expect(request.mock.calls.every(c=>!c[1]?.method||c[1].method==='GET')).toBe(true);
 });
 it('detalle rechazado por la API muestra el error sin datos de otra solicitud',async()=>{
@@ -64,7 +65,7 @@ it('sin asignaciones lo indica y un fallo de carga permite reintentar',async()=>
 it('solicitud externa muestra datos de RN-05 y abre el panel externo',async()=>{
  const externa={...detalle,tipoCambio:'Externo',carreraOrigenId:null,institucionOrigen:'Universidad sintética Ecuador',carreraOrigenExterna:'Carrera externa sintética',periodosCursados:3,cambiosPreviosCarrera:null};
  const request=vi.fn(async(path:string,_init?:RequestInit)=>path==='/api/solicitudes/asignadas'?json([{...solicitud,tipoCambio:'Externo'}]):path==='/api/solicitudes/asignadas/sol-a'?json({solicitud:externa,analisis:pendiente}):
-  path==='/api/homologaciones/solicitudes/sol-a/analisis-externo'?json([]):json({title:'Ruta no esperada'},500));
+  path==='/api/homologaciones/solicitudes/sol-a/analisis-externo'?json([]):path==='/api/solicitudes/sol-a/adjuntos'?json([]):json({title:'Ruta no esperada'},500));
  const user=userEvent.setup();render(<SolicitudesDocentePage request={request}/>);
  const dialogo=await abrir(user);
  expect(within(dialogo).getByText('3')).toBeInTheDocument();
@@ -72,4 +73,16 @@ it('solicitud externa muestra datos de RN-05 y abre el panel externo',async()=>{
  expect(within(dialogo).getByRole('button',{name:'Consultar análisis externo'})).toBeInTheDocument();
  await waitFor(()=>expect(request.mock.calls.map(c=>c[0])).toContain('/api/homologaciones/solicitudes/sol-a/analisis-externo'));
  expect(request.mock.calls.some(c=>String(c[0]).includes('analisis-interno'))).toBe(false);
+});
+
+it('HU-32: remitir el informe muestra «Remitida» en el detalle y en la lista',async()=>{
+ const informe={solicitudId:'sol-a',tipoCambio:'Interno',fecha:'2026-11-21T14:00:00Z',generadoPorId:'ana',generadoPor:'docente.ana',parejas:[],aprobadasSinAnalisis:[],convalidar:0,noConvalidar:0,sinAcuerdo:0,advertencias:[]};
+ const base=servidor();
+ const request=vi.fn(async(path:string,init?:RequestInit)=>path==='/api/homologaciones/solicitudes/sol-a/informe'?json(informe):
+  path==='/api/homologaciones/solicitudes/sol-a/informe/remision'&&init?.method==='POST'?json({solicitudId:'sol-a',fecha:'2026-11-21T15:00:00Z',remitidoPorId:'ana',remitidoPor:'docente.ana'}):base(path,init));
+ const user=userEvent.setup();render(<SolicitudesDocentePage request={request}/>);const dialogo=await abrir(user);
+ await user.click(await within(dialogo).findByRole('button',{name:'Remitir al coordinador'}));
+ expect(await within(dialogo).findByText(/Informe remitido al coordinador de carrera por docente\.ana/)).toBeInTheDocument();
+ expect(within(dialogo).getByText('Remitida')).toBeInTheDocument();
+ expect(within(screen.getByRole('table',{name:'Solicitudes asignadas'})).getByText('Remitida')).toBeInTheDocument();
 });
