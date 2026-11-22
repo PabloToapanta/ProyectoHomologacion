@@ -93,6 +93,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
    {informe.aprobadasSinAnalisis.length>0&&<p>Sin análisis docente: {informe.aprobadasSinAnalisis.map(nombre).join(', ')}.</p>}
    {informe.advertencias.map(a=><p key={a}>{a}</p>)}
    {remision?<p role="status">{`Informe remitido al coordinador de carrera por ${remision.remitidoPor} el ${new Date(remision.fecha).toLocaleString('es-EC')}.`}</p>
+    :estadoSolicitud==='Finalizada'?<p role="status">Solicitud finalizada por el coordinador de carrera.</p>
     :remitida?<p role="status">Informe remitido al coordinador de carrera.</p>
     :estadoSolicitud!==undefined&&<>
      <p>Remita el informe al coordinador de carrera cuando esté listo. Se remite una sola vez; las parejas «Sin acuerdo» las decide el coordinador.</p>

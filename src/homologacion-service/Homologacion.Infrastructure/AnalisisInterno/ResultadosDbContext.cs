@@ -29,6 +29,8 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<RegistroInforme> Informes => Set<RegistroInforme>();
     /// <summary>HU-25: historial del informe, solo de inserción.</summary>
     public DbSet<RegistroEventoInforme> EventosInforme => Set<RegistroEventoInforme>();
+    /// <summary>HU-33: decisión del coordinador por pareja «Sin acuerdo».</summary>
+    public DbSet<RegistroDecisionCoordinador> DecisionesCoordinador => Set<RegistroDecisionCoordinador>();
     public DbSet<RegistroConfiguracionHomologacion> Configuraciones => Set<RegistroConfiguracionHomologacion>();
     public DbSet<ConfiguracionHomologacionVigente> ConfiguracionVigente => Set<ConfiguracionHomologacionVigente>();
     protected override void OnModelCreating(ModelBuilder model)
@@ -65,14 +67,20 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
         v.Property(x => x.Usuario).HasMaxLength(256).IsRequired();
         v.Property(x => x.Rol).HasMaxLength(30).IsRequired();
         v.HasIndex(x => new { x.SolicitudId, x.Tipo }).IsUnique();
-        var c = model.Entity<RegistroConfiguracionHomologacion>();
-        c.ToTable("ConfiguracionesHomologacion");
-        c.HasKey(x => x.VersionId);
-        c.HasOne<RegistroConfiguracionHomologacion>().WithMany()
+        var c = model.Entity<RegistroDecisionCoordinador>();
+        c.ToTable("DecisionesCoordinador");
+        c.HasKey(x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId });
+        c.Property(x => x.Resultado).HasMaxLength(20).IsRequired();
+        c.Property(x => x.Justificacion).HasMaxLength(2000).IsRequired();
+        c.Property(x => x.Coordinador).HasMaxLength(256).IsRequired();
+        var cfg = model.Entity<RegistroConfiguracionHomologacion>();
+        cfg.ToTable("ConfiguracionesHomologacion");
+        cfg.HasKey(x => x.VersionId);
+        cfg.HasOne<RegistroConfiguracionHomologacion>().WithMany()
             .HasForeignKey(x => x.VersionAnteriorId).OnDelete(DeleteBehavior.Restrict);
-        c.Property(x => x.Motivo).HasMaxLength(500).IsRequired();
-        c.Property(x => x.Respaldo).HasMaxLength(2000).IsRequired();
-        c.Property(x => x.RowVersion).IsRequired().IsRowVersion();
+        cfg.Property(x => x.Motivo).HasMaxLength(500).IsRequired();
+        cfg.Property(x => x.Respaldo).HasMaxLength(2000).IsRequired();
+        cfg.Property(x => x.RowVersion).IsRequired().IsRowVersion();
         var vigente = model.Entity<ConfiguracionHomologacionVigente>();
         vigente.ToTable("ConfiguracionHomologacionVigente");
         vigente.HasKey(x => x.Id);

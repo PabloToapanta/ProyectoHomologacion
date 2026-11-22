@@ -291,6 +291,20 @@ namespace Homologacion.Infrastructure.AnalisisInterno
                     b.ToTable("EventosInforme", (string)null);
                 });
 
+            modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroDecisionCoordinador", b =>
+                {
+                    b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("AprobadaId").HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ReceptoraId").HasColumnType("uniqueidentifier");
+                    b.Property<string>("Coordinador").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+                    b.Property<Guid>("CoordinadorId").HasColumnType("uniqueidentifier");
+                    b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+                    b.Property<string>("Justificacion").IsRequired().HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+                    b.Property<string>("Resultado").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+                    b.HasKey("SolicitudId", "AprobadaId", "ReceptoraId");
+                    b.ToTable("DecisionesCoordinador", (string)null);
+                });
+
             modelBuilder.Entity("Homologacion.Infrastructure.RevisionDocente.RegistroRevisionDocente", b =>
                 {
                     b.Property<Guid>("SolicitudId")

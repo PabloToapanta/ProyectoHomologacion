@@ -40,14 +40,23 @@ public sealed class FuentesAnalisisHttp(HttpClient http, IOptions<ConfiguracionA
         return r;
     }
     /// <summary>HU-32: ruta interna de Solicitudes (no publicada en el Gateway). Solo 204 confirma; 404 y 409 se conservan.</summary>
-    public async Task MarcarRemitidaAsync(Guid solicitudId, CancellationToken ct)
+    public Task MarcarRemitidaAsync(Guid solicitudId, CancellationToken ct) =>
+        MarcarEstadoAsync($"api/solicitudes/{solicitudId}/remision", titulo => new EstadoSolicitudNoPermiteRemitirException(titulo),
+            "El estado de la solicitud no permite remitir el informe.", ct);
+
+    /// <summary>HU-33: ruta interna de Solicitudes «Remitida» → «Finalizada»; 204 también si ya estaba finalizada.</summary>
+    public Task MarcarFinalizadaAsync(Guid solicitudId, CancellationToken ct) =>
+        MarcarEstadoAsync($"api/solicitudes/{solicitudId}/finalizacion", titulo => new EstadoSolicitudNoPermiteFinalizarException(titulo),
+            "El estado de la solicitud no permite finalizarla.", ct);
+
+    private async Task MarcarEstadoAsync(string ruta, Func<string, Exception> conflicto, string generico, CancellationToken ct)
     {
         try
         {
-            using var response = await http.PostAsync(new Uri(new Uri(options.Value.SolicitudesUrl), $"api/solicitudes/{solicitudId}/remision"), null, ct);
+            using var response = await http.PostAsync(new Uri(new Uri(options.Value.SolicitudesUrl), ruta), null, ct);
             if (response.StatusCode == HttpStatusCode.NoContent) return;
             if (response.StatusCode == HttpStatusCode.NotFound) throw new SolicitudAnalisisNoEncontradaException();
-            if (response.StatusCode == HttpStatusCode.Conflict) throw new EstadoSolicitudNoPermiteRemitirException(await TituloConflicto(response, ct));
+            if (response.StatusCode == HttpStatusCode.Conflict) throw conflicto(await TituloConflicto(response, generico, ct));
             throw new FuenteAnalisisNoDisponibleException();
         }
         catch (HttpRequestException) { throw new FuenteAnalisisNoDisponibleException(); }
@@ -55,9 +64,8 @@ public sealed class FuentesAnalisisHttp(HttpClient http, IOptions<ConfiguracionA
         catch (OperationCanceledException) when (!ct.IsCancellationRequested) { throw new FuenteAnalisisNoDisponibleException(); }
     }
 
-    private static async Task<string> TituloConflicto(HttpResponseMessage response, CancellationToken ct)
+    private static async Task<string> TituloConflicto(HttpResponseMessage response, string generico, CancellationToken ct)
     {
-        const string generico = "El estado de la solicitud no permite remitir el informe.";
         if (response.Content.Headers.ContentLength > 4096) return generico;
         try
         {

@@ -9,10 +9,13 @@ public sealed class InformeYaRemitidoException() : Exception("El informe ya fue 
 /// <summary>Solicitudes rechazó el cambio de estado (409): la solicitud no está en «Docentes asignados».</summary>
 public sealed class EstadoSolicitudNoPermiteRemitirException(string message) : Exception(message);
 
-/// <summary>HU-32: puerto hacia Solicitudes, dueño del estado de la solicitud. Marcar «Remitida» de nuevo no cambia nada.</summary>
+/// <summary>Puerto hacia Solicitudes, dueño del estado de la solicitud. Repetir una marca no cambia nada.</summary>
 public interface IEstadoSolicitudes
 {
+    /// <summary>HU-32: «Docentes asignados» → «Remitida».</summary>
     Task MarcarRemitidaAsync(Guid solicitudId, CancellationToken ct);
+    /// <summary>HU-33: «Remitida» → «Finalizada».</summary>
+    Task MarcarFinalizadaAsync(Guid solicitudId, CancellationToken ct);
 }
 
 /// <summary>HU-32: un docente asignado remite el informe generado al coordinador, una sola vez.</summary>

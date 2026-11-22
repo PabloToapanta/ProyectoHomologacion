@@ -220,6 +220,49 @@ internal static class ModeloEventosInforme
     }
 }
 [DbContext(typeof(ResultadosDbContext))]
+[Migration("20261123000100_DecisionesCoordinadorHu33")]
+public sealed class DecisionesCoordinadorHu33 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(
+        name: "DecisionesCoordinador",
+        columns: table => new
+        {
+            SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            AprobadaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            ReceptoraId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Resultado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+            Justificacion = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+            CoordinadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Coordinador = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+            Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+        },
+        constraints: table => table.PrimaryKey("PK_DecisionesCoordinador", x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId }));
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("DecisionesCoordinador");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloDecisionesCoordinador.Construir(modelBuilder);
+}
+
+// Snapshot vigente: modelo de HU-25 más la tabla de HU-33.
+internal static class ModeloDecisionesCoordinador
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloEventosInforme.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroDecisionCoordinador", b =>
+        {
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("AprobadaId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("ReceptoraId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Coordinador").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+            b.Property<Guid>("CoordinadorId").HasColumnType("uniqueidentifier");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<string>("Justificacion").IsRequired().HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+            b.Property<string>("Resultado").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+            b.HasKey("SolicitudId", "AprobadaId", "ReceptoraId");
+            b.ToTable("DecisionesCoordinador");
+        });
+    }
+}
+[DbContext(typeof(ResultadosDbContext))]
 [Migration("20261121000100_ParametrosHomologacionHu03")]
 public sealed class ParametrosHomologacionHu03 : Migration
 {

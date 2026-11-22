@@ -22,10 +22,21 @@ public class InformeEndpointTests
     private static readonly Guid Carrera = Guid.Parse("a0000000-0000-0000-0000-000000000004");
 
     private sealed class Fuentes : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno,
-        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, IEstadoSolicitudes, IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
+        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, IEstadoSolicitudes, IDecisionesCoordinador,
+        IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
     {
         public int MarcasRemitida { get; private set; }
         public Task MarcarRemitidaAsync(Guid solicitudId, CancellationToken ct) { MarcasRemitida++; return Task.CompletedTask; }
+        public int MarcasFinalizada { get; private set; }
+        public Task MarcarFinalizadaAsync(Guid solicitudId, CancellationToken ct) { MarcasFinalizada++; return Task.CompletedTask; }
+        public List<DecisionCoordinador> Decisiones { get; } = [];
+        public Task GuardarAsync(DecisionCoordinador d, CancellationToken ct)
+        {
+            Decisiones.RemoveAll(x => x.AsignaturaAprobadaId == d.AsignaturaAprobadaId && x.AsignaturaReceptoraId == d.AsignaturaReceptoraId);
+            Decisiones.Add(d); return Task.CompletedTask;
+        }
+        Task<IReadOnlyList<DecisionCoordinador>> IDecisionesCoordinador.ListarAsync(Guid solicitudId, CancellationToken ct) =>
+            Task.FromResult<IReadOnlyList<DecisionCoordinador>>(Decisiones.Where(d => d.SolicitudId == solicitudId).ToArray());
         public bool Asignada { get; set; } = true;
         Task<IReadOnlyList<AnalisisAgrupacionGuardado>> IResultadosAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<AnalisisAgrupacionGuardado>>([]);
         Task<IReadOnlyList<RevisionAgrupacionRegistrada>> IRevisionesAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<RevisionAgrupacionRegistrada>>([]);
@@ -75,6 +86,7 @@ public class InformeEndpointTests
             s.RemoveAll<IInformesHomologacion>(); s.AddSingleton<IInformesHomologacion>(e);
             s.RemoveAll<IAuditoriaInformes>(); s.AddSingleton<IAuditoriaInformes>(e);
             s.RemoveAll<IEstadoSolicitudes>(); s.AddSingleton<IEstadoSolicitudes>(e);
+            s.RemoveAll<IDecisionesCoordinador>(); s.AddSingleton<IDecisionesCoordinador>(e);
             s.RemoveAll<IResultadosAgrupacionInforme>();s.AddSingleton<IResultadosAgrupacionInforme>(e);
             s.RemoveAll<IRevisionesAgrupacionInforme>();s.AddSingleton<IRevisionesAgrupacionInforme>(e);
             s.RemoveAll<TimeProvider>(); s.AddSingleton<TimeProvider>(new RelojAnalisis());
@@ -224,5 +236,96 @@ public class InformeEndpointTests
         if (rol is not null) c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token(rol));
         Assert.Equal(esperado, (int)(await c.PostAsync(Base + "/informe/remision", null)).StatusCode);
         Assert.Equal((0, 0), (e.Consultas, e.MarcasRemitida));
+    }
+
+    private static object Decision(string resultado = "NoConvalidar", string justificacion = "No cubre los resultados de aprendizaje.") =>
+        new { asignaturaAprobadaId = Aprobada, asignaturaReceptoraId = Receptora, resultado, justificacion };
+
+    private static async Task Remitido(MotorFactory f, WebApplicationFactory<Homologacion.Api.Program> host, string segunda = "NoHomologable")
+    {
+        using var ana = Docente(f, host); using var luis = Docente(f, host);
+        await ana.PutAsJsonAsync(Base + "/revisiones-docentes", Ajuste("Homologable"));
+        await luis.PutAsJsonAsync(Base + "/revisiones-docentes", Ajuste(segunda));
+        Assert.Equal(HttpStatusCode.Created, (await ana.PostAsync(Base + "/informe", null)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await luis.PostAsync(Base + "/informe/remision", null)).StatusCode);
+    }
+
+    [Fact]
+    public async Task HU33_el_coordinador_revisa_decide_y_finaliza_una_sola_vez()
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e);
+        using var coordinador = Coordinador(f, host);
+        // CA4: sin informe remitido no hay revisión, decisión ni finalización.
+        Assert.Equal(HttpStatusCode.NotFound, (await coordinador.GetAsync(Base + "/informe/revision")).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await coordinador.PostAsync(Base + "/informe/finalizacion", null)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await coordinador.PutAsJsonAsync(Base + "/informe/decisiones", Decision())).StatusCode);
+        await Remitido(f, host);
+
+        // CA1: parejas, agente, ambos docentes y la decisión pendiente.
+        using (var j = JsonDocument.Parse(await coordinador.GetStringAsync(Base + "/informe/revision")))
+        {
+            var pareja = j.RootElement.GetProperty("informe").GetProperty("parejas")[0];
+            Assert.Equal("SinAcuerdo", pareja.GetProperty("sugerenciaFinal").GetString());
+            Assert.Equal(2, pareja.GetProperty("docentes").GetArrayLength());
+            Assert.True(pareja.TryGetProperty("agente", out _));
+            Assert.Equal(1, j.RootElement.GetProperty("decisionesPendientes").GetInt32());
+            Assert.Equal(JsonValueKind.Null, j.RootElement.GetProperty("finalizacion").ValueKind);
+        }
+        // CA2: no se finaliza mientras falte la decisión en «Sin acuerdo».
+        Assert.Equal(HttpStatusCode.BadRequest, (await coordinador.PostAsync(Base + "/informe/finalizacion", null)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await coordinador.PutAsJsonAsync(Base + "/informe/decisiones", Decision(justificacion: " "))).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await coordinador.PutAsJsonAsync(Base + "/informe/decisiones", Decision(resultado: "Homologable"))).StatusCode);
+        using (var d = await coordinador.PutAsJsonAsync(Base + "/informe/decisiones", Decision()))
+        {
+            Assert.Equal(HttpStatusCode.OK, d.StatusCode);
+            using var j = JsonDocument.Parse(await d.Content.ReadAsStringAsync());
+            Assert.Equal("NoConvalidar", j.RootElement.GetProperty("resultado").GetString());
+            Assert.Equal("usuario-sintetico", j.RootElement.GetProperty("coordinador").GetString());
+            Assert.True(j.RootElement.TryGetProperty("fecha", out _));
+        }
+        // CA3: finaliza con fecha y coordinador; después no admite cambios.
+        using (var fin = await coordinador.PostAsync(Base + "/informe/finalizacion", null))
+        {
+            Assert.Equal(HttpStatusCode.OK, fin.StatusCode);
+            using var j = JsonDocument.Parse(await fin.Content.ReadAsStringAsync());
+            Assert.Equal(Solicitud, j.RootElement.GetProperty("solicitudId").GetGuid());
+            Assert.Equal("usuario-sintetico", j.RootElement.GetProperty("finalizadoPor").GetString());
+        }
+        Assert.Equal(HttpStatusCode.Conflict, (await coordinador.PostAsync(Base + "/informe/finalizacion", null)).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await coordinador.PutAsJsonAsync(Base + "/informe/decisiones", Decision("Convalidar"))).StatusCode);
+        Assert.Equal(1, e.MarcasFinalizada);
+        using var h = JsonDocument.Parse(await coordinador.GetStringAsync(Base + "/informe/historial"));
+        Assert.Equal(["Generado", "Remitido", "Finalizado"], h.RootElement.EnumerateArray().Select(x => x.GetProperty("tipo").GetString()));
+        Assert.Equal("Coordinador", h.RootElement[2].GetProperty("rol").GetString());
+        using var r = JsonDocument.Parse(await coordinador.GetStringAsync(Base + "/informe/revision"));
+        Assert.Equal("NoConvalidar", r.RootElement.GetProperty("decisiones")[0].GetProperty("resultado").GetString());
+        Assert.Equal(JsonValueKind.Object, r.RootElement.GetProperty("finalizacion").ValueKind);
+    }
+
+    [Fact]
+    public async Task HU33_con_acuerdo_en_todas_las_parejas_se_finaliza_sin_decisiones()
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e);
+        await Remitido(f, host, segunda: "Homologable");
+        using var coordinador = Coordinador(f, host);
+        Assert.Equal(HttpStatusCode.BadRequest, (await coordinador.PutAsJsonAsync(Base + "/informe/decisiones", Decision())).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await coordinador.PostAsync(Base + "/informe/finalizacion", null)).StatusCode);
+    }
+
+    [Theory]
+    [InlineData(null, 401)]
+    [InlineData("Docente", 403)]
+    [InlineData("Administrador", 403)]
+    public async Task HU33_solo_el_coordinador_revisa_decide_y_finaliza(string? rol, int esperado)
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e);
+        await Remitido(f, host);
+        using var c = host.CreateClient();
+        if (rol is not null) c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token(rol));
+        Assert.Equal(esperado, (int)(await c.GetAsync(Base + "/informe/revision")).StatusCode);
+        Assert.Equal(esperado, (int)(await c.PutAsJsonAsync(Base + "/informe/decisiones", Decision())).StatusCode);
+        Assert.Equal(esperado, (int)(await c.PostAsync(Base + "/informe/finalizacion", null)).StatusCode);
+        Assert.Empty(e.Decisiones);
+        Assert.Equal(0, e.MarcasFinalizada);
     }
 }
