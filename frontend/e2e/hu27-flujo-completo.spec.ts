@@ -8,6 +8,14 @@ const env = (name: string) => {
 
 const baseURL = env('E2E_BASE_URL');
 const runId = env('E2E_RUN_ID');
+let mostRecentPage: Page | undefined;
+
+test.afterEach(async (_fixtures, testInfo) => {
+  if (testInfo.status !== testInfo.expectedStatus && mostRecentPage?.isClosed() === false) {
+    await mostRecentPage.screenshot({ path: testInfo.outputPath('failure.png'), fullPage: true }).catch(() => undefined);
+  }
+  mostRecentPage = undefined;
+});
 
 async function login(browser: Browser, username: string, password: string): Promise<Page> {
   const context = await browser.newContext();
@@ -17,6 +25,7 @@ async function login(browser: Browser, username: string, password: string): Prom
   await page.getByLabel('Contraseña', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
   await expect(page).not.toHaveURL(/\/login/);
+  mostRecentPage = page;
   return page;
 }
 
