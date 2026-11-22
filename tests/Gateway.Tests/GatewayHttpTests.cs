@@ -12,6 +12,28 @@ namespace Gateway.Tests;
 
 public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<GatewayFactory>
 {
+    [Theory]
+    [InlineData("GET", "/api/carreras/carrera-prueba/mallas")]
+    [InlineData("POST", "/api/carreras/carrera-prueba/mallas")]
+    [InlineData("GET", "/api/mallas/malla-prueba")]
+    [InlineData("PUT", "/api/mallas/malla-prueba/vigencia")]
+    public async Task MallasHu07_solo_administrador_y_clave_interna(string metodo, string ruta)
+    {
+        using var client = factory.CreateClient();
+        var antes = factory.Forwarded.Count;
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        foreach (var rol in new[] { "Docente", "Coordinador" })
+        {
+            client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: rol));
+            Assert.Equal(HttpStatusCode.Forbidden, (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        }
+        Assert.Equal(antes, factory.Forwarded.Count);
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token());
+        Assert.Equal(HttpStatusCode.OK, (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        Assert.Equal("catalogo", factory.Forwarded.Last().Service);
+        Assert.Equal(GatewayFactory.InternalKey, factory.Forwarded.Last().InternalKey);
+    }
+
     public static TheoryData<string, string> RutasGestionHu02 => new()
     {
         { "GET", "/api/usuarios" }, { "POST", "/api/usuarios" },
