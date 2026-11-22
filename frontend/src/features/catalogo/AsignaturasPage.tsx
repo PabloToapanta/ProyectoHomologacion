@@ -8,6 +8,7 @@ import './catalogo.css';
 import { FormDialog } from '../../shared/ui/FormDialog';
 import { UnidadesPanel } from './UnidadesPanel';
 import { PerfilComparacionPanel } from './PerfilComparacionPanel';
+import { MallasPanel } from './MallasPanel';
 
 const vacio = { codigo: '', nombre: '', nivel: '', creditos: '', horas: '' };
 const mensaje = (e: unknown) => e instanceof Error ? e.message : 'No se pudo completar la operación.';
@@ -22,6 +23,8 @@ export function AsignaturasPage({ request, carreraSeleccionada, onSeleccion }: {
   const carreraId = carreraSeleccionada ?? seleccionLocal;
   const setCarreraId = onSeleccion ?? setSeleccionLocal;
   const [nivelFiltro, setNivelFiltro] = useState('');
+  const [mostrarMallas, setMostrarMallas] = useState(false);
+  const [mallaFiltro, setMallaFiltro] = useState('');
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [cargandoCarreras, setCargandoCarreras] = useState(true);
   const [cargando, setCargando] = useState(false);
@@ -52,12 +55,14 @@ export function AsignaturasPage({ request, carreraSeleccionada, onSeleccion }: {
     setSeleccionada(null); setPerfilSeleccionado(null); setNivelFiltro(''); setAsignaturas([]); setErrorListado(''); setError(''); setAviso(''); setForm(null);
     if (!carreraId) { setCargando(false); return () => controller.abort(); }
     setCargando(true);
-    api.listar(carreraId, controller.signal).then(items => {
+    api.listar(carreraId, controller.signal, mallaFiltro || undefined).then(items => {
       if (!controller.signal.aborted) setAsignaturas(items);
     }).catch(e => { if (!controller.signal.aborted) setErrorListado(mensaje(e)); })
       .finally(() => { if (!controller.signal.aborted) setCargando(false); });
     return () => controller.abort();
-  }, [api, carreraId, intento]);
+  }, [api, carreraId, intento, mallaFiltro]);
+
+  useEffect(() => { setMallaFiltro(''); setMostrarMallas(false); }, [carreraId]);
 
   useEffect(() => { if (form) codigoRef.current?.focus(); }, [form !== null]);
 
@@ -74,7 +79,7 @@ export function AsignaturasPage({ request, carreraSeleccionada, onSeleccion }: {
     }
     setGuardando(true); setError(''); setAviso('');
     try {
-      const creada = await api.crear({ carreraId, codigo: form.codigo.trim(), nombre: form.nombre.trim(), nivel, creditos, horas });
+      const creada = await api.crear({ carreraId, codigo: form.codigo.trim(), nombre: form.nombre.trim(), nivel, creditos, horas, mallaId: mallaFiltro || undefined });
       setAsignaturas(items => [...items, creada]);
       setForm(null); setNivelFiltro(''); setAviso('Asignatura registrada correctamente.');
     } catch (e) { setError(mensaje(e)); }
@@ -86,17 +91,20 @@ export function AsignaturasPage({ request, carreraSeleccionada, onSeleccion }: {
   const visibles = asignaturas.filter(a => !nivelFiltro || a.nivel === Number(nivelFiltro));
   return <div className="catalogo">
     <p className="eyebrow">ADMINISTRACIÓN / CATÁLOGO ACADÉMICO</p>
-    <div className="workspace-heading"><div><h1>Gestión de asignaturas</h1><p>{carreraActual ? `${carreraActual.nombre} · ${carreraActual.vigencia ? 'Malla vigente' : 'Malla no vigente'}` : 'Consulta las asignaturas por carrera y registra sus datos académicos.'}</p></div>
+    <div className="workspace-heading"><div><h1>Gestión de asignaturas</h1><p>{carreraActual ? `${carreraActual.nombre} · ${carreraActual.vigencia ? 'Carrera vigente' : 'Carrera no vigente'}` : 'Consulta las asignaturas por carrera y registra sus datos académicos.'}</p></div>
       <button className="app-button app-button--primary" disabled={!carreraId || cargando || !!errorListado || guardando || !!form} onClick={() => { setForm({ ...vacio }); setError(''); setAviso(''); }}>Nueva asignatura</button></div>
     {cargandoCarreras ? <p role="status">Cargando carreras…</p> : errorCarreras ? <div><p role="alert" className="auth-error">{errorCarreras}</p><button className="app-button app-button--secondary" onClick={() => setIntentoCarreras(i => i + 1)}>Reintentar carreras</button></div>
       : carreras.length === 0 ? <p className="catalogo-empty">Registra una carrera antes de agregar asignaturas.</p>
       : <label className="auth-label catalogo-select-label">Carrera<select className="auth-input" disabled={guardando} value={carreraId} onChange={e => setCarreraId(e.target.value)}>
         <option value="">Selecciona una carrera</option>{carreras.map(c => <option key={c.id} value={c.id}>{c.nombre} · {c.facultad}{c.vigencia ? '' : ' (no vigente)'}</option>)}
       </select></label>}
+    {carreraId && <button className="app-button app-button--secondary" disabled={guardando || !!form} onClick={() => { if (mostrarMallas) setMallaFiltro(''); setMostrarMallas(v => !v); }}>{mostrarMallas ? 'Ocultar versiones de malla' : 'Gestionar versiones de malla'}</button>}
+    {carreraId && mostrarMallas && <MallasPanel key={carreraId} carreraId={carreraId} request={request} onSeleccion={m => setMallaFiltro(m?.id ?? '')} onCambio={() => setIntento(i => i + 1)} />}
     {aviso && <p role="status" className="catalogo-aviso">{aviso}</p>}
     {error && !form && <p role="alert" className="auth-error">{error}</p>}
     {form && <FormDialog title="Nueva asignatura" titleId="asignatura-form-title" busy={guardando} onDismiss={() => { setForm(null); setError(''); }}>
       <p className="section-description">Carrera: {carreraActual?.nombre ?? 'Información incompleta'}</p>
+      <p>{mallaFiltro ? 'La asignatura se registrará en la versión seleccionada.' : 'La asignatura se registrará en la malla vigente al guardar. Puedes seleccionar otra versión en Gestionar versiones de malla.'}</p>
       {error && <p role="alert" className="auth-error">{error}</p>}
       <form onSubmit={guardar} noValidate><fieldset className="catalogo-fields" disabled={guardando}>
         <label className="auth-label">Código<input ref={codigoRef} className="auth-input" required maxLength={50} value={form.codigo} onChange={e => setForm({ ...form, codigo: e.target.value })} /></label>
@@ -115,8 +123,8 @@ export function AsignaturasPage({ request, carreraSeleccionada, onSeleccion }: {
       </select></label>
       {cargando ? <p role="status">Cargando asignaturas…</p> : errorListado ? <div><p role="alert" className="auth-error">{errorListado}</p><button className="app-button app-button--secondary" onClick={() => setIntento(i => i + 1)}>Reintentar asignaturas</button></div>
         : asignaturas.length === 0 ? <p className="catalogo-empty">No hay asignaturas registradas en esta carrera.</p>
-        : <><p className="catalogo-scroll-hint">Desliza la tabla horizontalmente para ver todos los datos.</p><div className="catalogo-table-scroll" tabIndex={0} role="region" aria-label="Tabla de asignaturas con desplazamiento horizontal"><table className="malla-table"><caption className="sr-only">Asignaturas ordenadas por nivel y código</caption><thead><tr><th scope="col">Nivel</th><th scope="col">Código</th><th scope="col">Asignatura</th><th scope="col">Créditos</th><th scope="col">Horas</th><th scope="col">Contenidos</th></tr></thead>
-          <tbody>{[...visibles].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td><td><button className="app-button app-button--secondary" onClick={() => setSeleccionada(a)}>Ver unidades de {a.nombre}</button><button className="app-button app-button--secondary" onClick={() => { setPerfilSeleccionado(a); setSeleccionada(null); }}>Perfil y equivalencias de {a.nombre}</button></td></tr>)}</tbody></table></div></>}
+        : <><p className="catalogo-scroll-hint">Desliza la tabla horizontalmente para ver todos los datos.</p><div className="catalogo-table-scroll" tabIndex={0} role="region" aria-label="Tabla de asignaturas con desplazamiento horizontal"><table className="malla-table"><caption className="sr-only">Asignaturas ordenadas por nivel y código</caption><thead><tr><th scope="col">Nivel</th><th scope="col">Código</th><th scope="col">Asignatura</th><th scope="col">Créditos</th><th scope="col">Horas</th><th scope="col">Malla</th><th scope="col">Contenidos</th></tr></thead>
+          <tbody>{[...visibles].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td><td>{a.malla ? `${a.malla.nombre} · ${a.malla.vigente ? 'Vigente' : 'No vigente'}` : 'Versión no registrada'}</td><td><button className="app-button app-button--secondary" onClick={() => setSeleccionada(a)}>Ver unidades de {a.nombre}</button><button className="app-button app-button--secondary" onClick={() => { setPerfilSeleccionado(a); setSeleccionada(null); }}>Perfil y equivalencias de {a.nombre}</button></td></tr>)}</tbody></table></div></>}
     </section>}
     {seleccionada && <UnidadesPanel key={seleccionada.id} asignaturaId={seleccionada.id} nombre={seleccionada.nombre} request={request} cerrar={() => setSeleccionada(null)} />}
     {perfilSeleccionado && <PerfilComparacionPanel key={perfilSeleccionado.id} id={perfilSeleccionado.id} nombre={perfilSeleccionado.nombre} request={request} cerrar={() => setPerfilSeleccionado(null)} />}

@@ -1,7 +1,8 @@
 import type { CatalogoRequest } from './carreras-api';
+import type { Malla } from './mallas-api';
 
-export interface AsignaturaInput { carreraId: string; codigo: string; nombre: string; nivel: number; creditos: number; horas: number }
-export interface Asignatura extends AsignaturaInput { id: string }
+export interface AsignaturaInput { carreraId: string; codigo: string; nombre: string; nivel: number; creditos: number; horas: number; mallaId?: string }
+export interface Asignatura extends AsignaturaInput { id: string; malla?: Malla | null }
 
 class AsignaturasError extends Error {}
 
@@ -27,7 +28,7 @@ export function asignaturasApi(request: CatalogoRequest) {
     }
   }
   return {
-    listar: (carreraId: string, signal?: AbortSignal) => enviar<Asignatura[]>(`/api/carreras/${encodeURIComponent(carreraId)}/asignaturas`, { signal }),
+    listar: (carreraId: string, signal?: AbortSignal, mallaId?: string) => enviar<Asignatura[]>(`/api/carreras/${encodeURIComponent(carreraId)}/asignaturas${mallaId ? `?mallaId=${encodeURIComponent(mallaId)}` : ''}`, { signal }),
     obtener: (id: string) => enviar<Asignatura>(`/api/asignaturas/${encodeURIComponent(id)}`),
     crear: (input: AsignaturaInput) => enviar<Asignatura>('/api/asignaturas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) }),
   };
