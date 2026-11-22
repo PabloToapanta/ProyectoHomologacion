@@ -156,7 +156,7 @@ def main():
                 "E2E_RUN_ID": project,
             }
             checked_run(["npm", "--prefix", "frontend", "run", "test:e2e", "--", "hu27-flujo-completo.spec.ts",
-                         "--trace", "retain-on-failure", "--screenshot", "only-on-failure"],
+                         "--trace", "off", "--screenshot", "only-on-failure"],
                 environment=playwright_env, secrets_to_hide=private, timeout=600)
             print("PASS: T66 Playwright completo", flush=True)
         finally:
@@ -168,3 +168,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
