@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { loginRequest } from './login-api';
-import { readSession } from './session';
+import { borrarSesion, guardarSesion, readSession, restaurarSesion } from './session';
 import type { Credentials, Session } from './types';
 
 interface AuthContextValue {
@@ -13,13 +13,15 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
-  const [session, setSession] = useState<Session | null>(null);
+  // Al recargar la pestaña se restaura la sesión vigente guardada en sessionStorage.
+  const [session, setSession] = useState<Session | null>(() => restaurarSesion());
   const generation = useRef(0);
   const pendingLogin = useRef<AbortController | null>(null);
   const logout = useCallback(() => {
     generation.current++;
     pendingLogin.current?.abort();
     pendingLogin.current = null;
+    borrarSesion();
     setSession(null);
   }, []);
 
@@ -32,6 +34,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       const response = await loginRequest(credentials, controller.signal);
       const next = readSession(response);
       if (attempt !== generation.current || controller.signal.aborted) throw new DOMException('Solicitud cancelada', 'AbortError');
+      guardarSesion(next);
       setSession(next);
     } finally {
       if (attempt === generation.current) pendingLogin.current = null;
