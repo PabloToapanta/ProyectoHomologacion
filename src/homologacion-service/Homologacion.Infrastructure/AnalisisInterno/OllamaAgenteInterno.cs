@@ -5,8 +5,10 @@ using System.Text.Json.Serialization;
 
 namespace Homologacion.Infrastructure.AnalisisInterno;
 
-public sealed class OllamaAgenteInterno : IAgenteAnalisisInterno
+public sealed class OllamaAgenteInterno : IAgenteAnalisisInterno, IDescripcionAgente
 {
+    /// <summary>HU-37: se incrementa al cambiar el mensaje de sistema, el esquema JSON o las opciones de generación.</summary>
+    public const string VersionPlantillaActual = "hu18-v1";
     private const int MaxBytes = 65536;
     private readonly HttpClient http;
     private readonly OllamaAnalisisOptions options;
@@ -23,6 +25,9 @@ public sealed class OllamaAgenteInterno : IAgenteAnalisisInterno
         this.http = http;
         this.options = options;
     }
+
+    public string Modelo => options.Modelo;
+    public string VersionPlantilla => VersionPlantillaActual;
 
     public async Task<ExplicacionAgente> JustificarAsync(ContextoAgente contexto, CancellationToken cancellationToken)
     {

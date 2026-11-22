@@ -40,7 +40,14 @@ public static class RegistroAnalisisInterno
                     new(new Uri(config.OllamaUrl), config.Modelo, TimeSpan.FromSeconds(config.TimeoutSegundos)))
                 : new AgenteNoConfigurado();
         });
-        services.AddScoped<AsistirEvaluacionInterna>();
+        // HU-37: reutilización de la explicación del agente; solo un agente que se describe (Ollama) se reutiliza.
+        services.AddScoped<IExplicacionesAgente, ExplicacionesAgenteSql>();
+        services.AddScoped(p =>
+        {
+            var agente = p.GetRequiredService<IAgenteAnalisisInterno>();
+            return new AsistirEvaluacionInterna(p.GetRequiredService<Homologacion.Application.Equivalencias.EvaluarEquivalencia>(), agente,
+                agente is IDescripcionAgente ? p.GetRequiredService<IExplicacionesAgente>() : null, p.GetRequiredService<TimeProvider>());
+        });
         services.AddScoped<AnalizarSolicitudInterna>();
         services.AddDbContext<ResultadosDbContext>((p, options) => options.UseSqlServer(
             p.GetRequiredService<IConfiguration>().GetConnectionString("Homologacion")

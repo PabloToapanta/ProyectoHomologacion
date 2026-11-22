@@ -31,6 +31,8 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
     public DbSet<RegistroEventoInforme> EventosInforme => Set<RegistroEventoInforme>();
     /// <summary>HU-33: decisión del coordinador por pareja «Sin acuerdo».</summary>
     public DbSet<RegistroDecisionCoordinador> DecisionesCoordinador => Set<RegistroDecisionCoordinador>();
+    /// <summary>HU-37: explicaciones del agente para reutilizar, solo de inserción.</summary>
+    public DbSet<RegistroExplicacionAgente> ExplicacionesAgente => Set<RegistroExplicacionAgente>();
     public DbSet<RegistroConfiguracionHomologacion> Configuraciones => Set<RegistroConfiguracionHomologacion>();
     public DbSet<ConfiguracionHomologacionVigente> ConfiguracionVigente => Set<ConfiguracionHomologacionVigente>();
     protected override void OnModelCreating(ModelBuilder model)
@@ -73,6 +75,16 @@ public sealed class ResultadosDbContext(DbContextOptions<ResultadosDbContext> op
         c.Property(x => x.Resultado).HasMaxLength(20).IsRequired();
         c.Property(x => x.Justificacion).HasMaxLength(2000).IsRequired();
         c.Property(x => x.Coordinador).HasMaxLength(256).IsRequired();
+        var x = model.Entity<RegistroExplicacionAgente>();
+        x.ToTable("ExplicacionesAgente");
+        x.HasKey(e => e.Id);
+        x.Property(e => e.Id).ValueGeneratedNever();
+        x.Property(e => e.Clave).HasMaxLength(64).IsUnicode(false).IsFixedLength().IsRequired();
+        x.Property(e => e.Modelo).HasMaxLength(128).IsRequired();
+        x.Property(e => e.VersionPlantilla).HasMaxLength(32).IsRequired();
+        x.Property(e => e.Explicacion).IsRequired();
+        x.Property(e => e.Motivo).HasMaxLength(500);
+        x.HasIndex(e => e.Clave);
         var cfg = model.Entity<RegistroConfiguracionHomologacion>();
         cfg.ToTable("ConfiguracionesHomologacion");
         cfg.HasKey(x => x.VersionId);

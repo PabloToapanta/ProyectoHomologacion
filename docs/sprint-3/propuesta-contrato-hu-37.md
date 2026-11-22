@@ -2,7 +2,7 @@
 
 Issue [#77](https://github.com/PabloToapanta/ProyectoHomologacion/issues/77). Rama `feature/hu-37-reutilizar-analisis`, desde `develop`. Responsables: Edwin y Shirley. **Revisión previa de Pablo antes de codificar (T70)**, porque cambia la orquestación de HU-18 (`AsistirEvaluacionInterna`) y la persistencia de HU-20.
 
-**Estado: propuesta.** No hay código. Las decisiones marcadas como **[Pablo]** esperan su respuesta; las demás vienen del issue y de las [decisiones del 20/11/2026](decisiones-validacion-ingeniero.md).
+**Estado: acordado e implementado.** Pablo aceptó todas las propuestas el 22/11/2026 (respuesta transmitida por Edwin): A1, huella del contexto incluida (B), tabla nueva solo de inserción y modificación de `AsistirEvaluacionInterna` sin decorador. Lo implementado y lo verificado está en [evidencia-hu-37.md](evidencia-hu-37.md). Las demás decisiones vienen del issue y de las [decisiones del 20/11/2026](decisiones-validacion-ingeniero.md).
 
 ## 1. Qué se reutiliza y qué no
 
