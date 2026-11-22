@@ -1,0 +1,77 @@
+name: HU-27 integración y E2E
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'frontend/**'
+      - 'compose.sprint1.yaml'
+      - 'compose.hu10.yaml'
+      - 'Homologacion.sln'
+      - '.github/workflows/hu27-e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-integration:
+    name: Backend e integración
+    runs-on: ubuntu-latest
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: 'Y'
+          MSSQL_PID: Developer
+          MSSQL_SA_PASSWORD: 'Hu27-CI-Sql_2026!'
+        ports: ['1433:1433']
+        options: >-
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Hu27-CI-Sql_2026!' -C -Q 'SELECT 1' -b -o /dev/null"
+          --health-interval=10s --health-timeout=5s --health-retries=30 --health-start-period=20s
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Probar motor y servicios
+        run: dotnet test Homologacion.sln --configuration Release --logger trx --results-directory TestResults/homologacion
+      - name: Probar Solicitudes con SQL Server
+        run: dotnet test src/solicitudes-service/Solicitudes.sln --configuration Release --logger trx --results-directory TestResults/solicitudes
+        env:
+          HU10_TEST_SQL: 'Server=localhost,1433;User Id=sa;Password=Hu27-CI-Sql_2026!;Encrypt=True;TrustServerCertificate=True'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hu27-backend-trx
+          path: TestResults/**/*.trx
+          if-no-files-found: ignore
+
+  browser-e2e:
+    name: Chromium · flujo HU-27 completo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Instalar dependencias del frontend
+        run: npm ci --prefix frontend
+      - name: Instalar Chromium para Playwright
+        run: npx --prefix frontend playwright install --with-deps chromium
+      - name: Levantar servicios, sembrar datos sintéticos y recorrer el flujo
+        run: python3 tests/security/hu27-e2e.py
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: hu27-e2e-screenshots-sinteticos
+          path: frontend/test-results/**/*.png
+          if-no-files-found: ignore
+
