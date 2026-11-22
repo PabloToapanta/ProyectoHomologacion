@@ -1,8 +1,8 @@
 # HU-27 — Plan de pruebas, E2E del flujo completo y CI
 
-**Issue:** [#65](https://github.com/PabloToapanta/ProyectoHomologacion/issues/65) · **Sprint:** 3 · **Prioridad:** alta · **Backlog:** 8 PH.  
-**Estado:** propuesta de spec para revisión de Pablo, Leslie, Edwin y Shirley. No acredita implementación ni aceptación.  
-**Base:** `develop` del 21/11/2026 (`0600f33`); rama `feature/hu-27-pruebas-e2e` hacia `develop` mediante Draft PR.
+**Issue:** [#65](https://github.com/PabloToapanta/ProyectoHomologacion/issues/65) · **Sprint:** 3 · **Prioridad:** alta · **Backlog:** 8 PH.
+**Estado:** propuesta de spec para revisión de Pablo, Leslie, Edwin y Shirley. No acredita implementación ni aceptación.
+**Base:** `develop` del 21/11/2026 (`843bf4f`); rama `feature/hu-27-pruebas-e2e` hacia `develop` mediante Draft PR.
 
 ## Historia de usuario
 
