@@ -10,7 +10,7 @@ const baseURL = env('E2E_BASE_URL');
 const runId = env('E2E_RUN_ID');
 let mostRecentPage: Page | undefined;
 
-test.afterEach(async (_fixtures, testInfo) => {
+test.afterEach(async ({}, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus && mostRecentPage?.isClosed() === false) {
     await mostRecentPage.screenshot({ path: testInfo.outputPath('failure.png'), fullPage: true }).catch(() => undefined);
   }
