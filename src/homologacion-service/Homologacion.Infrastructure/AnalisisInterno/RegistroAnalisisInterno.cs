@@ -65,6 +65,15 @@ public static class RegistroAnalisisInterno
             p.GetRequiredService<IResultadosAnalisisInterno>(), p.GetRequiredService<IResultadosAnalisisExterno>(), p.GetRequiredService<IRevisionesDocentes>(),
             p.GetRequiredService<TimeProvider>(), p.GetRequiredService<IInformesHomologacion>()));
         services.AddScoped<GenerarInformeHomologacion>();
+        services.AddScoped<Homologacion.Application.Equivalencias.EvaluarAgrupacion>();
+        services.AddScoped<Homologacion.Application.Agrupaciones.PrepararAgrupacion>();
+        services.AddScoped<Homologacion.Application.Agrupaciones.GestionarAgrupaciones>();
+        services.AddScoped<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>();
+        services.AddScoped<Homologacion.Application.Agrupaciones.IGruposAgrupacion>(p => p.GetRequiredService<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>());
+        services.AddScoped<IResultadosAgrupacionInforme>(p => p.GetRequiredService<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>());
+        services.AddScoped<IRevisionesAgrupacion>(p => p.GetRequiredService<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>());
+        services.AddScoped<IRevisionesAgrupacionInforme>(p => p.GetRequiredService<Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql>());
+        services.AddScoped<RegistrarRevisionAgrupacion>();
         return services;
     }
 

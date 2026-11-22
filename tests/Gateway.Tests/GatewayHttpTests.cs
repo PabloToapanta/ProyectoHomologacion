@@ -250,8 +250,11 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var json = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var paths = json.RootElement.GetProperty("paths");
-        // Rutas existentes más HU-02, HU-03 y las dos rutas de HU-12.
-        Assert.Equal(42, paths.EnumerateObject().Count());
+        // HU-21 publica las rutas de agrupación; HU-12 publica carga, listado y descarga de adjuntos.
+        Assert.Contains(paths.EnumerateObject(), p => p.Name.Contains("/agrupaciones/"));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos").TryGetProperty("get", out _));
+        Assert.True(paths.GetProperty("/api/solicitudes/{id}/adjuntos/{adjuntoId}").TryGetProperty("get", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/configuracion").TryGetProperty("put", out _));
         Assert.True(paths.GetProperty("/api/homologaciones/configuracion/historial").TryGetProperty("get", out _));
         Assert.Contains("Coordinador", paths.GetProperty("/api/homologaciones/configuracion").GetProperty("get").GetProperty("description").GetString());
