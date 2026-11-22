@@ -1,0 +1,47 @@
+name: HU-21 agrupaciones N:M
+on:
+  pull_request:
+    branches: [develop]
+    paths: ['src/homologacion-service/**', 'src/solicitudes-service/**', 'src/gateway/**', 'frontend/**', 'tests/**', '.github/workflows/hu21-agrupaciones.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backend-integracion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: dotnet test Homologacion.sln -c Release --logger trx --results-directory TestResults/solution
+      - run: dotnet test tests/Homologacion.Infrastructure.Tests -c Release --logger trx --results-directory TestResults/infrastructure
+      - run: dotnet test tests/Solicitudes.Tests -c Release --logger trx --results-directory TestResults/solicitudes
+      - name: SQL Server y recorrido real de agrupaciones, sin LLM
+        run: python -u tests/security/hu21-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hu21-evidencias-sin-secretos
+          path: |
+            TestResults/**/*.trx
+            TestResults/hu21-integration/resultado.json
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test -- --maxWorkers=1
+      - run: npm run build

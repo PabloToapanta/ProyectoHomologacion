@@ -11,7 +11,7 @@ async function completar(user:ReturnType<typeof userEvent.setup>) {
  await user.selectOptions(screen.getByLabelText('Carrera de origen'),'origen');await user.selectOptions(screen.getByLabelText('Carrera receptora'),'receptora');
 }
 it('abre registro por botón, registra y consulta detalle',async()=>{
- const user=userEvent.setup();const request=vi.fn(async(path:string,init?:RequestInit)=>path.endsWith('/carreras')?json(carreras):init?.method==='POST'?json(registrada,201):path.endsWith('/sol-1')?json(registrada):json([]));
+ const user=userEvent.setup();const request=vi.fn(async(path:string,init?:RequestInit)=>path.endsWith('/carreras')?json(carreras):path.endsWith('/informe')?json({title:'Sin informe'},404):init?.method==='POST'?json(registrada,201):path.endsWith('/sol-1')?json(registrada):json([]));
  render(<SolicitudesPage request={request}/>);expect(screen.queryByLabelText('Número de trámite Quipux')).not.toBeInTheDocument();await completar(user);await user.click(screen.getByRole('button',{name:'Registrar solicitud'}));
  expect(await screen.findByRole('status')).toHaveTextContent('Solicitud registrada correctamente');expect(screen.queryByLabelText('Número de trámite Quipux')).not.toBeInTheDocument();
  await user.click(screen.getByRole('button',{name:'Ver UTA-001'}));expect(await screen.findByRole('heading',{name:'Solicitud UTA-001'})).toBeInTheDocument();
@@ -30,8 +30,17 @@ const catalogo=[{id:'cat-1',codigo:'COD-1',nombre:'Álgebra sintética',nivel:1,
 const algebra={id:'asig-1',asignaturaOrigenId:'cat-1',codigoAsignatura:'COD-1',nombreAsignatura:'Álgebra sintética',creditos:3,sistemaCreditos:null,horas:144,unidadHoras:null,referenciaPrograma:null,nota:8.55,notaMaximaEscala:10,notaMinimaAprobacion:7,estado:'Aprobada',fechaAprobacion:'2025-06-15',numeroMatricula:'MAT-SINTETICA-1',intentoMatricula:2};
 const externa={...algebra,id:'asig-2',asignaturaOrigenId:null,codigoAsignatura:null,nombreAsignatura:'Álgebra externa',creditos:4,sistemaCreditos:'Créditos sintéticos',horas:64,unidadHoras:'Horas sintéticas',referenciaPrograma:'PROGRAMA-SINTETICO-1',nota:14,notaMaximaEscala:20,notaMinimaAprobacion:12,intentoMatricula:1};
 function servidor(asignaturas:unknown[],responder:()=>Response=()=>json(algebra,201),tipoCambio='Interno',origen:()=>Response=()=>json(catalogo)) {
- return vi.fn(async(path:string,_init?:RequestInit)=>path===rutaAsignaturas?responder():path.endsWith('/asignaturas-origen')?origen():path.endsWith('/carreras')?json(carreras):path==='/api/solicitudes/sol-1'?json({...registrada,tipoCambio,asignaturasAprobadas:asignaturas}):json([{...registrada,tipoCambio}]));
+ return vi.fn(async(path:string,_init?:RequestInit)=>path===rutaAsignaturas?responder():path.endsWith('/asignaturas-origen')?origen():path.endsWith('/informe')?json({title:'Sin informe'},404):path.endsWith('/carreras')?json(carreras):path==='/api/solicitudes/sol-1'?json({...registrada,tipoCambio,asignaturasAprobadas:asignaturas}):json([{...registrada,tipoCambio}]));
 }
+it('Coordinación exporta el informe FISEI existente sin poder generarlo',async()=>{
+ const user=userEvent.setup();
+ const informe={solicitudId:'sol-1',tipoCambio:'Interno',fecha:'2026-11-14T20:00:00Z',generadoPorId:'d1',generadoPor:'docente.ana',parejas:[],aprobadasSinAnalisis:[],convalidar:0,noConvalidar:0,sinAcuerdo:0,advertencias:['Informe técnico; no es una resolución oficial.']};
+ const request=vi.fn(async(path:string)=>path.endsWith('/carreras')?json(carreras):path.endsWith('/informe')?json(informe):path==='/api/solicitudes/sol-1'?json({...registrada,asignaturasAprobadas:[algebra]}):json([{...registrada,asignaturasAprobadas:[algebra]}]));
+ render(<SolicitudesPage request={request}/>);await abrirDetalle(user);
+ expect(await screen.findByRole('button',{name:'Exportar informe a PDF'})).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Generar informe'})).not.toBeInTheDocument();
+ expect(request).toHaveBeenCalledWith('/api/homologaciones/solicitudes/sol-1/informe',expect.objectContaining({signal:expect.any(AbortSignal)}));
+});
 async function abrirDetalle(user:ReturnType<typeof userEvent.setup>) {await user.click(await screen.findByRole('button',{name:'Ver UTA-001'}));await screen.findByRole('heading',{name:'Solicitud UTA-001'});}
 async function datosComunes(user:ReturnType<typeof userEvent.setup>,nota:string) {
  await user.type(screen.getByLabelText('Nota'),nota);await user.type(screen.getByLabelText('Fecha de aprobación'),'2025-06-15');await user.type(screen.getByLabelText('Número de matrícula'),'MAT-SINTETICA-1');await user.selectOptions(screen.getByLabelText('Intento de matrícula'),'2');
@@ -43,6 +52,39 @@ it('el detalle muestra datos, escala, estado e intento y aclara que no implican 
  const user=userEvent.setup();render(<SolicitudesPage request={servidor([algebra])}/>);await abrirDetalle(user);
  const fila=screen.getByRole('row',{name:/Álgebra sintética/});for(const texto of ['COD-1','8.55 / 10','Aprobada','15/06/2025','MAT-SINTETICA-1','Segunda','144'])expect(fila).toHaveTextContent(texto);
  expect(screen.getByText(/no implica elegibilidad/i)).toBeInTheDocument();
+});
+it('HU-17: una asignatura en tercera matrícula indica que RN-07 la excluye de la homologación',async()=>{
+ const user=userEvent.setup();render(<SolicitudesPage request={servidor([{...algebra,intentoMatricula:3},externa])}/>);await abrirDetalle(user);
+ expect(screen.getByRole('row',{name:/Álgebra sintética/})).toHaveTextContent('Tercera · excluida (RN-07)');
+ expect(screen.getByRole('row',{name:/Álgebra externa/})).not.toHaveTextContent('RN-07');
+});
+it('HU-25: el detalle del coordinador consulta el historial del informe de la solicitud',async()=>{
+ const user=userEvent.setup();const request=servidor([algebra]);render(<SolicitudesPage request={request}/>);await abrirDetalle(user);
+ expect(await screen.findByRole('heading',{name:'Historial del informe'})).toBeInTheDocument();
+ expect(request.mock.calls.some(c=>c[0]==='/api/homologaciones/solicitudes/sol-1/informe/historial')).toBe(true);
+});
+it('HU-33: con la solicitud «Remitida» el coordinador revisa el informe; al finalizar, detalle y lista muestran «Finalizada»',async()=>{
+ const user=userEvent.setup();
+ const remitida={...registrada,estado:'Remitida'};
+ const base='/api/homologaciones/solicitudes/sol-1/informe';
+ const pareja={asignaturaAprobadaId:'asig-1',asignaturaReceptoraId:'r1',receptoraCodigo:'R-01',receptoraNombre:'Receptora',agente:{estado:'Completo',sugerencia:'Homologable',porcentajeAcademico:85,porcentajeHoras:90,porcentajeCreditos:100},
+  docentes:[{docenteId:'d1',docente:'docente.ana',postura:'DeAcuerdo',decision:'Homologable',observacion:null,fecha:'2026-11-20T10:00:00Z'},{docenteId:'d2',docente:'docente.luis',postura:'DeAcuerdo',decision:'Homologable',observacion:null,fecha:'2026-11-20T10:00:00Z'}],sugerenciaFinal:'Convalidar'};
+ const revision={informe:{solicitudId:'sol-1',fecha:'2026-11-20T12:00:00Z',generadoPor:'docente.ana',parejas:[pareja],aprobadasSinAnalisis:[],advertencias:[]},remitidoEl:'2026-11-21T09:00:00Z',remitidoPor:'docente.luis',decisiones:[],decisionesPendientes:0,finalizacion:null};
+ const request=vi.fn(async(path:string,init?:RequestInit)=>path===`${base}/revision`?json(revision):path===`${base}/finalizacion`&&init?.method==='POST'?json({solicitudId:'sol-1',fecha:'2026-11-23T16:00:00Z',finalizadoPorId:'c1',finalizadoPor:'coordinadora.eva'})
+  :path.endsWith('/historial')?json([]):path.endsWith('/carreras')?json(carreras):path==='/api/solicitudes/sol-1'?json({...remitida,asignaturasAprobadas:[algebra]}):json([remitida]));
+ render(<SolicitudesPage request={request}/>);await abrirDetalle(user);
+ expect(await screen.findByRole('table',{name:'Revisión del informe por pareja'})).toHaveTextContent('Álgebra sintética');
+ await user.click(screen.getByRole('button',{name:'Finalizar solicitud'}));
+ expect(await screen.findByText(/Solicitud finalizada por coordinadora\.eva/)).toBeInTheDocument();
+ const dialogo=screen.getByRole('heading',{name:'Solicitud UTA-001'}).closest('dialog,[role="dialog"],section')!;
+ expect(within(dialogo as HTMLElement).getAllByText('Finalizada').length).toBeGreaterThan(0);
+ await user.click(screen.getByRole('button',{name:'Cerrar detalle'}));
+ expect(screen.getByRole('row',{name:/UTA-001/})).toHaveTextContent('Finalizada');
+});
+it('HU-33: antes de la remisión el detalle no consulta la revisión del coordinador',async()=>{
+ const user=userEvent.setup();const request=servidor([algebra]);render(<SolicitudesPage request={request}/>);await abrirDetalle(user);
+ await screen.findByRole('heading',{name:'Historial del informe'});
+ expect(request.mock.calls.some(c=>String(c[0]).endsWith('/informe/revision'))).toBe(false);
 });
 it('sin asignaturas lo indica y el formulario permanece cerrado',async()=>{
  const user=userEvent.setup();render(<SolicitudesPage request={servidor([])}/>);await abrirDetalle(user);
@@ -83,8 +125,8 @@ it('fallo de carga permite reintentar sin inventar listado',async()=>{
 it('externa registra períodos y cambios previos opcionales y los corrige antes de asignar docentes',async()=>{
  const user=userEvent.setup();
  const externaRegistrada={...registrada,tipoCambio:'Externo',carreraOrigenId:null,institucionOrigen:'Universidad sintética Ecuador',carreraOrigenExterna:'Carrera externa sintética',periodosCursados:null,cambiosPreviosCarrera:0,asignaturasAprobadas:[],docentesAsignados:[]};
- const request=vi.fn(async(path:string,init?:RequestInit)=>path.endsWith('/carreras')?json(carreras):path==='/api/solicitudes'&&init?.method==='POST'?json(externaRegistrada,201):
-  path.endsWith('/datos-cambio-externo')?json({...externaRegistrada,periodosCursados:4}):path==='/api/solicitudes/sol-1'?json(externaRegistrada):path.endsWith('/docentes-disponibles')?json([]):json([]));
+ const request=vi.fn(async(path:string,init?:RequestInit)=>path.endsWith('/carreras')?json(carreras):path.endsWith('/informe')?json({title:'Sin informe'},404):path==='/api/solicitudes'&&init?.method==='POST'?json(externaRegistrada,201):
+  path.endsWith('/datos-cambio-externo')?json({...externaRegistrada,periodosCursados:4}):path.endsWith('/informe')?json({title:'Sin informe'},404):path==='/api/solicitudes/sol-1'?json(externaRegistrada):path.endsWith('/docentes-disponibles')?json([]):json([]));
  render(<SolicitudesPage request={request}/>);
  await user.click(await screen.findByRole('button',{name:'Nueva solicitud'}));
  await user.type(screen.getByLabelText('Número de trámite Quipux'),'UTA-001');await user.type(screen.getByLabelText('Identificación del estudiante'),'EST-01');await user.type(screen.getByLabelText('Nombre del estudiante'),'Estudiante sintético');

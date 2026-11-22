@@ -142,15 +142,15 @@ public sealed class SolicitudesFactory : WebApplicationFactory<Program> {
   }) b.UseSetting(setting.Key,setting.Value);
   b.ConfigureServices(s=>{s.RemoveAll<DbContextOptions<SolicitudesDbContext>>();s.AddDbContext<SolicitudesDbContext>(o=>o.UseSqlite(db));s.RemoveAll<ICatalogoCarreras>();s.AddSingleton<ICatalogoCarreras>(Catalogo);s.RemoveAll<IDirectorioDocentes>();s.AddSingleton<IDirectorioDocentes>(Directorio);s.RemoveAll<TimeProvider>();s.AddSingleton<TimeProvider>(Reloj);});
  }
- public HttpClient Client(string? role="Coordinador",string sub="usuario-sintetico",string scenario="valid") {
+ public HttpClient Client(string? role="Coordinador",string sub="usuario-sintetico",string scenario="valid",string? name=null) {
   var client=CreateClient();using var scope=Services.CreateScope();scope.ServiceProvider.GetRequiredService<SolicitudesDbContext>().Database.EnsureCreated();
-  if(role is not null) client.DefaultRequestHeaders.Authorization=new("Bearer",Token(role,sub,scenario));
+  if(role is not null) client.DefaultRequestHeaders.Authorization=new("Bearer",Token(role,sub,scenario,name));
   return client;
  }
  // Igual que Auth en HU-35: firmado con HS256 y cifrado con A256KW + A256CBC-HS512.
- static string Token(string role,string sub,string scenario) {
+ static string Token(string role,string sub,string scenario,string? name=null) {
   var descriptor=new SecurityTokenDescriptor {
-   Issuer="test",Audience="test",Subject=new ClaimsIdentity([new Claim("sub",sub),new Claim("role",role)]),
+   Issuer="test",Audience="test",Subject=new ClaimsIdentity(new[]{new Claim("sub",sub),new Claim("role",role)}.Concat(name is null?Array.Empty<Claim>():new[]{new Claim("name",name)})),
    NotBefore=DateTime.UtcNow.AddMinutes(-1),Expires=DateTime.UtcNow.AddMinutes(5),
    SigningCredentials=new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key)),SecurityAlgorithms.HmacSha256),
    EncryptingCredentials=scenario=="plain"?null:new EncryptingCredentials(new SymmetricSecurityKey(scenario=="other-key"?System.Security.Cryptography.RandomNumberGenerator.GetBytes(32):Convert.FromBase64String(EncryptionKey)),SecurityAlgorithms.Aes256KW,SecurityAlgorithms.Aes256CbcHmacSha512)

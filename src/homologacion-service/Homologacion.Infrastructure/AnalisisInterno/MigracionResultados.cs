@@ -168,11 +168,100 @@ internal static class ModeloInformes
     }
 }
 [DbContext(typeof(ResultadosDbContext))]
-public sealed class ResultadosDbContextModelSnapshot : ModelSnapshot
+[Migration("20261120000100_EventosInformeHu25")]
+public sealed class EventosInformeHu25 : Migration
 {
-    protected override void BuildModel(ModelBuilder modelBuilder) => ModeloAuditoriaHu03.Construir(modelBuilder);
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.CreateTable(
+            name: "EventosInforme",
+            columns: table => new
+            {
+                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Tipo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                UsuarioId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Usuario = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                Rol = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false)
+            },
+            constraints: table => table.PrimaryKey("PK_EventosInforme", x => x.Id));
+        migrationBuilder.CreateIndex(name: "IX_EventosInforme_SolicitudId_Tipo", table: "EventosInforme",
+            columns: ["SolicitudId", "Tipo"], unique: true);
+        // CA3: la aplicación no modifica ni elimina eventos y, en SQL Server, la base también lo impide.
+        if (migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.SqlServer")
+            migrationBuilder.Sql(@"CREATE TRIGGER TR_EventosInforme_SoloInsercion ON EventosInforme INSTEAD OF UPDATE, DELETE AS
+BEGIN
+    THROW 50025, N'El historial del informe es de solo inserción.', 1;
+END");
+    }
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("EventosInforme");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloEventosInforme.Construir(modelBuilder);
 }
 
+internal static class ModeloEventosInforme
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloInformes.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroEventoInforme", b =>
+        {
+            b.Property<Guid>("Id").HasColumnType("uniqueidentifier");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<string>("Rol").IsRequired().HasMaxLength(30).HasColumnType("nvarchar(30)");
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Tipo").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+            b.Property<string>("Usuario").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+            b.Property<Guid>("UsuarioId").HasColumnType("uniqueidentifier");
+            b.HasKey("Id");
+            b.HasIndex("SolicitudId", "Tipo").IsUnique();
+            b.ToTable("EventosInforme");
+        });
+    }
+}
+[DbContext(typeof(ResultadosDbContext))]
+[Migration("20261123000100_DecisionesCoordinadorHu33")]
+public sealed class DecisionesCoordinadorHu33 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(
+        name: "DecisionesCoordinador",
+        columns: table => new
+        {
+            SolicitudId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            AprobadaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            ReceptoraId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Resultado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+            Justificacion = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+            CoordinadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+            Coordinador = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+            Fecha = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+        },
+        constraints: table => table.PrimaryKey("PK_DecisionesCoordinador", x => new { x.SolicitudId, x.AprobadaId, x.ReceptoraId }));
+    protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("DecisionesCoordinador");
+    protected override void BuildTargetModel(ModelBuilder modelBuilder) => ModeloDecisionesCoordinador.Construir(modelBuilder);
+}
+
+// Snapshot vigente: modelo de HU-25 más la tabla de HU-33.
+internal static class ModeloDecisionesCoordinador
+{
+    public static void Construir(ModelBuilder modelBuilder)
+    {
+        ModeloEventosInforme.Construir(modelBuilder);
+        modelBuilder.Entity("Homologacion.Infrastructure.Informe.RegistroDecisionCoordinador", b =>
+        {
+            b.Property<Guid>("SolicitudId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("AprobadaId").HasColumnType("uniqueidentifier");
+            b.Property<Guid>("ReceptoraId").HasColumnType("uniqueidentifier");
+            b.Property<string>("Coordinador").IsRequired().HasMaxLength(256).HasColumnType("nvarchar(256)");
+            b.Property<Guid>("CoordinadorId").HasColumnType("uniqueidentifier");
+            b.Property<DateTimeOffset>("Fecha").HasColumnType("datetimeoffset");
+            b.Property<string>("Justificacion").IsRequired().HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+            b.Property<string>("Resultado").IsRequired().HasMaxLength(20).HasColumnType("nvarchar(20)");
+            b.HasKey("SolicitudId", "AprobadaId", "ReceptoraId");
+            b.ToTable("DecisionesCoordinador");
+        });
+    }
+}
 [DbContext(typeof(ResultadosDbContext))]
 [Migration("20261121000100_ParametrosHomologacionHu03")]
 public sealed class ParametrosHomologacionHu03 : Migration
