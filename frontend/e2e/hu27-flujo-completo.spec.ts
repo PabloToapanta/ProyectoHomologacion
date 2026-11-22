@@ -65,8 +65,8 @@ test('HU-27: dos docentes revisan, remiten y coordinación finaliza con estado p
     await teacher.getByRole('button', { name: `Ver ${numero}` }).click();
     const assigned = teacher.getByRole('dialog', { name: `Solicitud ${numero}` });
     await assigned.getByRole('button', { name: 'Consultar análisis interno' }).click();
-    await assigned.getByLabel('Asignatura aprobada').selectOption({ label: /Asignatura sintética O/ });
-    await assigned.getByLabel('Asignatura receptora').selectOption({ label: /Asignatura sintética R/ });
+    await assigned.getByLabel('Asignatura aprobada').selectOption({ label: 'HU27-O · Asignatura sintética O' });
+    await assigned.getByLabel('Asignatura receptora').selectOption({ label: 'Nivel 1 · HU27-R · Asignatura sintética R' });
     await assigned.getByRole('button', { name: 'Ejecutar análisis y guardar' }).click();
     await expect(assigned.getByRole('status')).toContainText('Análisis guardado');
     await expect(assigned.getByRole('heading', { name: 'Resultado del análisis automatizado' })).toBeVisible();
