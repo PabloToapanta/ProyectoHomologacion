@@ -24,6 +24,26 @@ it('celda sin revisión vigente no es seleccionable y explica el motivo',async()
  render(<AgrupacionesPanel request={request} solicitudId="s" aprobadas={aprobadas}/>);await userEvent.click(screen.getByRole('button',{name:'Abrir agrupaciones'}));
  expect(await screen.findByLabelText('Vínculo Origen sintético a R1')).toBeDisabled();expect(screen.getAllByText('Falta revisión vigente')).toHaveLength(2);
 });
+it('permite quitar del borrador un vínculo cuya revisión dejó de estar vigente',async()=>{
+ const opcionesActuales={...opciones,
+  receptoras:[...opciones.receptoras,{id:'r3',codigo:'R3',nombre:'Destino tres',nivel:3,horas:20,creditos:1}],
+  vinculos:[{...opciones.vinculos[0],habilitado:false,motivo:'Falta revisión vigente'},opciones.vinculos[1],
+   {asignaturaAprobadaId:'o',asignaturaReceptoraId:'r3',habilitado:true,motivo:'Vigente'}]};
+ const request=vi.fn(async(path:string,init?:RequestInit)=>
+  init?.method==='PUT'?json({...grupo,aportes:[grupo.aportes[1],{asignaturaAprobadaId:'o',asignaturaReceptoraId:'r3',horasAportadas:null,creditosAportados:null}]}):
+  json(path.endsWith('/opciones')?opcionesActuales:path.endsWith('/g')?grupo:[grupo]));
+ render(<AgrupacionesPanel request={request} solicitudId="s" aprobadas={aprobadas}/>);const user=userEvent.setup();
+ await user.click(screen.getByRole('button',{name:'Abrir agrupaciones'}));
+ await user.click(await screen.findByRole('button',{name:'Abrir grupo g'}));
+ const obsoleto=screen.getByLabelText('Vínculo Origen sintético a R1');
+ expect(obsoleto).toBeChecked();expect(obsoleto).toBeEnabled();
+ await user.click(obsoleto);expect(obsoleto).not.toBeChecked();expect(obsoleto).toBeDisabled();
+ await user.click(screen.getByLabelText('Vínculo Origen sintético a R3'));
+ await user.click(screen.getByRole('button',{name:'Guardar borrador'}));
+ const call=request.mock.calls.find(x=>x[1]?.method==='PUT')!;
+ const body=JSON.parse(call[1]!.body as string);
+ expect(body.aportes.map((a:{asignaturaReceptoraId:string})=>a.asignaturaReceptoraId)).toEqual(['r2','r3']);
+});
 it('409 recarga composición nueva y no mezcla los aportes anteriores',async()=>{
  let lecturas=0;
  const request=vi.fn(async(path:string,init?:RequestInit)=>init?.method==='PUT'?json({title:'Versión obsoleta'},409):json(path.endsWith('/opciones')?opciones:path.endsWith('/g')?(++lecturas===1?grupo:{...grupo,version:'"v2"',aportes:grupo.aportes.map(a=>({...a,horasAportadas:20}))}):path.endsWith('/revisiones')?[]:[grupo]));
