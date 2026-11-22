@@ -1,14 +1,14 @@
 # HU-27 — Plan de implementación en pareja
 
-**Spec:** [HU-27](hu-27-e2e-flujo-completo-ci.md) · **Issue:** [#65](https://github.com/PabloToapanta/ProyectoHomologacion/issues/65) · **Estado al 22/11:** HU-32/33 ya integradas en `develop`; T65 en PR #94; T66/T67 en PR #95, pendientes de ejecución verde y revisión cruzada.
+**Spec:** [HU-27](hu-27-e2e-flujo-completo-ci.md) · **Issue:** [#65](https://github.com/PabloToapanta/ProyectoHomologacion/issues/65) · **Estado al 22/11:** HU-32/33 integradas en `develop`; T65 entregada en PR #94; T66/T67 ejecutadas en verde en PR #95. Revisión cruzada y aceptación PO pendientes.
 
 ## Orden de trabajo
 
 1. Shirley y Edwin completan T65 a partir de las HU realmente entregadas. Pablo y Leslie señalan el nombre y resultado de cada prueba que aporten, sin marcar criterios de otras historias como aceptados.
 2. Pablo prepara el arnés T66: Compose aislado, identidades y datos sintéticos, doble de Ollama, salidas saneadas y limpieza. Prueba primero una falla controlada del arnés y su propagación de estado no cero.
-3. El caso Playwright T66 ya recorre la interfaz de Coordinación y dos docentes sobre el stack de Docker Compose; verifica análisis, las dos revisiones, informe, remisión, finalización y estado al volver a iniciar sesión. Su aceptación depende de ejecutarlo en Chromium con los contratos integrados de HU-32/33.
-4. El workflow T67 ya declara jobs de integración .NET/SQL y E2E con Chromium/Docker. Verificar un run verde; Leslie revisa que el workflow pruebe la PR completa y Edwin hace la revisión cruzada.
-5. Shirley valida CA1–CA4 y los revisores confirman la cobertura. La PR queda lista para formalizarse cuando CI esté verde y no queden cambios solicitados. El merge requiere autorización separada.
+3. El caso Playwright T66 recorrió la interfaz de Coordinación y dos docentes sobre Docker Compose; verificó análisis, las dos revisiones, informe, remisión, finalización y persistencia tras autenticarse de nuevo.
+4. El workflow T67 corrió en verde con jobs de integración .NET/SQL y E2E Chromium/Docker. Leslie revisa el recorrido/CI y Edwin hace la revisión cruzada.
+5. Shirley confirma la matriz T65 y acepta CA1–CA4 después de la revisión cruzada. El merge requiere autorización separada; la protección de `develop` se configura en GitHub por la administración del repositorio.
 
 ## Propiedad inicial de archivos
 
@@ -26,7 +26,7 @@ Se reutilizan `frontend/e2e`, los smokes aislados y `tests/security/hu18-ollama-
 
 El caso Playwright recibe `E2E_BASE_URL`, usuarios/contraseñas sintéticas de Coordinación y dos docentes, carreras, asignaturas y `E2E_RUN_ID`. El arnés crea solo identidades, carreras, asignaturas, perfiles y correspondencia revisada. El caso crea la solicitud, asigna docentes, analiza, registra ambos acuerdos, genera y remite el informe y finaliza con Coordinación. El doble de Ollama reutiliza `tests/security/hu18-ollama-fake.py` dentro de la red Compose. El test runner genera captura solo al fallar; no se conserva trace porque puede incluir credenciales de autorización.
 
-`--fixture-only` solo verifica infraestructura y semilla; no acredita CA2. La ejecución completa requiere que CI construya y recorra el flujo en la rama de la PR.
+`--fixture-only` solo verifica infraestructura y semilla; no acredita CA2. La última ejecución completa de CI acreditó el recorrido en la rama del PR #95.
 
 - T65: revisión de cobertura HU → CA → prueba por Shirley/Edwin; cada hueco tiene dueño y estado.
 - T66: Playwright en Chromium con capturas/trace al fallar, estado final persistido y evidencia de remisión previa; repetición local aislada sin recursos residuales.
