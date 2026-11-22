@@ -168,12 +168,6 @@ internal static class ModeloInformes
     }
 }
 [DbContext(typeof(ResultadosDbContext))]
-public sealed class ResultadosDbContextModelSnapshot : ModelSnapshot
-{
-    protected override void BuildModel(ModelBuilder modelBuilder) => ModeloAuditoriaHu03.Construir(modelBuilder);
-}
-
-[DbContext(typeof(ResultadosDbContext))]
 [Migration("20261121000100_ParametrosHomologacionHu03")]
 public sealed class ParametrosHomologacionHu03 : Migration
 {

@@ -8,6 +8,7 @@ public sealed class SolicitudesDbContext(DbContextOptions<SolicitudesDbContext> 
  public DbSet<Solicitud> Solicitudes=>Set<Solicitud>();
  public DbSet<AsignaturaAprobada> AsignaturasAprobadas=>Set<AsignaturaAprobada>();
  public DbSet<DocenteAsignado> DocentesAsignados=>Set<DocenteAsignado>();
+ public DbSet<AdjuntoSolicitud> Adjuntos=>Set<AdjuntoSolicitud>();
  protected override void OnModelCreating(ModelBuilder b) {
   var s=b.Entity<Solicitud>();s.HasKey(x=>x.Id);
   s.Property(x=>x.NumeroQuipux).HasMaxLength(100).IsRequired();s.Property(x=>x.QuipuxNormalizado).HasMaxLength(100).IsRequired();
@@ -29,6 +30,13 @@ public sealed class SolicitudesDbContext(DbContextOptions<SolicitudesDbContext> 
   d.HasIndex(x=>new{x.SolicitudId,x.Orden}).IsUnique();d.HasIndex(x=>new{x.SolicitudId,x.DocenteId}).IsUnique();
   d.HasOne<Solicitud>().WithMany().HasForeignKey(x=>x.SolicitudId).OnDelete(DeleteBehavior.Restrict);
   a.HasOne<Solicitud>().WithMany().HasForeignKey(x=>x.SolicitudId).OnDelete(DeleteBehavior.Restrict);
+  var adj=b.Entity<AdjuntoSolicitud>();adj.HasKey(x=>x.Id);
+  adj.Property(x=>x.Tipo).HasMaxLength(40).IsRequired();adj.Property(x=>x.NombreArchivo).HasMaxLength(255).IsRequired();
+  adj.Property(x=>x.HuellaSha256).HasMaxLength(64).IsRequired();adj.Property(x=>x.SubidoPor).HasMaxLength(256).IsRequired();adj.Property(x=>x.SubidoPorNombre).HasMaxLength(256).IsRequired();
+  adj.Property(x=>x.FechaSubidaUtc).HasConversion(v=>v,v=>DateTime.SpecifyKind(v,DateTimeKind.Utc));
+  // Se deja que cada proveedor elija su tipo binario: varbinary(max) en SQL Server y BLOB en SQLite.
+  adj.Property(x=>x.Contenido).IsRequired();adj.HasIndex(x=>new{x.SolicitudId,x.FechaSubidaUtc});
+  adj.HasOne<Solicitud>().WithMany().HasForeignKey(x=>x.SolicitudId).OnDelete(DeleteBehavior.Restrict);
  }
 }
 public sealed class SolicitudesDbContextFactory : IDesignTimeDbContextFactory<SolicitudesDbContext> {
@@ -56,5 +64,14 @@ public sealed class SolicitudRepository(SolicitudesDbContext db) : ISolicitudRep
   try {await db.SaveChangesAsync(ct);} catch(DbUpdateConcurrencyException) {throw new DatosExternosNoEditablesException();}
  }
  public Task<bool> EstaAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct)=>db.DocentesAsignados.AnyAsync(d=>d.SolicitudId==solicitudId&&d.DocenteId==docenteId,ct);
+ public async Task<IReadOnlyList<AdjuntoSolicitudMetadata>> ListarAdjuntos(Guid solicitudId,CancellationToken ct)=>await db.Adjuntos.AsNoTracking().Where(x=>x.SolicitudId==solicitudId).OrderBy(x=>x.FechaSubidaUtc).ThenBy(x=>x.Id).Select(x=>new AdjuntoSolicitudMetadata(x.Id,x.SolicitudId,x.Tipo,x.NombreArchivo,x.TamanoBytes,x.HuellaSha256,x.SubidoPor,x.FechaSubidaUtc,x.SubidoPorNombre)).ToListAsync(ct);
+ public Task<AdjuntoSolicitud?> ObtenerAdjunto(Guid solicitudId,Guid adjuntoId,CancellationToken ct)=>db.Adjuntos.AsNoTracking().SingleOrDefaultAsync(x=>x.SolicitudId==solicitudId&&x.Id==adjuntoId,ct);
+ public async Task GuardarAdjunto(AdjuntoSolicitud adjunto,CancellationToken ct) {
+  // La transacción serializable ordena el chequeo de «Finalizada» y la escritura del BLOB frente a HU-33.
+  await using var tx=await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable,ct);
+  var solicitud=await db.Solicitudes.SingleOrDefaultAsync(x=>x.Id==adjunto.SolicitudId,ct)??throw new SolicitudNoEncontradaException();
+  if(solicitud.Estado=="Finalizada") throw new SolicitudFinalizadaException();
+  db.Adjuntos.Add(adjunto);await db.SaveChangesAsync(ct);await tx.CommitAsync(ct);
+ }
  public async Task<IReadOnlyList<Solicitud>> Listar(int pagina,CancellationToken ct)=>await db.Solicitudes.AsNoTracking().OrderByDescending(x=>x.FechaRegistro).ThenBy(x=>x.Id).Skip((pagina-1)*50).Take(50).ToListAsync(ct);
 }

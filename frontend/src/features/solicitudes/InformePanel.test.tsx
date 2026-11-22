@@ -30,11 +30,35 @@ it('sin informe ofrece generarlo y muestra agente, docentes y sugerencia final',
  expect(request.mock.calls.filter(c=>c[1]?.method==='POST')).toHaveLength(1);
 });
 
+it('Coordinación no puede generar un informe que todavía no existe',async()=>{
+ const request=vi.fn(async(_path:string,_init?:RequestInit)=>json({title:'Aún no existe'},404));
+ render(<InformePanel request={request} solicitudId="sol-a" aprobadas={aprobadas} puedeGenerar={false}/>);
+ expect(await screen.findByText(/Los docentes asignados deben generarlo/)).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Generar informe'})).not.toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Exportar informe a PDF'})).not.toBeInTheDocument();
+ expect(request.mock.calls.every(call=>call[1]?.method!=='POST')).toBe(true);
+});
+
 it('un informe ya generado se muestra sin ofrecer generarlo otra vez',async()=>{
  render(<InformePanel request={vi.fn(async()=>json(informe))} solicitudId="sol-a" aprobadas={aprobadas}/>);
  expect(await screen.findByRole('table',{name:'Informe de homologación por pareja'})).toBeInTheDocument();
  expect(screen.getByText(/Generado por docente\.ana/)).toBeInTheDocument();
  expect(screen.queryByRole('button',{name:'Generar informe'})).not.toBeInTheDocument();
+});
+
+it('exporta únicamente cuando el informe ya existe e imprime los datos y advertencias',async()=>{
+ const user=userEvent.setup();const imprimir=vi.spyOn(window,'print').mockImplementation(()=>{});
+ const request=vi.fn(async()=>json(informe));
+ const {rerender}=render(<InformePanel request={request} solicitudId="sol-a" aprobadas={aprobadas}/>);
+ expect(await screen.findByRole('table',{name:'Informe de homologación por pareja'})).toBeInTheDocument();
+ const exportar=screen.getByRole('button',{name:'Exportar informe a PDF'});
+ expect(screen.getByText(/no es una resolución oficial/i)).toBeInTheDocument();
+ expect(screen.getByRole('table')).toHaveTextContent('90 %');
+ await user.click(exportar);expect(imprimir).toHaveBeenCalledOnce();
+ rerender(<InformePanel request={vi.fn(async()=>json({title:'No generado'},404))} solicitudId="sol-b" aprobadas={aprobadas}/>);
+ expect(await screen.findByText(/aún no se ha generado/)).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Exportar informe a PDF'})).not.toBeInTheDocument();
+ imprimir.mockRestore();
 });
 
 it('si faltan análisis docentes muestra el motivo y no un informe',async()=>{
@@ -43,5 +67,11 @@ it('si faltan análisis docentes muestra el motivo y no un informe',async()=>{
  render(<InformePanel request={request} solicitudId="sol-a" aprobadas={aprobadas}/>);
  await user.click(await screen.findByRole('button',{name:'Generar informe'}));
  expect(await screen.findByRole('alert')).toHaveTextContent('Falta el análisis de un docente');
+ expect(screen.queryByRole('table')).not.toBeInTheDocument();
+});
+
+it('muestra error en vez de romper si la API devuelve un informe con estructura inválida',async()=>{
+ render(<InformePanel request={vi.fn(async()=>json([]))} solicitudId="sol-a" aprobadas={aprobadas}/>);
+ expect(await screen.findByRole('alert')).toHaveTextContent('formato no válido');
  expect(screen.queryByRole('table')).not.toBeInTheDocument();
 });
