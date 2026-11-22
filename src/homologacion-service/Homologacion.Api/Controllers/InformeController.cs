@@ -9,7 +9,7 @@ namespace Homologacion.Api.Controllers;
 [ApiController, Authorize(Roles = "Docente,Coordinador")]
 [Route("api/homologaciones/solicitudes/{id:guid}/informe")]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-public sealed class InformeController(GenerarInformeHomologacion service) : ControllerBase
+public sealed class InformeController(GenerarInformeHomologacion service, RemitirInformeHomologacion remision) : ControllerBase
 {
     /// <summary>Consulta un informe generado. Docentes: solo solicitudes asignadas. Coordinadores: solicitudes FISEI existentes.</summary>
     [HttpGet, ProducesResponseType(typeof(InformeHomologacion), 200)]
@@ -50,5 +50,27 @@ public sealed class InformeController(GenerarInformeHomologacion service) : Cont
         catch (AlmacenAnalisisNoDisponibleException error) { return Problem(statusCode: 503, title: error.Message); }
     }
 
+    /// <summary>HU-32: remite el informe generado al coordinador de carrera; cualquiera de los dos docentes asignados, una sola vez.</summary>
+    /// <remarks>Registra la fecha y el docente (evento «Remitido» del historial, HU-25) y pide a Solicitudes el estado «Remitida».
+    /// Cada pareja del informe debe tener el análisis de los dos docentes; las discrepancias quedan como «Sin acuerdo» para el
+    /// coordinador. 400 sin informe generado; 409 si ya fue remitido o el estado de la solicitud no lo permite; si Solicitudes no
+    /// responde, 503 sin remisión registrada. No es una resolución oficial.</remarks>
+    [HttpPost("remision"), Authorize(Roles = "Docente"), ProducesResponseType(typeof(RemisionInforme), 200)]
+    [ProducesResponseType(typeof(ProblemDetails), 400), ProducesResponseType(401), ProducesResponseType(403)]
+    [ProducesResponseType(typeof(ProblemDetails), 404), ProducesResponseType(typeof(ProblemDetails), 409), ProducesResponseType(typeof(ProblemDetails), 503)]
+    public async Task<IActionResult> Remitir(Guid id, CancellationToken ct)
+    {
+        if (DocenteId() is not Guid docente) return Forbid();
+        try { return Ok(await remision.RemitirAsync(id, docente, User.FindFirst("name")?.Value ?? docente.ToString(), ct)); }
+        catch (SolicitudAnalisisNoEncontradaException error) { return Problem(statusCode: 404, title: error.Message); }
+        catch (DatosAnalisisSolicitudException error) { return Problem(statusCode: 400, title: error.Message); }
+        catch (InformeYaRemitidoException error) { return Problem(statusCode: 409, title: error.Message); }
+        catch (EstadoSolicitudNoPermiteRemitirException error) { return Problem(statusCode: 409, title: error.Message); }
+        catch (Homologacion.Domain.Auditoria.EventoInformeInvalidoException error) { return Problem(statusCode: 409, title: error.Message); }
+        catch (FuenteAnalisisNoDisponibleException error) { return Problem(statusCode: 503, title: error.Message); }
+        catch (AlmacenAnalisisNoDisponibleException error) { return Problem(statusCode: 503, title: error.Message); }
+    }
+
+    private Guid? DocenteId() => Guid.TryParse(User.FindFirst("sub")?.Value, out var id) && id != Guid.Empty ? id : null;
     private Guid? UsuarioId() => Guid.TryParse(User.FindFirst("sub")?.Value, out var id) && id != Guid.Empty ? id : null;
 }

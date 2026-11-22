@@ -92,6 +92,15 @@ public sealed class SolicitudService(ISolicitudRepository repository,ICatalogoCa
   await repository.GuardarCambios(ct);
   return (await Obtener(solicitudId,ct))!;
  }
+ /// <summary>HU-32: lo invoca Homologación al remitir el informe; solo un docente asignado; si no existe o no está asignada, «no encontrada».</summary>
+ public async Task MarcarRemitida(Guid solicitudId,Guid docenteId,CancellationToken ct) {
+  if(!await repository.EstaAsignada(solicitudId,docenteId,ct)) throw new SolicitudNoEncontradaException();
+  var solicitud=await repository.ObtenerParaActualizar(solicitudId,ct)??throw new SolicitudNoEncontradaException();
+  if(!solicitud.MarcarRemitida()) return;
+  try {await repository.GuardarCambios(ct);}
+  // Estado es token de concurrencia: si otra petición lo cambió antes, se rechaza en vez de sobrescribir.
+  catch(DatosExternosNoEditablesException) {throw new EstadoSolicitudNoPermiteException("El estado de la solicitud cambió durante la remisión. Intente nuevamente.");}
+ }
  public Task<IReadOnlyList<Solicitud>> ListarAsignadas(Guid docenteId,CancellationToken ct)=>repository.ListarAsignadasA(docenteId,ct);
  /// <summary>Null si no existe o el docente no figura entre los asignados: no se distingue para no revelar solicitudes ajenas.</summary>
  public async Task<SolicitudAsignada?> ObtenerAsignada(Guid solicitudId,Guid docenteId,CancellationToken ct) {

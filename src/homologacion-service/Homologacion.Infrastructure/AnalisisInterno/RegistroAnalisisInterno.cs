@@ -68,6 +68,9 @@ public static class RegistroAnalisisInterno
         services.AddScoped<IAuditoriaInformes, EventosInformeSql>();
         services.AddScoped<GenerarInformeHomologacion>();
         services.AddScoped<ConsultarHistorialInforme>();
+        // HU-32: Solicitudes es dueño del estado; la remisión y el evento «Remitido» se confirman juntos.
+        services.AddScoped<IEstadoSolicitudes>(p => p.GetRequiredService<FuentesAnalisisHttp>());
+        services.AddScoped<RemitirInformeHomologacion>();
         services.AddScoped<Homologacion.Application.Equivalencias.EvaluarAgrupacion>();
         services.AddScoped<Homologacion.Application.Agrupaciones.PrepararAgrupacion>();
         services.AddScoped<Homologacion.Application.Agrupaciones.GestionarAgrupaciones>();

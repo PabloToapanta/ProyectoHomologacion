@@ -22,8 +22,10 @@ public class InformeEndpointTests
     private static readonly Guid Carrera = Guid.Parse("a0000000-0000-0000-0000-000000000004");
 
     private sealed class Fuentes : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno,
-        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
+        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, IEstadoSolicitudes, IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
     {
+        public int MarcasRemitida { get; private set; }
+        public Task MarcarRemitidaAsync(Guid solicitudId, CancellationToken ct) { MarcasRemitida++; return Task.CompletedTask; }
         public bool Asignada { get; set; } = true;
         Task<IReadOnlyList<AnalisisAgrupacionGuardado>> IResultadosAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<AnalisisAgrupacionGuardado>>([]);
         Task<IReadOnlyList<RevisionAgrupacionRegistrada>> IRevisionesAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<RevisionAgrupacionRegistrada>>([]);
@@ -72,9 +74,7 @@ public class InformeEndpointTests
             s.RemoveAll<IRevisionesDocentes>(); s.AddSingleton<IRevisionesDocentes>(e);
             s.RemoveAll<IInformesHomologacion>(); s.AddSingleton<IInformesHomologacion>(e);
             s.RemoveAll<IAuditoriaInformes>(); s.AddSingleton<IAuditoriaInformes>(e);
-            s.RemoveAll<IResultadosAgrupacionInforme>();s.AddSingleton<IResultadosAgrupacionInforme>(e);
-            s.RemoveAll<IRevisionesAgrupacionInforme>();s.AddSingleton<IRevisionesAgrupacionInforme>(e);
-            s.RemoveAll<IAuditoriaInformes>(); s.AddSingleton<IAuditoriaInformes>(e);
+            s.RemoveAll<IEstadoSolicitudes>(); s.AddSingleton<IEstadoSolicitudes>(e);
             s.RemoveAll<IResultadosAgrupacionInforme>();s.AddSingleton<IResultadosAgrupacionInforme>(e);
             s.RemoveAll<IRevisionesAgrupacionInforme>();s.AddSingleton<IRevisionesAgrupacionInforme>(e);
             s.RemoveAll<TimeProvider>(); s.AddSingleton<TimeProvider>(new RelojAnalisis());
@@ -173,5 +173,56 @@ public class InformeEndpointTests
         using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e); using var c = host.CreateClient();
         if (rol is not null) c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token(rol));
         Assert.Equal(esperado, (int)(await c.GetAsync(Base + "/informe/historial")).StatusCode);
+    }
+
+    [Fact]
+    public async Task HU32_el_docente_remite_una_sola_vez_y_el_coordinador_ve_el_evento()
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e);
+        using var ana = Docente(f, host); using var luis = Docente(f, host);
+        // CA3: sin informe generado no se remite.
+        using (var sin = await ana.PostAsync(Base + "/informe/remision", null))
+        {
+            Assert.Equal(HttpStatusCode.BadRequest, sin.StatusCode);
+            Assert.Contains("informe", await sin.Content.ReadAsStringAsync());
+        }
+        await ana.PutAsJsonAsync(Base + "/revisiones-docentes", Ajuste("Homologable"));
+        await luis.PutAsJsonAsync(Base + "/revisiones-docentes", Ajuste("NoHomologable"));
+        Assert.Equal(HttpStatusCode.Created, (await ana.PostAsync(Base + "/informe", null)).StatusCode);
+        using var r = await luis.PostAsync(Base + "/informe/remision", null);
+        Assert.Equal(HttpStatusCode.OK, r.StatusCode);
+        using (var j = JsonDocument.Parse(await r.Content.ReadAsStringAsync()))
+        {
+            Assert.Equal(Solicitud, j.RootElement.GetProperty("solicitudId").GetGuid());
+            Assert.True(j.RootElement.TryGetProperty("fecha", out _));
+            Assert.False(string.IsNullOrWhiteSpace(j.RootElement.GetProperty("remitidoPor").GetString()));
+        }
+        // CA2: un segundo intento responde 409 sin cambiar la remisión.
+        Assert.Equal(HttpStatusCode.Conflict, (await ana.PostAsync(Base + "/informe/remision", null)).StatusCode);
+        Assert.Equal(1, e.MarcasRemitida);
+        using var coordinador = host.CreateClient();
+        coordinador.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Coordinador"));
+        using var h = JsonDocument.Parse(await coordinador.GetStringAsync(Base + "/informe/historial"));
+        Assert.Equal(["Generado", "Remitido"], h.RootElement.EnumerateArray().Select(x => x.GetProperty("tipo").GetString()));
+    }
+
+    [Fact]
+    public async Task HU32_docente_no_asignado_recibe_404()
+    {
+        using var f = new MotorFactory(); var e = new Fuentes { Asignada = false }; using var host = Host(f, e); using var c = Docente(f, host);
+        Assert.Equal(HttpStatusCode.NotFound, (await c.PostAsync(Base + "/informe/remision", null)).StatusCode);
+        Assert.Equal(0, e.MarcasRemitida);
+    }
+
+    [Theory]
+    [InlineData(null, 401)]
+    [InlineData("Coordinador", 403)]
+    [InlineData("Administrador", 403)]
+    public async Task HU32_solo_el_docente_remite(string? rol, int esperado)
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e); using var c = host.CreateClient();
+        if (rol is not null) c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token(rol));
+        Assert.Equal(esperado, (int)(await c.PostAsync(Base + "/informe/remision", null)).StatusCode);
+        Assert.Equal((0, 0), (e.Consultas, e.MarcasRemitida));
     }
 }

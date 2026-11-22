@@ -86,6 +86,26 @@ public class EventosInformeSqlTests
         await Assert.ThrowsAsync<AlmacenAnalisisNoDisponibleException>(() => new EventosInformeSql(db).ListarAsync(Guid.NewGuid(), default));
     }
 
+    [Fact]
+    public async Task HU32_si_falla_la_accion_del_cierre_el_evento_no_se_confirma()
+    {
+        using var connection = new SqliteConnection("Data Source=:memory:");
+        var options = await Sqlite(connection);
+        var solicitud = Guid.NewGuid();
+        await using (var db = new ResultadosDbContext(options))
+        {
+            var eventos = new EventosInformeSql(db);
+            // Igual que la remisión: el evento se inserta y después Solicitudes no confirma el estado.
+            await Assert.ThrowsAsync<FuenteAnalisisNoDisponibleException>(() => new InformesHomologacionSql(db).ConCierreAsync<bool>(solicitud, async () =>
+            {
+                await eventos.RegistrarAsync(Evento(solicitud, TipoEventoInforme.Remitido, T0), default);
+                throw new FuenteAnalisisNoDisponibleException();
+            }, default));
+        }
+        await using var lectura = new ResultadosDbContext(options);
+        Assert.Empty(await new EventosInformeSql(lectura).ListarAsync(solicitud, default));
+    }
+
     [SqlServerExternoFact]
     public async Task SQL_Server_real_impide_modificar_o_eliminar_eventos()
     {
