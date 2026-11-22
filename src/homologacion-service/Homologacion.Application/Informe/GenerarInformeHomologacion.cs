@@ -2,6 +2,7 @@ using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Equivalencias;
 using Homologacion.Application.RevisionDocente;
+using Homologacion.Domain.Auditoria;
 using Homologacion.Application.Configuracion;
 using Homologacion.Domain.Configuracion;
 
@@ -52,7 +53,8 @@ public interface IInformesHomologacion
 public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solicitudes, IReceptorasAnalisisInterno receptoras,
     IResultadosAnalisisInterno internos, IResultadosAnalisisExterno externos, IRevisionesDocentes revisiones, IInformesHomologacion informes,
     TimeProvider reloj, IResultadosAgrupacionInforme? analisisGrupales = null, IRevisionesAgrupacionInforme? revisionesGrupales = null,
-    IParametrosHomologacionProvider? parametrosProvider = null, ISolicitudesAnalisisExterno? solicitudesExternas = null)
+    IAuditoriaInformes? auditoria = null, IParametrosHomologacionProvider? parametrosProvider = null,
+    ISolicitudesAnalisisExterno? solicitudesExternas = null)
 {
     public const int DocentesAsignados = 2;
 
@@ -184,6 +186,13 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
             lista.Count(p => p.SugerenciaFinal == "NoConvalidar") + grupos.Count(g => g.SugerenciaFinal == "NoConvalidar"), sinAcuerdo, advertencias)
         { Grupos = grupos };
         await informes.GuardarAsync(informe, ct);
+        // HU-25: dentro del mismo cierre y transacción que el informe; si el evento falla, el informe no se confirma.
+        if (auditoria is not null)
+        {
+            var evento = HistorialInforme.Crear(solicitudId, TipoEventoInforme.Generado, informe.Fecha, docenteId, informe.GeneradoPor, "Docente");
+            HistorialInforme.ValidarSiguiente((await auditoria.ListarAsync(solicitudId, ct)).ToArray(), evento.Tipo);
+            await auditoria.RegistrarAsync(evento, ct);
+        }
         return informe;
     }
 

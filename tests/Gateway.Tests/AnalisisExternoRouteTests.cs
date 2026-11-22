@@ -27,6 +27,7 @@ public class AnalisisExternoRouteTests
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/revisiones-docentes", "homologacion")]
     [InlineData("POST", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
     [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe", "homologacion")]
+    [InlineData("GET", "/api/homologaciones/solicitudes/{0}/informe/historial", "homologacion")]
     // HU-12: adjuntos del expediente (subir, listar y descargar).
     [InlineData("POST", "/api/solicitudes/{0}/adjuntos", "solicitudes")]
     [InlineData("GET", "/api/solicitudes/{0}/adjuntos", "solicitudes")]

@@ -45,6 +45,7 @@ public sealed class InformeController(GenerarInformeHomologacion service) : Cont
         catch (SolicitudAnalisisNoEncontradaException error) { return Problem(statusCode: 404, title: error.Message); }
         catch (DatosAnalisisSolicitudException error) { return Problem(statusCode: 400, title: error.Message); }
         catch (InformeYaGeneradoException error) { return Problem(statusCode: 409, title: error.Message); }
+        catch (Homologacion.Domain.Auditoria.EventoInformeInvalidoException error) { return Problem(statusCode: 409, title: error.Message); }
         catch (FuenteAnalisisNoDisponibleException error) { return Problem(statusCode: 503, title: error.Message); }
         catch (AlmacenAnalisisNoDisponibleException error) { return Problem(statusCode: 503, title: error.Message); }
     }

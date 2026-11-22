@@ -5,6 +5,7 @@ using Homologacion.Application.AnalisisExterno;
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Informe;
 using Homologacion.Application.RevisionDocente;
+using Homologacion.Domain.Auditoria;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -21,7 +22,7 @@ public class InformeEndpointTests
     private static readonly Guid Carrera = Guid.Parse("a0000000-0000-0000-0000-000000000004");
 
     private sealed class Fuentes : ISolicitudesAnalisisInterno, ICatalogoAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno,
-        IRevisionesDocentes, IInformesHomologacion, IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
+        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
     {
         public bool Asignada { get; set; } = true;
         Task<IReadOnlyList<AnalisisAgrupacionGuardado>> IResultadosAgrupacionInforme.ListarAsync(Guid id,CancellationToken ct)=>Task.FromResult<IReadOnlyList<AnalisisAgrupacionGuardado>>([]);
@@ -29,6 +30,10 @@ public class InformeEndpointTests
         public int Consultas { get; private set; }
         public List<RevisionDocenteRegistrada> Revisiones { get; } = [];
         public InformeHomologacion? Informe { get; set; }
+        public List<EventoInforme> Eventos { get; } = [];
+        public Task RegistrarAsync(EventoInforme evento, CancellationToken ct) { Eventos.Add(evento); return Task.CompletedTask; }
+        Task<IReadOnlyList<EventoInforme>> IAuditoriaInformes.ListarAsync(Guid solicitudId, CancellationToken ct) =>
+            Task.FromResult<IReadOnlyList<EventoInforme>>(Eventos.Where(e => e.SolicitudId == solicitudId).ToArray());
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct)
         {
             Consultas++;
@@ -66,6 +71,10 @@ public class InformeEndpointTests
             s.RemoveAll<IResultadosAnalisisExterno>(); s.AddSingleton<IResultadosAnalisisExterno>(e);
             s.RemoveAll<IRevisionesDocentes>(); s.AddSingleton<IRevisionesDocentes>(e);
             s.RemoveAll<IInformesHomologacion>(); s.AddSingleton<IInformesHomologacion>(e);
+            s.RemoveAll<IAuditoriaInformes>(); s.AddSingleton<IAuditoriaInformes>(e);
+            s.RemoveAll<IResultadosAgrupacionInforme>();s.AddSingleton<IResultadosAgrupacionInforme>(e);
+            s.RemoveAll<IRevisionesAgrupacionInforme>();s.AddSingleton<IRevisionesAgrupacionInforme>(e);
+            s.RemoveAll<IAuditoriaInformes>(); s.AddSingleton<IAuditoriaInformes>(e);
             s.RemoveAll<IResultadosAgrupacionInforme>();s.AddSingleton<IResultadosAgrupacionInforme>(e);
             s.RemoveAll<IRevisionesAgrupacionInforme>();s.AddSingleton<IRevisionesAgrupacionInforme>(e);
             s.RemoveAll<TimeProvider>(); s.AddSingleton<TimeProvider>(new RelojAnalisis());
@@ -132,5 +141,37 @@ public class InformeEndpointTests
         Assert.Equal(esperado, (int)(await c.PostAsync(Base + "/informe", null)).StatusCode);
         Assert.Equal(esperado, (int)(await c.GetAsync(Base + "/informe")).StatusCode);
         Assert.Equal(0, e.Consultas);
+    }
+
+    [Fact]
+    public async Task HU25_el_coordinador_consulta_el_historial_con_el_evento_generado()
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e);
+        using var ana = Docente(f, host); using var luis = Docente(f, host);
+        await ana.PutAsJsonAsync(Base + "/revisiones-docentes", Ajuste("Homologable"));
+        await luis.PutAsJsonAsync(Base + "/revisiones-docentes", Ajuste("Homologable"));
+        Assert.Equal(HttpStatusCode.Created, (await luis.PostAsync(Base + "/informe", null)).StatusCode);
+        using var coordinador = host.CreateClient();
+        coordinador.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Coordinador"));
+        using var r = await coordinador.GetAsync(Base + "/informe/historial");
+        Assert.Equal(HttpStatusCode.OK, r.StatusCode);
+        using var j = JsonDocument.Parse(await r.Content.ReadAsStringAsync());
+        var evento = Assert.Single(j.RootElement.EnumerateArray());
+        Assert.Equal("Generado", evento.GetProperty("tipo").GetString());
+        Assert.Equal("Docente", evento.GetProperty("rol").GetString());
+        Assert.False(string.IsNullOrWhiteSpace(evento.GetProperty("usuario").GetString()));
+        Assert.True(evento.TryGetProperty("fecha", out _));
+        Assert.Equal(HttpStatusCode.MethodNotAllowed, (await coordinador.DeleteAsync(Base + "/informe/historial")).StatusCode);
+    }
+
+    [Theory]
+    [InlineData(null, 401)]
+    [InlineData("Docente", 403)]
+    [InlineData("Administrador", 403)]
+    public async Task HU25_otros_roles_no_consultan_el_historial(string? rol, int esperado)
+    {
+        using var f = new MotorFactory(); var e = new Fuentes(); using var host = Host(f, e); using var c = host.CreateClient();
+        if (rol is not null) c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token(rol));
+        Assert.Equal(esperado, (int)(await c.GetAsync(Base + "/informe/historial")).StatusCode);
     }
 }

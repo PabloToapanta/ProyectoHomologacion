@@ -3,6 +3,7 @@ using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Informe;
 using Homologacion.Application.Equivalencias;
 using Homologacion.Application.RevisionDocente;
+using Homologacion.Domain.Auditoria;
 using Homologacion.Domain.Equivalencias;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -24,7 +25,8 @@ public class InformeHomologacionTests
     private static readonly Guid Ana = Guid.Parse("90000000-0000-0000-0000-0000000000d1");
     private static readonly Guid Luis = Guid.Parse("90000000-0000-0000-0000-0000000000d2");
 
-    private sealed class Fuentes : ISolicitudesAnalisisInterno, ISolicitudesAnalisisExterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno, IRevisionesDocentes, IInformesHomologacion,
+    private sealed class Fuentes : ISolicitudesAnalisisInterno, IReceptorasAnalisisInterno, IResultadosAnalisisInterno, IResultadosAnalisisExterno,
+        IRevisionesDocentes, IInformesHomologacion, IAuditoriaInformes, ISolicitudesAnalisisExterno,
         IResultadosAgrupacionInforme, IRevisionesAgrupacionInforme
     {
         public bool Asignada { get; set; } = true;
@@ -37,6 +39,10 @@ public class InformeHomologacionTests
         public List<RevisionAgrupacionRegistrada> RevisionesGrupos { get; } = [];
         public InformeHomologacion? Informe { get; set; }
         public bool AlmacenCaido { get; set; }
+        public List<EventoInforme> Eventos { get; } = [];
+        public Task RegistrarAsync(EventoInforme evento, CancellationToken ct) { Eventos.Add(evento); return Task.CompletedTask; }
+        Task<IReadOnlyList<EventoInforme>> IAuditoriaInformes.ListarAsync(Guid solicitudId, CancellationToken ct) =>
+            Task.FromResult<IReadOnlyList<EventoInforme>>(Eventos.Where(e => e.SolicitudId == solicitudId).ToArray());
         /// <summary>Pausa la escritura indicada dentro del cierre para fijar el orden de dos peticiones simultáneas.</summary>
         public TaskCompletionSource? PausaRevision { get; set; }
         public TaskCompletionSource? PausaInforme { get; set; }
@@ -100,7 +106,41 @@ public class InformeHomologacionTests
     }
 
     private sealed class Reloj : TimeProvider { public override DateTimeOffset GetUtcNow() => new(2026, 11, 4, 20, 0, 0, TimeSpan.Zero); }
-    private static (GenerarInformeHomologacion, Fuentes) Caso() { var f = new Fuentes(); return (new GenerarInformeHomologacion(f, f, f, f, f, f, new Reloj(), f, f, solicitudesExternas: f), f); }
+    private static (GenerarInformeHomologacion, Fuentes) Caso() { var f = new Fuentes(); return (new GenerarInformeHomologacion(f, f, f, f, f, f, new Reloj(), f, f, auditoria: f, solicitudesExternas: f), f); }
+
+    [Fact]
+    public async Task HU25_generar_registra_el_evento_con_fecha_y_usuario()
+    {
+        var (caso, f) = Caso();
+        f.Revision(Ana, A1, R1, "Homologable"); f.Revision(Luis, A1, R1, "Homologable");
+        var i = await caso.GenerarAsync(Solicitud, Ana, "docente.ana", default);
+        var e = Assert.Single(f.Eventos);
+        Assert.Equal((Solicitud, TipoEventoInforme.Generado, i.Fecha, Ana, "docente.ana", "Docente"), (e.SolicitudId, e.Tipo, e.Fecha, e.UsuarioId, e.Usuario, e.Rol));
+    }
+
+    [Fact]
+    public async Task HU25_sin_informe_guardado_no_hay_evento()
+    {
+        var (caso, f) = Caso();
+        f.Revision(Ana, A1, R1, "Homologable"); f.Revision(Luis, A1, R1, "Homologable");
+        f.AlmacenCaido = true;
+        await Assert.ThrowsAsync<AlmacenAnalisisNoDisponibleException>(() => caso.GenerarAsync(Solicitud, Ana, "docente.ana", default));
+        Assert.Empty(f.Eventos);
+    }
+
+    [Fact]
+    public async Task HU25_el_historial_se_consulta_en_orden_cronologico()
+    {
+        var f = new Fuentes();
+        var t = new DateTimeOffset(2026, 11, 20, 15, 0, 0, TimeSpan.Zero);
+        f.Eventos.Add(HistorialInforme.Crear(Solicitud, TipoEventoInforme.Remitido, t.AddHours(1), Ana, "docente.ana", "Docente"));
+        f.Eventos.Add(HistorialInforme.Crear(Solicitud, TipoEventoInforme.Generado, t, Ana, "docente.ana", "Docente"));
+        f.Eventos.Add(HistorialInforme.Crear(Guid.NewGuid(), TipoEventoInforme.Generado, t, Luis, "docente.luis", "Docente"));
+        var historial = await new ConsultarHistorialInforme(f).EjecutarAsync(Solicitud, default);
+        Assert.Equal([TipoEventoInforme.Generado, TipoEventoInforme.Remitido], historial.Select(e => e.Tipo));
+        await Assert.ThrowsAsync<DatosAnalisisSolicitudException>(() => new ConsultarHistorialInforme(f).EjecutarAsync(Guid.Empty, default));
+    }
+
     [Fact]
     public async Task Grupo_con_dos_revisiones_aparece_una_vez_y_conserva_desglose_y_evidencia()
     {
