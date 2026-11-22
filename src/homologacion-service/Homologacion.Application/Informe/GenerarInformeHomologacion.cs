@@ -13,7 +13,10 @@ public sealed record ParejaEnInforme(Guid AsignaturaAprobadaId, Guid AsignaturaR
 public sealed record GrupoEnInforme(Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas,
     IReadOnlyList<EvaluacionEquivalencia> Receptoras, string EstadoAnalisis, string? Sugerencia,
     IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal,
-    IReadOnlyList<AporteEvaluadoAgrupacion> Aportes, IReadOnlyList<EvidenciaAgrupacion> Evidencias, string Leyenda);
+    IReadOnlyList<AporteEvaluadoAgrupacion> Aportes, IReadOnlyList<EvidenciaAgrupacion> Evidencias, string Leyenda)
+{
+    public Guid? ConfiguracionVersionId { get; init; }
+}
 public sealed record AnalisisAgrupacionGuardado(Guid SolicitudId, Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas,
     ResultadoAgrupacion Evaluacion, DateTimeOffset Fecha);
 public sealed record RevisionAgrupacionRegistrada(Guid SolicitudId, Guid GrupoId, Guid DocenteId,
@@ -115,7 +118,8 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
             return new GrupoEnInforme(g.Key, a.AsignaturasAprobadas, a.Evaluacion.Receptoras,
                 a.Evaluacion.Estado.ToString(), a.Evaluacion.Estado == Homologacion.Domain.Equivalencias.EstadoEquivalencia.InformacionIncompleta
                     ? null : a.Evaluacion.Estado.ToString(), docentes, final, a.Evaluacion.Aportes, a.Evaluacion.Evidencias,
-                "Regla de análisis del proyecto pendiente de validación institucional: una sugerencia para toda la agrupación y tres criterios por cada receptora.");
+                "Homologación por agrupación — regla de análisis pendiente de validación institucional")
+            { ConfiguracionVersionId = a.Evaluacion.ConfiguracionVersionId };
         }).OrderBy(g => g.GrupoId).ToArray();
         var analizadas = lista.Select(p => p.AsignaturaAprobadaId).ToHashSet();
         foreach (var id in grupos.SelectMany(g => g.AsignaturasAprobadas)) analizadas.Add(id);

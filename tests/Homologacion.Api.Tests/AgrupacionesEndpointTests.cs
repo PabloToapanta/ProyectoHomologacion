@@ -102,6 +102,9 @@ public class AgrupacionesEndpointTests
         Assert.Single(i.RootElement.GetProperty("parejas").EnumerateArray());
         Assert.Equal(historica, i.RootElement.GetProperty("parejas")[0].GetProperty("asignaturaAprobadaId").GetGuid());
         Assert.Equal(2, i.RootElement.GetProperty("grupos")[0].GetProperty("docentes").GetArrayLength());
+        Assert.Equal(Guid.Parse("11111111-1111-1111-1111-111111111111"), i.RootElement.GetProperty("grupos")[0].GetProperty("configuracionVersionId").GetGuid());
+        Assert.Equal("Homologación por agrupación — regla de análisis pendiente de validación institucional",
+            i.RootElement.GetProperty("grupos")[0].GetProperty("leyenda").GetString());
         Assert.Equal(HttpStatusCode.Conflict, (await c.PutAsJsonAsync(detalle + "/revisiones", revision)).StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, (await c.PostAsync(detalle + "/analisis", null)).StatusCode);
         e.Solicitud = null; Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(detalle)).StatusCode);

@@ -19,6 +19,7 @@ public class InformeHomologacionTests
     private static readonly Guid R1 = Guid.Parse("90000000-0000-0000-0000-0000000000b1");
     private static readonly Guid R2 = Guid.Parse("90000000-0000-0000-0000-0000000000b2");
     private static readonly Guid Grupo = Guid.Parse("90000000-0000-0000-0000-0000000000c1");
+    private static readonly Guid VersionParametros = Guid.Parse("90000000-0000-0000-0000-0000000000c2");
     private static readonly Guid Carrera = Guid.Parse("90000000-0000-0000-0000-000000000004");
     private static readonly Guid Ana = Guid.Parse("90000000-0000-0000-0000-0000000000d1");
     private static readonly Guid Luis = Guid.Parse("90000000-0000-0000-0000-0000000000d2");
@@ -83,7 +84,8 @@ public class InformeHomologacionTests
                  new([A1.ToString(), A2.ToString()], R2.ToString(), 85, 85, 85, 80, EstadoEquivalencia.Homologable, "ok", [], [], [])],
                 80, EstadoEquivalencia.Homologable, "ok", [],
                 [new(A1.ToString(), R1.ToString(), 72, 2.5m)],
-                [new(A1.ToString(), R1.ToString(), "Contenido", "C1", "C1", "origen/C1", "receptora/C1")]);
+                [new(A1.ToString(), R1.ToString(), "Contenido", "C1", "C1", "origen/C1", "receptora/C1")])
+            { ConfiguracionVersionId = VersionParametros };
             AnalisisGrupos.Add(new(Solicitud, Grupo, [A1, A2], evaluacion, DateTimeOffset.UnixEpoch));
         }
         public void RevisionGrupo(Guid docente, string decision) => RevisionesGrupos.Add(new(Solicitud, Grupo, docente,
@@ -107,6 +109,10 @@ public class InformeHomologacionTests
         Assert.Equal(2, grupo.Receptoras.Count);
         Assert.Equal(2, grupo.Docentes.Count);
         Assert.Equal("Convalidar", grupo.SugerenciaFinal);
+        Assert.Equal(VersionParametros, grupo.ConfiguracionVersionId);
+        Assert.Equal("Homologación por agrupación — regla de análisis pendiente de validación institucional", grupo.Leyenda);
+        var restaurado = JsonSerializer.Deserialize<InformeHomologacion>(JsonSerializer.Serialize(informe));
+        Assert.Equal(VersionParametros, Assert.Single(restaurado!.Grupos).ConfiguracionVersionId);
         Assert.Single(grupo.Evidencias);
         Assert.Equal([A3], informe.AprobadasSinAnalisis);
         Assert.Equal(1, informe.Convalidar);
