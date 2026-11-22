@@ -3,6 +3,8 @@ using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Equivalencias;
 using Homologacion.Application.RevisionDocente;
 using Homologacion.Domain.Auditoria;
+using Homologacion.Application.Configuracion;
+using Homologacion.Domain.Configuracion;
 
 namespace Homologacion.Application.Informe;
 
@@ -51,7 +53,8 @@ public interface IInformesHomologacion
 public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solicitudes, IReceptorasAnalisisInterno receptoras,
     IResultadosAnalisisInterno internos, IResultadosAnalisisExterno externos, IRevisionesDocentes revisiones, IInformesHomologacion informes,
     TimeProvider reloj, IResultadosAgrupacionInforme? analisisGrupales = null, IRevisionesAgrupacionInforme? revisionesGrupales = null,
-    IAuditoriaInformes? auditoria = null)
+    IAuditoriaInformes? auditoria = null, IParametrosHomologacionProvider? parametrosProvider = null,
+    ISolicitudesAnalisisExterno? solicitudesExternas = null)
 {
     public const int DocentesAsignados = 2;
 
@@ -130,6 +133,53 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
         var advertencias = new List<string> { "Informe técnico para el coordinador de carrera; no es una resolución oficial." };
         if (sinAcuerdo > 0) advertencias.Add("Hay análisis sin acuerdo entre los docentes: decide el coordinador de carrera.");
         if (sinAnalisis.Length > 0) advertencias.Add("Hay asignaturas aprobadas sin análisis docente; no tienen sugerencia.");
+        ParametrosHomologacion? parametros;
+        try { parametros = parametrosProvider is null ? ParametrosHomologacion.Predeterminados() : await parametrosProvider.ObtenerVigentesAsync(ct); }
+        catch (AlmacenAnalisisNoDisponibleException)
+        {
+            parametros = null;
+            advertencias.Add("Información incompleta: no se pudieron consultar los parámetros vigentes de HU-03; no se evalúan los mínimos de HU-16 ni se sugiere una ruta alternativa.");
+        }
+        if (parametros is not null)
+        {
+            var minimoHomologables = solicitud.TipoCambio == "Externo"
+                ? parametros.AsignaturasHomologablesMinimasExterno : parametros.AsignaturasHomologablesMinimasInterno;
+            var homologablesConfirmadas = lista.Where(p => p.Agente.Estado == "Completo" && p.Agente.Sugerencia == "Homologable")
+                .Select(p => p.AsignaturaAprobadaId).Distinct().Count();
+            var analisisCompleto = sinAnalisis.Length == 0 && lista.All(p => p.Agente.Estado == "Completo");
+            if (homologablesConfirmadas < minimoHomologables)
+            {
+                if (analisisCompleto)
+                    advertencias.Add(AlertarRutaAlternativa($"asignaturas homologables: mínimo {minimoHomologables}, alcanzado {homologablesConfirmadas}"));
+                else
+                    advertencias.Add($"No se puede determinar el mínimo de asignaturas homologables ({minimoHomologables} requeridas): faltan análisis completos de todas las asignaturas aprobadas.");
+            }
+        }
+        if (solicitud.TipoCambio == "Externo")
+        {
+            SolicitudExternaParaAnalisis? externa = null;
+            try { if (solicitudesExternas is not null) externa = await solicitudesExternas.ObtenerSolicitudExternaAsync(solicitudId, ct); }
+            catch (FuenteAnalisisNoDisponibleException) { }
+            if (externa is null || externa.Id != solicitudId || externa.TipoCambio != "Externo")
+                advertencias.Add("Información incompleta: no se pudieron consultar los períodos cursados ni los cambios previos de la solicitud externa.");
+            else
+            {
+                if (parametros is null)
+                    advertencias.Add("No se evalúan los períodos mínimos externos porque los parámetros vigentes no están disponibles.");
+                else if (externa.PeriodosCursados is null)
+                    advertencias.Add($"Información incompleta: no se declararon los períodos cursados; no se puede determinar si se alcanza el mínimo externo de {parametros.PeriodosMinimosExterno}.");
+                else if (externa.PeriodosCursados < parametros.PeriodosMinimosExterno)
+                    advertencias.Add(AlertarRutaAlternativa($"períodos cursados: mínimo {parametros.PeriodosMinimosExterno}, alcanzado {externa.PeriodosCursados}"));
+                if (externa.CambiosPreviosCarrera is null)
+                    advertencias.Add("Información incompleta: no se declararon los cambios previos de carrera; no se puede evaluar este requisito externo.");
+                else if (externa.CambiosPreviosCarrera > 0)
+                    advertencias.Add(AlertarRutaAlternativa($"cambios previos de carrera: se requieren 0, declarados {externa.CambiosPreviosCarrera}"));
+            }
+        }
+        else
+        {
+            advertencias.Add("No se registran períodos cursados para solicitudes internas; este dato de HU-16 no puede verificarse en el expediente actual.");
+        }
         var nombre = string.IsNullOrWhiteSpace(docente) ? docenteId.ToString() : docente.Trim();
         var informe = new InformeHomologacion(solicitudId, solicitud.TipoCambio, reloj.GetUtcNow(), docenteId, nombre.Length > 256 ? nombre[..256] : nombre,
             lista, sinAnalisis, lista.Count(p => p.SugerenciaFinal == "Convalidar") + grupos.Count(g => g.SugerenciaFinal == "Convalidar"),
@@ -145,6 +195,9 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
         }
         return informe;
     }
+
+    private static string AlertarRutaAlternativa(string requisito)
+        => $"Alerta informativa de ruta alternativa: no se alcanza el requisito ({requisito}). Revise el proceso vigente de admisión y cambio de carrera de la UTA (RRA del CES, art. 79; Instructivo UTA RES CAU-P-005-2023); la ruta aplicable y la decisión corresponden a la institución. Regla de análisis del proyecto pendiente de confirmación institucional; no bloquea ni modifica el veredicto de homologación.";
 
     public async Task<InformeHomologacion?> ConsultarAsync(Guid solicitudId, CancellationToken ct)
     {
