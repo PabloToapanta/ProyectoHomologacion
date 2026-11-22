@@ -31,6 +31,7 @@ public sealed class GatewayHttpsTests
     [InlineData("/login", "frontend")]
     [InlineData("/panel", "frontend")]
     [InlineData("/admin/carreras?seccion=asignaturas", "frontend")]
+    [InlineData("/admin/usuarios", "frontend")]
     [InlineData("/validaciones", "frontend")]
     [InlineData("/solicitudes", "frontend")]
     [InlineData("/docente/solicitudes", "frontend")]

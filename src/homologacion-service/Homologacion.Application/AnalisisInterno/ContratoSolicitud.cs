@@ -3,7 +3,10 @@ using Homologacion.Domain.Antiguedad;
 
 namespace Homologacion.Application.AnalisisInterno;
 
-public sealed record AprobadaParaAnalisis(Guid Id, Guid? AsignaturaOrigenId, decimal Creditos, int Horas, string Estado, DateOnly FechaAprobacion);
+public sealed record AprobadaParaAnalisis(Guid Id, Guid? AsignaturaOrigenId, decimal Creditos, int Horas, string Estado, DateOnly FechaAprobacion)
+{
+    public int? IntentoMatricula { get; init; }
+}
 public sealed record SolicitudParaAnalisis(Guid Id, string TipoCambio, Guid? CarreraOrigenId, Guid CarreraReceptoraId, IReadOnlyList<AprobadaParaAnalisis> AsignaturasAprobadas);
 public sealed record ElementoParaAnalisis(Guid Id, string Texto);
 public sealed record AsignaturaParaAnalisis(Guid Id, Guid CarreraId, string Facultad, bool CarreraVigente, decimal Creditos, int Horas,

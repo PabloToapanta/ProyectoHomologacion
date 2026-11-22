@@ -79,9 +79,10 @@ petición; no inventa agregaciones para múltiples orígenes.
 
 ## Lecturas internas nuevas
 
-- Solicitudes: GET `/api/solicitudes/{id}/contexto-analisis-interno` (Docente), sin
+- Solicitudes: GET `/api/solicitudes/{id}/contexto-analisis-interno` (Docente asignado), sin
   Quipux, identificación/nombre del estudiante ni matrícula. Usa ISolicitudRepository
-  y la asignación existente; no modifica el módulo ni las rutas propias de HU-30.
+  y la asignación existente. HU-24 añade lectura de ese contexto mínimo para Coordinación
+  sobre solicitudes FISEI existentes; no modifica las rutas propias de HU-30.
 - Catálogo: GET `/api/asignaturas/{id}/analisis-interno/contexto` y GET
   `/api/asignaturas/{id}/analisis-interno/correspondencias/{receptoraId}` (Docente,
   solo lectura). No concede CRUD ni modifica los permisos de endpoints anteriores.
