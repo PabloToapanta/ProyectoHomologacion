@@ -10,7 +10,7 @@ public class AsignaturaServiceTests
     public async Task Crea_consulta_y_ordena_por_nivel_y_codigo()
     {
         var repo = new Repository();
-        var service = new AsignaturaService(repo, repo);
+        var service = new AsignaturaService(repo, repo, new MallasPrueba(repo.Carrera.Id));
         var a = await service.CrearAsync(new(repo.Carrera.Id, "Z", "Segundo nivel", 2, 3, 144));
         await service.CrearAsync(new(repo.Carrera.Id, "B", "Primero B", 1, 3, 144));
         await service.CrearAsync(new(repo.Carrera.Id, "A", "Primero A", 1, 3, 144));
@@ -22,7 +22,7 @@ public class AsignaturaServiceTests
     public async Task Carrera_inexistente_no_registra_y_listado_devuelve_404()
     {
         var repo = new Repository();
-        var service = new AsignaturaService(repo, repo);
+        var service = new AsignaturaService(repo, repo, new MallasPrueba(repo.Carrera.Id));
         var id = Guid.NewGuid();
         Assert.Equal("no_encontrada", (await Assert.ThrowsAsync<CatalogoException>(() => service.CrearAsync(new(id, "C", "N", 1, 3, 144)))).Codigo);
         Assert.Equal("no_encontrada", (await Assert.ThrowsAsync<CatalogoException>(() => service.ListarAsync(id))).Codigo);
@@ -33,7 +33,7 @@ public class AsignaturaServiceTests
     public async Task Rechaza_codigo_repetido_en_carrera()
     {
         var repo = new Repository();
-        var service = new AsignaturaService(repo, repo);
+        var service = new AsignaturaService(repo, repo, new MallasPrueba(repo.Carrera.Id));
         await service.CrearAsync(new(repo.Carrera.Id, "ALG", "N", 1, 3, 144));
         var error = await Assert.ThrowsAsync<CatalogoException>(() => service.CrearAsync(new(repo.Carrera.Id, " alg ", "Otra", 2, 4, 100)));
         Assert.Equal("duplicado", error.Codigo);
@@ -44,7 +44,7 @@ public class AsignaturaServiceTests
     public async Task Carrera_sin_asignaturas_y_asignatura_inexistente()
     {
         var repo = new Repository();
-        var service = new AsignaturaService(repo, repo);
+        var service = new AsignaturaService(repo, repo, new MallasPrueba(repo.Carrera.Id));
         Assert.Empty(await service.ListarAsync(repo.Carrera.Id));
         Assert.Equal("no_encontrada", (await Assert.ThrowsAsync<CatalogoException>(() => service.ObtenerAsync(Guid.NewGuid()))).Codigo);
     }
@@ -55,7 +55,7 @@ public class AsignaturaServiceTests
         public List<Asignatura> Items { get; } = [];
         public Task<Asignatura?> BuscarAsync(Guid id, CancellationToken ct) => Task.FromResult(Items.SingleOrDefault(a => a.Id == id));
         public Task<IReadOnlyList<Asignatura>> ListarPorCarreraAsync(Guid carreraId, CancellationToken ct) => Task.FromResult<IReadOnlyList<Asignatura>>(Items.Where(a => a.CarreraId == carreraId).OrderBy(a => a.Nivel).ThenBy(a => a.CodigoNormalizado).ToList());
-        public Task<bool> ExisteCodigoAsync(Guid carreraId, string codigoNormalizado, CancellationToken ct) => Task.FromResult(Items.Any(a => a.CarreraId == carreraId && a.CodigoNormalizado == codigoNormalizado));
+        public Task<bool> ExisteCodigoAsync(Guid carreraId, string codigoNormalizado, CancellationToken ct, Guid? mallaId = null) => Task.FromResult(Items.Any(a => a.CarreraId == carreraId && a.CodigoNormalizado == codigoNormalizado));
         public Task CrearAsync(Asignatura asignatura, CancellationToken ct) { Items.Add(asignatura); return Task.CompletedTask; }
         Task<Carrera?> ICarreraRepository.BuscarAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Carrera.Id ? Carrera : null);
         public Task<IReadOnlyList<Carrera>> ListarAsync(CancellationToken ct) => Task.FromResult<IReadOnlyList<Carrera>>([Carrera]);

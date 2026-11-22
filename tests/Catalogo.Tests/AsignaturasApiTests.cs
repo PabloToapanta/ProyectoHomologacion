@@ -136,13 +136,13 @@ public class AsignaturasApiTests
         var id = await CrearCarrera(client);
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CatalogoDbContext>();
-        db.Asignaturas.Add(new Asignatura(id, "DEMO", "N", 1, 3, 144));
+        db.Asignaturas.Add(new Asignatura(id, "DEMO", "N", 1, 3, 144).EnMalla(db));
         await db.SaveChangesAsync();
         db.ChangeTracker.Clear();
-        db.Asignaturas.Add(new Asignatura(id, " demo ", "Otra", 1, 3, 144));
+        db.Asignaturas.Add(new Asignatura(id, " demo ", "Otra", 1, 3, 144).EnMalla(db));
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
         db.ChangeTracker.Clear();
-        db.Asignaturas.Add(new Asignatura(Guid.NewGuid(), "C", "N", 1, 3, 144));
+        db.Asignaturas.Add(new Asignatura(Guid.NewGuid(), "C", "N", 1, 3, 144).EnMalla(db));
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
         db.ChangeTracker.Clear();
         await Assert.ThrowsAsync<Microsoft.Data.Sqlite.SqliteException>(() => db.Database.ExecuteSqlInterpolatedAsync($"UPDATE Asignaturas SET Horas = 0 WHERE CarreraId = {id}"));
@@ -153,7 +153,7 @@ public class AsignaturasApiTests
     {
         using var db = new CatalogoDbContext(new DbContextOptionsBuilder<CatalogoDbContext>()
             .UseSqlServer("Server=unused;Database=Catalogo").Options);
-        var sql = db.GetService<IMigrator>().GenerateScript(options: MigrationsSqlGenerationOptions.Idempotent);
+        var sql = db.GetService<IMigrator>().GenerateScript(toMigration: "20261104083910_ProgramasAnaliticosHu08", options: MigrationsSqlGenerationOptions.Idempotent);
         Assert.Contains("THROW 51000", sql);
         Assert.Contains("IF EXISTS (SELECT 1 FROM [Asignaturas])", sql);
         Assert.Contains("ALTER TABLE [Asignaturas] ADD [Creditos] decimal(9,2) NOT NULL", sql);

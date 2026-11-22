@@ -91,6 +91,31 @@ public class ExtractorTextoPdfPigTests
 
 public class ImportacionProgramasApiTests
 {
+    [Fact]
+    public async Task Hu07_importacion_y_aviso_de_duplicados_se_resuelven_en_la_malla_vigente()
+    {
+        using var f = new CatalogoFactory(); using var admin = f.Admin(); var carrera = await Carrera(admin);
+        admin.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Administrador", usuario: "admin.hu07"));
+        var pdf = PdfSintetico.Desde(PlanSintetico.Completo());
+        var primera = await admin.PostAsync("/api/importaciones-programas/confirmacion", Confirmacion(Programa(carrera), pdf));
+        Assert.Equal(HttpStatusCode.Created, primera.StatusCode);
+        var anterior = await primera.Content.ReadFromJsonAsync<JsonElement>();
+        var version = await admin.PostAsJsonAsync($"/api/carreras/{carrera}/mallas", new { nombre = "Versión nueva HU07", vigente = true });
+        Assert.Equal(HttpStatusCode.Created, version.StatusCode);
+        var nueva = await version.Content.ReadFromJsonAsync<JsonElement>();
+        var analisis = await admin.PostAsync("/api/importaciones-programas/analisis", Lote(carrera, ("plan.pdf", pdf, "application/pdf")));
+        var lote = await analisis.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.DoesNotContain(lote.GetProperty("archivos")[0].GetProperty("borrador").GetProperty("advertencias").EnumerateArray(),
+            a => a.GetString()!.Contains("código ya existe", StringComparison.OrdinalIgnoreCase));
+        var segunda = await admin.PostAsync("/api/importaciones-programas/confirmacion", Confirmacion(Programa(carrera), pdf));
+        Assert.Equal(HttpStatusCode.Created, segunda.StatusCode);
+        var actual = await segunda.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.NotEqual(anterior.GetProperty("id").GetGuid(), actual.GetProperty("id").GetGuid());
+        Assert.Equal(nueva.GetProperty("id").GetGuid(), actual.GetProperty("mallaId").GetGuid());
+        Assert.Equal(HttpStatusCode.Conflict, (await admin.PostAsync("/api/importaciones-programas/confirmacion", Confirmacion(Programa(carrera), pdf))).StatusCode);
+        Assert.Equal(2, (await admin.GetFromJsonAsync<JsonElement[]>($"/api/carreras/{carrera}/asignaturas"))!.Length);
+    }
+
     private static MultipartFormDataContent Lote(Guid carreraId, params (string Nombre, byte[] Bytes, string Tipo)[] archivos)
     {
         var form = new MultipartFormDataContent { { new StringContent(carreraId.ToString()), "carreraId" } };
@@ -111,7 +136,12 @@ public class ImportacionProgramasApiTests
 
     private static object Programa(Guid carreraId) => new
     {
-        carreraId, codigo = "SINT-01-02", nombre = "Asignatura sintetica", nivel = 1, creditos = 3, horas = 144,
+        carreraId,
+        codigo = "SINT-01-02",
+        nombre = "Asignatura sintetica",
+        nivel = 1,
+        creditos = 3,
+        horas = 144,
         unidades = new[]
         {
             new { numero = 1, nombre = "Unidad sintetica uno", horas = 72, resultadoAprendizaje = "Resultado sintetico uno.",

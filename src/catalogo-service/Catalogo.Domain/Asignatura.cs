@@ -6,6 +6,7 @@ public sealed class Asignatura
 {
     public Guid Id { get; private set; }
     public Guid CarreraId { get; private set; }
+    public Guid MallaId { get; private set; }
     public string Codigo { get; private set; } = "";
     public string CodigoNormalizado { get; private set; } = "";
     public string Nombre { get; private set; } = "";
@@ -29,6 +30,13 @@ public sealed class Asignatura
         Nivel = nivel;
         Creditos = creditos;
         Horas = horas;
+    }
+
+    public void AsignarMalla(Malla malla)
+    {
+        if (malla.CarreraId != CarreraId || (MallaId != Guid.Empty && MallaId != malla.Id))
+            throw new CatalogoException("validacion", "La malla debe pertenecer a la carrera; una asignatura existente no se traslada de versión.");
+        MallaId = malla.Id;
     }
 
     private static string Limpiar(string? valor, string campo, int maximo)

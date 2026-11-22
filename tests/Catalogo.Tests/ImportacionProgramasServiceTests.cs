@@ -30,7 +30,7 @@ public class ImportacionProgramasServiceTests
         public List<ProgramaAnalitico> Programas { get; } = [];
         public Task<Asignatura?> BuscarAsync(Guid id, CancellationToken ct) => Task.FromResult(Asignaturas.SingleOrDefault(a => a.Id == id));
         public Task<IReadOnlyList<Asignatura>> ListarPorCarreraAsync(Guid carreraId, CancellationToken ct) => Task.FromResult<IReadOnlyList<Asignatura>>(Asignaturas);
-        public Task<bool> ExisteCodigoAsync(Guid carreraId, string codigo, CancellationToken ct) => Task.FromResult(Asignaturas.Any(a => a.CarreraId == carreraId && a.CodigoNormalizado == codigo));
+        public Task<bool> ExisteCodigoAsync(Guid carreraId, string codigo, CancellationToken ct, Guid? mallaId = null) => Task.FromResult(Asignaturas.Any(a => a.CarreraId == carreraId && a.CodigoNormalizado == codigo));
         public Task CrearAsync(Asignatura asignatura, CancellationToken ct) { Asignaturas.Add(asignatura); return Task.CompletedTask; }
         Task<Carrera?> ICarreraRepository.BuscarAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Carrera.Id ? Carrera : null);
         public Task<IReadOnlyList<Carrera>> ListarAsync(CancellationToken ct) => Task.FromResult<IReadOnlyList<Carrera>>([Carrera]);
@@ -50,7 +50,7 @@ public class ImportacionProgramasServiceTests
     private static (ImportacionProgramasService, Repo, Extractor) Crear()
     {
         var repo = new Repo(); var extractor = new Extractor();
-        return (new ImportacionProgramasService(extractor, repo, repo, repo, new Reloj()), repo, extractor);
+        return (new ImportacionProgramasService(extractor, repo, repo, repo, new Reloj(), new MallasPrueba(repo.Carrera.Id)), repo, extractor);
     }
 
     private static ProgramaConfirmado Confirmado(Guid carrera, string codigo = "SINT-01-02") => new(carrera, codigo, "Asignatura sintetica", 1, 3, 144,

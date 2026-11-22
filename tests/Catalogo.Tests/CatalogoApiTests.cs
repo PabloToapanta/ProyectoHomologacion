@@ -58,7 +58,7 @@ public class CatalogoApiTests
             await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO Carreras (Id, Nombre, Facultad, Vigencia, NombreNormalizado, FacultadNormalizada) VALUES ({id}, {"Carrera anterior"}, {"Facultad anterior"}, {true}, {"CARRERA ANTERIOR"}, {"FACULTAD ANTERIOR"})");
             var asignatura = new Asignatura(id, "DEMO-ANTERIOR", "Asignatura anterior", 1, 3, 144);
             asignaturaId = asignatura.Id;
-            db.Asignaturas.Add(asignatura);
+            db.Asignaturas.Add(asignatura.EnMalla(db));
             await db.SaveChangesAsync();
         }
         var anterior = await client.GetFromJsonAsync<CarreraDto>($"/api/carreras/{id}");
@@ -130,7 +130,7 @@ public class CatalogoApiTests
         using (var scope = factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<CatalogoDbContext>();
-            db.Asignaturas.Add(new Asignatura(carrera.Id, "DEMO-REL", "Referencia sintética HU-04", 1, 1, 1));
+            db.Asignaturas.Add(new Asignatura(carrera.Id, "DEMO-REL", "Referencia sintética HU-04", 1, 1, 1).EnMalla(db));
             await db.SaveChangesAsync();
         }
         var result = await client.DeleteAsync($"/api/carreras/{carrera.Id}");
@@ -151,7 +151,7 @@ public class CatalogoApiTests
         db.Carreras.Add(new Carrera(" carrera sintética ", "fisei", true));
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
         db.ChangeTracker.Clear();
-        db.Asignaturas.Add(new Asignatura(carrera.Id, "DEMO-REL", "Referencia sintética HU-04", 1, 1, 1));
+        db.Asignaturas.Add(new Asignatura(carrera.Id, "DEMO-REL", "Referencia sintética HU-04", 1, 1, 1).EnMalla(db));
         await db.SaveChangesAsync();
         db.ChangeTracker.Clear();
         var entity = await db.Carreras.SingleAsync();
@@ -260,7 +260,8 @@ internal sealed class CatalogoFactory : WebApplicationFactory<Program>
     {
         var descriptor = new SecurityTokenDescriptor
         {
-            Issuer = "catalogo-tests", Audience = "catalogo-tests",
+            Issuer = "catalogo-tests",
+            Audience = "catalogo-tests",
             // HU-08: el usuario opcional permite registrar quién cargó un programa analítico.
             Subject = new ClaimsIdentity(usuario is null ? [new Claim("role", role)] : [new Claim("role", role), new Claim("sub", Guid.NewGuid().ToString()), new Claim("name", usuario)]),
             NotBefore = DateTime.UtcNow.AddMinutes(-10),
