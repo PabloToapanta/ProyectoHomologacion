@@ -36,3 +36,53 @@ it('error de persistencia no muestra confirmación de guardado',async()=>{
  expect(await screen.findByRole('alert')).toHaveTextContent('No se confirma ningún guardado');
  expect(screen.queryByText('Análisis guardado.')).not.toBeInTheDocument();
 });
+// HU-37: reutilización de la explicación del agente y opción de forzar un análisis nuevo.
+const receptoraOpciones=[{id:'r1',codigo:'R1',nombre:'Receptora sintética',nivel:1}];
+const completo=(agente:unknown)=>({estado:'Completo',mensaje:'Evaluación completada',resultado:{porcentajeAcademico:90,porcentajeHoras:80,porcentajeCreditos:100,sugerencia:'Homologable',justificacion:'Justificación sintética',evidencias:[]},
+ asignaturaAprobadaId:'a1',asignaturaReceptoraId:'r1',advertencias:[],agente});
+async function abrirYSeleccionar(){
+ const user=userEvent.setup();await user.click(screen.getByRole('button',{name:'Consultar análisis interno'}));
+ await user.selectOptions(await screen.findByLabelText('Asignatura aprobada'),'a1');await user.selectOptions(screen.getByLabelText('Asignatura receptora'),'r1');
+ return user;
+}
+it('HU-37 indica que la explicación del agente se reutilizó, con su fecha e id originales',async()=>{
+ const agente={explicacionId:'exp-1',reutilizada:true,explicacionOriginalId:'exp-1',fechaOriginal:'2026-11-20T15:00:00Z',modelo:'modelo-sintetico',versionPlantilla:'hu18-v1'};
+ const request=vi.fn(async(path:string,init?:RequestInit)=>json(init?.method==='POST'?completo(agente):path.endsWith('/opciones')?receptoraOpciones:[]));
+ render(<AnalisisInternoPanel request={request} solicitudId="sol-a" aprobadas={aprobadas} inicial={pendiente}/>);
+ const user=await abrirYSeleccionar();
+ await user.click(screen.getByRole('button',{name:'Ejecutar análisis y guardar'}));
+ const nota=await screen.findByText(/^Reutilizado ·/);
+ expect(nota).toHaveTextContent(new Date('2026-11-20T15:00:00Z').toLocaleString('es-EC'));
+ expect(nota).toHaveTextContent('análisis exp-1');
+});
+it('HU-37 una explicación nueva no se marca como reutilizada',async()=>{
+ const agente={explicacionId:'exp-2',reutilizada:false,explicacionOriginalId:null,fechaOriginal:null,modelo:'modelo-sintetico',versionPlantilla:'hu18-v1'};
+ const request=vi.fn(async(path:string,init?:RequestInit)=>json(init?.method==='POST'?completo(agente):path.endsWith('/opciones')?receptoraOpciones:[]));
+ render(<AnalisisInternoPanel request={request} solicitudId="sol-a" aprobadas={aprobadas} inicial={pendiente}/>);
+ const user=await abrirYSeleccionar();
+ await user.click(screen.getByRole('button',{name:'Ejecutar análisis y guardar'}));
+ expect(await screen.findByText('Análisis guardado.')).toBeInTheDocument();
+ expect(screen.queryByText(/^Reutilizado ·/)).not.toBeInTheDocument();
+});
+it('HU-37 forzar un análisis nuevo exige el motivo y lo envía',async()=>{
+ const request=vi.fn(async(path:string,init?:RequestInit)=>json(init?.method==='POST'?completo(null):path.endsWith('/opciones')?receptoraOpciones:[]));
+ render(<AnalisisInternoPanel request={request} solicitudId="sol-a" aprobadas={aprobadas} inicial={pendiente}/>);
+ const user=await abrirYSeleccionar();
+ await user.click(screen.getByLabelText('Forzar un análisis nuevo'));
+ const ejecutar=screen.getByRole('button',{name:'Ejecutar análisis y guardar'});
+ expect(ejecutar).toBeDisabled();
+ await user.type(screen.getByLabelText('Motivo'),'  Se revisó el programa receptor ');
+ expect(ejecutar).toBeEnabled();
+ await user.click(ejecutar);
+ await screen.findByText('Análisis guardado.');
+ const call=request.mock.calls.find(c=>c[1]?.method==='POST')!;
+ expect(JSON.parse(call[1]!.body as string)).toEqual({asignaturaAprobadaId:'a1',asignaturaReceptoraId:'r1',forzarNuevo:true,motivo:'Se revisó el programa receptor'});
+ expect(screen.getByLabelText('Forzar un análisis nuevo')).not.toBeChecked();
+});
+it('HU-37 el análisis externo no ofrece forzar porque no usa el agente',async()=>{
+ const request=vi.fn(async(path:string)=>json(path.endsWith('/opciones')?receptoraOpciones:path.endsWith('/requisitos-externos')?{estado:'Incompleto',periodosCursados:null,cambiosPreviosCarrera:null,asignaturasAprobadas:0,asignaturasConAnalisisCompleto:0,asignaturasHomologables:0,incumplimientos:[],faltantes:[],advertencias:[]}:[]));
+ render(<AnalisisInternoPanel request={request} solicitudId="sol-a" aprobadas={aprobadas} inicial={pendiente} tipo="Externo"/>);
+ const user=userEvent.setup();await user.click(screen.getByRole('button',{name:'Consultar análisis externo'}));
+ await screen.findByLabelText('Asignatura aprobada');
+ expect(screen.queryByLabelText('Forzar un análisis nuevo')).not.toBeInTheDocument();
+});

@@ -163,6 +163,52 @@ namespace Homologacion.Infrastructure.AnalisisInterno
                     b.ToTable("AnalisisExternos", (string)null);
                 });
 
+            modelBuilder.Entity("Homologacion.Infrastructure.AnalisisInterno.RegistroExplicacionAgente", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Clave")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("char(64)")
+                        .IsFixedLength();
+
+                    b.Property<string>("Explicacion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("Fecha")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ForzadoPorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Modelo")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Motivo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("VersionParametros")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("VersionPlantilla")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Clave");
+
+                    b.ToTable("ExplicacionesAgente", (string)null);
+                });
+
             modelBuilder.Entity("Homologacion.Infrastructure.AnalisisInterno.RegistroResultado", b =>
                 {
                     b.Property<Guid>("SolicitudId")

@@ -11,7 +11,12 @@ namespace Homologacion.Application.AnalisisInterno;
 public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicitudes, ICatalogoAnalisisInterno catalogo,
     AsistirEvaluacionInterna asistencia, TimeProvider reloj, IParametrosHomologacionProvider? parametrosProvider = null)
 {
-    public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitudId, Guid aprobadaId, Guid receptoraId, CancellationToken ct)
+    public Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitudId, Guid aprobadaId, Guid receptoraId, CancellationToken ct) =>
+        EjecutarAsync(solicitudId, aprobadaId, receptoraId, null, ct);
+
+    /// <summary>HU-37: con <paramref name="forzar"/> se llama siempre al agente; sin él se reutiliza la explicación de la misma clave.</summary>
+    public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitudId, Guid aprobadaId, Guid receptoraId, ForzarAnalisis? forzar,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         var parametros = parametrosProvider is null ? ParametrosHomologacion.Predeterminados() : await parametrosProvider.ObtenerVigentesAsync(ct);
@@ -79,7 +84,8 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
                 origen.EsSintetico || receptora.EsSintetico, advertencias);
         }
         AnalisisAsistido resultado;
-        try { resultado = await asistencia.EjecutarAsync(datos, textos, faltantes, parametros, ct); }
+        var reutilizacion = new ReutilizacionAgente(FirmaPareja(origen, receptora, aprobada, revision), forzar);
+        try { resultado = await asistencia.EjecutarAsync(datos, textos, faltantes, parametros, reutilizacion, ct); }
         catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
         var estadoAnalisis = resultado.Estado switch
         {
@@ -95,8 +101,23 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         };
         var resumen = estadoAnalisis == "Completo" ? Resumen(resultado) : null;
         return new(solicitudId, aprobadaId, receptoraId, estadoAnalisis, mensaje, resumen, resultado.Evaluacion, antiguedad,
-            origen.EsSintetico || receptora.EsSintetico, advertencias);
+            origen.EsSintetico || receptora.EsSintetico, advertencias) { Agente = resultado.Agente };
     }
+
+    /// <summary>HU-37 (A1): Homologación firma los programas con los datos que evalúa; el origen lleva horas y créditos de la aprobada.</summary>
+    private static string FirmaPareja(AsignaturaParaAnalisis origen, AsignaturaParaAnalisis receptora, AprobadaParaAnalisis aprobada,
+        RevisionParaAnalisis revision) => HuellaReutilizacion.De(new
+        {
+            origenId = origen.Id,
+            receptoraId = receptora.Id,
+            firmaOrigen = FirmaPrograma(origen with { Horas = aprobada.Horas, Creditos = aprobada.Creditos }),
+            firmaReceptora = FirmaPrograma(receptora),
+            firmaCorrespondencias = HuellaReutilizacion.De(new { revision.Registrada, revision.Vigente, revision.Contenidos, revision.Resultados })
+        });
+    private static string FirmaPrograma(AsignaturaParaAnalisis a) => HuellaReutilizacion.De(new
+    {
+        a.PlanAnalitico, a.Horas, a.UnidadHoras, a.Creditos, a.SistemaCreditos, a.Contenidos, a.Resultados
+    });
 
     private static DatosAsignatura Datos(AsignaturaParaAnalisis a) => new(a.Id.ToString(), a.PlanAnalitico, a.Horas,
         a.UnidadHoras, a.Creditos, a.SistemaCreditos, a.Contenidos.Select(e => e.Id.ToString()).ToArray(), a.Resultados.Select(e => e.Id.ToString()).ToArray());

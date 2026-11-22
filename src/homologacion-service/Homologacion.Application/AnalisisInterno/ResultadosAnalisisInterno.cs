@@ -15,9 +15,13 @@ public sealed class AlmacenAnalisisNoDisponibleException() : Exception("No fue p
 public sealed class GestionarAnalisisInterno(AnalizarSolicitudInterna analisis, ISolicitudesAnalisisInterno solicitudes,
     IResultadosAnalisisInterno resultados, TimeProvider reloj)
 {
-    public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitud, Guid aprobada, Guid receptora, CancellationToken ct)
+    public Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitud, Guid aprobada, Guid receptora, CancellationToken ct) =>
+        EjecutarAsync(solicitud, aprobada, receptora, null, ct);
+
+    /// <summary>HU-37: <paramref name="forzar"/> pide una explicación nueva del agente; la anterior se conserva.</summary>
+    public async Task<ResultadoInternoSolicitud> EjecutarAsync(Guid solicitud, Guid aprobada, Guid receptora, ForzarAnalisis? forzar, CancellationToken ct)
     {
-        var resultado = await analisis.EjecutarAsync(solicitud, aprobada, receptora, ct);
+        var resultado = await analisis.EjecutarAsync(solicitud, aprobada, receptora, forzar, ct);
         await resultados.GuardarAsync(new(reloj.GetUtcNow(), resultado), ct);
         return resultado;
     }

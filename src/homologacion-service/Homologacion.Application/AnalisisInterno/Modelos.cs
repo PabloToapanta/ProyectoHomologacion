@@ -18,4 +18,8 @@ public sealed class FalloAgenteException(TipoFalloAgente tipo) : Exception("No s
 }
 public enum EstadoAsistencia { Completada, InformacionIncompleta, RevisionManual }
 public sealed record AnalisisAsistido(EvaluacionEquivalencia Evaluacion, EstadoAsistencia Estado,
-    ExplicacionAgente? Asistencia, TipoFalloAgente? Fallo, IReadOnlyList<ReferenciaAnalisis>? Referencias = null);
+    ExplicacionAgente? Asistencia, TipoFalloAgente? Fallo, IReadOnlyList<ReferenciaAnalisis>? Referencias = null)
+{
+    /// <summary>HU-37: explicación nueva o reutilizada; null si no se reutiliza ni guarda.</summary>
+    public AgenteAnalisis? Agente { get; init; }
+}
