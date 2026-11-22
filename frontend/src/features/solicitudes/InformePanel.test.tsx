@@ -70,6 +70,16 @@ it('si faltan análisis docentes muestra el motivo y no un informe',async()=>{
  expect(screen.queryByRole('table')).not.toBeInTheDocument();
 });
 
+it('HU-17: una pareja excluida por tercera matrícula muestra el motivo RN-07 junto a la sugerencia final',async()=>{
+ const motivo='Excluida por tercera matrícula (RN-07): la asignatura aprobada en tercera matrícula no se homologa; las demás asignaturas de la solicitud se evalúan normalmente.';
+ const excluido={...informe,parejas:[{...informe.parejas[0],sugerenciaFinal:'NoConvalidar',exclusion:motivo}],convalidar:0,noConvalidar:1,sinAcuerdo:0};
+ render(<InformePanel request={vi.fn(async()=>json(excluido))} solicitudId="sol-a" aprobadas={aprobadas}/>);
+ const tabla=await screen.findByRole('table',{name:'Informe de homologación por pareja'});
+ const fila=within(tabla).getByRole('row',{name:/Álgebra sintética/});
+ expect(fila).toHaveTextContent('No convalidar');
+ expect(fila).toHaveTextContent('RN-07');
+});
+
 // HU-32: remisión del informe al coordinador de carrera.
 const remision='/api/homologaciones/solicitudes/sol-a/informe/remision';
 it('HU-32: con el informe generado remite al coordinador una sola vez y avisa el nuevo estado',async()=>{

@@ -64,10 +64,11 @@ public class RegistrarRevisionDocenteTests
         public string Tipo { get; set; } = "Interno";
         public HashSet<Guid> Asignados { get; } = [Ana, Luis];
         public Guid DocenteActual { get; set; } = Ana;
+        public int? Intento { get; set; } = 1;
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct) =>
             Task.FromResult(id == Solicitud && Asignados.Contains(DocenteActual)
                 ? new SolicitudParaAnalisis(Solicitud, Tipo, Tipo == "Interno" ? Guid.NewGuid() : null, Carrera,
-                    [new(Aprobada, Tipo == "Interno" ? Guid.NewGuid() : null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1))])
+                    [new(Aprobada, Tipo == "Interno" ? Guid.NewGuid() : null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1)) { IntentoMatricula = Intento }])
                 : null);
         public Task<AsignaturaParaAnalisis?> ObtenerAsignaturaAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Receptora
             ? new AsignaturaParaAnalisis(Receptora, Carrera, "FISEI", true, 3, 144, "plan", "h", "c", true, [], [])
@@ -141,6 +142,20 @@ public class RegistrarRevisionDocenteTests
         var (caso, _, _, _, _) = Caso();
         var r = await caso.RegistrarAsync(Solicitud, Ana, "ana", Input(decision: "Homologable"), default);
         Assert.Equal(("SinAnalisis", (string?)null, "Homologable"), (r.EstadoAgente, r.SugerenciaAgente, r.Decision));
+    }
+
+    [Fact]
+    public async Task Tercera_matricula_no_admite_decidir_homologable()
+    {
+        var (caso, fuentes, internos, _, almacen) = Caso();
+        fuentes.Intento = 3;
+        var error = await Assert.ThrowsAsync<DatosAnalisisSolicitudException>(() => caso.RegistrarAsync(Solicitud, Ana, "ana", Input(decision: "Homologable"), default));
+        Assert.Contains("RN-07", error.Message);
+        internos.Agregar("Completo", "Homologable"); // Análisis anterior a la regla: tampoco permite homologar.
+        await Assert.ThrowsAsync<DatosAnalisisSolicitudException>(() => caso.RegistrarAsync(Solicitud, Ana, "ana", Input("DeAcuerdo", null, null), default));
+        Assert.Empty(almacen.Datos);
+        var r = await caso.RegistrarAsync(Solicitud, Ana, "ana", Input(decision: "NoHomologable", observacion: "Tercera matrícula."), default);
+        Assert.Equal("NoHomologable", r.Decision);
     }
 
     [Fact]

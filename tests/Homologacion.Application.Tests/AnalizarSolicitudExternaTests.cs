@@ -19,8 +19,8 @@ internal sealed class EscenarioExterno : ISolicitudesAnalisisExterno, ICatalogoA
     public static readonly Guid AjenaId = Guid.Parse("20000000-0000-0000-0000-000000000007");
     public SolicitudExternaParaAnalisis? Solicitud { get; set; } = new(SolicitudId, "Externo", CarreraReceptora,
         "Universidad sintética Ecuador", "Carrera externa sintética", 3, 0,
-        [new(AprobadaId, "Programación externa sintética", 80, "hora-reloj", 8, "sistema-sintetico", "programa-externo-sintetico", "Aprobada", new DateOnly(2025, 1, 1)),
-         new(OtraAprobadaId, "Cálculo externo sintético", 90, "hora-reloj", 9, "sistema-sintetico", "programa-externo-sintetico-2", "Aprobada", new DateOnly(2025, 1, 1))]);
+        [new(AprobadaId, "Programación externa sintética", 80, "hora-reloj", 8, "sistema-sintetico", "programa-externo-sintetico", "Aprobada", new DateOnly(2025, 1, 1), 1),
+         new(OtraAprobadaId, "Cálculo externo sintético", 90, "hora-reloj", 9, "sistema-sintetico", "programa-externo-sintetico-2", "Aprobada", new DateOnly(2025, 1, 1), 1)]);
     public Dictionary<Guid, AsignaturaParaAnalisis> Materias { get; } = new()
     {
         [ReceptoraId] = new(ReceptoraId, CarreraReceptora, "FISEI", true, 10, 100, "plan-sintetico-R", "hora-reloj", "sistema-sintetico", true,
@@ -107,6 +107,31 @@ public class AnalizarSolicitudExternaTests
         var antigua = await Ejecutar(e);
         Assert.Equal(EstadoAntiguedad.RequiereValidacionConocimientos, antigua.Antiguedad!.Estado);
         Assert.Null(antigua.Resultado);
+    }
+
+    [Fact]
+    public async Task Tercera_matricula_excluye_la_asignatura_externa()
+    {
+        var e = new EscenarioExterno();
+        e.Aprobada(a => a with { IntentoMatricula = 3 });
+        var r = await Ejecutar(e);
+        Assert.Equal("Completo", r.Estado);
+        Assert.Equal(Homologacion.Domain.Equivalencias.EstadoEquivalencia.NoHomologable, r.Evaluacion.Estado);
+        Assert.Equal("No homologable", r.Resultado!.Sugerencia);
+        Assert.Contains("RN-07", r.Evaluacion.Justificacion);
+        var otra = await Caso(e).EjecutarAsync(EscenarioExterno.SolicitudId, EscenarioExterno.OtraAprobadaId, EscenarioExterno.ReceptoraId, default);
+        Assert.Equal("Incompleto", otra.Estado);
+        Assert.DoesNotContain("RN-07", otra.Evaluacion.Justificacion);
+    }
+
+    [Fact]
+    public async Task Sin_intento_de_matricula_registra_la_falta()
+    {
+        var e = new EscenarioExterno();
+        e.Aprobada(a => a with { IntentoMatricula = null });
+        var r = await Ejecutar(e);
+        Assert.Equal("Incompleto", r.Estado);
+        Assert.Contains(r.Evaluacion.InformacionFaltante, f => f.Contains("intento de matrícula", StringComparison.Ordinal));
     }
 
     [Fact]

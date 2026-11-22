@@ -19,7 +19,7 @@ internal sealed class EscenarioInterno : ISolicitudesAnalisisInterno, ICatalogoA
     private static readonly Guid ResultadoO = Guid.Parse("10000000-0000-0000-0000-000000000009");
     private static readonly Guid ResultadoR = Guid.Parse("10000000-0000-0000-0000-000000000010");
     public SolicitudParaAnalisis? Solicitud { get; set; } = new(SolicitudId, "Interno", CarreraOrigen, CarreraReceptora,
-        [new(AprobadaId, OrigenId, 8, 80, "Aprobada", new DateOnly(2025, 1, 1))]);
+        [new(AprobadaId, OrigenId, 8, 80, "Aprobada", new DateOnly(2025, 1, 1)) { IntentoMatricula = 1 }]);
     public Dictionary<Guid, AsignaturaParaAnalisis> Materias { get; } = new()
     {
         [OrigenId] = new(OrigenId, CarreraOrigen, "FISEI", true, 8, 80, "plan-sintetico-O", "hora-reloj", "sistema-sintetico", true,
@@ -105,6 +105,41 @@ public class AnalizarSolicitudInternaTests
         Assert.True(r.DatosSinteticos);
         Assert.Contains(r.Advertencias, a => a.Contains("períodos"));
         Assert.Contains("Contenido origen sintetico", System.Text.Json.JsonSerializer.Serialize(e.Contexto));
+    }
+    [Fact]
+    public async Task Tercera_matricula_excluye_la_asignatura_sin_invocar_al_agente()
+    {
+        var e = new EscenarioInterno();
+        e.Solicitud = e.Solicitud! with { AsignaturasAprobadas = [e.Solicitud.AsignaturasAprobadas[0] with { IntentoMatricula = 3 }] };
+        var r = await Caso(e).EjecutarAsync(EscenarioInterno.SolicitudId, EscenarioInterno.AprobadaId, EscenarioInterno.ReceptoraId, default);
+        Assert.Equal("Completo", r.Estado);
+        Assert.False(r.Evaluacion.Homologable);
+        Assert.Equal(Homologacion.Domain.Equivalencias.EstadoEquivalencia.NoHomologable, r.Evaluacion.Estado);
+        Assert.Equal("No homologable", r.Resultado!.Sugerencia);
+        Assert.Contains("RN-07", r.Evaluacion.Justificacion);
+        Assert.Contains("RN-07", r.Mensaje);
+        Assert.Empty(r.Resultado.Evidencias);
+        Assert.Equal(0, e.LlamadasAgente);
+    }
+    [Fact]
+    public async Task Segunda_matricula_se_evalua_normalmente()
+    {
+        var e = new EscenarioInterno();
+        e.Solicitud = e.Solicitud! with { AsignaturasAprobadas = [e.Solicitud.AsignaturasAprobadas[0] with { IntentoMatricula = 2 }] };
+        var r = await Caso(e).EjecutarAsync(EscenarioInterno.SolicitudId, EscenarioInterno.AprobadaId, EscenarioInterno.ReceptoraId, default);
+        Assert.Equal("Completo", r.Estado);
+        Assert.True(r.Evaluacion.Homologable);
+        Assert.Equal(1, e.LlamadasAgente);
+    }
+    [Fact]
+    public async Task Sin_intento_de_matricula_es_informacion_incompleta()
+    {
+        var e = new EscenarioInterno();
+        e.Solicitud = e.Solicitud! with { AsignaturasAprobadas = [e.Solicitud.AsignaturasAprobadas[0] with { IntentoMatricula = null }] };
+        var r = await Caso(e).EjecutarAsync(EscenarioInterno.SolicitudId, EscenarioInterno.AprobadaId, EscenarioInterno.ReceptoraId, default);
+        Assert.Equal("Incompleto", r.Estado);
+        Assert.Contains(r.Evaluacion.InformacionFaltante, f => f.Contains("intento de matrícula"));
+        Assert.Equal(0, e.LlamadasAgente);
     }
     [Fact]
     public async Task Solicitud_ajena_o_inexistente_no_invoca_modelo()

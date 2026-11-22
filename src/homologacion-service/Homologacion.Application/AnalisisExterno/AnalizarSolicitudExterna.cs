@@ -1,7 +1,9 @@
 using Homologacion.Application.AnalisisInterno;
 using Homologacion.Application.Antiguedad;
 using Homologacion.Application.Equivalencias;
+using Homologacion.Application.TerceraMatricula;
 using Homologacion.Domain.Antiguedad;
+using Homologacion.Domain.TerceraMatricula;
 using Homologacion.Domain.Equivalencias;
 using Homologacion.Application.Configuracion;
 using Homologacion.Domain.Configuracion;
@@ -34,6 +36,7 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
             throw new FuenteAnalisisNoDisponibleException();
         if (!Enum.TryParse<EstadoAsignatura>(aprobada.Estado, out var estado) || !Enum.IsDefined(estado) || aprobada.Estado != estado.ToString())
             throw new FuenteAnalisisNoDisponibleException();
+        var terceraMatricula = ExclusionTerceraMatricula.Evaluar(aprobada.IntentoMatricula);
 
         var receptora = await catalogo.ObtenerAsignaturaAsync(receptoraId, ct)
             ?? throw new DatosAnalisisSolicitudException("No se encontró la asignatura receptora.");
@@ -59,6 +62,8 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
             if (antiguedad.Estado != EstadoAntiguedad.Elegible) faltantes.Add(antiguedad.Motivo);
         }
 
+        if (terceraMatricula == ResultadoTerceraMatricula.IntentoDesconocido) faltantes.Add(ReglaTerceraMatricula.FaltaIntento);
+
         // El origen externo no tiene inventarios (D2): el motor registra la falta y nunca calcula el criterio académico.
         var origen = new DatosAsignatura(aprobada.Id.ToString(), aprobada.ReferenciaPrograma, aprobada.Horas, unidadHoras,
             aprobada.Creditos, sistemaCreditos, null, null);
@@ -68,6 +73,10 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
         EvaluacionEquivalencia evaluacion;
         try { evaluacion = motor.Ejecutar(new([new(origen, estado == EstadoAsignatura.Aprobada)], destino, null, null), parametros); }
         catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
+        if (terceraMatricula == ResultadoTerceraMatricula.Excluida)
+            return ExclusionTerceraMatricula.Resultado(solicitudId, aprobadaId, receptoraId, evaluacion with { CompatibilidadAcademicaPct = null },
+                antiguedad, receptora.EsSintetico,
+                ["No se invocó al agente: la regla RN-07 resuelve la asignatura.", "No es una aprobación oficial."]);
         var todas = faltantes.Concat(evaluacion.InformacionFaltante).Distinct().ToArray();
         evaluacion = evaluacion with
         {

@@ -6,6 +6,9 @@ namespace Homologacion.Application.AnalisisInterno;
 
 public sealed class AsistirEvaluacionInterna(EvaluarEquivalencia motor, IAgenteAnalisisInterno agente)
 {
+    /// <summary>HU-17: evaluación determinista sin agente, para casos que una regla resuelve antes de la asistencia.</summary>
+    public EvaluacionEquivalencia EvaluarSinAgente(SolicitudEquivalencia datos) => motor.Ejecutar(datos);
+
     public Task<AnalisisAsistido> EjecutarAsync(SolicitudEquivalencia datos, CancellationToken cancellationToken = default) =>
         EjecutarAsync(datos, [], [], cancellationToken);
 

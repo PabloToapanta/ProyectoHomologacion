@@ -31,6 +31,7 @@ public class InformeHomologacionTests
     {
         public bool Asignada { get; set; } = true;
         public string Tipo { get; set; } = "Interno";
+        public HashSet<Guid> TerceraMatricula { get; } = [];
         public int? PeriodosCursados { get; set; } = 2;
         public int? CambiosPreviosCarrera { get; set; } = 0;
         public List<AnalisisGuardado> Agente { get; } = [];
@@ -54,7 +55,7 @@ public class InformeHomologacionTests
             try { return await accion(); } finally { cierre.Release(); }
         }
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Solicitud && Asignada
-            ? new SolicitudParaAnalisis(Solicitud, Tipo, null, Carrera, new[] { A1, A2, A3 }.Select(a =>new AprobadaParaAnalisis(a, null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1))).ToArray())
+            ? new SolicitudParaAnalisis(Solicitud, Tipo, null, Carrera, new[] { A1, A2, A3 }.Select(a =>new AprobadaParaAnalisis(a, null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1)) { IntentoMatricula = TerceraMatricula.Contains(a) ? 3 : 1 }).ToArray())
             : null);
         public Task<SolicitudExternaParaAnalisis?> ObtenerSolicitudExternaAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Solicitud && Asignada
             ? new SolicitudExternaParaAnalisis(Solicitud, "Externo", Carrera, "Institución sintética", "Carrera sintética", PeriodosCursados, CambiosPreviosCarrera,
@@ -209,6 +210,25 @@ public class InformeHomologacionTests
         Assert.NotNull(restaurado);
         Assert.Empty(restaurado.Grupos);
         Assert.Single(restaurado.Parejas);
+    }
+
+    [Fact]
+    public async Task Tercera_matricula_queda_no_convalidar_con_su_motivo_y_no_afecta_a_las_demas()
+    {
+        var (caso, f) = Caso();
+        f.TerceraMatricula.Add(A1);
+        // Decisiones registradas antes de la regla: RN-07 prevalece sobre ellas en el informe.
+        f.Revision(Ana, A1, R1, "Homologable"); f.Revision(Luis, A1, R1, "Homologable");
+        f.Revision(Ana, A2, R2, "Homologable"); f.Revision(Luis, A2, R2, "Homologable");
+        var i = await caso.GenerarAsync(Solicitud, Ana, "docente.ana", default);
+        var excluida = i.Parejas.Single(p => p.AsignaturaAprobadaId == A1);
+        Assert.Equal("NoConvalidar", excluida.SugerenciaFinal);
+        Assert.Contains("RN-07", excluida.Exclusion);
+        var otra = i.Parejas.Single(p => p.AsignaturaAprobadaId == A2);
+        Assert.Equal("Convalidar", otra.SugerenciaFinal);
+        Assert.Null(otra.Exclusion);
+        Assert.Equal((1, 1), (i.Convalidar, i.NoConvalidar));
+        Assert.Contains(i.Advertencias, a => a.Contains("RN-07"));
     }
 
     [Fact]

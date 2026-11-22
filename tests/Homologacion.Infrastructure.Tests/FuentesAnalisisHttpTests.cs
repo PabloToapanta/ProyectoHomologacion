@@ -64,6 +64,16 @@ public class FuentesAnalisisHttpTests
         Assert.DoesNotContain("nombreEstudiante", JsonSerializer.Serialize(r));
     }
     [Fact]
+    public async Task Lee_el_intento_de_matricula_para_RN_07()
+    {
+        var body = JsonSerializer.Serialize(new { id = Id, tipoCambio = "Interno", carreraOrigenId = Guid.NewGuid(), carreraReceptoraId = Guid.NewGuid(),
+            asignaturasAprobadas = new[] { new { id = Guid.NewGuid(), asignaturaOrigenId = Guid.NewGuid(), creditos = 3, horas = 144, estado = "Aprobada",
+                fechaAprobacion = "2025-01-01", intentoMatricula = 3 } } });
+        using var handler = new Capture(body); using var http = new HttpClient(handler);
+        var r = await Crear(http).ObtenerSolicitudAsync(Id, default);
+        Assert.Equal(3, Assert.Single(r!.AsignaturasAprobadas).IntentoMatricula);
+    }
+    [Fact]
     public async Task No_encontrada_se_conserva_como_null()
     {
         using var handler = new Capture("", HttpStatusCode.NotFound); using var http = new HttpClient(handler);
