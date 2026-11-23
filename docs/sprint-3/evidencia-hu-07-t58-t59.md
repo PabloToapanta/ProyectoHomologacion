@@ -1,5 +1,7 @@
 # HU-07 — Evidencia técnica de Catálogo y T59
 
+Esta evidencia corresponde al incremento inicial aeb8485. Fue complementada por el acuerdo y la implementación de [CA3](evidencia-hu-07-ca3.md); los pendientes de trazabilidad de esta versión histórica se consultan en esa evidencia nueva.
+
 Issue [#68](https://github.com/PabloToapanta/ProyectoHomologacion/issues/68). Rama local `feature/hu-07-versiones-malla`, base remota `843bf4f`. Criterios y acuerdo técnico confirmados por Leslie en este chat. Implementación para revisión. Leslie autorizó crear commits atómicos en español y publicar esta rama; no autorizó merge ni aceptación funcional.
 
 ## Implementación comprobada
