@@ -39,6 +39,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         var receptora = await catalogo.ObtenerAsignaturaAsync(receptoraId, ct)
             ?? throw new DatosAnalisisSolicitudException("No se encontró la asignatura receptora.");
         ValidarContexto(origen, origenId); ValidarContexto(receptora, receptoraId);
+        var mallas = MallasAnalisis.Pareja(aprobadaId, origen, receptora);
         if (origen.CarreraId != carreraOrigen || receptora.CarreraId != solicitud.CarreraReceptoraId)
             throw new DatosAnalisisSolicitudException("Las asignaturas deben pertenecer a las carreras de la solicitud.");
         var faltantes = new List<string>();
@@ -81,7 +82,8 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             try { motor = asistencia.EvaluarSinAgente(datos); }
             catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
             return ExclusionTerceraMatricula.Resultado(solicitudId, aprobadaId, receptoraId, motor, antiguedad,
-                origen.EsSintetico || receptora.EsSintetico, advertencias);
+                origen.EsSintetico || receptora.EsSintetico, advertencias) with
+            { Mallas = mallas };
         }
         AnalisisAsistido resultado;
         var reutilizacion = new ReutilizacionAgente(FirmaPareja(origen, receptora, aprobada, revision), forzar);
@@ -101,7 +103,8 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         };
         var resumen = estadoAnalisis == "Completo" ? Resumen(resultado) : null;
         return new(solicitudId, aprobadaId, receptoraId, estadoAnalisis, mensaje, resumen, resultado.Evaluacion, antiguedad,
-            origen.EsSintetico || receptora.EsSintetico, advertencias) { Agente = resultado.Agente };
+            origen.EsSintetico || receptora.EsSintetico, advertencias)
+        { Agente = resultado.Agente, Mallas = mallas };
     }
 
     /// <summary>HU-37 (A1): Homologación firma los programas con los datos que evalúa; el origen lleva horas y créditos de la aprobada.</summary>
@@ -116,7 +119,13 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         });
     private static string FirmaPrograma(AsignaturaParaAnalisis a) => HuellaReutilizacion.De(new
     {
-        a.PlanAnalitico, a.Horas, a.UnidadHoras, a.Creditos, a.SistemaCreditos, a.Contenidos, a.Resultados
+        a.PlanAnalitico,
+        a.Horas,
+        a.UnidadHoras,
+        a.Creditos,
+        a.SistemaCreditos,
+        a.Contenidos,
+        a.Resultados
     });
 
     private static DatosAsignatura Datos(AsignaturaParaAnalisis a) => new(a.Id.ToString(), a.PlanAnalitico, a.Horas,

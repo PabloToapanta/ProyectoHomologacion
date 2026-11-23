@@ -9,7 +9,9 @@ public sealed record AnalisisInternoResponse(Guid SolicitudId, Guid AsignaturaAp
 {
     public static AnalisisInternoResponse Desde(ResultadoInternoSolicitud r) => new(r.SolicitudId, r.AsignaturaAprobadaId,
         r.AsignaturaReceptoraId, r.Estado, r.Mensaje, r.Resultado, EvaluarResponse.FromApplication(r.Evaluacion),
-        r.Antiguedad is null ? null : ValidarAntiguedadResponse.FromDomain(r.Antiguedad), r.DatosSinteticos, r.Advertencias) { Agente = r.Agente };
+        r.Antiguedad is null ? null : ValidarAntiguedadResponse.FromDomain(r.Antiguedad), r.DatosSinteticos, r.Advertencias)
+    { Agente = r.Agente, Mallas = r.Mallas };
     /// <summary>HU-37: explicación nueva (<c>reutilizada: false</c>) o reutilizada con su id y fecha originales; null en Incompleto/Fallido.</summary>
     public AgenteAnalisis? Agente { get; init; }
+    public MallasAnalisis? Mallas { get; init; }
 }

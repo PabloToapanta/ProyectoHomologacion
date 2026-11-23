@@ -13,6 +13,32 @@ namespace Homologacion.Application.Tests;
 
 public class InformeHomologacionTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    [InlineData(null)]
+    public async Task HU07_informe_y_HU22_usan_solo_mallas_guardadas_de_parejas_y_grupos(bool? vigente)
+    {
+        var (caso, f) = Caso();
+        f.AnalisisAgente(A3, R1); f.Revision(Ana, A3, R1, "Homologable"); f.Revision(Luis, A3, R1, "Homologable");
+        f.AnalisisGrupo(); f.RevisionGrupo(Ana, "Homologable"); f.RevisionGrupo(Luis, "Homologable");
+        MallaAnalisis? origen = vigente.HasValue ? new(Guid.NewGuid(), Carrera, "Plan de origen guardado", vigente.Value) : null;
+        var mallas = new MallasAnalisis([new(A3, Guid.NewGuid(), origen)], [new(null, R1, new(Guid.NewGuid(), Carrera, "Plan receptor guardado", true))]);
+        f.Agente[0] = f.Agente[0] with { Analisis = f.Agente[0].Analisis with { Mallas = mallas } };
+        var grupales = new MallasAnalisis([new(A1, Guid.NewGuid(), origen), new(A2, Guid.NewGuid(), origen)], mallas.Receptoras);
+        f.AnalisisGrupos[0] = f.AnalisisGrupos[0] with { Mallas = grupales };
+        var informe = await caso.GenerarAsync(Solicitud, Ana, "ana", default);
+        Assert.Equal(mallas, Assert.Single(informe.Parejas).Mallas);
+        Assert.Equal(grupales, Assert.Single(informe.Grupos).Mallas);
+        var hayAlerta = informe.Advertencias.Any(a => a.Contains("malla de origen no vigente", StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(vigente == false, hayAlerta);
+        Assert.Equal(2, informe.Convalidar);
+        // Simula que después cambian los datos actuales: el informe fijo no consulta ni reconstruye sus mallas.
+        f.Agente[0] = f.Agente[0] with { Analisis = f.Agente[0].Analisis with { Mallas = null } };
+        var recuperado = await caso.ConsultarAsync(Solicitud, default);
+        Assert.Equal(mallas, recuperado!.Parejas[0].Mallas);
+    }
+
     private static readonly Guid Solicitud = Guid.Parse("90000000-0000-0000-0000-000000000001");
     private static readonly Guid A1 = Guid.Parse("90000000-0000-0000-0000-0000000000a1");
     private static readonly Guid A2 = Guid.Parse("90000000-0000-0000-0000-0000000000a2");
@@ -55,7 +81,7 @@ public class InformeHomologacionTests
             try { return await accion(); } finally { cierre.Release(); }
         }
         public Task<SolicitudParaAnalisis?> ObtenerSolicitudAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Solicitud && Asignada
-            ? new SolicitudParaAnalisis(Solicitud, Tipo, null, Carrera, new[] { A1, A2, A3 }.Select(a =>new AprobadaParaAnalisis(a, null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1)) { IntentoMatricula = TerceraMatricula.Contains(a) ? 3 : 1 }).ToArray())
+            ? new SolicitudParaAnalisis(Solicitud, Tipo, null, Carrera, new[] { A1, A2, A3 }.Select(a => new AprobadaParaAnalisis(a, null, 3, 144, "Aprobada", new DateOnly(2025, 1, 1)) { IntentoMatricula = TerceraMatricula.Contains(a) ? 3 : 1 }).ToArray())
             : null);
         public Task<SolicitudExternaParaAnalisis?> ObtenerSolicitudExternaAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Solicitud && Asignada
             ? new SolicitudExternaParaAnalisis(Solicitud, "Externo", Carrera, "Institución sintética", "Carrera sintética", PeriodosCursados, CambiosPreviosCarrera,

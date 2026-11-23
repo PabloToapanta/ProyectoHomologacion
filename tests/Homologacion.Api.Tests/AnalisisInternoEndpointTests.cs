@@ -116,13 +116,20 @@ public class AnalisisInternoEndpointTests
     public async Task Consulta_persistida_vuelve_a_comprobar_asignacion()
     {
         using var f = new MotorFactory(); var e = new EscenarioInterno(); using var host = Host(f, e); using var c = host.CreateClient();
+        var malla = Guid.NewGuid();
+        e.Materias[EscenarioInterno.OrigenId] = e.Materias[EscenarioInterno.OrigenId] with
+        { Malla = new(malla, e.Materias[EscenarioInterno.OrigenId].CarreraId, "Versión guardada HU07", false) };
         c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Docente"));
         Assert.Equal(HttpStatusCode.OK, (await c.PostAsJsonAsync(Ruta, Input())).StatusCode);
+        e.Materias[EscenarioInterno.OrigenId] = e.Materias[EscenarioInterno.OrigenId] with { Malla = null };
         using var saved = await c.GetAsync(Ruta);
         Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
         using var j = JsonDocument.Parse(await saved.Content.ReadAsStringAsync());
         Assert.Single(j.RootElement.EnumerateArray());
         Assert.Equal("Completo", j.RootElement[0].GetProperty("analisis").GetProperty("estado").GetString());
+        var guardada = j.RootElement[0].GetProperty("analisis").GetProperty("mallas").GetProperty("origenes")[0].GetProperty("malla");
+        Assert.Equal(malla, guardada.GetProperty("id").GetGuid());
+        Assert.False(guardada.GetProperty("vigenteAlAnalizar").GetBoolean());
         e.Solicitud = null;
         Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(Ruta)).StatusCode);
     }

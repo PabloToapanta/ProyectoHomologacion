@@ -45,6 +45,7 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
             throw new FuenteAnalisisNoDisponibleException();
         if (receptora.CarreraId != solicitud.CarreraReceptoraId)
             throw new DatosAnalisisSolicitudException("La asignatura receptora debe pertenecer a la carrera de la solicitud.");
+        var mallas = MallasAnalisis.Pareja(aprobadaId, null, receptora);
 
         var faltantes = new List<string> { FaltaProgramaExterno };
         if (receptora.Facultad != "FISEI") faltantes.Add("catálogo histórico de otra facultad: requiere revisión, sin reasignar registros");
@@ -76,7 +77,8 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
         if (terceraMatricula == ResultadoTerceraMatricula.Excluida)
             return ExclusionTerceraMatricula.Resultado(solicitudId, aprobadaId, receptoraId, evaluacion with { CompatibilidadAcademicaPct = null },
                 antiguedad, receptora.EsSintetico,
-                ["No se invocó al agente: la regla RN-07 resuelve la asignatura.", "No es una aprobación oficial."]);
+                ["No se invocó al agente: la regla RN-07 resuelve la asignatura.", "No es una aprobación oficial."]) with
+            { Mallas = mallas };
         var todas = faltantes.Concat(evaluacion.InformacionFaltante).Distinct().ToArray();
         evaluacion = evaluacion with
         {
@@ -90,7 +92,8 @@ public sealed class AnalizarSolicitudExterna(ISolicitudesAnalisisExterno solicit
             null, evaluacion, antiguedad, receptora.EsSintetico,
             ["No se invocó al agente: no existe evidencia académica externa registrada que pueda citar.",
              "Horas y créditos solo se comparan con unidades idénticas a las de la receptora; no se aplican conversiones.",
-             "No es una aprobación oficial."]);
+             "No es una aprobación oficial."])
+        { Mallas = mallas };
     }
 
     internal static async Task<SolicitudExternaParaAnalisis> ObtenerExternaAsync(ISolicitudesAnalisisExterno solicitudes, Guid id, CancellationToken ct)
