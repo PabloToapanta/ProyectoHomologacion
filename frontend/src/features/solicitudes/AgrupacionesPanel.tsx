@@ -1,9 +1,10 @@
+import {MallasAnalisisResumen,type MallasGuardadas} from './MallasAnalisisResumen';
 import {useState} from 'react';
 import {ResultadoAgrupacion,estadoGrupo,type EvaluacionGrupo} from './ResultadoAgrupacion';
 import {RevisionAgrupacionPanel} from './RevisionAgrupacionPanel';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Aporte={asignaturaAprobadaId:string;asignaturaReceptoraId:string;horasAportadas:number|null;creditosAportados:number|null};
-type Grupo={grupoId:string;version:string;congelado:boolean;origenes:string[];receptoras:string[];aportes:Aporte[];ultimoAnalisis:{evaluacion:EvaluacionGrupo}|null};
+type Grupo={grupoId:string;version:string;congelado:boolean;origenes:string[];receptoras:string[];aportes:Aporte[];ultimoAnalisis:{evaluacion:EvaluacionGrupo;mallas?:MallasGuardadas|null}|null};
 type Opciones={origenes:{id:string;horas:number;creditos:number;estado:string;elegible:boolean|null;motivos:string[]}[];receptoras:{id:string;codigo:string;nombre:string;nivel:number;horas:number;creditos:number}[];vinculos:{asignaturaAprobadaId:string;asignaturaReceptoraId:string;habilitado:boolean;motivo:string}[]};
 const leyenda='Homologación por agrupación — regla de análisis pendiente de validación institucional';
 export function AgrupacionesPanel({request,solicitudId,aprobadas}:{request:Request;solicitudId:string;aprobadas:{id:string;nombreAsignatura:string}[]}){
@@ -45,6 +46,7 @@ export function AgrupacionesPanel({request,solicitudId,aprobadas}:{request:Reque
    {!grupo?.congelado&&<button className="app-button" disabled={busy||!!desbordado||precision||aportes.length<2} onClick={guardar}>Guardar borrador</button>}
    {grupo&&<><button className="app-button" disabled={busy||sucio} onClick={analizar}>Analizar grupo guardado</button>{!grupo.congelado&&<button disabled={busy} onClick={eliminar}>Eliminar borrador</button>}</>}
    {evaluacion&&<ResultadoAgrupacion evaluacion={evaluacion} nombre={nombre}/>} {advertencias.map(a=><p key={a}>{a}</p>)}
+   {grupo?.ultimoAnalisis&&<MallasAnalisisResumen mallas={grupo.ultimoAnalisis.mallas}/>}
    {grupo?.ultimoAnalisis&&<RevisionAgrupacionPanel key={`${grupo.grupoId}/${grupo.version}`} request={request} ruta={`${ruta}/${grupo.grupoId}/revisiones`} sugerencia={estadoGrupo(grupo.ultimoAnalisis.evaluacion.estado)}/>}
   </>}
  </section>;

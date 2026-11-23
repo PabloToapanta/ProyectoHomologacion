@@ -1,3 +1,4 @@
+import {MallasAnalisisResumen,type MallasGuardadas} from './MallasAnalisisResumen';
 import {useEffect,useState} from 'react';
 import {GruposInforme,type GrupoInforme} from './GruposInforme';
 import './InformePanel.css';
@@ -6,7 +7,7 @@ type Aprobada={id:string;nombreAsignatura:string};
 type DocenteEnInforme={docenteId:string;docente:string;postura:'DeAcuerdo'|'Ajuste';decision:'Homologable'|'NoHomologable';observacion:string|null;fecha:string};
 type Pareja={asignaturaAprobadaId:string;asignaturaReceptoraId:string;receptoraCodigo:string|null;receptoraNombre:string|null;
  agente:{estado:string;sugerencia:string|null;porcentajeAcademico:number|null;porcentajeHoras:number|null;porcentajeCreditos:number|null};
- docentes:DocenteEnInforme[];sugerenciaFinal:'Convalidar'|'NoConvalidar'|'SinAcuerdo';exclusion?:string|null};
+ docentes:DocenteEnInforme[];sugerenciaFinal:'Convalidar'|'NoConvalidar'|'SinAcuerdo';exclusion?:string|null;mallas?:MallasGuardadas|null};
 type Informe={solicitudId:string;tipoCambio:string;fecha:string;generadoPor:string;parejas:Pareja[];aprobadasSinAnalisis:string[];
  convalidar:number;noConvalidar:number;sinAcuerdo:number;advertencias:string[];grupos?:GrupoInforme[]};
 function esInforme(value:unknown):value is Informe {
@@ -82,7 +83,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
    <div className="solicitudes-table"><table><caption>Informe de homologación por pareja</caption>
     <thead><tr><th>Asignatura aprobada</th><th>Receptora</th><th>Agente</th><th>Porcentajes (académico · horas · créditos)</th><th>Docentes</th><th>Sugerencia final</th></tr></thead>
     <tbody>{informe.parejas.map(p=><tr key={`${p.asignaturaAprobadaId}/${p.asignaturaReceptoraId}`}>
-     <td>{nombre(p.asignaturaAprobadaId)}</td>
+     <td>{nombre(p.asignaturaAprobadaId)}<MallasAnalisisResumen mallas={p.mallas}/></td>
      <td>{p.receptoraCodigo??'—'} · {p.receptoraNombre??'—'}</td>
      <td>{p.agente.estado}{p.agente.sugerencia?` · ${p.agente.sugerencia}`:''}</td>
      <td>{pct(p.agente.porcentajeAcademico)} · {pct(p.agente.porcentajeHoras)} · {pct(p.agente.porcentajeCreditos)}</td>
