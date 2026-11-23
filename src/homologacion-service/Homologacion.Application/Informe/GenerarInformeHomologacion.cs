@@ -23,7 +23,11 @@ public sealed record GrupoEnInforme(Guid GrupoId, IReadOnlyList<Guid> Asignatura
     public Guid? ConfiguracionVersionId { get; init; }
 }
 public sealed record AnalisisAgrupacionGuardado(Guid SolicitudId, Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas,
-    ResultadoAgrupacion Evaluacion, DateTimeOffset Fecha);
+    ResultadoAgrupacion Evaluacion, DateTimeOffset Fecha)
+{
+    /// <summary>HU-07: versiones capturadas al analizar; null en históricos. El informe debe consumir esta fotografía.</summary>
+    public MallasAnalisis? Mallas { get; init; }
+}
 public sealed record RevisionAgrupacionRegistrada(Guid SolicitudId, Guid GrupoId, Guid DocenteId,
     string Docente, string Postura, string Decision, string? Observacion, DateTimeOffset Fecha);
 public interface IResultadosAgrupacionInforme

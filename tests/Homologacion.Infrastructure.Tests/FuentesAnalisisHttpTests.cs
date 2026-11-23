@@ -66,13 +66,45 @@ public class FuentesAnalisisHttpTests
     [Fact]
     public async Task Lee_el_intento_de_matricula_para_RN_07()
     {
-        var body = JsonSerializer.Serialize(new { id = Id, tipoCambio = "Interno", carreraOrigenId = Guid.NewGuid(), carreraReceptoraId = Guid.NewGuid(),
+        var body = JsonSerializer.Serialize(new
+        {
+            id = Id,
+            tipoCambio = "Interno",
+            carreraOrigenId = Guid.NewGuid(),
+            carreraReceptoraId = Guid.NewGuid(),
             asignaturasAprobadas = new[] { new { id = Guid.NewGuid(), asignaturaOrigenId = Guid.NewGuid(), creditos = 3, horas = 144, estado = "Aprobada",
-                fechaAprobacion = "2025-01-01", intentoMatricula = 3 } } });
+                fechaAprobacion = "2025-01-01", intentoMatricula = 3 } }
+        });
         using var handler = new Capture(body); using var http = new HttpClient(handler);
         var r = await Crear(http).ObtenerSolicitudAsync(Id, default);
         Assert.Equal(3, Assert.Single(r!.AsignaturasAprobadas).IntentoMatricula);
     }
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Lee_malla_del_contrato_aditivo_de_Catalogo_y_admite_fuente_anterior(bool conMalla)
+    {
+        var carrera = Guid.NewGuid(); var malla = Guid.NewGuid();
+        var body = System.Text.Json.Nodes.JsonNode.Parse(JsonSerializer.Serialize(new
+        {
+            id = Id,
+            carreraId = carrera,
+            facultad = "FISEI",
+            carreraVigente = false,
+            creditos = 3,
+            horas = 144,
+            contenidos = Array.Empty<object>(),
+            resultados = Array.Empty<object>(),
+            malla = new { id = malla, carreraId = carrera, nombre = "Plan sintético", vigente = true }
+        }))!.AsObject();
+        if (!conMalla) body.Remove("malla");
+        using var handler = new Capture(body.ToJsonString()); using var http = new HttpClient(handler);
+        var a = await Crear(http).ObtenerAsignaturaAsync(Id, default);
+        Assert.False(a!.CarreraVigente);
+        if (conMalla) Assert.Equal(new MallaParaAnalisis(malla, carrera, "Plan sintético", true), a.Malla);
+        else Assert.Null(a.Malla);
+    }
+
     [Fact]
     public async Task No_encontrada_se_conserva_como_null()
     {

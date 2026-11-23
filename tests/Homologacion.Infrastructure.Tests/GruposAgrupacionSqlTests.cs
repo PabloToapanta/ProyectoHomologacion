@@ -11,6 +11,45 @@ namespace Homologacion.Infrastructure.Tests;
 public class GruposAgrupacionSqlTests
 {
     [Fact]
+    public async Task Grupo_conserva_mallas_al_reabrir_y_admite_historico_sin_metadatos()
+    {
+        using var c = new SqliteConnection("Data Source=:memory:"); await c.OpenAsync();
+        var options = new DbContextOptionsBuilder<ResultadosDbContext>().UseSqlite(c).Options;
+        var s = Guid.NewGuid(); var o = Guid.NewGuid(); var b = Guid.NewGuid(); var r = Guid.NewGuid();
+        var g = GrupoAgrupacion.Crear(s, [o, b], [r], [new(o, r, 40, 4), new(b, r, 40, 4)]);
+        var mallas = new Homologacion.Application.AnalisisInterno.MallasAnalisis(
+            [new(Guid.NewGuid(), o, new(Guid.NewGuid(), Guid.NewGuid(), "Plan anterior", false)), new(null, b, null)],
+            [new(r, null, new(Guid.NewGuid(), Guid.NewGuid(), "Plan receptor", true))]);
+        var evaluacion = new Homologacion.Application.Equivalencias.ResultadoAgrupacion([], 80,
+            Homologacion.Domain.Equivalencias.EstadoEquivalencia.InformacionIncompleta, "Prueba de persistencia", [], [], []);
+        var analisis = new Homologacion.Application.Informe.AnalisisAgrupacionGuardado(s, g.GrupoId, g.Origenes, evaluacion, DateTimeOffset.UtcNow) { Mallas = mallas };
+        await using (var db = new ResultadosDbContext(options))
+        {
+            await db.Database.EnsureCreatedAsync(); var repo = new GruposAgrupacionSql(db); var cierre = new InformesHomologacionSql(db);
+            await cierre.ConCierreAsync(s, async () => { await repo.GuardarAsync(g, null, default); return true; }, default);
+            g.Congelar();
+            await cierre.ConCierreAsync(s, async () => { await repo.GuardarAsync(g, analisis, default); return true; }, default);
+        }
+        await using (var db = new ResultadosDbContext(options))
+        {
+            var detalle = await new GruposAgrupacionSql(db).ObtenerAsync(s, g.GrupoId, default);
+            Assert.True(detalle!.Grupo.Congelado);
+            Assert.Equal(mallas.Origenes, detalle.UltimoAnalisis!.Mallas!.Origenes);
+            Assert.Equal(mallas.Receptoras, detalle.UltimoAnalisis.Mallas.Receptoras);
+            var fila = await db.Set<RegistroGrupo>().SingleAsync();
+            var json = System.Text.Json.Nodes.JsonNode.Parse(fila.Analisis!)!.AsObject(); json.Remove("mallas");
+            fila.Analisis = json.ToJsonString(); await db.SaveChangesAsync();
+        }
+        await using (var db = new ResultadosDbContext(options))
+        {
+            var historico = await new GruposAgrupacionSql(db).ObtenerAsync(s, g.GrupoId, default);
+            Assert.Null(historico!.UltimoAnalisis!.Mallas);
+            Assert.Equal(analisis.Evaluacion.Justificacion, historico.UltimoAnalisis.Evaluacion.Justificacion);
+            Assert.True(historico.Grupo.Congelado);
+        }
+    }
+
+    [Fact]
     public async Task Revision_manual_1a1_sin_agente_tambien_reserva_la_unidad_y_no_roba_un_grupo()
     {
         using var c = new SqliteConnection("Data Source=:memory:"); await c.OpenAsync();

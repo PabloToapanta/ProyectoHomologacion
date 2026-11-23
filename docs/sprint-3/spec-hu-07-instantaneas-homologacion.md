@@ -32,7 +32,7 @@ Edwin mantiene el consumo y presentación en informe, PDF y HU-22; Leslie mantie
 ## Criterios verificables
 
 - Pareja interna conserva ambas mallas; externa conserva receptora y origen desconocido.
-- Estados Completo, Incompleto, Fallido y exclusión RN-07 conservan la trazabilidad disponible.
+- Estados Completo, Incompleto y Fallido, incluida la exclusión RN-07 (estado Completo, no homologable), conservan la trazabilidad disponible.
 - Grupos conservan una entrada por asignatura y distinguen los dos espacios de UUID.
 - Cambiar únicamente nombre/vigencia de malla no cambia el motor, el JSON del contexto ni la clave HU-37; una nueva ejecución captura metadatos nuevos y reutiliza la explicación.
 - Tras reabrir almacenamiento se recupera la fotografía guardada; históricos sin campo deserializan como null. API y OpenAPI exponen el contrato.
@@ -40,4 +40,34 @@ Edwin mantiene el consumo y presentación en informe, PDF y HU-22; Leslie mantie
 
 ## Evidencia de ejecución
 
-Pendiente de ejecutar pasos 2–6. No se atribuyen pruebas ni aceptación antes de ejecutarlas.
+Implementación preparada en la [PR Draft #97](https://github.com/PabloToapanta/ProyectoHomologacion/pull/97), desde `1542986` de develop. Plan ejecutado: spec, TDD, implementación, exposición API, persistencia y regresión comprobadas. La implementación se publica en la misma PR Draft; revisión humana e integración completa permanecen pendientes.
+
+### TDD y ajustes de fixtures
+
+La primera ejecución de `InstantaneasMallaTests` falló en compilación (`CS0117`/`CS1061`) porque aún no existían Malla/Mallas. Después de implementar, la ejecución detectó dos supuestos incorrectos en los fixtures nuevos: RN-07 conserva el estado Completo con decisión no homologable, y la reutilización requiere un proveedor de parámetros con versión estable (el fallback de pruebas genera otra versión). Se corrigieron esos fixtures sin cambiar reglas productivas. Las pruebas nuevas se integraron después en las suites completas.
+
+### Verificación ejecutada
+
+| Suite de Homologación | Correctas | Fallidas | Omitidas |
+| --- | ---: | ---: | ---: |
+| Application | 236 | 0 | 0 |
+| Infrastructure | 91 | 0 | 17 |
+| API | 161 | 0 | 0 |
+| Domain | 115 | 0 | 0 |
+| Total | **603** | **0** | **17** |
+
+Comando por suite: `dotnet test tests/Homologacion.<Suite>.Tests/Homologacion.<Suite>.Tests.csproj --nologo --logger "trx;LogFileName=<suite>.trx" --results-directory TestResults/hu07-instantaneas`. Logs/TRX locales ignorados en esa carpeta. No se suman las ejecuciones filtradas a los totales.
+
+Las 18 pruebas nuevas cubren captura por estado, RN-07, interno/externo, N:1, rechazo de metadatos incoherentes, deserialización HTTP con y sin malla, persistencia de parejas internas/externas y grupos con SQLite al reabrir contextos, históricos reales sin campo y contrato de respuesta/OpenAPI. Además se amplió la prueba integrada HTTP de agrupaciones para comprobar la fotografía al cambiar la fuente. Las regresiones existentes incluyen autorización, reservas, cierre del informe y HU-37.
+
+Se verificó que añadir malla a una fuente anterior, renombrarla o cambiar su vigencia no cambia el motor, el JSON del contexto realmente enviado ni la clave HU-37; nuevas ejecuciones capturan la nueva fotografía y reutilizan la explicación previa. Las pruebas existentes de cambios académicos siguen invalidando la reutilización.
+
+Las 17 omitidas requieren servicios reales (16 SQL Server y 1 Ollama). La persistencia y el flujo HTTP integrado de este cambio se ejecutaron con SQLite y agente simulado. No se ejecutaron SQL Server real, Ollama real, navegador ni Docker Compose para esta PR; no hay cambios de esquema. La compilación de Infrastructure.Tests reportó dos advertencias xUnit2031 preexistentes en AgrupacionesSqlServerTests (líneas 102 y 124), fuera del diff.
+
+Formato: `dotnet format whitespace` aplicado y verificado con `--verify-no-changes --no-restore --include <archivos afectados>` en los proyectos de pruebas Application, Infrastructure y API. Se corrigió espacio en blanco de los nuevos inicializadores; no hubo cambios semánticos después de las suites. `git diff --check` correcto.
+
+### Entrega a Edwin y dependencias
+
+Leer `AnalisisGuardado.Analisis.Mallas` para parejas y `AnalisisAgrupacionGuardado.Mallas` para grupos. Copiar esos valores al informe nuevo y a la fuente informativa de HU-22, sin consultas que sustituyan la fotografía por la vigencia actual. `mallas = null` o una entrada con `malla = null` significa «versión no registrada», nunca «no vigente». En origen externo también falta `asignaturaCatalogoId`. La vigencia se llama `vigenteAlAnalizar`, distinta de CarreraVigente.
+
+Catálogo anterior a la PR #96 produce fotografías con malla null; se conserva compatibilidad, sin atribuir retrospectivamente versiones. Antes de cerrar CA3 faltan integrar y verificar con Catálogo #96, el consumo de Edwin en informe/HU-22/UI/PDF y la aceptación de Shirley. Los informes emitidos permanecen intactos. No se efectuó merge ni se declara HU-07 terminada.
