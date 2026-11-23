@@ -41,6 +41,8 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         ValidarContexto(origen, origenId); ValidarContexto(receptora, receptoraId);
         if (origen.CarreraId != carreraOrigen || receptora.CarreraId != solicitud.CarreraReceptoraId)
             throw new DatosAnalisisSolicitudException("Las asignaturas deben pertenecer a las carreras de la solicitud.");
+        var mallas = new MallasAnalisis([MallaAsignaturaAnalizada.Capturar(origen, aprobadaId)],
+            [MallaAsignaturaAnalizada.Capturar(receptora)]);
         var faltantes = new List<string>();
         if (origen.Facultad != "FISEI" || receptora.Facultad != "FISEI")
             faltantes.Add("catálogo histórico de otra facultad: requiere revisión, sin reasignar registros");
@@ -81,7 +83,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             try { motor = asistencia.EvaluarSinAgente(datos); }
             catch (DatosEvaluacionInvalidosException) { throw new FuenteAnalisisNoDisponibleException(); }
             return ExclusionTerceraMatricula.Resultado(solicitudId, aprobadaId, receptoraId, motor, antiguedad,
-                origen.EsSintetico || receptora.EsSintetico, advertencias);
+                origen.EsSintetico || receptora.EsSintetico, advertencias) with { Mallas = mallas };
         }
         AnalisisAsistido resultado;
         var reutilizacion = new ReutilizacionAgente(FirmaPareja(origen, receptora, aprobada, revision), forzar);
@@ -101,7 +103,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         };
         var resumen = estadoAnalisis == "Completo" ? Resumen(resultado) : null;
         return new(solicitudId, aprobadaId, receptoraId, estadoAnalisis, mensaje, resumen, resultado.Evaluacion, antiguedad,
-            origen.EsSintetico || receptora.EsSintetico, advertencias) { Agente = resultado.Agente };
+            origen.EsSintetico || receptora.EsSintetico, advertencias) { Agente = resultado.Agente, Mallas = mallas };
     }
 
     /// <summary>HU-37 (A1): Homologación firma los programas con los datos que evalúa; el origen lleva horas y créditos de la aprobada.</summary>

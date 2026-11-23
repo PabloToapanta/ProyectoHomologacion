@@ -24,9 +24,13 @@ public sealed record GrupoResponse(Guid GrupoId, Guid SolicitudId, string Versio
     IReadOnlyList<Guid> Receptoras, IReadOnlyList<AporteGrupo> Aportes, AnalisisAgrupacionGuardadoResponse? UltimoAnalisis, string Leyenda)
 {
     public static GrupoResponse Desde(DetalleGrupo d) => new(d.Grupo.GrupoId, d.Grupo.SolicitudId, GestionarAgrupaciones.ETag(d.Grupo),
-        d.Grupo.Congelado, d.Grupo.Origenes, d.Grupo.Receptoras, d.Grupo.Aportes, d.UltimoAnalisis is { } a ? new(a.SolicitudId, a.GrupoId, a.AsignaturasAprobadas, ResultadoAgrupacionResponse.Desde(a.Evaluacion), a.Fecha) : null, GestionarAgrupaciones.Leyenda);
+        d.Grupo.Congelado, d.Grupo.Origenes, d.Grupo.Receptoras, d.Grupo.Aportes, d.UltimoAnalisis is { } a ? new(a.SolicitudId, a.GrupoId, a.AsignaturasAprobadas, ResultadoAgrupacionResponse.Desde(a.Evaluacion), a.Fecha) { Mallas = a.Mallas } : null, GestionarAgrupaciones.Leyenda);
 }
-public sealed record AnalisisAgrupacionGuardadoResponse(Guid SolicitudId, Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas, ResultadoAgrupacionResponse Evaluacion, DateTimeOffset Fecha);
+public sealed record AnalisisAgrupacionGuardadoResponse(Guid SolicitudId, Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas, ResultadoAgrupacionResponse Evaluacion, DateTimeOffset Fecha)
+{
+    /// <summary>HU-07: fotografía de mallas por asignatura; null en históricos sin registro.</summary>
+    public MallasAnalisis? Mallas { get; init; }
+}
 public sealed record ResultadoAgrupacionResponse(IReadOnlyList<EvaluarResponse> Receptoras, decimal UmbralPct, string Estado, string Justificacion,
     IReadOnlyList<string> InformacionFaltante, IReadOnlyList<AporteEvaluadoAgrupacion> Aportes, IReadOnlyList<EvidenciaAgrupacion> Evidencias, bool Homologable, Guid? ConfiguracionVersionId)
 {

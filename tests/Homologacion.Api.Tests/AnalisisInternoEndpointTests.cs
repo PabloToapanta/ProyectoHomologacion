@@ -127,6 +127,31 @@ public class AnalisisInternoEndpointTests
         Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(Ruta)).StatusCode);
     }
     [Fact]
+    public async Task API_devuelve_instantaneas_guardadas_y_OpenAPI_publica_el_contrato()
+    {
+        using var f = new MotorFactory(); var e = new EscenarioInterno();
+        foreach (var id in e.Materias.Keys.ToArray())
+            e.Materias[id] = e.Materias[id] with { Malla = new(Guid.NewGuid(), e.Materias[id].CarreraId, "Plan original", true) };
+        using var host = Host(f, e); using var c = host.CreateClient();
+        c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Docente"));
+        using var response = await c.PostAsJsonAsync(Ruta, Input());
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using var ejecutado = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var mallas = ejecutado.RootElement.GetProperty("mallas");
+        Assert.Equal(EscenarioInterno.OrigenId, mallas.GetProperty("origenes")[0].GetProperty("asignaturaCatalogoId").GetGuid());
+        Assert.True(mallas.GetProperty("origenes")[0].GetProperty("malla").GetProperty("vigenteAlAnalizar").GetBoolean());
+        foreach (var id in e.Materias.Keys.ToArray())
+            e.Materias[id] = e.Materias[id] with { Malla = e.Materias[id].Malla! with { Nombre = "Otro nombre", Vigente = false } };
+        using var guardados = JsonDocument.Parse(await c.GetStringAsync(Ruta));
+        Assert.Equal(mallas.GetRawText(), guardados.RootElement[0].GetProperty("analisis").GetProperty("mallas").GetRawText());
+        using var swagger = JsonDocument.Parse(await c.GetStringAsync("/swagger/v1/swagger.json"));
+        var schemas = swagger.RootElement.GetProperty("components").GetProperty("schemas");
+        Assert.True(schemas.GetProperty("AnalisisInternoResponse").GetProperty("properties").TryGetProperty("mallas", out _));
+        Assert.True(schemas.GetProperty("AnalisisAgrupacionGuardadoResponse").GetProperty("properties").TryGetProperty("mallas", out _));
+        Assert.True(schemas.GetProperty("InstantaneaMalla").GetProperty("properties").TryGetProperty("vigenteAlAnalizar", out _));
+    }
+
+    [Fact]
     public async Task Error_de_guardado_es_503_sin_exito_ficticio()
     {
         using var f = new MotorFactory(); var e = new EscenarioInterno(); using var host = Host(f, e, almacen: new Almacen { Fallar = true }); using var c = host.CreateClient();

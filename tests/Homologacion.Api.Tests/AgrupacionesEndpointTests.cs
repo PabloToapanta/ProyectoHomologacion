@@ -23,6 +23,8 @@ public class AgrupacionesEndpointTests
         using var connection = new SqliteConnection("Data Source=:memory:"); await connection.OpenAsync();
         using var f = new MotorFactory(); var e = new EscenarioInterno();
         e.Solicitud = e.Solicitud! with { AsignaturasAprobadas = [e.Solicitud!.AsignaturasAprobadas[0] with { IntentoMatricula = 1 }] };
+        foreach (var idM in e.Materias.Keys.ToArray())
+            e.Materias[idM] = e.Materias[idM] with { Malla = new(Guid.NewGuid(), e.Materias[idM].CarreraId, "Plan de grupo", true) };
         var r2 = Guid.NewGuid(); e.Materias[r2] = e.Materias[EscenarioInterno.ReceptoraId] with { Id = r2 };
         using var host = f.WithWebHostBuilder(b => b.ConfigureServices(services =>
         {
@@ -73,6 +75,15 @@ public class AgrupacionesEndpointTests
         using var evaluated = await c.PostAsync(detalle + "/analisis", null); Assert.Equal(HttpStatusCode.OK, evaluated.StatusCode);
         using var a = JsonDocument.Parse(await evaluated.Content.ReadAsStringAsync()); Assert.True(a.RootElement.GetProperty("guardado").GetBoolean());
         Assert.Equal(2, a.RootElement.GetProperty("evaluacion").GetProperty("receptoras").GetArrayLength());
+        var mallas = a.RootElement.GetProperty("detalle").GetProperty("ultimoAnalisis").GetProperty("mallas");
+        Assert.Single(mallas.GetProperty("origenes").EnumerateArray());
+        Assert.Equal(EscenarioInterno.OrigenId, mallas.GetProperty("origenes")[0].GetProperty("asignaturaCatalogoId").GetGuid());
+        Assert.Equal(EscenarioInterno.AprobadaId, mallas.GetProperty("origenes")[0].GetProperty("asignaturaAprobadaId").GetGuid());
+        Assert.Equal(2, mallas.GetProperty("receptoras").GetArrayLength());
+        foreach (var idM in e.Materias.Keys.ToArray())
+            e.Materias[idM] = e.Materias[idM] with { Malla = e.Materias[idM].Malla! with { Vigente = false } };
+        using (var guardadoMallas = JsonDocument.Parse(await c.GetStringAsync(detalle)))
+            Assert.Equal(mallas.GetRawText(), guardadoMallas.RootElement.GetProperty("ultimoAnalisis").GetProperty("mallas").GetRawText());
         etag = evaluated.Headers.ETag!.ToString(); c.DefaultRequestHeaders.Remove("If-Match"); c.DefaultRequestHeaders.TryAddWithoutValidation("If-Match", etag);
         Assert.Equal(HttpStatusCode.Conflict, (await c.DeleteAsync(detalle)).StatusCode);
         e.Solicitud = e.Solicitud! with { AsignaturasAprobadas = [e.Solicitud.AsignaturasAprobadas[0] with { IntentoMatricula = 3 }] };

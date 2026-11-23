@@ -75,7 +75,7 @@ public sealed class GestionarAgrupaciones(ISolicitudesAnalisisInterno solicitude
             if (guardar)
             {
                 actual.Grupo.Congelar();
-                var a = new AnalisisAgrupacionGuardado(id, grupo, actual.Grupo.Origenes, r, reloj.GetUtcNow());
+                var a = new AnalisisAgrupacionGuardado(id, grupo, actual.Grupo.Origenes, r, reloj.GetUtcNow()) { Mallas = entrada.Mallas };
                 await grupos.GuardarAsync(actual.Grupo, a, ct); actual = new(actual.Grupo, a);
             }
             return new AnalisisGrupoRespuesta(guardar, r, actual, entrada.Advertencias);

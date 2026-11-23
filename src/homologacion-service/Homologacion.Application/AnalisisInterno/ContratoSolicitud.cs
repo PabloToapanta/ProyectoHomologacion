@@ -12,7 +12,11 @@ public sealed record SolicitudParaAnalisis(Guid Id, string TipoCambio, Guid? Car
 public sealed record ElementoParaAnalisis(Guid Id, string Texto);
 public sealed record AsignaturaParaAnalisis(Guid Id, Guid CarreraId, string Facultad, bool CarreraVigente, decimal Creditos, int Horas,
     string? PlanAnalitico, string? UnidadHoras, string? SistemaCreditos, bool EsSintetico,
-    IReadOnlyList<ElementoParaAnalisis> Contenidos, IReadOnlyList<ElementoParaAnalisis> Resultados);
+    IReadOnlyList<ElementoParaAnalisis> Contenidos, IReadOnlyList<ElementoParaAnalisis> Resultados)
+{
+    /// <summary>HU-07: metadatos de Catálogo; null si la fuente aún no los proporciona. No se envían al agente.</summary>
+    public MallaParaAnalisis? Malla { get; init; }
+}
 public sealed record VinculoParaAnalisis(string ElementoOrigen, string ElementoReceptor, string UbicacionOrigen, string UbicacionReceptora);
 public sealed record RevisionParaAnalisis(bool Registrada, bool Vigente, IReadOnlyList<VinculoParaAnalisis> Contenidos, IReadOnlyList<VinculoParaAnalisis> Resultados);
 public interface ISolicitudesAnalisisInterno
@@ -32,6 +36,8 @@ public sealed record ResultadoInternoSolicitud(Guid SolicitudId, Guid Asignatura
 {
     /// <summary>HU-37: origen de la explicación del agente; null en «Incompleto», «Fallido» y en análisis guardados antes de HU-37.</summary>
     public AgenteAnalisis? Agente { get; init; }
+    /// <summary>HU-07: fotografía de las versiones consultadas; null en históricos sin registro.</summary>
+    public MallasAnalisis? Mallas { get; init; }
 }
 public sealed class SolicitudAnalisisNoEncontradaException() : Exception("Solicitud no encontrada entre sus asignaciones.");
 public sealed class DatosAnalisisSolicitudException(string message) : Exception(message);
