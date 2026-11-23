@@ -31,11 +31,17 @@ function exportarInformePdf(){
  ventana.document.open();
  ventana.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><base href="${document.baseURI}"><title>Informe técnico de homologación</title>${estilos}
   <style>
+   body{margin:0;padding:16px;font-family:Arial,sans-serif;color:#172522;background:#f4f7f6}
+   .pdf-print-actions{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px;margin:-16px -16px 18px;padding:12px 16px;background:#fff;border-bottom:1px solid #cbd6d2}
+   .pdf-print-actions button{border:0;border-radius:6px;padding:10px 16px;background:#176b5b;color:#fff;font-weight:700;cursor:pointer}
+   .pdf-print-actions button:focus-visible{outline:3px solid #8abfb2;outline-offset:2px}
+   .pdf-print-actions span{font-size:14px}
    @page{size:A4 landscape;margin:12mm}
    @media print{
     html,body{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
-    body{margin:0!important;color:#172522!important;background:#fff!important}
+    body{margin:0!important;padding:0!important;color:#172522!important;background:#fff!important}
     body *{visibility:visible!important}
+    .pdf-print-actions{display:none!important}
     .informe-pdf__contenido{display:block!important;position:static!important;inset:auto!important;width:100%!important;max-height:none!important;overflow:visible!important;color:#172522!important;background:#fff!important;font-size:8pt!important}
     .informe-pdf__cabecera{break-inside:avoid;page-break-inside:avoid;border-top:8px solid #176b5b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .informe-pdf__contenido table{display:table!important;width:100%!important;table-layout:fixed!important;border-collapse:collapse!important;break-inside:auto!important;page-break-inside:auto!important}
@@ -50,13 +56,14 @@ function exportarInformePdf(){
     .informe-pdf__contenido col.informe-col--sugerencia{width:11%}
     .informe-pdf__contenido ul{margin:0;padding-left:14px}
    }
-  </style></head><body>${contenido.outerHTML}</body></html>`);
+  </style></head><body><nav class="pdf-print-actions" aria-label="Opciones del informe"><button id="pdf-print-button" type="button">Imprimir / Guardar como PDF</button><span>En el diálogo de impresión, selecciona «Guardar como PDF» en Destino.</span></nav>${contenido.outerHTML}</body></html>`);
  ventana.document.close();
  ventana.addEventListener('afterprint',()=>ventana.close(),{once:true});
+ ventana.document.getElementById('pdf-print-button')?.addEventListener('click',()=>ventana.print());
  void (async()=>{
   await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));
   await ventana.document.fonts.ready;
-  ventana.focus();ventana.print();
+  ventana.focus();
  })();
 }
 
