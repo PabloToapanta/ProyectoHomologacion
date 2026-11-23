@@ -17,11 +17,19 @@ Issue #72 · rama `feature/hu-24-informe-pdf` · fecha: 15/11/2026.
 - Solicitudes: `dotnet test tests/Solicitudes.Tests/Solicitudes.Tests.csproj -c Release --no-restore` — **141 aprobadas, 0 fallidas, 5 omitidas**. Las omitidas requieren el SQL Server aislado (`HU10_TEST_SQL`).
 - Las pruebas específicas cubren consulta de Coordinación, docente no asignado, ausencia del informe, rol sin permiso, ocultación del botón antes de generar y ejecución de impresión.
 
+## Verificación manual de exportación — 22/11/2026
+
+- Se abrió la solicitud de demostración finalizada `DEMO-HU37-01` en el entorno local con Docker Compose.
+- Al pulsar **Exportar informe a PDF**, el navegador mostró la vista previa nativa en la misma pestaña, sin abrir una pestaña intermedia.
+- La vista previa contiene el encabezado verde, el informe y la tabla completa en una página (1/1); las columnas se leen sin cortar palabras ni duplicar filas.
+- Captura proporcionada por Shirley durante la comprobación:
+
+![Vista previa del informe PDF completo, una página](evidencias/hu24-20261122/preview-informe-pdf.png)
+
 ## Pendiente para la Definición de Hecho
 
-- Recorrido manual en navegador y comprobación de «Guardar como PDF» con un informe de demostración autorizado.
-- Ejecución integrada con Docker Compose y CI remoto.
-- Revisión cruzada de Leslie y aceptación funcional de Shirley.
+- Revisión cruzada de la PR y confirmación de CI remoto.
+- Aceptación formal de HU-24 por Shirley después de la revisión cruzada.
 
-La evidencia técnica local no declara la historia aceptada ni integrada.
+La captura documenta la vista previa manual; no declara la historia integrada ni sustituye la revisión cruzada.
 
