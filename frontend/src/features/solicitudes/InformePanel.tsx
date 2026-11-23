@@ -22,6 +22,44 @@ const decisiones={Homologable:'Homologable',NoHomologable:'No homologable'} as c
 const finales={Convalidar:'Convalidar',NoConvalidar:'No convalidar',SinAcuerdo:'Sin acuerdo'} as const;
 const pct=(v:number|null)=>v===null?'—':`${v.toLocaleString('es-EC',{maximumFractionDigits:2})} %`;
 
+function exportarInformePdf(){
+ const contenido=document.querySelector<HTMLElement>('.informe-pdf__contenido');
+ if(!contenido){window.print();return;}
+ const ventana=window.open('','_blank');
+ if(!ventana){window.print();return;}
+ const estilos=[...document.head.querySelectorAll('link[rel="stylesheet"],style')].map(e=>e.outerHTML).join('\n');
+ ventana.document.open();
+ ventana.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><base href="${document.baseURI}"><title>Informe técnico de homologación</title>${estilos}
+  <style>
+   @page{size:A4 landscape;margin:12mm}
+   @media print{
+    html,body{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+    body{margin:0!important;color:#172522!important;background:#fff!important}
+    body *{visibility:visible!important}
+    .informe-pdf__contenido{display:block!important;position:static!important;inset:auto!important;width:100%!important;max-height:none!important;overflow:visible!important;color:#172522!important;background:#fff!important;font-size:8pt!important}
+    .informe-pdf__cabecera{break-inside:avoid;page-break-inside:avoid}
+    .informe-pdf__contenido table{display:table!important;width:100%!important;table-layout:fixed!important;border-collapse:collapse!important;break-inside:auto!important;page-break-inside:auto!important}
+    .informe-pdf__contenido thead{display:table-header-group}
+    .informe-pdf__contenido tr{break-inside:auto!important;page-break-inside:auto!important}
+    .informe-pdf__contenido th,.informe-pdf__contenido td{padding:4px!important;font-size:7.5pt!important;vertical-align:top!important;overflow-wrap:anywhere!important;word-break:normal!important}
+    .informe-pdf__contenido th:nth-child(1),.informe-pdf__contenido td:nth-child(1){width:13%}
+    .informe-pdf__contenido th:nth-child(2),.informe-pdf__contenido td:nth-child(2){width:14%}
+    .informe-pdf__contenido th:nth-child(3),.informe-pdf__contenido td:nth-child(3){width:12%}
+    .informe-pdf__contenido th:nth-child(4),.informe-pdf__contenido td:nth-child(4){width:15%}
+    .informe-pdf__contenido th:nth-child(5),.informe-pdf__contenido td:nth-child(5){width:34%}
+    .informe-pdf__contenido th:nth-child(6),.informe-pdf__contenido td:nth-child(6){width:12%}
+    .informe-pdf__contenido ul{margin:0;padding-left:14px}
+   }
+  </style></head><body>${contenido.outerHTML}</body></html>`);
+ ventana.document.close();
+ ventana.addEventListener('afterprint',()=>ventana.close(),{once:true});
+ void (async()=>{
+  await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));
+  await ventana.document.fonts.ready;
+  ventana.focus();ventana.print();
+ })();
+}
+
 type Remision={solicitudId:string;fecha:string;remitidoPorId:string;remitidoPor:string};
 
 /** HU-23: informe fijo; HU-32 añade la remisión del docente asignado; puede deshabilitarse para la vista del coordinador. */
@@ -71,7 +109,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
    {puedeGenerar&&<button className="app-button" disabled={ocupado} onClick={generar}>{ocupado?'Generando…':'Generar informe'}</button>}
   </>}
   {informe&&<>
-   <button type="button" className="app-button informe-pdf__exportar" onClick={()=>window.print()}>Exportar informe a PDF</button>
+   <button type="button" className="app-button informe-pdf__exportar" onClick={exportarInformePdf}>Exportar informe a PDF</button>
    <div className="informe-pdf__contenido">
    <header className="informe-pdf__cabecera"><p className="informe-pdf__rotulo">Sistema de Homologación FISEI-UTA</p><h2>Informe técnico de homologación</h2>
     <p>Solicitud: {informe.solicitudId} · Tipo de cambio: {informe.tipoCambio}</p>
