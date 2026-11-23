@@ -37,17 +37,17 @@ function exportarInformePdf(){
     body{margin:0!important;color:#172522!important;background:#fff!important}
     body *{visibility:visible!important}
     .informe-pdf__contenido{display:block!important;position:static!important;inset:auto!important;width:100%!important;max-height:none!important;overflow:visible!important;color:#172522!important;background:#fff!important;font-size:8pt!important}
-    .informe-pdf__cabecera{break-inside:avoid;page-break-inside:avoid}
+    .informe-pdf__cabecera{break-inside:avoid;page-break-inside:avoid;border-top:8px solid #176b5b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .informe-pdf__contenido table{display:table!important;width:100%!important;table-layout:fixed!important;border-collapse:collapse!important;break-inside:auto!important;page-break-inside:auto!important}
     .informe-pdf__contenido thead{display:table-header-group}
-    .informe-pdf__contenido tr{break-inside:auto!important;page-break-inside:auto!important}
-    .informe-pdf__contenido th,.informe-pdf__contenido td{padding:4px!important;font-size:7.5pt!important;vertical-align:top!important;overflow-wrap:anywhere!important;word-break:normal!important}
-    .informe-pdf__contenido th:nth-child(1),.informe-pdf__contenido td:nth-child(1){width:13%}
-    .informe-pdf__contenido th:nth-child(2),.informe-pdf__contenido td:nth-child(2){width:14%}
-    .informe-pdf__contenido th:nth-child(3),.informe-pdf__contenido td:nth-child(3){width:12%}
-    .informe-pdf__contenido th:nth-child(4),.informe-pdf__contenido td:nth-child(4){width:15%}
-    .informe-pdf__contenido th:nth-child(5),.informe-pdf__contenido td:nth-child(5){width:34%}
-    .informe-pdf__contenido th:nth-child(6),.informe-pdf__contenido td:nth-child(6){width:12%}
+    .informe-pdf__contenido tr{break-inside:avoid!important;page-break-inside:avoid!important}
+    .informe-pdf__contenido th,.informe-pdf__contenido td{padding:5px!important;font-size:7.5pt!important;vertical-align:top!important;overflow-wrap:break-word!important;word-break:normal!important;white-space:normal!important}
+    .informe-pdf__contenido col.informe-col--asignatura{width:16%}
+    .informe-pdf__contenido col.informe-col--receptora{width:18%}
+    .informe-pdf__contenido col.informe-col--agente{width:11%}
+    .informe-pdf__contenido col.informe-col--porcentajes{width:15%}
+    .informe-pdf__contenido col.informe-col--docentes{width:29%}
+    .informe-pdf__contenido col.informe-col--sugerencia{width:11%}
     .informe-pdf__contenido ul{margin:0;padding-left:14px}
    }
   </style></head><body>${contenido.outerHTML}</body></html>`);
@@ -118,6 +118,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
    </header>
    <p>Parejas analizadas: {informe.parejas.length} · Convalidar: {informe.convalidar} · No convalidar: {informe.noConvalidar} · Sin acuerdo: {informe.sinAcuerdo}.</p>
    <div className="solicitudes-table"><table><caption>Informe de homologación por pareja</caption>
+    <colgroup><col className="informe-col--asignatura"/><col className="informe-col--receptora"/><col className="informe-col--agente"/><col className="informe-col--porcentajes"/><col className="informe-col--docentes"/><col className="informe-col--sugerencia"/></colgroup>
     <thead><tr><th>Asignatura aprobada</th><th>Receptora</th><th>Agente</th><th>Porcentajes (académico · horas · créditos)</th><th>Docentes</th><th>Sugerencia final</th></tr></thead>
     <tbody>{informe.parejas.map(p=><tr key={`${p.asignaturaAprobadaId}/${p.asignaturaReceptoraId}`}>
      <td>{nombre(p.asignaturaAprobadaId)}</td>
