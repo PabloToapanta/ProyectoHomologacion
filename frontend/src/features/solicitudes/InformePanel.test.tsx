@@ -55,6 +55,9 @@ it('exporta únicamente cuando el informe ya existe e imprime los datos y advert
  expect(screen.getByText(/no es una resolución oficial/i)).toBeInTheDocument();
  expect(screen.getByRole('table')).toHaveTextContent('90 %');
  await user.click(exportar);expect(imprimir).toHaveBeenCalledOnce();
+ expect(screen.getAllByRole('table',{name:'Informe de homologación por pareja'})).toHaveLength(2);
+ window.dispatchEvent(new Event('afterprint'));
+ expect(screen.getAllByRole('table',{name:'Informe de homologación por pareja'})).toHaveLength(1);
  rerender(<InformePanel request={vi.fn(async()=>json({title:'No generado'},404))} solicitudId="sol-b" aprobadas={aprobadas}/>);
  expect(await screen.findByText(/aún no se ha generado/)).toBeInTheDocument();
  expect(screen.queryByRole('button',{name:'Exportar informe a PDF'})).not.toBeInTheDocument();
