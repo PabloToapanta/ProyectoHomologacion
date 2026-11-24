@@ -12,8 +12,10 @@ public sealed class ContextoAnalisisInternoController(AsignaturaService asignatu
     IUnidadRepository unidades, ComparacionCatalogoService comparaciones) : ControllerBase
 {
     /// <summary>Lista las receptoras de la carrera ya verificada en la solicitud.</summary>
+    /// <remarks>HU-07: solo las de la malla vigente, que es el destino del estudiante. Sin malla vigente devuelve [] y no infiere otra versión.</remarks>
     [HttpGet("/api/carreras/{id:guid}/analisis-interno/asignaturas"), ProducesResponseType(typeof(IReadOnlyList<AsignaturaDto>), 200)]
-    public async Task<IActionResult> Receptoras(Guid id, CancellationToken ct) => Ok(await asignaturas.ListarAsync(id, ct));
+    public async Task<IActionResult> Receptoras(Guid id, CancellationToken ct) =>
+        Ok((await asignaturas.ListarAsync(id, ct)).Where(a => a.Malla?.Vigente == true).ToArray());
     /// <summary>Lee el programa actual, sus unidades de medida y textos académicos.</summary>
     [HttpGet("contexto"), ProducesResponseType(typeof(AsignaturaContextoInterno), 200)]
     public async Task<IActionResult> Contexto(Guid id, CancellationToken ct)
