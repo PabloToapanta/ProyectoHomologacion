@@ -88,3 +88,7 @@ La versión debe quedar guardada con cada análisis nuevo para que activar otra 
 - No se ha migrado ni accedido a una base persistente. No se ejecutó SQL Server ni navegador para HU-07. El frontend no cambió; no se atribuyen a esta entrega pruebas de UI ni chequeo de tipos.
 
 El primer incremento anterior queda como evidencia histórica. Para el incremento actual, consultar [evidencia T58/T59](evidencia-hu-07-t58-t59.md). Actualización: el contrato de instantáneas fue aprobado e implementado. Ver [evidencia CA3](evidencia-hu-07-ca3.md) para los resultados posteriores a incorporar develop 1542986. Pendientes revisión cruzada del incremento, respaldo/restauración antes de una base persistente y aceptación de Shirley. No se declara HU-07 aceptada.
+
+## Conciliación del 23/11
+
+Se resolvió el solapamiento de CA3 con la implementación de Pablo ya integrada en develop 6842f94, manteniendo un único contrato y la compatibilidad del JSON previo. Se conservaron las correcciones de impresión HU-24 y todas las pruebas. Ver [evidencia de conciliación](evidencia-hu-07-conciliacion-20261123.md). La aceptación humana sigue pendiente.

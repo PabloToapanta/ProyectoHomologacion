@@ -12,6 +12,24 @@ namespace Homologacion.Application.Tests;
 
 public class MallasAnalisisTests
 {
+    [Fact]
+    public void JSON_publicado_antes_de_conciliar_conserva_los_dos_espacios_de_identificadores()
+    {
+        var aprobada = Guid.NewGuid(); var catalogo = Guid.NewGuid(); var malla = Guid.NewGuid(); var carrera = Guid.NewGuid();
+        // Orden de campos de la PR #96 antes del merge: aprobada primero, Catálogo después.
+        var contenido = """
+            {"origenes":[{"asignaturaAprobadaId":"@aprobada@","asignaturaCatalogoId":"@catalogo@",
+            "malla":{"id":"@malla@","carreraId":"@carrera@","nombre":"Plan conservado","vigenteAlAnalizar":false}}],"receptoras":[]}
+            """.Replace("@aprobada@", aprobada.ToString()).Replace("@catalogo@", catalogo.ToString())
+            .Replace("@malla@", malla.ToString()).Replace("@carrera@", carrera.ToString());
+        var leidas = JsonSerializer.Deserialize<MallasAnalisis>(contenido, Json)!;
+        var origen = Assert.Single(leidas.Origenes);
+        Assert.Equal(aprobada, origen.AsignaturaAprobadaId);
+        Assert.Equal(catalogo, origen.AsignaturaCatalogoId);
+        Assert.Equal(malla, origen.Malla!.Id);
+        Assert.False(origen.Malla.VigenteAlAnalizar);
+    }
+
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private sealed class ParametrosFijos : Homologacion.Application.Configuracion.IParametrosHomologacionProvider
     {
@@ -75,9 +93,10 @@ public class MallasAnalisisTests
         var grupo = GrupoAgrupacion.Crear(EscenarioInterno.SolicitudId, [EscenarioInterno.AprobadaId], [EscenarioInterno.ReceptoraId, r2],
             [new(EscenarioInterno.AprobadaId, EscenarioInterno.ReceptoraId, 40, 4), new(EscenarioInterno.AprobadaId, r2, 40, 4)]);
         var entrada = await new PrepararAgrupacion(e, new RelojAnalisis()).ConstruirAsync(e.Solicitud!, grupo, ParametrosHomologacion.Predeterminados(), default);
-        Assert.Equal(EscenarioInterno.AprobadaId, Assert.Single(entrada.Mallas.Origenes).AsignaturaAprobadaId);
-        Assert.Equal(EscenarioInterno.OrigenId, entrada.Mallas.Origenes[0].AsignaturaCatalogoId);
-        Assert.Equal(2, entrada.Mallas.Receptoras.Count);
+        var mallasGrupo = Assert.IsType<MallasAnalisis>(entrada.Mallas);
+        Assert.Equal(EscenarioInterno.AprobadaId, Assert.Single(mallasGrupo.Origenes).AsignaturaAprobadaId);
+        Assert.Equal(EscenarioInterno.OrigenId, mallasGrupo.Origenes[0].AsignaturaCatalogoId);
+        Assert.Equal(2, mallasGrupo.Receptoras.Count);
     }
 
     [Theory]

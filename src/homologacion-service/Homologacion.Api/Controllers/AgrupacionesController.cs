@@ -28,6 +28,7 @@ public sealed record GrupoResponse(Guid GrupoId, Guid SolicitudId, string Versio
 }
 public sealed record AnalisisAgrupacionGuardadoResponse(Guid SolicitudId, Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas, ResultadoAgrupacionResponse Evaluacion, DateTimeOffset Fecha)
 {
+    /// <summary>HU-07: fotografía de mallas por asignatura; null en históricos sin registro.</summary>
     public MallasAnalisis? Mallas { get; init; }
 }
 public sealed record ResultadoAgrupacionResponse(IReadOnlyList<EvaluarResponse> Receptoras, decimal UmbralPct, string Estado, string Justificacion,

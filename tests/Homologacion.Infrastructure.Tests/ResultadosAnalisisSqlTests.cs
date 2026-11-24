@@ -73,8 +73,11 @@ public class ResultadosAnalisisSqlTests
         var options = new DbContextOptionsBuilder<ResultadosDbContext>().UseSqlite(connection).Options;
         var version = Guid.NewGuid();
         var original = Resultado();
-        var resultado = original with { Analisis = original.Analisis with
-            { Evaluacion = original.Analisis.Evaluacion with { ConfiguracionVersionId = version } } };
+        var resultado = original with
+        {
+            Analisis = original.Analisis with
+            { Evaluacion = original.Analisis.Evaluacion with { ConfiguracionVersionId = version } }
+        };
         await using (var db = new ResultadosDbContext(options))
         {
             await db.Database.EnsureCreatedAsync();
@@ -94,6 +97,51 @@ public class ResultadosAnalisisSqlTests
             var guardado = Assert.Single(await new ResultadosAnalisisSql(db).ListarAsync(resultado.Analisis.SolicitudId, default));
             Assert.Equal(version, guardado.Analisis.Evaluacion.ConfiguracionVersionId);
             Assert.Equal(resultado.Analisis.Evaluacion.UmbralPct, guardado.Analisis.Evaluacion.UmbralPct);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Mallas_se_conservan_al_reabrir_y_JSON_historico_sin_campo_se_lee(bool externo)
+    {
+        using var connection = new SqliteConnection("Data Source=:memory:"); await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ResultadosDbContext>().UseSqlite(connection).Options;
+        var original = Resultado();
+        var mallas = new MallasAnalisis(
+            [new(externo ? null : Guid.NewGuid(), original.Analisis.AsignaturaAprobadaId,
+                externo ? null : new(Guid.NewGuid(), Guid.NewGuid(), "Plan anterior", false))],
+            [new(original.Analisis.AsignaturaReceptoraId, null, new(Guid.NewGuid(), Guid.NewGuid(), "Plan receptor", true))]);
+        var resultado = original with { Analisis = original.Analisis with { Mallas = mallas } };
+        await using (var db = new ResultadosDbContext(options))
+        {
+            await db.Database.EnsureCreatedAsync();
+            if (externo) await new Homologacion.Infrastructure.AnalisisExterno.ResultadosAnalisisExternoSql(db).GuardarAsync(resultado, default);
+            else await new ResultadosAnalisisSql(db).GuardarAsync(resultado, default);
+        }
+        await using (var db = new ResultadosDbContext(options))
+        {
+            var listado = externo
+                ? await new Homologacion.Infrastructure.AnalisisExterno.ResultadosAnalisisExternoSql(db).ListarAsync(resultado.Analisis.SolicitudId, default)
+                : await new ResultadosAnalisisSql(db).ListarAsync(resultado.Analisis.SolicitudId, default);
+            var guardado = Assert.Single(listado);
+            Assert.Equal(mallas.Origenes, guardado.Analisis.Mallas!.Origenes);
+            Assert.Equal(mallas.Receptoras, guardado.Analisis.Mallas.Receptoras);
+            Assert.Equal(original.Analisis.Evaluacion.Estado, guardado.Analisis.Evaluacion.Estado);
+            // Reproduce una fila histórica real, eliminando el campo aditivo del JSON persistido.
+            IRegistroAnalisis fila = externo ? await db.ResultadosExternos.SingleAsync() : await db.Resultados.SingleAsync();
+            var json = System.Text.Json.Nodes.JsonNode.Parse(fila.Contenido)!.AsObject(); json.Remove("mallas");
+            fila.Contenido = json.ToJsonString(); await db.SaveChangesAsync();
+        }
+        await using (var db = new ResultadosDbContext(options))
+        {
+            var listado = externo
+                ? await new Homologacion.Infrastructure.AnalisisExterno.ResultadosAnalisisExternoSql(db).ListarAsync(resultado.Analisis.SolicitudId, default)
+                : await new ResultadosAnalisisSql(db).ListarAsync(resultado.Analisis.SolicitudId, default);
+            var historico = Assert.Single(listado);
+            Assert.Null(historico.Analisis.Mallas);
+            Assert.Equal(original.Analisis.Estado, historico.Analisis.Estado);
+            Assert.Equal(original.Analisis.Evaluacion.Justificacion, historico.Analisis.Evaluacion.Justificacion);
         }
     }
 

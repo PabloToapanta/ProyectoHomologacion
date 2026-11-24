@@ -29,6 +29,7 @@ public sealed record GrupoEnInforme(Guid GrupoId, IReadOnlyList<Guid> Asignatura
 public sealed record AnalisisAgrupacionGuardado(Guid SolicitudId, Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas,
     ResultadoAgrupacion Evaluacion, DateTimeOffset Fecha)
 {
+    /// <summary>HU-07: versiones capturadas al analizar; null en históricos. El informe debe consumir esta fotografía.</summary>
     public MallasAnalisis? Mallas { get; init; }
 }
 public sealed record RevisionAgrupacionRegistrada(Guid SolicitudId, Guid GrupoId, Guid DocenteId,
@@ -150,7 +151,7 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
         // HU-07 / HU-22: exclusivamente la vigencia capturada al analizar, nunca Carrera.Vigencia ni una consulta actual.
         var mallasOrigen = lista.SelectMany(p => p.Mallas?.Origenes ?? [])
             .Concat(grupos.SelectMany(g => g.Mallas?.Origenes ?? []))
-            .Select(o => o.Malla).OfType<MallaAnalisis>().Where(m => !m.VigenteAlAnalizar).DistinctBy(m => m.Id);
+            .Select(o => o.Malla).OfType<InstantaneaMalla>().Where(m => !m.VigenteAlAnalizar).DistinctBy(m => m.Id);
         foreach (var malla in mallasOrigen)
             advertencias.Add($"Malla de origen no vigente al analizar: {malla.Nombre} ({malla.Id}). La carrera debe confirmar la ruta de cambio de plan de estudios y su tabla de homologación para este caso. Alerta informativa de HU-22; no bloquea ni modifica el veredicto. Regla de análisis del proyecto pendiente de confirmación institucional.");
         ParametrosHomologacion? parametros;

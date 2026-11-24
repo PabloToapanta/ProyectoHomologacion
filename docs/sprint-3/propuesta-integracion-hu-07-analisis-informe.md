@@ -50,6 +50,6 @@ Las comprobaciones y los límites reales están en la evidencia CA3. No se atrib
 
 ## Forma implementada de la instantánea
 
-Las respuestas y los JSON guardados añaden `mallas` nullable. Contiene `origenes[]` y `receptoras[]`; cada entrada tiene `asignaturaAprobadaId` nullable, `asignaturaCatalogoId` nullable y `malla` nullable con `id`, `carreraId`, `nombre` y `vigenteAlAnalizar`. En Application, los tipos propios son MallaCatalogoAnalisis (entrada), MallaAnalisis (instantánea), AsignaturaMallaAnalisis y MallasAnalisis.
+Las respuestas y los JSON guardados añaden `mallas` nullable. Contiene `origenes[]` y `receptoras[]`; cada entrada tiene `asignaturaAprobadaId` nullable, `asignaturaCatalogoId` nullable y `malla` nullable con `id`, `carreraId`, `nombre` y `vigenteAlAnalizar`. En Application, los tipos propios, unificados con develop el 23/11, son MallaParaAnalisis (entrada), InstantaneaMalla (instantánea), MallaAsignaturaAnalizada y MallasAnalisis.
 
 El informe copia este objeto desde el análisis guardado. La alerta de HU-22 se calcula desde sus orígenes con `vigenteAlAnalizar: false`; la ausencia de versión nunca se convierte en false. Esta ampliación usa los JSON existentes y no requiere una migración nueva de Homologación.

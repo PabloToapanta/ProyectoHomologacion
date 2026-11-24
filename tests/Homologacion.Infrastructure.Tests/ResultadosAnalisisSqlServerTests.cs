@@ -25,13 +25,13 @@ public class ResultadosAnalisisSqlServerTests
     public Task HU07_SQL_conserva_mallas_de_parejas_grupos_informe_y_lee_historicos() => EnBaseTemporal(async options =>
     {
         var s = Guid.NewGuid(); var a = Guid.NewGuid(); var r = Guid.NewGuid(); var ag = Guid.NewGuid(); var rg = Guid.NewGuid(); var rg2 = Guid.NewGuid();
-        var malla = new MallaAnalisis(Guid.NewGuid(), Guid.NewGuid(), "Plan guardado en SQL", false);
-        var mallas = new MallasAnalisis([new(a, Guid.NewGuid(), malla)], [new(null, r, malla with { VigenteAlAnalizar = true })]);
+        var malla = new InstantaneaMalla(Guid.NewGuid(), Guid.NewGuid(), "Plan guardado en SQL", false);
+        var mallas = new MallasAnalisis([new(Guid.NewGuid(), a, malla)], [new(r, null, malla with { VigenteAlAnalizar = true })]);
         var pareja = Resultado(s, a, r, "Completo", DateTimeOffset.UtcNow);
         pareja = pareja with { Analisis = pareja.Analisis with { Mallas = mallas } };
         var grupo = Homologacion.Domain.Agrupaciones.GrupoAgrupacion.Crear(s, [ag], [rg, rg2], [new(ag, rg, 1, 1), new(ag, rg2, 1, 1)]);
         grupo.Congelar();
-        var mg = new MallasAnalisis([new(ag, Guid.NewGuid(), malla)], [new(null, rg, malla), new(null, rg2, malla)]);
+        var mg = new MallasAnalisis([new(Guid.NewGuid(), ag, malla)], [new(rg, null, malla), new(rg2, null, malla)]);
         var evaluacion = new ResultadoAgrupacion([pareja.Analisis.Evaluacion], 80,
             Homologacion.Domain.Equivalencias.EstadoEquivalencia.Homologable, "Sin cambios", [], [], []);
         var analisisGrupo = new Homologacion.Application.Informe.AnalisisAgrupacionGuardado(s, grupo.GrupoId, [ag], evaluacion, DateTimeOffset.UtcNow) { Mallas = mg };
@@ -40,7 +40,7 @@ public class ResultadosAnalisisSqlServerTests
         { Grupos = [new(grupo.GrupoId, [ag], evaluacion.Receptoras, "Homologable", "Homologable", [], "Convalidar", [], [], "Agrupación") { Mallas = mg }] };
         var historico = Resultado(Guid.NewGuid(), Guid.NewGuid(), r, "Completo", DateTimeOffset.UtcNow);
         var externo = Resultado(Guid.NewGuid(), Guid.NewGuid(), r, "Incompleto", DateTimeOffset.UtcNow);
-        externo = externo with { Analisis = externo.Analisis with { Mallas = new([new(externo.Analisis.AsignaturaAprobadaId, null, null)], mallas.Receptoras) } };
+        externo = externo with { Analisis = externo.Analisis with { Mallas = new([new(null, externo.Analisis.AsignaturaAprobadaId, null)], mallas.Receptoras) } };
         var json = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web);
         await using (var db = new ResultadosDbContext(options))
         {

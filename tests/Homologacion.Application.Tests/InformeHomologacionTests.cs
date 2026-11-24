@@ -22,10 +22,10 @@ public class InformeHomologacionTests
         var (caso, f) = Caso();
         f.AnalisisAgente(A3, R1); f.Revision(Ana, A3, R1, "Homologable"); f.Revision(Luis, A3, R1, "Homologable");
         f.AnalisisGrupo(); f.RevisionGrupo(Ana, "Homologable"); f.RevisionGrupo(Luis, "Homologable");
-        MallaAnalisis? origen = vigente.HasValue ? new(Guid.NewGuid(), Carrera, "Plan de origen guardado", vigente.Value) : null;
-        var mallas = new MallasAnalisis([new(A3, Guid.NewGuid(), origen)], [new(null, R1, new(Guid.NewGuid(), Carrera, "Plan receptor guardado", true))]);
+        InstantaneaMalla? origen = vigente.HasValue ? new(Guid.NewGuid(), Carrera, "Plan de origen guardado", vigente.Value) : null;
+        var mallas = new MallasAnalisis([new(Guid.NewGuid(), A3, origen)], [new(R1, null, new(Guid.NewGuid(), Carrera, "Plan receptor guardado", true))]);
         f.Agente[0] = f.Agente[0] with { Analisis = f.Agente[0].Analisis with { Mallas = mallas } };
-        var grupales = new MallasAnalisis([new(A1, Guid.NewGuid(), origen), new(A2, Guid.NewGuid(), origen)], mallas.Receptoras);
+        var grupales = new MallasAnalisis([new(Guid.NewGuid(), A1, origen), new(Guid.NewGuid(), A2, origen)], mallas.Receptoras);
         f.AnalisisGrupos[0] = f.AnalisisGrupos[0] with { Mallas = grupales };
         var informe = await caso.GenerarAsync(Solicitud, Ana, "ana", default);
         Assert.Equal(mallas, Assert.Single(informe.Parejas).Mallas);

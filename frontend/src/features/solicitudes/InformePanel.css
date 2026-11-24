@@ -11,16 +11,39 @@
 
 @media print {
   @page { size: A4 landscape; margin: 14mm; }
-  body * { visibility: hidden !important; }
-  .informe-pdf, .informe-pdf * { visibility: visible !important; }
-  .informe-pdf { position: absolute !important; inset: 0 auto auto 0; width: 100%; color: #172522 !important; background: #fff !important; }
-  .informe-pdf__contenido { color: #172522 !important; background: #fff !important; font-size: 10pt; }
+  html, body { height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  body.informe-pdf--imprimiendo > * { display: none !important; }
+  body.informe-pdf--imprimiendo > .informe-pdf__impresion {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    color: #172522 !important;
+    background: #fff !important;
+    visibility: visible !important;
+  }
+  body.informe-pdf--imprimiendo > .informe-pdf__impresion * { visibility: visible !important; }
+  .informe-pdf__contenido { color: #172522 !important; background: #fff !important; font-size: 9pt; }
   .informe-pdf__exportar { display: none !important; }
-  .informe-pdf__cabecera { border-color: #9aa9a5 !important; border-top-color: #176b5b !important; padding: 10px 12px; }
+  .informe-pdf__cabecera { border-color: #9aa9a5 !important; border-top: 8px solid #176b5b !important; padding: 10px 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .informe-pdf__rotulo { color: #176b5b !important; }
   .informe-pdf__aviso, .informe-pdf__contenido th { color: #172522 !important; background: #eef2f1 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .informe-pdf__contenido tr { break-inside: avoid; page-break-inside: avoid; }
   .informe-pdf__contenido table { break-inside: auto; page-break-inside: auto; }
-  .informe-pdf__contenido th, .informe-pdf__contenido td { padding: 6px; border-color: #b9c3c0 !important; }
+  .informe-pdf__contenido table { display: table !important; width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
+  .informe-pdf__contenido thead { display: table-header-group; }
+  .informe-pdf__contenido th, .informe-pdf__contenido td { padding: 5px; border-color: #b9c3c0 !important; font-size: 8pt; vertical-align: top; overflow-wrap: break-word; word-break: normal; white-space: normal; }
+  .informe-pdf__contenido col.informe-col--asignatura { width: 16%; }
+  .informe-pdf__contenido col.informe-col--receptora { width: 18%; }
+  .informe-pdf__contenido col.informe-col--agente { width: 11%; }
+  .informe-pdf__contenido col.informe-col--porcentajes { width: 15%; }
+  .informe-pdf__contenido col.informe-col--docentes { width: 29%; }
+  .informe-pdf__contenido col.informe-col--sugerencia { width: 11%; }
+  .informe-pdf__contenido ul { margin: 0; padding-left: 14px; }
   a { color: inherit !important; text-decoration: none !important; }
 }

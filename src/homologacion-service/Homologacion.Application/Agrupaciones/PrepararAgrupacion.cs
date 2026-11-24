@@ -7,17 +7,17 @@ namespace Homologacion.Application.Agrupaciones;
 
 public sealed record EntradaAgrupacion(SolicitudAgrupacion Datos, IReadOnlyList<string> Advertencias)
 {
-    public MallasAnalisis Mallas { get; init; } = new([], []);
+    public MallasAnalisis? Mallas { get; init; }
 }
 public sealed class PrepararAgrupacion(ICatalogoAnalisisInterno catalogo, TimeProvider reloj)
 {
     public async Task<EntradaAgrupacion> ConstruirAsync(SolicitudParaAnalisis solicitud, GrupoAgrupacion grupo, ParametrosHomologacion parametros, CancellationToken ct)
     {
         var advertencias = new List<string>();
+        var mallasOrigen = new List<MallaAsignaturaAnalizada>();
+        var mallasReceptoras = new List<MallaAsignaturaAnalizada>();
         var origenes = new Dictionary<Guid, OrigenComparacion>();
         var programas = new Dictionary<Guid, AsignaturaParaAnalisis>();
-        var mallasOrigen = new List<AsignaturaMallaAnalisis>();
-        var mallasReceptoras = new List<AsignaturaMallaAnalisis>();
         foreach (var id in grupo.Origenes)
         {
             var a = solicitud.AsignaturasAprobadas.SingleOrDefault(a => a.Id == id) ?? throw new GrupoInvalidoException($"Origen {id}: no pertenece a la solicitud.");
@@ -31,16 +31,16 @@ public sealed class PrepararAgrupacion(ICatalogoAnalisisInterno catalogo, TimePr
                 Validar(p, catalogoId);
                 if (p.CarreraId != solicitud.CarreraOrigenId) throw new GrupoInvalidoException($"Origen {id}: carrera ajena a la solicitud.");
                 programas[id] = p;
-                mallasOrigen.Add(AsignaturaMallaAnalisis.Capturar(p, id));
+                mallasOrigen.Add(MallaAsignaturaAnalizada.Capturar(p, id));
                 datos = Datos(p) with { Id = id.ToString(), Horas = a.Horas, Creditos = a.Creditos };
                 if (p.Facultad != "FISEI" || !p.CarreraVigente || p.Horas != a.Horas || p.Creditos != a.Creditos)
                 { datos = datos with { PlanAnalitico = null }; advertencias.Add($"Origen {id}: revisar histórico, vigencia o diferencias con catálogo; no se reasigna."); }
             }
             else
             {
+                mallasOrigen.Add(MallaAsignaturaAnalizada.Capturar(null, id));
                 // D2: no existe programa analítico externo registrado. No se inventan elementos ni unidades.
                 datos = new(id.ToString(), null, a.Horas, null, a.Creditos, null, [], []);
-                mallasOrigen.Add(AsignaturaMallaAnalisis.Capturar(null, id));
                 advertencias.Add($"Origen {id}: información incompleta; falta programa analítico de origen externo (D2).");
             }
             bool? elegible = null;
@@ -61,8 +61,8 @@ public sealed class PrepararAgrupacion(ICatalogoAnalisisInterno catalogo, TimePr
         {
             var p = await catalogo.ObtenerAsignaturaAsync(id, ct) ?? throw new GrupoInvalidoException($"Receptora {id}: inexistente.");
             Validar(p, id);
-            mallasReceptoras.Add(AsignaturaMallaAnalisis.Capturar(p));
             if (p.CarreraId != solicitud.CarreraReceptoraId) throw new GrupoInvalidoException($"Receptora {id}: carrera ajena a la solicitud.");
+            mallasReceptoras.Add(MallaAsignaturaAnalizada.Capturar(p));
             receptoras[id] = Datos(p) with { PlanAnalitico = p.Facultad == "FISEI" && p.CarreraVigente ? p.PlanAnalitico : null };
         }
         var aportes = new List<AporteAgrupacion>();

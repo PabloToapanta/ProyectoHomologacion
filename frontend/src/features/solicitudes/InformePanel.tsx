@@ -23,6 +23,22 @@ const decisiones={Homologable:'Homologable',NoHomologable:'No homologable'} as c
 const finales={Convalidar:'Convalidar',NoConvalidar:'No convalidar',SinAcuerdo:'Sin acuerdo'} as const;
 const pct=(v:number|null)=>v===null?'—':`${v.toLocaleString('es-EC',{maximumFractionDigits:2})} %`;
 
+function exportarInformePdf(){
+ const contenido=document.querySelector<HTMLElement>('.informe-pdf__contenido');
+ if(!contenido){window.print();return;}
+ const impresion=contenido.cloneNode(true) as HTMLElement;
+ impresion.classList.add('informe-pdf__impresion');
+ document.body.classList.add('informe-pdf--imprimiendo');
+ document.body.append(impresion);
+ const limpiar=()=>{
+  impresion.remove();
+  document.body.classList.remove('informe-pdf--imprimiendo');
+  window.removeEventListener('afterprint',limpiar);
+ };
+ window.addEventListener('afterprint',limpiar,{once:true});
+ window.print();
+}
+
 type Remision={solicitudId:string;fecha:string;remitidoPorId:string;remitidoPor:string};
 
 /** HU-23: informe fijo; HU-32 añade la remisión del docente asignado; puede deshabilitarse para la vista del coordinador. */
@@ -72,7 +88,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
    {puedeGenerar&&<button className="app-button" disabled={ocupado} onClick={generar}>{ocupado?'Generando…':'Generar informe'}</button>}
   </>}
   {informe&&<>
-   <button type="button" className="app-button informe-pdf__exportar" onClick={()=>window.print()}>Exportar informe a PDF</button>
+   <button type="button" className="app-button informe-pdf__exportar" onClick={exportarInformePdf}>Exportar informe a PDF</button>
    <div className="informe-pdf__contenido">
    <header className="informe-pdf__cabecera"><p className="informe-pdf__rotulo">Sistema de Homologación FISEI-UTA</p><h2>Informe técnico de homologación</h2>
     <p>Solicitud: {informe.solicitudId} · Tipo de cambio: {informe.tipoCambio}</p>
@@ -81,6 +97,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
    </header>
    <p>Parejas analizadas: {informe.parejas.length} · Convalidar: {informe.convalidar} · No convalidar: {informe.noConvalidar} · Sin acuerdo: {informe.sinAcuerdo}.</p>
    <div className="solicitudes-table"><table><caption>Informe de homologación por pareja</caption>
+    <colgroup><col className="informe-col--asignatura"/><col className="informe-col--receptora"/><col className="informe-col--agente"/><col className="informe-col--porcentajes"/><col className="informe-col--docentes"/><col className="informe-col--sugerencia"/></colgroup>
     <thead><tr><th>Asignatura aprobada</th><th>Receptora</th><th>Agente</th><th>Porcentajes (académico · horas · créditos)</th><th>Docentes</th><th>Sugerencia final</th></tr></thead>
     <tbody>{informe.parejas.map(p=><tr key={`${p.asignaturaAprobadaId}/${p.asignaturaReceptoraId}`}>
      <td>{nombre(p.asignaturaAprobadaId)}<MallasAnalisisResumen mallas={p.mallas}/></td>
