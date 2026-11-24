@@ -16,7 +16,11 @@ public sealed class CarreraRepository(CatalogoDbContext db) : ICarreraRepository
 
     public async Task GuardarAsync(Carrera carrera, bool nueva, CancellationToken ct)
     {
-        if (nueva) db.Carreras.Add(carrera);
+        if (nueva)
+        {
+            db.Carreras.Add(carrera);
+            db.Mallas.Add(new Malla(carrera.Id, "Inicial", true));
+        }
         try { await db.SaveChangesAsync(ct); }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 2601 or 2627 })
         {

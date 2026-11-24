@@ -48,6 +48,9 @@ namespace Catalogo.Infrastructure.Migrations
                     b.Property<int>("Horas")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("MallaId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Nivel")
                         .HasColumnType("int");
 
@@ -58,7 +61,11 @@ namespace Catalogo.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CarreraId", "CodigoNormalizado")
+                    b.HasIndex("CarreraId");
+
+                    b.HasIndex("MallaId", "CarreraId");
+
+                    b.HasIndex("MallaId", "CodigoNormalizado")
                         .IsUnique();
 
                     b.ToTable("Asignaturas", null, t =>
@@ -140,6 +147,40 @@ namespace Catalogo.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Contenidos", (string)null);
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.Malla", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CarreraId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NombreNormalizado")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<bool>("Vigente")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarreraId")
+                        .IsUnique()
+                        .HasFilter("[Vigente] = 1");
+
+                    b.HasIndex("CarreraId", "NombreNormalizado")
+                        .IsUnique();
+
+                    b.ToTable("Mallas", (string)null);
                 });
 
             modelBuilder.Entity("Catalogo.Domain.PerfilComparacion", b =>
@@ -312,6 +353,13 @@ namespace Catalogo.Infrastructure.Migrations
                         .HasForeignKey("CarreraId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Catalogo.Domain.Malla", null)
+                        .WithMany()
+                        .HasForeignKey("MallaId", "CarreraId")
+                        .HasPrincipalKey("Id", "CarreraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Catalogo.Domain.Contenido", b =>
@@ -326,6 +374,15 @@ namespace Catalogo.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("UnidadTematicaId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.Malla", b =>
+                {
+                    b.HasOne("Catalogo.Domain.Carrera", null)
+                        .WithMany()
+                        .HasForeignKey("CarreraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Catalogo.Domain.PerfilComparacion", b =>

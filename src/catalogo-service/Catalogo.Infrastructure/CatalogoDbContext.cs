@@ -7,6 +7,7 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
 {
     public DbSet<Carrera> Carreras => Set<Carrera>();
     public DbSet<Asignatura> Asignaturas => Set<Asignatura>();
+    public DbSet<Malla> Mallas => Set<Malla>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,6 +43,18 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
         }
         carrera.HasIndex(c => new { c.NombreNormalizado, c.FacultadNormalizada }).IsUnique();
 
+        var malla = modelBuilder.Entity<Malla>();
+        malla.ToTable("Mallas");
+        malla.HasKey(m => m.Id);
+        malla.Property(m => m.Id).ValueGeneratedNever();
+        malla.HasAlternateKey(m => new { m.Id, m.CarreraId });
+        malla.Property(m => m.Nombre).HasMaxLength(100).IsRequired();
+        malla.Property(m => m.NombreNormalizado).HasMaxLength(100).IsRequired();
+        if (Database.IsSqlServer()) malla.Property(m => m.NombreNormalizado).UseCollation("Latin1_General_100_BIN2");
+        malla.HasIndex(m => new { m.CarreraId, m.NombreNormalizado }).IsUnique();
+        malla.HasIndex(m => m.CarreraId).IsUnique().HasFilter("[Vigente] = 1");
+        malla.HasOne<Carrera>().WithMany().HasForeignKey(m => m.CarreraId).OnDelete(DeleteBehavior.Cascade);
+
         var asignatura = modelBuilder.Entity<Asignatura>();
         asignatura.ToTable("Asignaturas", t =>
         {
@@ -56,7 +69,9 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
         if (Database.IsSqlServer()) asignatura.Property(a => a.CodigoNormalizado).UseCollation("Latin1_General_100_BIN2");
         asignatura.Property(a => a.Nombre).HasMaxLength(200).IsRequired();
         asignatura.Property(a => a.Creditos).HasPrecision(9, 2);
-        asignatura.HasIndex(a => new { a.CarreraId, a.CodigoNormalizado }).IsUnique();
+        asignatura.HasIndex(a => new { a.MallaId, a.CodigoNormalizado }).IsUnique();
+        asignatura.HasOne<Malla>().WithMany().HasForeignKey(a => new { a.MallaId, a.CarreraId })
+            .HasPrincipalKey(m => new { m.Id, m.CarreraId }).OnDelete(DeleteBehavior.Restrict);
         asignatura.HasOne<Carrera>().WithMany().HasForeignKey(a => a.CarreraId).OnDelete(DeleteBehavior.Restrict);
         var unidad = modelBuilder.Entity<UnidadCurricular>();
         unidad.ToTable("UnidadesCurriculares", t => {

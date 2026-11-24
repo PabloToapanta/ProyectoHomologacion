@@ -13,7 +13,10 @@ public sealed record ResultadoAnalisisArchivo(string Archivo, string Estado, str
 public sealed record ResultadoAnalisisLote(Guid CarreraId, IReadOnlyList<ResultadoAnalisisArchivo> Archivos);
 public sealed record UnidadConfirmada(int Numero, string Nombre, int Horas, string ResultadoAprendizaje, IReadOnlyList<TematicaDatos> Tematicas);
 /// <summary>Borrador revisado y corregido por el Administrador.</summary>
-public sealed record ProgramaConfirmado(Guid CarreraId, string Codigo, string Nombre, int Nivel, decimal Creditos, int Horas, IReadOnlyList<UnidadConfirmada> Unidades);
+public sealed record ProgramaConfirmado(Guid CarreraId, string Codigo, string Nombre, int Nivel, decimal Creditos, int Horas, IReadOnlyList<UnidadConfirmada> Unidades)
+{
+    public Guid? MallaId { get; init; }
+}
 
 public interface IImportacionProgramasRepository
 {
@@ -24,7 +27,7 @@ public interface IImportacionProgramasRepository
 
 /// <summary>HU-08 / Issue #50: carga masiva de programas analíticos FISEI con revisión humana antes de guardar.</summary>
 public sealed class ImportacionProgramasService(IExtractorTextoPdf extractor, ICarreraRepository carreras,
-    IAsignaturaRepository asignaturas, IImportacionProgramasRepository importaciones, TimeProvider reloj)
+    IAsignaturaRepository asignaturas, IImportacionProgramasRepository importaciones, TimeProvider reloj, IMallaRepository mallas)
 {
     /// <summary>Admite la malla completa de una carrera en un lote (los planes FISEI pesan unos 40 KB).</summary>
     public const int MaxArchivos = 50;
@@ -36,6 +39,7 @@ public sealed class ImportacionProgramasService(IExtractorTextoPdf extractor, IC
         if (archivos is null || archivos.Count is 0 or > MaxArchivos)
             throw new CatalogoException("validacion", $"Selecciona entre 1 y {MaxArchivos} archivos PDF.");
         await VerificarCarrera(carreraId, ct);
+        var malla = await MallaService.ResolverAsync(mallas, carreraId, null, ct);
         var resultados = new List<ResultadoAnalisisArchivo>();
         foreach (var archivo in archivos)
         {
@@ -51,8 +55,8 @@ public sealed class ImportacionProgramasService(IExtractorTextoPdf extractor, IC
             var borrador = AnalizadorPlanAnaliticoFisei.Analizar(extraccion.Palabras);
             if (borrador is null)
             { resultados.Add(new(nombre, "Invalido", "El documento no sigue el formato del plan analítico FISEI.", null)); continue; }
-            if (borrador.Codigo is not null && await asignaturas.ExisteCodigoAsync(carreraId, Normalizar(borrador.Codigo), ct))
-                borrador = borrador with { Advertencias = [.. borrador.Advertencias, "El código ya existe en la carrera: la confirmación será rechazada sin sobrescribir."] };
+            if (borrador.Codigo is not null && await asignaturas.ExisteCodigoAsync(carreraId, Normalizar(borrador.Codigo), ct, malla.Id))
+                borrador = borrador with { Advertencias = [.. borrador.Advertencias, "El código ya existe en la malla vigente: la confirmación será rechazada sin sobrescribir."] };
             resultados.Add(new(nombre, "Borrador", borrador.Faltantes.Count == 0
                 ? "Borrador listo para revisar." : "Borrador con datos no encontrados: complételos antes de confirmar.", borrador));
         }
@@ -81,11 +85,13 @@ public sealed class ImportacionProgramasService(IExtractorTextoPdf extractor, IC
             return unidad;
         }).ToList();
         await VerificarCarrera(programa.CarreraId, ct);
-        if (await asignaturas.ExisteCodigoAsync(programa.CarreraId, asignatura.CodigoNormalizado, ct))
-            throw new CatalogoException("duplicado", "Ya existe una asignatura con ese código en la carrera.");
+        var malla = await MallaService.ResolverAsync(mallas, programa.CarreraId, programa.MallaId, ct);
+        asignatura.AsignarMalla(malla);
+        if (await asignaturas.ExisteCodigoAsync(programa.CarreraId, asignatura.CodigoNormalizado, ct, malla.Id))
+            throw new CatalogoException("duplicado", "Ya existe una asignatura con ese código en la malla.");
         var pdf = new ProgramaAnalitico(asignatura.Id, archivo.Nombre, archivo.Contenido, reloj.GetUtcNow(), usuario);
         await importaciones.GuardarAsync(asignatura, unidades, pdf, ct);
-        return AsignaturaDto.From(asignatura);
+        return AsignaturaDto.From(asignatura, malla);
     }
 
     public Task<ProgramaAnalitico?> ObtenerProgramaAsync(Guid asignaturaId, CancellationToken ct) => importaciones.ObtenerProgramaAsync(asignaturaId, ct);

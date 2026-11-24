@@ -22,9 +22,14 @@ public class AgrupacionesEndpointTests
     {
         using var connection = new SqliteConnection("Data Source=:memory:"); await connection.OpenAsync();
         using var f = new MotorFactory(); var e = new EscenarioInterno();
+        var mallaOrigen = Guid.NewGuid();
+        foreach (var idMateria in e.Materias.Keys.ToArray())
+        {
+            var materia = e.Materias[idMateria];
+            e.Materias[idMateria] = materia with { Malla = new(idMateria == EscenarioInterno.OrigenId ? mallaOrigen : Guid.NewGuid(), materia.CarreraId, "Plan capturado HU07", idMateria != EscenarioInterno.OrigenId) };
+        }
         e.Solicitud = e.Solicitud! with { AsignaturasAprobadas = [e.Solicitud!.AsignaturasAprobadas[0] with { IntentoMatricula = 1 }] };
-        foreach (var idM in e.Materias.Keys.ToArray())
-            e.Materias[idM] = e.Materias[idM] with { Malla = new(Guid.NewGuid(), e.Materias[idM].CarreraId, "Plan de grupo", true) };
+        // Un solo fixture de mallas para ambas series de aserciones; no sobrescribir sus identificadores.
         var r2 = Guid.NewGuid(); e.Materias[r2] = e.Materias[EscenarioInterno.ReceptoraId] with { Id = r2 };
         using var host = f.WithWebHostBuilder(b => b.ConfigureServices(services =>
         {
@@ -96,6 +101,9 @@ public class AgrupacionesEndpointTests
         using (var persistido = JsonDocument.Parse(await c.GetStringAsync(detalle)))
             Assert.Contains(persistido.RootElement.GetProperty("ultimoAnalisis").GetProperty("evaluacion").GetProperty("informacionFaltante").EnumerateArray(), x => x.GetString()!.Contains("tercera matrícula"));
         var revision = new { postura = "Ajuste", decision = "NoHomologable", observacion = "Revisión sintética del grupo" };
+        // Simula activar otra versión en Catálogo después del último análisis guardado.
+        var origenActual = e.Materias[EscenarioInterno.OrigenId];
+        e.Materias[origenActual.Id] = origenActual with { Malla = origenActual.Malla! with { Vigente = true } };
         Assert.Equal(HttpStatusCode.OK, (await c.PutAsJsonAsync(detalle + "/revisiones", revision)).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await c.PutAsJsonAsync(detalle + "/revisiones", revision)).StatusCode);
         // Una pareja histórica no se convierte en grupo; el informe debe leer ambas fuentes reales de DI.
@@ -111,6 +119,11 @@ public class AgrupacionesEndpointTests
         using var generado = await c.PostAsync(informe, null); Assert.Equal(HttpStatusCode.Created, generado.StatusCode);
         using var i = JsonDocument.Parse(await generado.Content.ReadAsStringAsync()); Assert.Single(i.RootElement.GetProperty("grupos").EnumerateArray());
         Assert.Single(i.RootElement.GetProperty("parejas").EnumerateArray());
+        var mallasGuardadas = i.RootElement.GetProperty("grupos")[0].GetProperty("mallas");
+        Assert.Equal(mallaOrigen, mallasGuardadas.GetProperty("origenes")[0].GetProperty("malla").GetProperty("id").GetGuid());
+        Assert.False(mallasGuardadas.GetProperty("origenes")[0].GetProperty("malla").GetProperty("vigenteAlAnalizar").GetBoolean());
+        Assert.Equal(2, mallasGuardadas.GetProperty("receptoras").GetArrayLength());
+        Assert.Equal(JsonValueKind.Null, i.RootElement.GetProperty("parejas")[0].GetProperty("mallas").ValueKind);
         Assert.Equal(historica, i.RootElement.GetProperty("parejas")[0].GetProperty("asignaturaAprobadaId").GetGuid());
         Assert.Equal(2, i.RootElement.GetProperty("grupos")[0].GetProperty("docentes").GetArrayLength());
         Assert.Equal(Guid.Parse("11111111-1111-1111-1111-111111111111"), i.RootElement.GetProperty("grupos")[0].GetProperty("configuracionVersionId").GetGuid());

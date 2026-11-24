@@ -14,13 +14,17 @@ public sealed record DocenteEnInforme(Guid DocenteId, string Docente, string Pos
 /// <summary>SugerenciaFinal: Convalidar, NoConvalidar o SinAcuerdo (decide el coordinador).
 /// Exclusion: motivo de una regla que impide convalidar (HU-17 / RN-07); null si no aplica. Los informes anteriores no lo incluyen.</summary>
 public sealed record ParejaEnInforme(Guid AsignaturaAprobadaId, Guid AsignaturaReceptoraId, string? ReceptoraCodigo, string? ReceptoraNombre,
-    AgenteEnInforme Agente, IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal, string? Exclusion = null);
+    AgenteEnInforme Agente, IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal, string? Exclusion = null)
+{
+    public MallasAnalisis? Mallas { get; init; }
+}
 public sealed record GrupoEnInforme(Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas,
     IReadOnlyList<EvaluacionEquivalencia> Receptoras, string EstadoAnalisis, string? Sugerencia,
     IReadOnlyList<DocenteEnInforme> Docentes, string SugerenciaFinal,
     IReadOnlyList<AporteEvaluadoAgrupacion> Aportes, IReadOnlyList<EvidenciaAgrupacion> Evidencias, string Leyenda)
 {
     public Guid? ConfiguracionVersionId { get; init; }
+    public MallasAnalisis? Mallas { get; init; }
 }
 public sealed record AnalisisAgrupacionGuardado(Guid SolicitudId, Guid GrupoId, IReadOnlyList<Guid> AsignaturasAprobadas,
     ResultadoAgrupacion Evaluacion, DateTimeOffset Fecha)
@@ -119,7 +123,8 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
             return new ParejaEnInforme(p.Key.AsignaturaAprobadaId, p.Key.AsignaturaReceptoraId, receptora?.Codigo, receptora?.Nombre,
                 new(a?.Estado ?? "SinAnalisis", a?.Estado == "Completo" ? a.Resultado?.Sugerencia : null,
                     a?.Evaluacion.CompatibilidadAcademicaPct, a?.Evaluacion.CompatibilidadHorariaPct, a?.Evaluacion.CompatibilidadCreditosPct),
-                docentes, final, excluida ? ReglaTerceraMatricula.Motivo : null);
+                docentes, final, excluida ? ReglaTerceraMatricula.Motivo : null)
+            { Mallas = a?.Mallas };
         }).OrderBy(p => p.ReceptoraCodigo ?? p.AsignaturaReceptoraId.ToString(), StringComparer.Ordinal).ThenBy(p => p.AsignaturaAprobadaId).ToArray();
         var grupos = revisionesGrupo.Select(g =>
         {
@@ -132,7 +137,7 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
                 a.Evaluacion.Estado.ToString(), a.Evaluacion.Estado == Homologacion.Domain.Equivalencias.EstadoEquivalencia.InformacionIncompleta
                     ? null : a.Evaluacion.Estado.ToString(), docentes, final, a.Evaluacion.Aportes, a.Evaluacion.Evidencias,
                 "Homologación por agrupación — regla de análisis pendiente de validación institucional")
-            { ConfiguracionVersionId = a.Evaluacion.ConfiguracionVersionId };
+            { ConfiguracionVersionId = a.Evaluacion.ConfiguracionVersionId, Mallas = a.Mallas };
         }).OrderBy(g => g.GrupoId).ToArray();
         var analizadas = lista.Select(p => p.AsignaturaAprobadaId).ToHashSet();
         foreach (var id in grupos.SelectMany(g => g.AsignaturasAprobadas)) analizadas.Add(id);
@@ -143,6 +148,12 @@ public sealed class GenerarInformeHomologacion(ISolicitudesAnalisisInterno solic
         if (lista.Any(p => p.Exclusion is not null))
             advertencias.Add("Hay asignaturas aprobadas en tercera matrícula: RN-07 las excluye y su sugerencia final es «No convalidar»; las demás se evalúan normalmente.");
         if (sinAnalisis.Length > 0) advertencias.Add("Hay asignaturas aprobadas sin análisis docente; no tienen sugerencia.");
+        // HU-07 / HU-22: exclusivamente la vigencia capturada al analizar, nunca Carrera.Vigencia ni una consulta actual.
+        var mallasOrigen = lista.SelectMany(p => p.Mallas?.Origenes ?? [])
+            .Concat(grupos.SelectMany(g => g.Mallas?.Origenes ?? []))
+            .Select(o => o.Malla).OfType<InstantaneaMalla>().Where(m => !m.VigenteAlAnalizar).DistinctBy(m => m.Id);
+        foreach (var malla in mallasOrigen)
+            advertencias.Add($"Malla de origen no vigente al analizar: {malla.Nombre} ({malla.Id}). La carrera debe confirmar la ruta de cambio de plan de estudios y su tabla de homologación para este caso. Alerta informativa de HU-22; no bloquea ni modifica el veredicto. Regla de análisis del proyecto pendiente de confirmación institucional.");
         ParametrosHomologacion? parametros;
         try { parametros = parametrosProvider is null ? ParametrosHomologacion.Predeterminados() : await parametrosProvider.ObtenerVigentesAsync(ct); }
         catch (AlmacenAnalisisNoDisponibleException)

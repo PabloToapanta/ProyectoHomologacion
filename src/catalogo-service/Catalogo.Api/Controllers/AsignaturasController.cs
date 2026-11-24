@@ -13,7 +13,8 @@ public sealed record AsignaturaRequest(
     [Required] decimal? Creditos,
     [Required] int? Horas)
 {
-    public AsignaturaInput ToInput() => new(CarreraId!.Value, Codigo, Nombre, Nivel!.Value, Creditos!.Value, Horas!.Value);
+    public Guid? MallaId { get; init; }
+    public AsignaturaInput ToInput() => new(CarreraId!.Value, Codigo, Nombre, Nivel!.Value, Creditos!.Value, Horas!.Value) { MallaId = MallaId };
 }
 
 [ApiController]
@@ -22,8 +23,8 @@ public sealed record AsignaturaRequest(
 [ProducesResponseType(typeof(ProblemDetails), 403)]
 public sealed class AsignaturasController(AsignaturaService service, IUnidadRepository unidades) : ControllerBase
 {
-    /// <summary>Registra una asignatura vinculada a una carrera existente.</summary>
-    /// <remarks>Nivel y horas: enteros positivos. Créditos: decimal positivo (hasta dos decimales). Código único por carrera, ignorando caso/espacios y normalizando Unicode.</remarks>
+    /// <summary>Registra una asignatura en una versión de malla de su carrera; sin mallaId usa la vigente.</summary>
+    /// <remarks>Nivel y horas: enteros positivos. Créditos: decimal positivo (hasta dos decimales). Código único por versión de malla, ignorando caso/espacios y normalizando Unicode.</remarks>
     [HttpPost("api/asignaturas")]
     [ProducesResponseType(typeof(AsignaturaDto), 201)]
     [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
@@ -44,15 +45,19 @@ public sealed class AsignaturasController(AsignaturaService service, IUnidadRepo
         var a = await service.ObtenerAsync(id, ct);
         var detalle = new AsignaturaDetalleDto(a.Id, a.CarreraId, a.Codigo, a.Nombre, a.Nivel, a.Creditos, a.Horas,
             (await unidades.ListarAsync(id, ct)).Select(UnidadDto.From).ToList());
-        return Ok(detalle);
+        return Ok(detalle with { MallaId = a.MallaId, Malla = a.Malla });
     }
 
     /// <summary>Lista las asignaturas de una carrera, ordenadas por nivel y código.</summary>
-    /// <remarks>Devuelve [] para una carrera sin asignaturas y 404 cuando la carrera no existe.</remarks>
+    /// <remarks>Filtro mallaId opcional. Sin filtro conserva todas las versiones. Devuelve [] para una carrera sin asignaturas y 404 cuando la carrera no existe.</remarks>
     [HttpGet("api/carreras/{id:guid}/asignaturas")]
     [ProducesResponseType(typeof(IReadOnlyList<AsignaturaDto>), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 404)]
-    public async Task<ActionResult<IReadOnlyList<AsignaturaDto>>> Listar(Guid id, CancellationToken ct) => Ok(await service.ListarAsync(id, ct));
+    public async Task<ActionResult<IReadOnlyList<AsignaturaDto>>> Listar(Guid id, CancellationToken ct, [FromQuery] Guid? mallaId = null) => Ok(await service.ListarAsync(id, ct, mallaId));
 }
 
-public record AsignaturaDetalleDto(Guid Id, Guid CarreraId, string Codigo, string Nombre, int Nivel, decimal Creditos, int Horas, IReadOnlyList<UnidadDto> Unidades);
+public record AsignaturaDetalleDto(Guid Id, Guid CarreraId, string Codigo, string Nombre, int Nivel, decimal Creditos, int Horas, IReadOnlyList<UnidadDto> Unidades)
+{
+    public Guid MallaId { get; init; }
+    public MallaDto? Malla { get; init; }
+}

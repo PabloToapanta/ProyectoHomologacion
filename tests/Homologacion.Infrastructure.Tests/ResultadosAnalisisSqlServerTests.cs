@@ -22,6 +22,56 @@ public sealed class SqlServerFactAttribute : FactAttribute
 public class ResultadosAnalisisSqlServerTests
 {
     [SqlServerFact]
+    public Task HU07_SQL_conserva_mallas_de_parejas_grupos_informe_y_lee_historicos() => EnBaseTemporal(async options =>
+    {
+        var s = Guid.NewGuid(); var a = Guid.NewGuid(); var r = Guid.NewGuid(); var ag = Guid.NewGuid(); var rg = Guid.NewGuid(); var rg2 = Guid.NewGuid();
+        var malla = new InstantaneaMalla(Guid.NewGuid(), Guid.NewGuid(), "Plan guardado en SQL", false);
+        var mallas = new MallasAnalisis([new(Guid.NewGuid(), a, malla)], [new(r, null, malla with { VigenteAlAnalizar = true })]);
+        var pareja = Resultado(s, a, r, "Completo", DateTimeOffset.UtcNow);
+        pareja = pareja with { Analisis = pareja.Analisis with { Mallas = mallas } };
+        var grupo = Homologacion.Domain.Agrupaciones.GrupoAgrupacion.Crear(s, [ag], [rg, rg2], [new(ag, rg, 1, 1), new(ag, rg2, 1, 1)]);
+        grupo.Congelar();
+        var mg = new MallasAnalisis([new(Guid.NewGuid(), ag, malla)], [new(rg, null, malla), new(rg2, null, malla)]);
+        var evaluacion = new ResultadoAgrupacion([pareja.Analisis.Evaluacion], 80,
+            Homologacion.Domain.Equivalencias.EstadoEquivalencia.Homologable, "Sin cambios", [], [], []);
+        var analisisGrupo = new Homologacion.Application.Informe.AnalisisAgrupacionGuardado(s, grupo.GrupoId, [ag], evaluacion, DateTimeOffset.UtcNow) { Mallas = mg };
+        var informe = new Homologacion.Application.Informe.InformeHomologacion(s, "Interno", DateTimeOffset.UtcNow, Guid.NewGuid(), "Docente", [
+            new(a, r, "R", "Receptora", new("Completo", "Homologable", 100, 80, 100), [], "Convalidar") { Mallas = mallas }], [], 1, 0, 0, [])
+        { Grupos = [new(grupo.GrupoId, [ag], evaluacion.Receptoras, "Homologable", "Homologable", [], "Convalidar", [], [], "Agrupación") { Mallas = mg }] };
+        var historico = Resultado(Guid.NewGuid(), Guid.NewGuid(), r, "Completo", DateTimeOffset.UtcNow);
+        var externo = Resultado(Guid.NewGuid(), Guid.NewGuid(), r, "Incompleto", DateTimeOffset.UtcNow);
+        externo = externo with { Analisis = externo.Analisis with { Mallas = new([new(null, externo.Analisis.AsignaturaAprobadaId, null)], mallas.Receptoras) } };
+        var json = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web);
+        await using (var db = new ResultadosDbContext(options))
+        {
+            await new ResultadosAnalisisSql(db).GuardarAsync(pareja, default);
+            await new Homologacion.Infrastructure.AnalisisExterno.ResultadosAnalisisExternoSql(db).GuardarAsync(externo, default);
+            await new ResultadosAnalisisSql(db).GuardarAsync(historico, default);
+            // AlmacenPorPareja guarda el resultado directamente; la fecha está en su propia columna.
+            var viejo = System.Text.Json.Nodes.JsonNode.Parse(System.Text.Json.JsonSerializer.Serialize(historico.Analisis, json))!;
+            viejo.AsObject().Remove("mallas");
+            var contenidoHistorico = viejo.ToJsonString();
+            await db.Resultados.Where(x => x.SolicitudId == historico.Analisis.SolicitudId).ExecuteUpdateAsync(set => set.SetProperty(x => x.Contenido, contenidoHistorico));
+            var cierre = new Homologacion.Infrastructure.Informe.InformesHomologacionSql(db);
+            await cierre.ConCierreAsync(s, async () => { await new Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql(db).GuardarAsync(grupo, analisisGrupo, default); return true; }, default);
+            await cierre.GuardarAsync(informe, default);
+        }
+        await using var lectura = new ResultadosDbContext(options);
+        var leida = Assert.Single(await new ResultadosAnalisisSql(lectura).ListarAsync(s, default));
+        Assert.Equal(System.Text.Json.JsonSerializer.Serialize(mallas, json), System.Text.Json.JsonSerializer.Serialize(leida.Analisis.Mallas, json));
+        Assert.False(leida.Analisis.Mallas!.Origenes[0].Malla!.VigenteAlAnalizar);
+        var agrupada = await new Homologacion.Infrastructure.Agrupaciones.GruposAgrupacionSql(lectura).ObtenerAsync(s, grupo.GrupoId, default);
+        Assert.Equal(System.Text.Json.JsonSerializer.Serialize(mg, json), System.Text.Json.JsonSerializer.Serialize(agrupada!.UltimoAnalisis!.Mallas, json));
+        var fijo = await new Homologacion.Infrastructure.Informe.InformesHomologacionSql(lectura).ObtenerAsync(s, default);
+        Assert.Equal(malla, fijo!.Parejas[0].Mallas!.Origenes[0].Malla);
+        Assert.Equal(malla, fijo.Grupos[0].Mallas!.Origenes[0].Malla);
+        Assert.Null(Assert.Single(await new ResultadosAnalisisSql(lectura).ListarAsync(historico.Analisis.SolicitudId, default)).Analisis.Mallas);
+        var guardadoExterno = Assert.Single(await new Homologacion.Infrastructure.AnalisisExterno.ResultadosAnalisisExternoSql(lectura).ListarAsync(externo.Analisis.SolicitudId, default));
+        Assert.Null(guardadoExterno.Analisis.Mallas!.Origenes[0].Malla);
+        return true;
+    });
+
+    [SqlServerFact]
     public Task Configuracion_hu03_actualiza_atomica_y_audita_en_sql_server() => EnBaseTemporal(async options =>
     {
         await using var db = new ResultadosDbContext(options);

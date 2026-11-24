@@ -10,8 +10,8 @@ public sealed class AsignaturaRepository(CatalogoDbContext db) : IAsignaturaRepo
     public Task<Asignatura?> BuscarAsync(Guid id, CancellationToken ct) => db.Asignaturas.AsNoTracking().SingleOrDefaultAsync(a => a.Id == id, ct);
     public async Task<IReadOnlyList<Asignatura>> ListarPorCarreraAsync(Guid carreraId, CancellationToken ct) =>
         await db.Asignaturas.AsNoTracking().Where(a => a.CarreraId == carreraId).OrderBy(a => a.Nivel).ThenBy(a => a.CodigoNormalizado).ToListAsync(ct);
-    public Task<bool> ExisteCodigoAsync(Guid carreraId, string codigoNormalizado, CancellationToken ct) =>
-        db.Asignaturas.AnyAsync(a => a.CarreraId == carreraId && a.CodigoNormalizado == codigoNormalizado, ct);
+    public Task<bool> ExisteCodigoAsync(Guid carreraId, string codigoNormalizado, CancellationToken ct, Guid? mallaId = null) =>
+        db.Asignaturas.AnyAsync(a => a.CarreraId == carreraId && a.CodigoNormalizado == codigoNormalizado && (!mallaId.HasValue || a.MallaId == mallaId), ct);
     public async Task CrearAsync(Asignatura asignatura, CancellationToken ct)
     {
         db.Asignaturas.Add(asignatura);

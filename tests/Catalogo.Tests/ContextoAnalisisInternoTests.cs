@@ -27,6 +27,8 @@ public class ContextoAnalisisInternoTests
         using var j = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         Assert.Equal(a.Id, j.RootElement.GetProperty("id").GetGuid());
         Assert.Equal(a.CarreraId, j.RootElement.GetProperty("carreraId").GetGuid());
+        Assert.Equal(a.MallaId, j.RootElement.GetProperty("malla").GetProperty("id").GetGuid());
+        Assert.Equal(a.Malla!.Nombre, j.RootElement.GetProperty("malla").GetProperty("nombre").GetString());
         Assert.Equal("FISEI", j.RootElement.GetProperty("facultad").GetString());
         Assert.Equal("Contenido sintético", j.RootElement.GetProperty("contenidos")[0].GetProperty("texto").GetString());
         Assert.Equal("Resultado sintético", j.RootElement.GetProperty("resultados")[0].GetProperty("texto").GetString());

@@ -1,3 +1,4 @@
+import {MallasAnalisisResumen,type MallasGuardadas} from './MallasAnalisisResumen';
 import {useEffect,useState} from 'react';
 import {FormDialog} from '../../shared/ui/FormDialog';
 import {AgrupacionesPanel} from './AgrupacionesPanel';
@@ -12,7 +13,7 @@ type Asignatura={id:string;nombreAsignatura:string;creditos:number;horas:number;
 type Detalle=Solicitud&{asignaturasAprobadas:Asignatura[];docentesAsignados:DocenteAsignado[];periodosCursados?:number|null;cambiosPreviosCarrera?:number|null};
 /** Propuesta HU-30: HU-18 y HU-20 fijan el contrato definitivo del resultado. */
 export type ResultadoAnalisis={porcentajeAcademico:number|null;porcentajeHoras:number|null;porcentajeCreditos:number|null;sugerencia:string;justificacion:string;evidencias:string[]};
-export type Analisis={estado:string;mensaje:string;resultado:ResultadoAnalisis|null};
+export type Analisis={estado:string;mensaje:string;resultado:ResultadoAnalisis|null;mallas?:MallasGuardadas|null};
 type SolicitudAsignada={solicitud:Detalle;analisis:Analisis};
 const mensaje=(e:unknown)=>e instanceof Error?e.message:'No se pudo completar la operación.';
 const porcentaje=(v:number|null)=>v===null?'Sin dato':`${v.toLocaleString('es-EC',{maximumFractionDigits:2})} %`;
@@ -20,14 +21,14 @@ const porcentaje=(v:number|null)=>v===null?'Sin dato':`${v.toLocaleString('es-EC
 export function AnalisisSolicitud({analisis}:{analisis:Analisis}) {
  const {estado,mensaje:texto,resultado}=analisis;
  if(estado==='Completo'&&resultado) return <section aria-labelledby="analisis-titulo">
-  <h3 id="analisis-titulo">Resultado del análisis automatizado</h3>
+  <h3 id="analisis-titulo">Resultado del análisis automatizado</h3><MallasAnalisisResumen mallas={analisis.mallas}/>
   <p>Insumo para su revisión académica: no es la decisión final de homologación.</p>
   <dl><dt>Académico combinado</dt><dd>{porcentaje(resultado.porcentajeAcademico)}</dd><dt>Horas</dt><dd>{porcentaje(resultado.porcentajeHoras)}</dd><dt>Créditos</dt><dd>{porcentaje(resultado.porcentajeCreditos)}</dd>
    <dt>Sugerencia</dt><dd>{resultado.sugerencia}</dd><dt>Justificación</dt><dd>{resultado.justificacion}</dd></dl>
   <h4>Evidencia disponible</h4>{resultado.evidencias.length?<ul>{resultado.evidencias.map(e=><li key={e}>{e}</li>)}</ul>:<p>Sin evidencia registrada.</p>}
  </section>;
  const titulo=estado==='Pendiente'?'Análisis pendiente':estado==='Fallido'?'El análisis falló':'Información incompleta';
- return <section aria-labelledby="analisis-titulo" role="status"><h3 id="analisis-titulo">{titulo}</h3><p>{texto||'No hay un resultado de análisis disponible para esta solicitud.'}</p></section>;
+ return <section aria-labelledby="analisis-titulo" role="status"><h3 id="analisis-titulo">{titulo}</h3><p>{texto||'No hay un resultado de análisis disponible para esta solicitud.'}</p>{estado!=='Pendiente'&&<MallasAnalisisResumen mallas={analisis.mallas}/>}</section>;
 }
 /** HU-30 consulta solicitudes; HU-18 (interno) y HU-19 (externo) analizan parejas sin aprobar ni remitir (HU-31). */
 export function SolicitudesDocentePage({request}:{request:Request}) {
