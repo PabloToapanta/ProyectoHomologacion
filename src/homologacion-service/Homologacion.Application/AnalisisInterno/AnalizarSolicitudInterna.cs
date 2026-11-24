@@ -121,9 +121,9 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
         a.PlanAnalitico, a.Horas, a.UnidadHoras, a.Creditos, a.SistemaCreditos, a.Contenidos, a.Resultados
     });
 
-    private static DatosAsignatura Datos(AsignaturaParaAnalisis a) => new(a.Id.ToString(), a.PlanAnalitico, a.Horas,
+    internal static DatosAsignatura Datos(AsignaturaParaAnalisis a) => new(a.Id.ToString(), a.PlanAnalitico, a.Horas,
         a.UnidadHoras, a.Creditos, a.SistemaCreditos, a.Contenidos.Select(e => e.Id.ToString()).ToArray(), a.Resultados.Select(e => e.Id.ToString()).ToArray());
-    private static IReadOnlyList<CorrespondenciaAcademica?> Vinculos(Guid origen, IReadOnlyList<VinculoParaAnalisis> vinculos) =>
+    internal static IReadOnlyList<CorrespondenciaAcademica?> Vinculos(Guid origen, IReadOnlyList<VinculoParaAnalisis> vinculos) =>
         vinculos.Select(v => (CorrespondenciaAcademica?)new CorrespondenciaAcademica(origen.ToString(), v.ElementoOrigen, v.ElementoReceptor, new(v.UbicacionOrigen, v.UbicacionReceptora))).ToArray();
     private static IEnumerable<TextoElementoAnalisis> Textos(AsignaturaParaAnalisis a) =>
         a.Contenidos.Select(e => new TextoElementoAnalisis(a.Id.ToString(), "Contenido", e.Id.ToString(), e.Texto))

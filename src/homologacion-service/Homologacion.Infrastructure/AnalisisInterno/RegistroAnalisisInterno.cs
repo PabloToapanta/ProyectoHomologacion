@@ -49,6 +49,9 @@ public static class RegistroAnalisisInterno
                 agente is IDescripcionAgente ? p.GetRequiredService<IExplicacionesAgente>() : null, p.GetRequiredService<TimeProvider>());
         });
         services.AddScoped<AnalizarSolicitudInterna>();
+        // HU-09: consulta informativa entre carreras FISEI; no usa el agente ni guarda resultados.
+        services.AddScoped<Homologacion.Application.ConsultaHomologables.ICatalogoConsultaHomologables>(p => p.GetRequiredService<FuentesAnalisisHttp>());
+        services.AddScoped<Homologacion.Application.ConsultaHomologables.ConsultarHomologables>();
         services.AddDbContext<ResultadosDbContext>((p, options) => options.UseSqlServer(
             p.GetRequiredService<IConfiguration>().GetConnectionString("Homologacion")
             ?? throw new InvalidOperationException("Configure ConnectionStrings:Homologacion para guardar análisis.")));

@@ -15,6 +15,8 @@ public interface IComparacionCatalogoRepository
     Task<RevisionComparacion?> RevisionAsync(Guid origen, Guid receptora, CancellationToken ct);
     Task GuardarPerfilAsync(PerfilComparacion perfil, CancellationToken ct);
     Task GuardarRevisionAsync(RevisionComparacion revision, CancellationToken ct);
+    /// <summary>HU-09: pares (origen, receptora) con revisión registrada entre los dos conjuntos.</summary>
+    Task<IReadOnlyList<(Guid Origen, Guid Receptora)>> RevisionesEntreAsync(IReadOnlyCollection<Guid> origenes, IReadOnlyCollection<Guid> receptoras, CancellationToken ct);
 }
 public sealed class ComparacionCatalogoService(IComparacionCatalogoRepository repository, IAsignaturaRepository asignaturas, IUnidadRepository unidades)
 {
