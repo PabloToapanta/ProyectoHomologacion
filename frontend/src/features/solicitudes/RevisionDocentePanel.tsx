@@ -50,7 +50,7 @@ export function RevisionDocentePanel({request,solicitudId,aprobadaId,receptoraId
    <label><input type="radio" name="postura" value="Ajuste" checked={postura==='Ajuste'} onChange={()=>setPostura('Ajuste')}/>Ajuste con mi decisión</label>
    {postura==='Ajuste'&&<label>Mi decisión<select required value={decision} onChange={e=>setDecision(e.target.value as Decision)}><option value="">Seleccione</option><option value="Homologable">Homologable</option><option value="NoHomologable">No homologable</option></select></label>}
    {postura&&<label>Observación<textarea required={postura==='Ajuste'} maxLength={2000} value={observacion} onChange={e=>setObservacion(e.target.value)}/></label>}
-  </fieldset><button className="app-button" disabled={ocupado||!postura}>{ocupado?'Guardando…':'Guardar mi análisis'}</button></form>}
+  </fieldset><button className="app-button app-button--primary" disabled={ocupado||!postura}>{ocupado?'Guardando…':'Guardar mi análisis'}</button></form>}
   {dePareja.length>0?<ul aria-label="Análisis de los docentes">{dePareja.map(r=><li key={r.docenteId}>
    {r.docente} · {posturas[r.postura]} · {decisiones[r.decision]}{r.observacion?` · ${r.observacion}`:''} · {fechaHora(r.fecha)}
   </li>)}</ul>:<p>Ningún docente ha registrado su análisis para esta pareja.</p>}

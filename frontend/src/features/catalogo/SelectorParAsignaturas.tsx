@@ -21,7 +21,7 @@ export function SelectorParAsignaturas({ request, origen, receptora, seleccionar
   }, [request, intento]);
   return <>
     {cargando && <p role="status">Cargando catálogo…</p>}
-    {error && <p role="alert">{error} <button type="button" onClick={() => setIntento(i => i + 1)}>Reintentar catálogo</button></p>}
+    {error && <p role="alert">{error} <button type="button" className="app-button app-button--secondary" onClick={() => setIntento(i => i + 1)}>Reintentar catálogo</button></p>}
     {!cargando && !error && !opciones.length && <p>No hay asignaturas registradas. Agrégalas en el catálogo.</p>}
     <div className="catalogo-fields selector-par">{(['o', 'r'] as const).map(lado => <label key={lado} className="auth-label">Asignatura {lado === 'o' ? 'origen' : 'receptora'}<select aria-label={`Asignatura ${lado === 'o' ? 'origen' : 'receptora'}`} className="auth-input" disabled={disabled || cargando || !!error} value={lado === 'o' ? origen : receptora} onChange={e => seleccionar(lado, e.target.value)}>
       <option value="">Selecciona una asignatura</option>{[...new Set(opciones.map(a => a.carrera))].map(c => <optgroup label={c} key={c}>{opciones.filter(a => a.carrera === c).map(a => <option key={a.id} value={a.id}>{a.codigo} · {a.nombre} — {c}</option>)}</optgroup>)}

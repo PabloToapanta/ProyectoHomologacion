@@ -20,7 +20,7 @@ export function ValidacionesPage() {
   return <WorkspaceLayout>
     <div className="catalogo"><p className="eyebrow">HOMOLOGACIÓN / VALIDACIONES</p><h1>Validaciones académicas</h1>
       <p>Estos resultados son sugerencias. La decisión oficial corresponde al Consejo Directivo.</p>
-      {session?.role === 'Administrador' && <p><Link to="/panel">Volver al panel</Link></p>}
+      {session?.role === 'Administrador' && <p><Link className="app-button app-button--secondary" to="/panel">← Volver al panel</Link></p>}
       <nav className="catalogo-tabs" aria-label="Tipo de validación">{[['antiguedad', 'Aprobación y antigüedad'], ['requisitos', 'Requisitos de cambio'], ['equivalencia', 'Equivalencia de asignaturas']].map(([id, label]) => <button key={id} className="app-button app-button--secondary" aria-pressed={seccion === id} onClick={() => setSeccion(id!)}>{label}</button>)}</nav>
       {seccion === 'equivalencia' ? <EquivalenciaForm request={request} /> : <ReglasForm key={seccion} tipo={seccion} request={request} />}
     </div></WorkspaceLayout>;

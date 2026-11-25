@@ -39,7 +39,7 @@ export function CorrespondenciasPanel({ request, origenInicial }: { request: Cat
   return <section className="catalogo-card"><h3>Correspondencias académicas del catálogo</h3>
     <p>Revisa ambos planes y registra evidencia. Guardar con todas las filas «Sin correspondencia» registra una revisión explícita con cobertura cero. No se generan coincidencias por nombres.</p>
     <SelectorParAsignaturas request={request} origen={par.o} receptora={par.r} seleccionar={seleccionar} disabled={ocupado} />
-    {error && <p role="alert">{error} <button type="button" onClick={() => setIntento(i => i + 1)}>Reintentar revisión</button></p>}{aviso && <p role="status">{aviso}</p>}
+    {error && <p role="alert">{error} <button type="button" className="app-button app-button--secondary" onClick={() => setIntento(i => i + 1)}>Reintentar revisión</button></p>}{aviso && <p role="status">{aviso}</p>}
     {ocupado && <p role="status">Procesando revisión…</p>}
     {datos.length === 2 && <form onSubmit={guardar}><fieldset disabled={ocupado}>
       {(['contenidos', 'resultados'] as const).map(tipo => <section key={tipo}><h4>{tipo === 'contenidos' ? 'Contenidos receptores' : 'Resultados receptores'}</h4>

@@ -22,7 +22,7 @@ export function PerfilComparacionPanel({ id, nombre, request, cerrar }: { id: st
   return <section className="catalogo-card" aria-label="Perfil de comparación">
     <div className="catalogo-list-heading"><h2>Perfil de comparación · {nombre}</h2><button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={cerrar}>Cerrar perfil</button></div>
     <p>Estos datos se guardan una sola vez y se reutilizan al comparar. Una modificación exige revisar las correspondencias existentes.</p>
-    {error && <p role="alert">{error} <button type="button" onClick={() => setIntento(i => i + 1)}>Recargar perfil</button></p>}
+    {error && <p role="alert">{error} <button type="button" className="app-button app-button--secondary" onClick={() => setIntento(i => i + 1)}>Recargar perfil</button></p>}
     {aviso && <p role="status">{aviso}</p>}
     {cargando ? <p role="status">Cargando perfil…</p> : <form onSubmit={guardar} onChange={() => setAviso('')}><fieldset className="catalogo-fields" disabled={ocupado}>
       {([['planAnalitico', 'Referencia al plan analítico', 500], ['unidadHoras', 'Unidad de horas', 100], ['sistemaCreditos', 'Sistema de créditos', 100]] as const).map(([key, label, max]) => <label key={key} className="auth-label">{label}<input className="auth-input" required maxLength={max} value={perfil[key]} onChange={e => setPerfil(p => ({ ...p, [key]: e.target.value }))} /></label>)}
