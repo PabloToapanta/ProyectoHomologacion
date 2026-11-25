@@ -57,4 +57,22 @@ public class ContextoAnalisisInternoTests
         if (rol is not null) c.DefaultRequestHeaders.Authorization = new("Bearer", f.Token(rol));
         Assert.Equal(esperado, (int)(await c.GetAsync($"/api/asignaturas/{Guid.NewGuid()}/analisis-interno/contexto")).StatusCode);
     }
+    [Fact]
+    public async Task Receptoras_del_analisis_solo_ofrecen_la_malla_vigente()
+    {
+        using var f = new CatalogoFactory(); using var admin = f.Admin();
+        var anterior = await Crear(admin, "HU07-R1");
+        var nueva = (await (await admin.PostAsJsonAsync($"/api/carreras/{anterior.CarreraId}/mallas", new { nombre = "Plan nuevo", vigente = true }))
+            .Content.ReadFromJsonAsync<MallaDto>())!;
+        var vigente = (await (await admin.PostAsJsonAsync("/api/asignaturas", new { carreraId = anterior.CarreraId, codigo = "HU07-R1", nombre = "Receptora vigente", nivel = 1, creditos = 3, horas = 100 }))
+            .Content.ReadFromJsonAsync<AsignaturaDto>())!;
+        Assert.Equal(nueva.Id, vigente.MallaId);
+        using var docente = f.CreateClient(); docente.DefaultRequestHeaders.Authorization = new("Bearer", f.Token("Docente"));
+        using var response = await docente.GetAsync($"/api/carreras/{anterior.CarreraId}/analisis-interno/asignaturas");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var receptoras = (await response.Content.ReadFromJsonAsync<AsignaturaDto[]>())!;
+        Assert.Equal([vigente.Id], receptoras.Select(r => r.Id));
+        // La gestión del Administrador conserva todas las versiones.
+        Assert.Equal(2, (await admin.GetFromJsonAsync<AsignaturaDto[]>($"/api/carreras/{anterior.CarreraId}/asignaturas"))!.Length);
+    }
 }
