@@ -48,6 +48,20 @@ public sealed class AsignaturasController(AsignaturaService service, IUnidadRepo
         return Ok(detalle with { MallaId = a.MallaId, Malla = a.Malla });
     }
 
+    /// <summary>Elimina una asignatura registrada por error. Solo Administrador.</summary>
+    /// <remarks>Elimina también sus unidades, temáticas, contenidos, perfil de comparación, programa analítico y
+    /// correspondencias revisadas con otras asignaturas. El código queda libre. Las solicitudes y los análisis ya
+    /// guardados conservan sus datos registrados.</remarks>
+    [HttpDelete("api/asignaturas/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(typeof(ProblemDetails), 404)]
+    [ProducesResponseType(typeof(ProblemDetails), 409)]
+    public async Task<IActionResult> Eliminar(Guid id, CancellationToken ct)
+    {
+        await service.EliminarAsync(id, ct);
+        return NoContent();
+    }
+
     /// <summary>Lista las asignaturas de una carrera, ordenadas por nivel y código.</summary>
     /// <remarks>Filtro mallaId opcional. Sin filtro conserva todas las versiones. Devuelve [] para una carrera sin asignaturas y 404 cuando la carrera no existe.</remarks>
     [HttpGet("api/carreras/{id:guid}/asignaturas")]

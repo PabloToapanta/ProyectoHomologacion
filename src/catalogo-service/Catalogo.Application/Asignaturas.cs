@@ -20,10 +20,19 @@ public interface IAsignaturaRepository
     Task<IReadOnlyList<Asignatura>> ListarPorCarreraAsync(Guid carreraId, CancellationToken ct);
     Task<bool> ExisteCodigoAsync(Guid carreraId, string codigoNormalizado, CancellationToken ct, Guid? mallaId = null);
     Task CrearAsync(Asignatura asignatura, CancellationToken ct);
+    /// <summary>Elimina la asignatura y sus datos propios (unidades, perfil, programa y correspondencias) en una transacción.</summary>
+    Task<bool> EliminarAsync(Guid id, CancellationToken ct);
 }
 
 public sealed class AsignaturaService(IAsignaturaRepository asignaturas, ICarreraRepository carreras, IMallaRepository mallas)
 {
+    /// <summary>Corrige un registro equivocado: el código queda libre para registrar la asignatura correcta.</summary>
+    public async Task EliminarAsync(Guid id, CancellationToken ct = default)
+    {
+        if (!await asignaturas.EliminarAsync(id, ct))
+            throw new CatalogoException("no_encontrada", "No se encontró la asignatura.");
+    }
+
     public async Task<AsignaturaDto> CrearAsync(AsignaturaInput input, CancellationToken ct = default)
     {
         var asignatura = new Asignatura(input.CarreraId, input.Codigo, input.Nombre, input.Nivel, input.Creditos, input.Horas);
