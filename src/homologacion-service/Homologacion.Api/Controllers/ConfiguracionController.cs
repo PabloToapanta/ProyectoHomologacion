@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Homologacion.Api.Controllers;
 
 [ApiController]
-[Authorize(Roles = "Coordinador")]
+[Authorize(Roles = "Coordinador,Administrador")]
 [Route("api/homologaciones/configuracion")]
 public sealed class ConfiguracionController(GestionarConfiguracionHomologacion gestion) : ControllerBase
 {
     /// <summary>Consulta la versión vigente de parámetros académicos de HU-03.</summary>
-    /// <remarks>Solo Coordinador. El ETag identifica la versión que debe enviarse en If-Match al actualizar.</remarks>
+    /// <remarks>Coordinador y Administrador (HU-38). El ETag identifica la versión que debe enviarse en If-Match al actualizar.</remarks>
     [HttpGet]
     [ProducesResponseType(typeof(ParametrosHomologacion), 200)]
     [ProducesResponseType(401), ProducesResponseType(403), ProducesResponseType(typeof(ProblemDetails), 503)]

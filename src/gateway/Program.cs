@@ -63,8 +63,9 @@ public partial class Program
             options.AddPolicy("AcademicAccess", academic);
             options.AddPolicy("UserAdministration", new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
                 .RequireAuthenticatedUser().RequireRole("Administrador").Build());
+            // HU-38: el Administrador también gestiona los parámetros de HU-03.
             options.AddPolicy("ConfigurationManagement", new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-                .RequireAuthenticatedUser().RequireRole("Coordinador").Build());
+                .RequireAuthenticatedUser().RequireRole("Coordinador", "Administrador").Build());
             options.DefaultPolicy = academic;
             options.FallbackPolicy = academic;
         });

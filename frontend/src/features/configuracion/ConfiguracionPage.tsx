@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { ConfiguracionApiError, configuracionApi } from './configuracion-api';
 import type { ConfiguracionRequest, EntradaHistorial, ParametrosConfiguracion } from './configuracion-api';
+import { base as rutaNormativas, leer, normativaDelRespaldo, respaldoDe } from '../normativas/normativas-api';
+import type { Normativa } from '../normativas/normativas-api';
 
 type Campo = Exclude<keyof ParametrosConfiguracion, 'versionId'>;
 const campos: { key: Campo; label: string; max: number }[] = [
@@ -23,7 +25,10 @@ export function ConfiguracionPage({ request }: { request: ConfiguracionRequest }
   const [etag, setEtag] = useState('');
   const [valores, setValores] = useState<ParametrosConfiguracion | null>(null);
   const [motivo, setMotivo] = useState('');
-  const [respaldo, setRespaldo] = useState('');
+  const [normativaId, setNormativaId] = useState('');
+  const [detalleRespaldo, setDetalleRespaldo] = useState('');
+  const [normativas, setNormativas] = useState<Normativa[]>([]);
+  const [errorNormativas, setErrorNormativas] = useState('');
   const [historial, setHistorial] = useState<EntradaHistorial[]>([]);
   const [cursorSiguiente, setCursorSiguiente] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
@@ -41,8 +46,18 @@ export function ConfiguracionPage({ request }: { request: ConfiguracionRequest }
       })
       .catch(e => { if (!controller.signal.aborted) setError(errorTexto(e)); })
       .finally(() => { if (!controller.signal.aborted) setCargando(false); });
+    // HU-38: el respaldo se elige del catálogo de normativas; si no responde, la página sigue disponible para consulta.
+    request(rutaNormativas, { signal: controller.signal })
+      .then(r => leer<Normativa[]>(r, 'No se pudo consultar el catálogo de normativas.'))
+      .then(lista => { if (!controller.signal.aborted) setNormativas(lista); })
+      .catch(e => { if (!controller.signal.aborted) setErrorNormativas(errorTexto(e)); });
     return () => controller.abort();
-  }, [api]);
+  }, [api, request]);
+
+  const vigentes = normativas.filter(n => n.estado === 'Vigente');
+  // Aviso determinista: la configuración vigente cita una normativa que ya no rige.
+  const respaldoVigente = vigente && historial[0]?.versionId === vigente.versionId ? historial[0].respaldo : undefined;
+  const citada = normativaDelRespaldo(respaldoVigente, normativas);
 
   async function recargar() {
     const [actual, pagina] = await Promise.all([api.obtener(), api.historial()]);
@@ -54,15 +69,17 @@ export function ConfiguracionPage({ request }: { request: ConfiguracionRequest }
     event.preventDefault();
     if (!valores || !etag || ocupado) return;
     const invalidos = campos.some(c => !Number.isInteger(valores[c.key]) || valores[c.key] < 1 || valores[c.key] > c.max);
-    if (invalidos || !motivo.trim() || motivo.trim().length > 500 || !respaldo.trim() || respaldo.trim().length > 2000) {
-      setError('Revisa los rangos enteros y completa motivo (hasta 500) y respaldo (hasta 2000 caracteres).'); return;
+    const normativa = vigentes.find(n => n.id === normativaId);
+    const respaldo = normativa ? [respaldoDe(normativa), detalleRespaldo.trim()].filter(Boolean).join(' · ') : '';
+    if (invalidos || !motivo.trim() || motivo.trim().length > 500 || !normativa || respaldo.length > 2000) {
+      setError('Revisa los rangos enteros, completa el motivo (hasta 500 caracteres) y elige la normativa vigente que respalda el cambio.'); return;
     }
     setOcupado(true); setError(''); setAviso('');
     try {
       const { versionId: _versionId, ...parametros } = valores;
-      await api.actualizar({ ...parametros, motivo: motivo.trim(), respaldo: respaldo.trim() }, etag);
+      await api.actualizar({ ...parametros, motivo: motivo.trim(), respaldo }, etag);
       await recargar();
-      setMotivo(''); setRespaldo(''); setAviso('Configuración guardada. Los análisis anteriores conservan sus resultados.');
+      setMotivo(''); setNormativaId(''); setDetalleRespaldo(''); setAviso('Configuración guardada. Los análisis anteriores conservan sus resultados.');
     } catch (e) {
       if (e instanceof ConfiguracionApiError && e.status === 409) {
         try { await recargar(); } catch (recarga) { setError(errorTexto(recarga)); return; }
@@ -83,9 +100,14 @@ export function ConfiguracionPage({ request }: { request: ConfiguracionRequest }
   }
 
   return <section className="configuracion-page" aria-labelledby="configuracion-title">
-    <p className="eyebrow">COORDINACIÓN / CONFIGURACIÓN</p>
+    <p className="eyebrow">CONFIGURACIÓN</p>
     <h1 id="configuracion-title">Parámetros de homologación</h1>
-    <p>Los valores nuevos se aplican a los análisis que comiencen después de guardar.</p>
+    <p>Los valores nuevos se aplican a los análisis que comiencen después de guardar. Cada cambio cita la normativa vigente que lo respalda.</p>
+    {citada && citada.estado !== 'Vigente' && <p role="alert" className="configuracion-alerta">
+      La configuración vigente se apoya en {citada.codigo}, que está «{citada.estado}»{citada.reformadaPor ? ` por ${citada.reformadaPor.codigo}` : ''}.
+      Revisa los parámetros con la normativa vigente y guarda el cambio citándola.</p>}
+    {vigente && historial[0]?.versionId === vigente.versionId && normativas.length > 0 && !citada && <p className="configuracion-nota">
+      La configuración vigente no cita una normativa del catálogo (respaldo en texto libre anterior a HU-38).</p>}
     {cargando && <p>Cargando configuración…</p>}
     {error && <p role="alert" className="configuracion-error">{error}</p>}
     {aviso && <p role="status" className="configuracion-aviso">{aviso}</p>}
@@ -101,7 +123,13 @@ export function ConfiguracionPage({ request }: { request: ConfiguracionRequest }
           </label>)}</div>
           <p>El cambio externo siempre requiere cero cambios previos de carrera.</p>
           <label>Motivo del cambio<textarea required maxLength={500} value={motivo} onChange={e => setMotivo(e.target.value)} /></label>
-          <label>Respaldo<textarea required maxLength={2000} value={respaldo} onChange={e => setRespaldo(e.target.value)} /></label>
+          <label>Normativa que respalda el cambio<select required value={normativaId} onChange={e => setNormativaId(e.target.value)}>
+            <option value="">Selecciona una normativa vigente</option>
+            {vigentes.map(n => <option key={n.id} value={n.id}>{respaldoDe(n)}</option>)}
+          </select></label>
+          {errorNormativas && <p role="alert" className="configuracion-error">{errorNormativas}</p>}
+          {!errorNormativas && vigentes.length === 0 && <p className="configuracion-nota">No hay normativas vigentes. Regístrala primero en <a href="/normativas">Normativas</a>.</p>}
+          <label>Detalle del respaldo (opcional: artículo, sección)<textarea maxLength={500} value={detalleRespaldo} onChange={e => setDetalleRespaldo(e.target.value)} /></label>
           <button type="submit" className="app-button app-button--primary">Guardar configuración</button>
         </fieldset>
       </form>

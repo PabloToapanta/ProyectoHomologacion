@@ -35,6 +35,7 @@ public sealed class GatewayHttpsTests
     [InlineData("/validaciones", "frontend")]
     [InlineData("/solicitudes", "frontend")]
     [InlineData("/docente/solicitudes", "frontend")]
+    [InlineData("/normativas", "frontend")]
     [InlineData("/assets/index-demo.js", "frontend")]
     public async Task RutasDeInterfaz_SeSirvenPorGatewayHttps(string path, string destination)
     {

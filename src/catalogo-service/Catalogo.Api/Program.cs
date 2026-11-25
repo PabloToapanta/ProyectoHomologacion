@@ -46,6 +46,9 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IExtractorTextoPdf, ExtractorTextoPdfPig>();
 builder.Services.AddScoped<IImportacionProgramasRepository, ImportacionProgramasRepository>();
 builder.Services.AddScoped<ImportacionProgramasService>();
+// HU-38: catálogo de normativas institucionales.
+builder.Services.AddScoped<INormativaRepository, NormativaRepository>();
+builder.Services.AddScoped<NormativaService>();
 
 var issuer = builder.Configuration["Jwt:Issuer"];
 var audience = builder.Configuration["Jwt:Audience"];

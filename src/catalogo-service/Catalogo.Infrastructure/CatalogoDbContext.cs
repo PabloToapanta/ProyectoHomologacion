@@ -8,6 +8,8 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
     public DbSet<Carrera> Carreras => Set<Carrera>();
     public DbSet<Asignatura> Asignaturas => Set<Asignatura>();
     public DbSet<Malla> Mallas => Set<Malla>();
+    public DbSet<Normativa> Normativas => Set<Normativa>();
+    public DbSet<EventoNormativa> EventosNormativa => Set<EventoNormativa>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -110,5 +112,30 @@ public sealed class CatalogoDbContext(DbContextOptions<CatalogoDbContext> option
         programa.Property(p => p.CargadoPor).HasMaxLength(256).IsRequired();
         programa.HasIndex(p => p.AsignaturaId).IsUnique();
         programa.HasOne<Asignatura>().WithMany().HasForeignKey(p => p.AsignaturaId).OnDelete(DeleteBehavior.Restrict);
+        // HU-38: normativas institucionales con su PDF; el historial no tiene clave foránea para sobrevivir a la eliminación.
+        var normativa = modelBuilder.Entity<Normativa>();
+        normativa.ToTable("Normativas", t => t.HasCheckConstraint("CK_Normativas_Tamano", "[Tamano] > 0"));
+        normativa.HasKey(n => n.Id);
+        normativa.Property(n => n.Id).ValueGeneratedNever();
+        normativa.Property(n => n.Codigo).HasMaxLength(50).IsRequired();
+        normativa.Property(n => n.CodigoNormalizado).HasMaxLength(50).IsRequired();
+        normativa.HasIndex(n => n.CodigoNormalizado).IsUnique();
+        normativa.Property(n => n.Titulo).HasMaxLength(300).IsRequired();
+        normativa.Property(n => n.Emisor).HasMaxLength(200).IsRequired();
+        normativa.Property(n => n.Estado).HasConversion<string>().HasMaxLength(20).IsRequired();
+        normativa.Property(n => n.MotivoDerogacion).HasMaxLength(500);
+        normativa.Property(n => n.NombreArchivo).HasMaxLength(200).IsRequired();
+        normativa.Property(n => n.Sha256).HasMaxLength(64).IsFixedLength().IsRequired();
+        normativa.Property(n => n.Contenido).IsRequired();
+        normativa.Property(n => n.RegistradaPor).HasMaxLength(256).IsRequired();
+        var evento = modelBuilder.Entity<EventoNormativa>();
+        evento.ToTable("EventosNormativa");
+        evento.HasKey(e => e.Id);
+        evento.Property(e => e.Id).ValueGeneratedNever();
+        evento.Property(e => e.CodigoNormativa).HasMaxLength(50).IsRequired();
+        evento.Property(e => e.Tipo).HasConversion<string>().HasMaxLength(20).IsRequired();
+        evento.Property(e => e.Usuario).HasMaxLength(256).IsRequired();
+        evento.Property(e => e.Detalle).HasMaxLength(600);
+        evento.HasIndex(e => e.NormativaId);
     }
 }

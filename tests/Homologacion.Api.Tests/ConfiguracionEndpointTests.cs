@@ -89,11 +89,23 @@ public class ConfiguracionEndpointTests
         Assert.Single(segunda.GetProperty("entradas").EnumerateArray());
     }
 
+    [Fact]
+    public async Task HU38_el_Administrador_tambien_consulta_actualiza_y_ve_el_historial()
+    {
+        using var motor = new MotorFactory(); var store = new Store(); using var host = Host(motor, store);
+        using var client = host.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", motor.Token("Administrador"));
+        var lectura = await client.GetAsync(Ruta);
+        Assert.Equal(HttpStatusCode.OK, lectura.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await Cambiar(client, lectura.Headers.ETag!.ToString(), Datos())).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync(Ruta + "/historial")).StatusCode);
+        Assert.Equal(1, store.Escrituras);
+    }
+
     [Theory]
     [InlineData(null, HttpStatusCode.Unauthorized)]
-    [InlineData("Administrador", HttpStatusCode.Forbidden)]
     [InlineData("Docente", HttpStatusCode.Forbidden)]
-    public async Task Solo_coordinador_accede_a_las_tres_operaciones(string? rol, HttpStatusCode esperado)
+    public async Task Solo_coordinador_y_administrador_acceden_a_las_tres_operaciones(string? rol, HttpStatusCode esperado)
     {
         using var motor = new MotorFactory(); var store = new Store(); using var host = Host(motor, store);
         using var client = host.CreateClient();

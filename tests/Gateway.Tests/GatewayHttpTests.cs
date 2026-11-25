@@ -34,6 +34,27 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(GatewayFactory.InternalKey, factory.Forwarded.Last().InternalKey);
     }
 
+    [Theory]
+    [InlineData("GET", "/api/normativas")]
+    [InlineData("POST", "/api/normativas")]
+    [InlineData("GET", "/api/normativas/normativa-prueba")]
+    [InlineData("DELETE", "/api/normativas/normativa-prueba")]
+    [InlineData("GET", "/api/normativas/normativa-prueba/pdf")]
+    [InlineData("GET", "/api/normativas/normativa-prueba/historial")]
+    [InlineData("POST", "/api/normativas/normativa-prueba/derogacion")]
+    public async Task NormativasHu38_llegan_a_catalogo_con_sesion_y_clave_interna(string metodo, string ruta)
+    {
+        using var client = factory.CreateClient();
+        var antes = factory.Forwarded.Count;
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        Assert.Equal(antes, factory.Forwarded.Count);
+        // Los permisos por operación (registrar, derogar, eliminar) los aplica Catálogo.
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: "Docente"));
+        Assert.Equal(HttpStatusCode.OK, (await client.SendAsync(new HttpRequestMessage(new HttpMethod(metodo), ruta))).StatusCode);
+        Assert.Equal("catalogo", factory.Forwarded.Last().Service);
+        Assert.Equal(GatewayFactory.InternalKey, factory.Forwarded.Last().InternalKey);
+    }
+
     public static TheoryData<string, string> RutasGestionHu02 => new()
     {
         { "GET", "/api/usuarios" }, { "POST", "/api/usuarios" },
@@ -69,6 +90,12 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(antes + 1, factory.Forwarded.Count);
         Assert.Equal("homologacion", factory.Forwarded.Last().Service);
         Assert.Equal(ruta + "?limit=10", factory.Forwarded.Last().PathAndQuery);
+        // HU-38: el Administrador también gestiona los parámetros.
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: "Administrador"));
+        using var deAdministrador = new HttpRequestMessage(new HttpMethod(metodo), ruta);
+        if (metodo == "PUT") deAdministrador.Headers.TryAddWithoutValidation("If-Match", "\"version-sintetica\"");
+        Assert.Equal(HttpStatusCode.OK, (await client.SendAsync(deAdministrador)).StatusCode);
+        Assert.Equal(antes + 2, factory.Forwarded.Count);
     }
 
     [Theory]

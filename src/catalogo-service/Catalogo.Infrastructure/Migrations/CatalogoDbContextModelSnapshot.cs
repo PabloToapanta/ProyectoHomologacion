@@ -149,6 +149,43 @@ namespace Catalogo.Infrastructure.Migrations
                     b.ToTable("Contenidos", (string)null);
                 });
 
+            modelBuilder.Entity("Catalogo.Domain.EventoNormativa", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodigoNormativa")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Detalle")
+                        .HasMaxLength(600)
+                        .HasColumnType("nvarchar(600)");
+
+                    b.Property<DateTimeOffset>("Fecha")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("NormativaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormativaId");
+
+                    b.ToTable("EventosNormativa", (string)null);
+                });
+
             modelBuilder.Entity("Catalogo.Domain.Malla", b =>
                 {
                     b.Property<Guid>("Id")
@@ -181,6 +218,92 @@ namespace Catalogo.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Mallas", (string)null);
+                });
+
+            modelBuilder.Entity("Catalogo.Domain.Normativa", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CodigoNormalizado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<byte[]>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Emisor")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTimeOffset?>("FechaDerogacion")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateOnly>("FechaEmision")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("FechaRegistro")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("MotivoDerogacion")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("NombreArchivo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("ReformaAId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReformadaPorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RegistradaPor")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nchar(64)")
+                        .IsFixedLength();
+
+                    b.Property<int>("Tamano")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateOnly>("VigenteDesde")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodigoNormalizado")
+                        .IsUnique();
+
+                    b.ToTable("Normativas", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Normativas_Tamano", "[Tamano] > 0");
+                        });
                 });
 
             modelBuilder.Entity("Catalogo.Domain.PerfilComparacion", b =>
