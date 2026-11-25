@@ -3,10 +3,11 @@ import { Brand } from '../../shared/ui/Brand';
 import { useAuth } from './AuthProvider';
 import type { Role } from './types';
 
-export function ProtectedRoute({ role }: { role?: Role }) {
+/** `role` admite un rol o varios (HU-09: Docente y Coordinador). */
+export function ProtectedRoute({ role }: { role?: Role | Role[] }) {
   const { session, logout } = useAuth();
   if (!session || session.expiresAt <= Date.now()) return <Navigate to="/login" replace />;
-  if (role && session.role !== role) {
+  if (role && !(Array.isArray(role) ? role : [role]).includes(session.role)) {
     return <main className="access-page"><Brand /><section className="access-card">
       <p className="eyebrow">PERMISOS DE ACCESO</p><h1>Acceso restringido</h1>
       <p>Tu cuenta no tiene acceso a esta sección.</p>

@@ -36,6 +36,7 @@ builder.Services.AddScoped<IAsignaturaRepository, AsignaturaRepository>();
 builder.Services.AddScoped<AsignaturaService>();
 builder.Services.AddScoped<IMallaRepository, MallaRepository>();
 builder.Services.AddScoped<MallaService>();
+builder.Services.AddScoped<ConsultaHomologablesService>();
 builder.Services.AddScoped<IUnidadRepository, UnidadRepository>();
 builder.Services.AddScoped<UnidadService>();
 builder.Services.AddScoped<IComparacionCatalogoRepository, ComparacionCatalogoRepository>();

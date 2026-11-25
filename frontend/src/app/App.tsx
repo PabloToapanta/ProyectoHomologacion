@@ -7,6 +7,7 @@ import { ValidacionesPage } from '../features/validaciones/ValidacionesPage';
 import { CatalogoRoute } from '../features/catalogo/CatalogoRoute';
 import { UsuariosRoute } from '../features/usuarios/UsuariosRoute';
 import { ConfiguracionRoute } from '../features/configuracion/ConfiguracionRoute';
+import { ConsultaHomologablesRoute } from '../features/consulta/ConsultaHomologablesRoute';
 
 export function App() {
   return <AuthProvider><Routes>
@@ -19,6 +20,7 @@ export function App() {
     <Route element={<ProtectedRoute />}><Route path="/validaciones" element={<ValidacionesPage />} /></Route>
     <Route element={<ProtectedRoute role="Coordinador" />}><Route path="/solicitudes" element={<SolicitudesRoute />} /><Route path="/configuracion" element={<ConfiguracionRoute />} /></Route>
     <Route element={<ProtectedRoute role="Docente" />}><Route path="/docente/solicitudes" element={<SolicitudesDocenteRoute />} /></Route>
+    <Route element={<ProtectedRoute role={['Docente', 'Coordinador']} />}><Route path="/consulta-homologables" element={<ConsultaHomologablesRoute />} /></Route>
     <Route path="*" element={<Navigate to="/panel" replace />} />
   </Routes></AuthProvider>;
 }

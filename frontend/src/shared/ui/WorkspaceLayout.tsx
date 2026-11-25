@@ -28,6 +28,7 @@ export function WorkspaceLayout({ children }: { children: ReactNode }) {
         {session?.role === 'Coordinador' && <NavLink to="/solicitudes"><span aria-hidden="true">▤</span>Solicitudes</NavLink>}
         {session?.role === 'Coordinador' && <NavLink to="/configuracion"><span aria-hidden="true">⚙</span>Configuración</NavLink>}
         {session?.role === 'Docente' && <NavLink to="/docente/solicitudes"><span aria-hidden="true">▤</span>Mis solicitudes</NavLink>}
+        {(session?.role === 'Docente' || session?.role === 'Coordinador') && <NavLink to="/consulta-homologables"><span aria-hidden="true">⇄</span>Homologables FISEI</NavLink>}
         <NavLink to="/validaciones"><span aria-hidden="true">✓</span>Validaciones académicas</NavLink>
       </nav>
       <p className="sidebar-caption">Facultad de Ingeniería en Sistemas, Electrónica e Industrial</p>
