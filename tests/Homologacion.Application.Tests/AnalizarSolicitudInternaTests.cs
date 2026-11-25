@@ -107,6 +107,18 @@ public class AnalizarSolicitudInternaTests
         Assert.Contains("Contenido origen sintetico", System.Text.Json.JsonSerializer.Serialize(e.Contexto));
     }
     [Fact]
+    public async Task La_evidencia_muestra_el_texto_de_cada_tema_y_no_identificadores_internos()
+    {
+        var e = new EscenarioInterno();
+        var r = await Caso(e).EjecutarAsync(EscenarioInterno.SolicitudId, EscenarioInterno.AprobadaId, EscenarioInterno.ReceptoraId, default);
+        Assert.Equal(
+        [
+            "C1 · Contenido: «Contenido origen sintetico» → «Contenido receptor sintetico» | Ubicación: plan-O/U1/C1 → plan-R/U1/C1",
+            "R1 · Resultado de aprendizaje: «Resultado origen sintetico» → «Resultado receptor sintetico» | Ubicación: plan-O/U1/RA → plan-R/U1/RA"
+        ], r.Resultado!.Evidencias);
+        Assert.DoesNotContain(r.Resultado.Evidencias, x => x.Contains(EscenarioInterno.OrigenId.ToString()) || x.Contains("10000000-0000"));
+    }
+    [Fact]
     public async Task Tercera_matricula_excluye_la_asignatura_sin_invocar_al_agente()
     {
         var e = new EscenarioInterno();

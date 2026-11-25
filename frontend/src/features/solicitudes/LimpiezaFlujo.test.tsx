@@ -7,6 +7,8 @@ import { InformePanel } from './InformePanel';
 it('presenta la evidencia con sus ubicaciones y sin identificadores internos', () => {
   expect(evidenciaLegible('C1: ae43-o/3a76-c [plan-SW-101/U1/C1] → c7c4-r [plan-TI-101/U1/C1]')).toBe('C1 · plan-SW-101/U1/C1 → plan-TI-101/U1/C1');
   expect(evidenciaLegible('Formato desconocido')).toBe('Formato desconocido');
+  expect(evidenciaLegible('C1 · Contenido: «Matrices» → «Matrices y determinantes» | Ubicación: U1 → U1'))
+    .toBe('C1 · Contenido: «Matrices» → «Matrices y determinantes» (U1 → U1)');
 });
 
 it('una solicitud finalizada no ofrece registrar asignaturas', () => {

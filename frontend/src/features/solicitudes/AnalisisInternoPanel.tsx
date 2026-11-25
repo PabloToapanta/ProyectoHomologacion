@@ -90,8 +90,11 @@ export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo
    </li>)}</ul>}
   </>}
   {confirmado&&<p role="status">Análisis guardado.</p>}
-  {resultado?.agente?.reutilizada&&<p>{`Reutilizado · ${resultado.agente.fechaOriginal?fechaHora(resultado.agente.fechaOriginal):'fecha no registrada'} · análisis ${resultado.agente.explicacionOriginalId??resultado.agente.explicacionId}`}</p>}
-  <AnalisisSolicitud analisis={resultado??(abierto?pendiente:inicial)}/>
+  {resultado?.agente?.reutilizada&&<p title={`Explicación ${resultado.agente.explicacionOriginalId??resultado.agente.explicacionId}`}>{`Explicación del agente reutilizada: se generó el ${resultado.agente.fechaOriginal?fechaHora(resultado.agente.fechaOriginal):'(fecha no registrada)'} para esta misma pareja y los mismos programas. Los porcentajes se recalcularon ahora.`}</p>}
+  <AnalisisSolicitud analisis={resultado??(abierto?pendiente:inicial)} nombres={{
+    origen:aprobadas.find(a=>a.id===(resultado?.asignaturaAprobadaId??aprobada))?.nombreAsignatura,
+    receptora:receptoras.find(r=>r.id===(resultado?.asignaturaReceptoraId??receptora))?.nombre,
+    receptoraId:resultado?.asignaturaReceptoraId??receptora}}/>
   {resultado?.advertencias?.map(a=><p key={a}>{a}</p>)}
   {/* HU-31: el docente registra su análisis sobre la pareja seleccionada, haya o no sugerencia del agente. */}
   {abierto&&aprobada&&receptora&&<RevisionDocentePanel soloLectura={soloLectura} request={request} solicitudId={solicitudId} aprobadaId={aprobada} receptoraId={receptora}
