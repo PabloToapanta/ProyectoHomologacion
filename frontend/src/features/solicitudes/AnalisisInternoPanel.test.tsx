@@ -52,9 +52,11 @@ it('HU-37 indica que la explicación del agente se reutilizó, con su fecha e id
  render(<AnalisisInternoPanel request={request} solicitudId="sol-a" aprobadas={aprobadas} inicial={pendiente}/>);
  const user=await abrirYSeleccionar();
  await user.click(screen.getByRole('button',{name:'Ejecutar análisis y guardar'}));
- const nota=await screen.findByText(/^Reutilizado ·/);
+ const nota=await screen.findByText(/^Explicación del agente reutilizada/);
  expect(nota).toHaveTextContent(fechaHora('2026-11-20T15:00:00Z'));
- expect(nota).toHaveTextContent('análisis exp-1');
+ // El identificador interno no se muestra al docente; queda solo como información técnica.
+ expect(nota).not.toHaveTextContent('exp-1');
+ expect(nota).toHaveAttribute('title','Explicación exp-1');
 });
 it('HU-37 una explicación nueva no se marca como reutilizada',async()=>{
  const agente={explicacionId:'exp-2',reutilizada:false,explicacionOriginalId:null,fechaOriginal:null,modelo:'modelo-sintetico',versionPlantilla:'hu18-v1'};
@@ -63,7 +65,7 @@ it('HU-37 una explicación nueva no se marca como reutilizada',async()=>{
  const user=await abrirYSeleccionar();
  await user.click(screen.getByRole('button',{name:'Ejecutar análisis y guardar'}));
  expect(await screen.findByText('Análisis guardado.')).toBeInTheDocument();
- expect(screen.queryByText(/^Reutilizado ·/)).not.toBeInTheDocument();
+ expect(screen.queryByText(/^Explicación del agente reutilizada/)).not.toBeInTheDocument();
 });
 it('HU-37 forzar un análisis nuevo exige el motivo y lo envía',async()=>{
  const request=vi.fn(async(path:string,init?:RequestInit)=>json(init?.method==='POST'?completo(null):path.endsWith('/opciones')?receptoraOpciones:[]));

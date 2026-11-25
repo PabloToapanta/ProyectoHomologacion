@@ -101,7 +101,7 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             "Incompleto" => resultado.Evaluacion.Justificacion,
             _ => "No fue posible completar la asistencia. Se requiere revisión manual; no se presenta un resultado exitoso."
         };
-        var resumen = estadoAnalisis == "Completo" ? Resumen(resultado) : null;
+        var resumen = estadoAnalisis == "Completo" ? Resumen(resultado, textos) : null;
         return new(solicitudId, aprobadaId, receptoraId, estadoAnalisis, mensaje, resumen, resultado.Evaluacion, antiguedad,
             origen.EsSintetico || receptora.EsSintetico, advertencias) { Agente = resultado.Agente, Mallas = mallas };
     }
@@ -135,14 +135,21 @@ public sealed class AnalizarSolicitudInterna(ISolicitudesAnalisisInterno solicit
             || a.Contenidos.Select(e => e.Id).Distinct().Count() != a.Contenidos.Count || a.Resultados.Select(e => e.Id).Distinct().Count() != a.Resultados.Count)
             throw new FuenteAnalisisNoDisponibleException();
     }
-    private static ResumenAnalisisInterno Resumen(AnalisisAsistido resultado)
+    /// <summary>
+    /// Evidencia legible para el docente: el texto del contenido o resultado de cada lado (del catálogo consultado)
+    /// y, como dato secundario, la ubicación registrada en la revisión. Sin identificadores internos.
+    /// </summary>
+    private static ResumenAnalisisInterno Resumen(AnalisisAsistido resultado, IReadOnlyList<TextoElementoAnalisis> textos)
     {
         var r = resultado.Evaluacion;
         var referencias = resultado.Referencias!.ToDictionary(e => e.Id, StringComparer.Ordinal);
+        var texto = textos.GroupBy(t => t.ElementoId, StringComparer.Ordinal).ToDictionary(g => g.Key, g => g.First().Texto, StringComparer.Ordinal);
+        string Tema(string id) => texto.TryGetValue(id, out var t) ? $"«{t}»" : "«tema no disponible en el catálogo actual»";
         var citas = resultado.Asistencia!.EvidenciasCitadas.Select(id =>
         {
-            var referencia = referencias[id]; var c = referencia.Correspondencia;
-            return $"{id}: {c.AsignaturaOrigen}/{c.ElementoOrigen} [{c.Evidencia!.UbicacionOrigen}] → {c.ElementoReceptor} [{c.Evidencia.UbicacionReceptora}]";
+            var c = referencias[id].Correspondencia;
+            var categoria = id.StartsWith('R') ? "Resultado de aprendizaje" : "Contenido";
+            return $"{id} · {categoria}: {Tema(c.ElementoOrigen)} → {Tema(c.ElementoReceptor)} | Ubicación: {c.Evidencia!.UbicacionOrigen} → {c.Evidencia.UbicacionReceptora}";
         }).ToArray();
         return new(r.CompatibilidadAcademicaPct, r.CompatibilidadHorariaPct, r.CompatibilidadCreditosPct,
             r.Homologable ? "Homologable" : "No homologable", r.Justificacion + " Asistencia: " + resultado.Asistencia.Resumen, citas);

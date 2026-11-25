@@ -1,3 +1,4 @@
+import {evidenciaPartes,explicarFaltantes,type NombresPareja} from './explicarAnalisis';
 import {fechaHora} from '../../shared/fecha';
 import {MallasAnalisisResumen,type MallasGuardadas} from './MallasAnalisisResumen';
 import {useEffect,useState} from 'react';
@@ -19,21 +20,26 @@ export type ResultadoAnalisis={porcentajeAcademico:number|null;porcentajeHoras:n
 export type Analisis={estado:string;mensaje:string;resultado:ResultadoAnalisis|null;mallas?:MallasGuardadas|null};
 type SolicitudAsignada={solicitud:Detalle;analisis:Analisis};
 const mensaje=(e:unknown)=>e instanceof Error?e.message:'No se pudo completar la operación.';
-/** «C1: uuid/uuid [plan-O/U1] → uuid [plan-R/U1]» → «C1 · plan-O/U1 → plan-R/U1». Si no reconoce el formato, lo deja igual. */
-export const evidenciaLegible=(e:string)=>{const m=/^(\w+):.*?\[([^\]]*)\]\s*→.*?\[([^\]]*)\]\s*$/.exec(e);return m?`${m[1]} · ${m[2]} → ${m[3]}`:e;};
+/** Texto de una evidencia sin identificadores internos (formato nuevo o de análisis guardados antes). */
+export const evidenciaLegible=(e:string)=>{const p=evidenciaPartes(e);return p.ubicacion?`${p.principal} (${p.ubicacion})`:p.principal;};
 const porcentaje=(v:number|null)=>v===null?'Sin dato':`${v.toLocaleString('es-EC',{maximumFractionDigits:2})} %`;
 /** Solo «Completo» con resultado presenta una sugerencia; cualquier otro caso se muestra como no concluido. */
-export function AnalisisSolicitud({analisis}:{analisis:Analisis}) {
+export function AnalisisSolicitud({analisis,nombres={}}:{analisis:Analisis;nombres?:NombresPareja}) {
  const {estado,mensaje:texto,resultado}=analisis;
+ const pasos=estado==='Incompleto'&&/^\s*Información incompleta:/i.test(texto)?explicarFaltantes(texto,nombres):[];
  if(estado==='Completo'&&resultado) return <section aria-labelledby="analisis-titulo">
   <h3 id="analisis-titulo">Resultado del análisis automatizado</h3><MallasAnalisisResumen mallas={analisis.mallas}/>
   <p>Insumo para su revisión académica: no es la decisión final de homologación.</p>
   <dl><dt>Académico combinado</dt><dd>{porcentaje(resultado.porcentajeAcademico)}</dd><dt>Horas</dt><dd>{porcentaje(resultado.porcentajeHoras)}</dd><dt>Créditos</dt><dd>{porcentaje(resultado.porcentajeCreditos)}</dd>
    <dt>Sugerencia</dt><dd>{resultado.sugerencia}</dd><dt>Justificación</dt><dd>{resultado.justificacion}</dd></dl>
-  <h4>Evidencia disponible</h4>{resultado.evidencias.length?<ul>{resultado.evidencias.map(e=><li key={e}>{evidenciaLegible(e)}</li>)}</ul>:<p>Sin evidencia registrada.</p>}
+  <h4>Evidencia disponible</h4>{resultado.evidencias.length?<ul className="evidencias-analisis">{resultado.evidencias.map(e=>{const p=evidenciaPartes(e);return <li key={e}>{p.principal}{p.ubicacion&&<><br/><small>Ubicación registrada: {p.ubicacion}</small></>}</li>;})}</ul>:<p>Sin evidencia registrada.</p>}
  </section>;
  const titulo=estado==='Pendiente'?'Análisis pendiente':estado==='Fallido'?'El análisis falló':'Información incompleta';
- return <section aria-labelledby="analisis-titulo" role="status"><h3 id="analisis-titulo">{titulo}</h3><p>{texto||'No hay un resultado de análisis disponible para esta solicitud.'}</p>{estado!=='Pendiente'&&<MallasAnalisisResumen mallas={analisis.mallas}/>}</section>;
+ return <section aria-labelledby="analisis-titulo" role="status"><h3 id="analisis-titulo">{titulo}</h3>
+  {pasos.length?<><p>Esta pareja todavía no se puede analizar. Para completarla falta:</p><ul>{pasos.map(p=><li key={p}>{p}</li>)}</ul>
+   <p><small>Los datos del catálogo los completa el administrador. Cuando estén registrados, vuelve a ejecutar el análisis.</small></p></>
+   :<p>{texto||'No hay un resultado de análisis disponible para esta solicitud.'}</p>}
+  {estado!=='Pendiente'&&<MallasAnalisisResumen mallas={analisis.mallas}/>}</section>;
 }
 /** HU-30 consulta solicitudes; HU-18 (interno) y HU-19 (externo) analizan parejas sin aprobar ni remitir (HU-31). */
 export function SolicitudesDocentePage({request}:{request:Request}) {
