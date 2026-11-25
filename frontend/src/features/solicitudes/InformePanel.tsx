@@ -86,7 +86,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
   {cargando&&<p>Consultando informe…</p>}{error&&<p role="alert">{error}</p>}
   {pendiente&&!informe&&<>
    <p>El informe aún no se ha generado. {puedeGenerar?'Puede generarlo cualquiera de los dos docentes cuando cada pareja analizada tenga el análisis de ambos. Una vez generado es fijo y los análisis docentes quedan cerrados.':'Los docentes asignados deben generarlo antes de que Coordinación pueda exportarlo.'}</p>
-   {puedeGenerar&&<button className="app-button" disabled={ocupado} onClick={generar}>{ocupado?'Generando…':'Generar informe'}</button>}
+   {puedeGenerar&&<button className="app-button app-button--primary" disabled={ocupado} onClick={generar}>{ocupado?'Generando…':'Generar informe'}</button>}
   </>}
   {informe&&<>
    <button type="button" className="app-button informe-pdf__exportar" onClick={exportarInformePdf}>Exportar informe a PDF</button>
@@ -116,7 +116,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
     :remitida?<p role="status">Informe remitido al coordinador de carrera.</p>
     :estadoSolicitud!==undefined&&<>
      <p>Remita el informe al coordinador de carrera cuando esté listo. Se remite una sola vez; las parejas «Sin acuerdo» las decide el coordinador.</p>
-     <button className="app-button" disabled={ocupado} onClick={remitir}>{ocupado?'Remitiendo…':'Remitir al coordinador'}</button>
+     <button className="app-button app-button--primary" disabled={ocupado} onClick={remitir}>{ocupado?'Remitiendo…':'Remitir al coordinador'}</button>
     </>}
    </div>
   </>}

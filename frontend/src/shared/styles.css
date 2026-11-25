@@ -59,6 +59,13 @@ button:disabled { cursor: wait; }
 .app-button--primary:disabled { opacity: .7; }
 .app-button--secondary { border-color: #cfdbd1; color: #25554d; background: transparent; }
 .app-button--secondary:hover { background: #e7eee5; }
+.app-button--secondary:disabled, .app-button--danger:disabled { opacity: .6; }
+.app-button--danger { border-color: #b3261e; color: #fff; background: #b3261e; }
+.app-button--danger:hover:not(:disabled) { background: #8f1e18; }
+a.app-button { text-decoration: none; }
+/* Enlaces dentro del texto: color de la aplicación en lugar del azul/morado del navegador. */
+.enlace, .academic-content p a:not(.app-button) { color: var(--accent); font-weight: 650; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.enlace:hover, .academic-content p a:not(.app-button):hover { color: #194e48; }
 .login-submit { margin-top: 27px; width: 100%; justify-content: space-between; }
 .login-submit > span:last-child { font-size: 18px; }
 .auth-error { margin-top: 20px; padding: 12px 14px; border: 1px solid #eacbc2; border-radius: 7px; background: #fff3ee; color: #8e3525; font-size: 12px; line-height: 1.7; }

@@ -84,7 +84,7 @@ export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo
     {forzar&&<label>Motivo<textarea value={motivo} maxLength={500} required disabled={ocupado} onChange={e=>setMotivo(e.target.value)}/></label>}
     <p>Si los programas, las correspondencias, los parámetros y el modelo no cambiaron, se reutiliza la explicación anterior del agente. Al forzar, la anterior se conserva.</p>
    </fieldset>}
-   <button className="app-button" disabled={ocupado||!aprobada||!receptora||faltaMotivo} onClick={ejecutar}>Ejecutar análisis y guardar</button></>}
+   <button className="app-button app-button--primary" disabled={ocupado||!aprobada||!receptora||faltaMotivo} onClick={ejecutar}>Ejecutar análisis y guardar</button></>}
    {guardados.length>0&&<ul aria-label="Análisis guardados por pareja">{guardados.map(x=><li key={`${x.analisis.asignaturaAprobadaId}/${x.analisis.asignaturaReceptoraId}`}>
     <button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>{setResultado(x.analisis);setAprobada(x.analisis.asignaturaAprobadaId);setReceptora(x.analisis.asignaturaReceptoraId);setConfirmado(false);}}>Ver {aprobadas.find(a=>a.id===x.analisis.asignaturaAprobadaId)?.nombreAsignatura??'Asignatura histórica'} → {receptoras.find(a=>a.id===x.analisis.asignaturaReceptoraId)?.nombre??'Receptora histórica'} ({x.analisis.estado})</button>
    </li>)}</ul>}

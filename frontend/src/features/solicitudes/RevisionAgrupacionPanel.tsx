@@ -14,7 +14,7 @@ export function RevisionAgrupacionPanel({request,ruta,sugerencia}:{request:Reque
   <label>Postura del grupo<select value={postura} onChange={e=>setPostura(e.target.value)}><option value="Ajuste">Ajuste</option><option value="DeAcuerdo" disabled={!completa}>De acuerdo con la sugerencia</option></select></label>
   {postura==='Ajuste'&&<label>Decisión del grupo<select value={decision} required onChange={e=>setDecision(e.target.value)}><option value="">Seleccione</option><option value="Homologable">Homologable</option><option value="NoHomologable">No homologable</option></select></label>}
   <label>Observación del grupo<textarea maxLength={2000} required={postura==='Ajuste'} value={observacion} onChange={e=>setObservacion(e.target.value)}/></label>
-  <button className="app-button" disabled={busy}>Guardar mi revisión del grupo</button></fieldset></form>
+  <button className="app-button app-button--primary" disabled={busy}>Guardar mi revisión del grupo</button></fieldset></form>
   <ul aria-label="Revisiones del grupo">{revisiones.map(r=><li key={r.docenteId}>{r.docente} · {r.postura} · {r.decision} · {r.observacion}</li>)}</ul>
  </section>;
 }

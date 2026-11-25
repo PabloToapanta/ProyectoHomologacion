@@ -111,7 +111,7 @@ export function ConfiguracionPage({ request }: { request: ConfiguracionRequest }
     {cargando && <p>Cargando configuración…</p>}
     {error && <p role="alert" className="configuracion-error">{error}</p>}
     {aviso && <p role="status" className="configuracion-aviso">{aviso}</p>}
-    {!cargando && !vigente && <button type="button" className="app-button" onClick={() => void recargar().catch(e => setError(errorTexto(e)))}>Reintentar</button>}
+    {!cargando && !vigente && <button type="button" className="app-button app-button--secondary" onClick={() => void recargar().catch(e => setError(errorTexto(e)))}>Reintentar</button>}
     {vigente && valores && <>
       <p className="configuracion-version">Versión vigente: <code>{vigente.versionId}</code></p>
       <form onSubmit={guardar} className="configuracion-form">
@@ -128,7 +128,7 @@ export function ConfiguracionPage({ request }: { request: ConfiguracionRequest }
             {vigentes.map(n => <option key={n.id} value={n.id}>{respaldoDe(n)}</option>)}
           </select></label>
           {errorNormativas && <p role="alert" className="configuracion-error">{errorNormativas}</p>}
-          {!errorNormativas && vigentes.length === 0 && <p className="configuracion-nota">No hay normativas vigentes. Regístrala primero en <a href="/normativas">Normativas</a>.</p>}
+          {!errorNormativas && vigentes.length === 0 && <p className="configuracion-nota">No hay normativas vigentes. Regístrala primero en <a className="enlace" href="/normativas">Normativas</a>.</p>}
           <label>Detalle del respaldo (opcional: artículo, sección)<textarea maxLength={500} value={detalleRespaldo} onChange={e => setDetalleRespaldo(e.target.value)} /></label>
           <button type="submit" className="app-button app-button--primary">Guardar configuración</button>
         </fieldset>

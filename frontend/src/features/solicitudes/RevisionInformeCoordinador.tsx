@@ -103,7 +103,7 @@ export function RevisionInformeCoordinador({request,solicitudId,aprobadas,onFina
     <p>{revision.decisionesPendientes>0
      ?`Falta decidir ${revision.decisionesPendientes} pareja${revision.decisionesPendientes===1?'':'s'} «Sin acuerdo» antes de finalizar.`
      :'Al finalizar, la solicitud queda «Finalizada» con la fecha y su usuario, y ya no admite cambios.'}</p>
-    <button className="app-button" disabled={ocupado||revision.decisionesPendientes>0} onClick={finalizar}>Finalizar solicitud</button>
+    <button className="app-button app-button--primary" disabled={ocupado||revision.decisionesPendientes>0} onClick={finalizar}>Finalizar solicitud</button>
    </>}
   </>}
  </section>;
