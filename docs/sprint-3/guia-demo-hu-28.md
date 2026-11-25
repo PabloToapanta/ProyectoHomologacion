@@ -1,7 +1,7 @@
 # HU-28 — Arranque local, guía por rol y guion de demostración
 
 **Issue:** [#73 — Documentación y guion de demo](https://github.com/PabloToapanta/ProyectoHomologacion/issues/73)  
-**Revisión de la guía:** 21/11/2026 · **Base revisada:** `origin/develop` en `10a2b5e`  
+**Revisión de la guía:** 25/11/2026 (pasos del flujo completo y §7) · 21/11/2026 (arranque) · **Base revisada:** `origin/develop` en `b326843`  
 **Estado:** borrador de documentación. El 21/11/2026 se levantaron dos stacks aislados, HTTP (`hu28-demo-20261121`) y HTTPS (`hu28-https-20261121`); los siete servicios de cada uno quedaron saludables. HTTP está disponible en `http://127.0.0.1:15173/login` y `http://127.0.0.1:15080`; HTTPS en `https://localhost/login`. La página de login respondió 200, el login de la cuenta local respondió 200 y una ruta protegida sin sesión respondió 401. HTTP redirigió a HTTPS con 308; HTTPS respondió 200 y `Strict-Transport-Security: max-age=60`. Brave mostró el login sin intersticial de certificado. Los stacks conservan volúmenes separados. Al inicio faltaban dos claves en `.env.sprint1`; se generaron aleatoriamente y se guardaron solo en ese archivo privado antes de reiniciar ambos stacks. No se mostraron ni versionaron. La revisión visual del flujo por roles, el flujo completo, la aceptación de la PO y la revisión cruzada siguen pendientes.
 
 Esta guía usa cuentas y registros sintéticos. No copiar contraseñas, tokens, certificados privados ni datos personales en el repositorio, capturas o evidencias.
@@ -96,7 +96,9 @@ Abrir <https://localhost/login>. También se puede visitar `http://localhost/log
 2. Registrar una solicitud de demostración, elegir el tipo de cambio y proporcionar los datos requeridos por el formulario. El número de trámite debe ser sintético.
 3. Abrir el detalle, registrar las asignaturas aprobadas que correspondan al fixture y asignar dos docentes diferentes.
 4. Consultar el estado de la solicitud y, si forma parte del escenario, revisar **Configuración**. Los valores académicos son parámetros del proyecto pendientes de validación institucional; no presentarlos como normativa oficial.
-5. La generación del informe está disponible cuando el flujo y los análisis requeridos están completos. La remisión y finalización del Coordinador están pendientes de integrar y verificar en el `develop` revisado (véase §7).
+5. En **Homologables FISEI** (HU-09), elegir dos carreras y consultar los porcentajes y el veredicto de cada pareja revisada. Es solo lectura.
+6. Cuando los docentes remiten el informe, la solicitud pasa a **Remitida**. En su detalle, el Coordinador revisa el informe, registra una decisión justificada en cada pareja **Sin acuerdo** y pulsa **Finalizar solicitud**. La solicitud queda **Finalizada** y en solo lectura.
+7. **Historial del informe** (HU-25) muestra «Generado», «Remitido» y «Finalizado», con fecha, usuario y rol.
 
 ### Docente
 
@@ -104,7 +106,7 @@ Abrir <https://localhost/login>. También se puede visitar `http://localhost/log
 2. Abrir solo una solicitud asignada y revisar los datos disponibles.
 3. Registrar su análisis individual para el caso correspondiente. El agente entrega una sugerencia; el docente revisa y registra su decisión. No presentar la salida del agente como decisión académica oficial.
 4. Repetir con la segunda cuenta Docente para comprobar que cada análisis es individual.
-5. La pantalla del informe es de consulta. Remisión y finalización requieren la integración pendiente indicada abajo.
+5. Cuando las dos cuentas completaron su análisis, cualquiera de ellas pulsa **Generar informe**; el informe queda fijo. Desde ahí se puede **Exportar informe a PDF** (HU-24) y **Remitir al coordinador** (HU-32). Tras la remisión, los análisis quedan solo en consulta.
 
 ## 6. Guion de demo
 
@@ -114,12 +116,13 @@ Duración orientativa: 8–12 minutos, más el tiempo de inicio de contenedores.
 2. **Administrador (2 min):** iniciar sesión, crear una cuenta Coordinador y dos Docentes de prueba, y mostrar el catálogo sintético.
 3. **Coordinador (2 min):** registrar una solicitud interna sintética, seleccionar las asignaturas preparadas y asignar a los dos docentes.
 4. **Docentes (2–3 min):** iniciar sesión separadamente con cada cuenta, abrir la solicitud asignada y guardar cada análisis individual. Mostrar que una cuenta no edita el análisis de la otra.
-5. **Informe (1 min):** volver a la cuenta Coordinador y mostrar el informe disponible cuando se completen los análisis. Describir únicamente los campos y el estado que aparezcan en pantalla.
-6. **Remisión (solo después de integrar HU-32, PR #86):** iniciar sesión como uno de los docentes asignados, abrir el informe y pulsar **Remitir al coordinador**. Volver a Coordinador y comprobar el estado **Remitida**.
-7. **Revisión y finalización (solo después de integrar HU-33, PR #89):** como Coordinador, abrir la revisión del informe; si hay parejas **Sin acuerdo**, registrar una decisión propia con justificación; finalizar y comprobar que la solicitud queda en solo lectura. Mostrar eventos del historial solo si HU-25 (PR #85) está integrada.
-8. **Calidad y cierre (1 min):** enseñar los checks de la PR y la matriz de pruebas solo si están visibles y actuales. Cerrar sesión y detener el stack conservando el volumen.
+5. **Informe (1 min):** con una de las cuentas Docente, generar el informe y mostrarlo. Exportarlo a PDF. Describir únicamente los campos y el estado que aparezcan en pantalla.
+6. **Remisión (HU-32):** con el mismo docente, pulsar **Remitir al coordinador**. Volver a Coordinador y comprobar el estado **Remitida**.
+7. **Revisión y finalización (HU-33):** como Coordinador, abrir la revisión del informe; si hay parejas **Sin acuerdo**, registrar una decisión propia con justificación; finalizar y comprobar que la solicitud queda en solo lectura (no ofrece agregar asignaturas).
+8. **Auditoría (HU-25):** mostrar **Historial del informe** con los tres eventos.
+9. **Calidad y cierre (1 min):** enseñar los checks de la PR y la matriz de pruebas solo si están visibles y actuales. Cerrar sesión y detener el stack conservando el volumen.
 
-No afirmar que el flujo completo de remisión/finalización, adjuntos, auditoría o exportación PDF está disponible hasta verificar que sus PR correspondientes están integradas y pasar el recorrido de extremo a extremo.
+Lo que no se ha probado en el recorrido (véase §7) se presenta como pendiente, no como funcionando.
 
 ## 7. Estado verificado frente a pendiente
 
@@ -127,9 +130,12 @@ No afirmar que el flujo completo de remisión/finalización, adjuntos, auditorí
 | --- | --- |
 | Compose base `compose.sprint1.yaml` y overlay de Solicitudes `compose.hu10.yaml` | Stack HTTP aislado compilado y reiniciado con `.env.sprint1`; 7/7 servicios saludables. Frontend `/login`: 200; login de la cuenta local: 200; ruta protegida sin sesión: 401. |
 | Overlay HTTPS `compose.hu34.yaml` y rutas de login por rol | Stack HTTPS aislado con certificado .NET confiable; 7/7 saludables. HTTP → HTTPS: 308; HTTPS `/login`: 200; HSTS `max-age=60`; ruta protegida: 401; login: 200. Brave mostró el login sin intersticial de certificado. |
-| Roles Administrador, Coordinador y Docente; solicitudes, análisis e informe | Rutas y componentes presentes en la base `10a2b5e`; requieren comprobación manual de la demo. |
-| Adjuntos HU-12 (#82) y exportación PDF HU-24 (#83) | PR abiertas en la revisión del 21/11; no dar por integradas hasta comprobar `develop`. |
-| Remisión HU-32 (#86), auditoría HU-25 (#85) y finalización HU-33 (#89) | PR abiertas en la revisión del 21/11; los pasos 6–7 del guion dependen de integración y de verificar el recorrido en navegador. |
+| Roles Administrador, Coordinador y Docente; solicitudes, análisis e informe | Recorrido manual de los tres roles en navegador el 24–25/11 sobre `develop` con #100 y #101, con datos sintéticos y el agente simulado. |
+| Adjuntos HU-12, PDF HU-24, remisión HU-32, finalización HU-33 y auditoría HU-25 | Integradas en `develop`. Remisión, finalización e historial se recorrieron en navegador; la impresión real del PDF no se comprobó en esta revisión. |
+| HU-09, filtro de receptoras por malla vigente y limpieza del detalle (#100, #101, #102) | Integradas en `develop` el 25/11 (`b326843`). HU-09 respondió por el Gateway con las tres parejas sintéticas esperadas; sin sesión, 401. |
+| E2E HU-27 (Playwright) | Superada el 25/11 sobre `b326843`, en un proyecto Docker aislado y con Edge como navegador: dos docentes analizan, se genera y remite el informe y el coordinador finaliza la solicitud. |
+| Frontend (Vitest) sobre `b326843` | 224/224 superadas; `tsc` correcto. |
+| Ollama real y HTTPS | No comprobados en la revisión del 25/11; la última comprobación de HTTPS es la del 21/11 (arriba). |
 | Certificado, cuentas, datos de prueba, captura y aceptación de PO | Preparación/ejecución pendiente del equipo; no se adjuntan secretos ni resultados simulados. |
 
 Antes de la demo, actualizar esta tabla con el SHA real de `develop`, el estado de cada PR, fecha, persona que ejecutó Compose, resultado observado y evidencias saneadas. Un check de CI o una prueba de servicio no equivale por sí solo a aceptación funcional de la PO.
