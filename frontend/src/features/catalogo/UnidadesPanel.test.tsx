@@ -3,6 +3,17 @@ import userEvent from '@testing-library/user-event';
 import { expect, test, vi } from 'vitest';
 import { UnidadesPanel } from './UnidadesPanel';
 
+test('las unidades se abren en una ventana modal que se cierra con su botón', async () => {
+  const request = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ unidades: [] })));
+  const cerrar = vi.fn();
+  render(<UnidadesPanel asignaturaId="a" nombre="ALGEBRA LINEAL" request={request} cerrar={cerrar} />);
+  const ventana = screen.getByRole('dialog', { name: 'Unidades y contenidos · ALGEBRA LINEAL' });
+  expect(within(ventana).getByRole('region', { name: 'Unidades de ALGEBRA LINEAL' })).toBeInTheDocument();
+  await within(ventana).findByText('No hay unidades registradas.');
+  await userEvent.setup().click(within(ventana).getByRole('button', { name: 'Cerrar ventana' }));
+  expect(cerrar).toHaveBeenCalledOnce();
+});
+
 test('consulta unidades y registra contenido sin perder el resultado de aprendizaje', async () => {
   const request = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ unidades: [] })))
     .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'u', numero: 1, nombre: 'Unidad sintética', horas: 36, resultadoAprendizaje: 'Resultado sintético', contenidos: [{ id: 'c', orden: 1, tema: 'Tema sintético' }] }), { status: 201 }));

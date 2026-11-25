@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import type { FormEvent } from 'react';
 
+import { FormDialog } from '../../shared/ui/FormDialog';
 import type { CatalogoRequest } from './carreras-api';
 
 interface Tematica { id?: string; nombre: string; contenidos: { id: string; orden: number; tema: string }[] }
@@ -112,9 +113,8 @@ export function UnidadesPanel({ asignaturaId, nombre, request, cerrar }: { asign
 
       </fieldset><button className="app-button app-button--primary" disabled={guardando}>{guardando ? 'Guardando…' : editando ? 'Guardar cambios' : 'Guardar unidad'}</button><button type="button" className="app-button app-button--secondary" disabled={guardando} onClick={() => { setEditando(null); setRegistrando(false); setForm(inicial); setError(''); }}>{editando ? 'Cancelar edición' : 'Cancelar registro'}</button><p>Cada línea se guarda como un contenido. Une los saltos de línea que provengan del PDF antes de guardar.</p></form>
   </>;
-  return <section className="catalogo-card" aria-label={`Unidades de ${nombre}`}>
-
-    <div className="catalogo-list-heading"><h2>Unidades y contenidos · {nombre}</h2><button className="app-button app-button--secondary" disabled={guardando} onClick={cerrar}>Cerrar unidades</button></div>
+  return <FormDialog title={`Unidades y contenidos · ${nombre}`} titleId="unidades-dialogo-titulo" busy={guardando} onDismiss={cerrar}>
+  <section className="unidades-dialogo" aria-label={`Unidades de ${nombre}`}>
 
     {!editando && error && <p role="alert" className="auth-error">{error}</p>}{aviso && <p role="status">{aviso}</p>}
 
@@ -131,7 +131,8 @@ export function UnidadesPanel({ asignaturaId, nombre, request, cerrar }: { asign
 
     </>}
 
-  </section>;
+  </section>
+  </FormDialog>;
 
 }
 
