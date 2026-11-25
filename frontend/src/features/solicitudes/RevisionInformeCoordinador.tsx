@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react';
 import type {FormEvent} from 'react';
+import {fechaHora} from '../../shared/fecha';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Aprobada={id:string;nombreAsignatura:string};
 type DocenteEnInforme={docenteId:string;docente:string;postura:'DeAcuerdo'|'Ajuste';decision:'Homologable'|'NoHomologable';observacion:string|null;fecha:string};
@@ -14,7 +15,7 @@ const posturas={DeAcuerdo:'De acuerdo',Ajuste:'Ajuste'} as const;
 const decisiones={Homologable:'Homologable',NoHomologable:'No homologable'} as const;
 const resultados={Convalidar:'Convalidar',NoConvalidar:'No convalidar',SinAcuerdo:'Sin acuerdo'} as const;
 const pct=(v:number|null)=>v===null?'—':`${v.toLocaleString('es-EC',{maximumFractionDigits:2})} %`;
-const fecha=(v:string)=>new Date(v).toLocaleString('es-EC');
+const fecha=(v:string)=>fechaHora(v);
 const clave=(aprobada:string,receptora:string)=>`${aprobada}/${receptora}`;
 async function motivo(r:Response,defecto:string){try{const p=await r.json();return p.detail??p.title??defecto;}catch{return defecto;}}
 

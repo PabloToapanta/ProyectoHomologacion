@@ -9,7 +9,7 @@ const intentos=['Primera','Segunda','Tercera'];
 // La fecha académica no tiene hora: se muestra tal cual para no desplazarla por zona horaria.
 const fecha=(valor:string)=>valor.split('-').reverse().join('/');
 const mensaje=(e:unknown)=>e instanceof Error?e.message:'No se pudo completar la operación.';
-export function AsignaturasAprobadas({tipoCambio,asignaturas,ocupado,cargarOrigen,registrar}:{tipoCambio:'Interno'|'Externo';asignaturas:AsignaturaAprobada[];ocupado:boolean;cargarOrigen:()=>Promise<AsignaturaCatalogo[]>;registrar:(input:AsignaturaAprobadaInput)=>Promise<void>}) {
+export function AsignaturasAprobadas({tipoCambio,asignaturas,ocupado,cargarOrigen,registrar,finalizada=false}:{finalizada?:boolean;tipoCambio:'Interno'|'Externo';asignaturas:AsignaturaAprobada[];ocupado:boolean;cargarOrigen:()=>Promise<AsignaturaCatalogo[]>;registrar:(input:AsignaturaAprobadaInput)=>Promise<void>}) {
  const [campos,setCampos]=useState<Campos|null>(null),[origen,setOrigen]=useState<AsignaturaCatalogo[]>([]),[error,setError]=useState(''),[aviso,setAviso]=useState('');
  const interno=tipoCambio==='Interno';
  const campo=(nombre:keyof Campos)=>({value:campos?.[nombre]??'',onChange:(e:{target:{value:string}})=>setCampos(actual=>actual&&{...actual,[nombre]:e.target.value})});
@@ -47,6 +47,6 @@ export function AsignaturasAprobadas({tipoCambio,asignaturas,ocupado,cargarOrige
    <label>Número de matrícula<input required maxLength={50} {...campo('numeroMatricula')}/></label>
    <label>Intento de matrícula<select required {...campo('intentoMatricula')}><option value="">Seleccione el intento</option>{intentos.map((nombre,i)=><option key={nombre} value={i+1}>{nombre}</option>)}</select></label>
    </fieldset><div className="catalogo-actions"><button className="app-button app-button--primary" disabled={ocupado}>{ocupado?'Registrando…':'Registrar asignatura'}</button><button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={()=>{setCampos(null);setError('');}}>Cancelar registro</button></div>
-  </form>:<button className="app-button app-button--primary" disabled={ocupado} onClick={agregar}>Agregar asignatura aprobada</button>}
+  </form>:finalizada?<p>Solicitud finalizada: no admite registrar asignaturas.</p>:<button className="app-button app-button--primary" disabled={ocupado} onClick={agregar}>Agregar asignatura aprobada</button>}
  </section>;
 }

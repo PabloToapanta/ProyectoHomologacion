@@ -1,3 +1,4 @@
+import {fechaHora} from '../../shared/fecha';
 import {useEffect,useState} from 'react';
 import type {FormEvent} from 'react';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
@@ -8,6 +9,8 @@ async function leer<T>(response:Response):Promise<T>{
  if(!response.ok){let text='No se pudo completar la operación.';try{const problem=await response.json();text=problem.detail??problem.title??text;}catch{/* Respuesta sin cuerpo. */}throw new Error(text);}
  return response.json() as Promise<T>;
 }
+/** Tamaño legible: KiB por debajo de 1 MiB para no mostrar «0.00 MiB». */
+const tamano=(bytes:number)=>bytes<1024*1024?`${Math.max(1,Math.round(bytes/1024))} KiB`:`${(bytes/1024/1024).toFixed(2)} MiB`;
 export function AdjuntosSolicitud({solicitudId,request,puedeSubir,finalizada=false}:{solicitudId:string;request:Request;puedeSubir:boolean;finalizada?:boolean}){
  const [items,setItems]=useState<Adjunto[]>([]),[tipo,setTipo]=useState('Historial académico'),[archivo,setArchivo]=useState<File|null>(null);
  const [cargando,setCargando]=useState(true),[ocupado,setOcupado]=useState(false),[error,setError]=useState(''),[aviso,setAviso]=useState('');
@@ -25,6 +28,6 @@ export function AdjuntosSolicitud({solicitudId,request,puedeSubir,finalizada=fal
    <label>Tipo de documento<select value={tipo} onChange={e=>setTipo(e.target.value)}><option>Historial académico</option><option>Sílabo</option></select></label>
    <label>Archivo PDF<input type="file" accept="application/pdf,.pdf" onChange={e=>setArchivo(e.target.files?.[0]??null)}/></label>
   </fieldset><button type="submit" className="app-button app-button--primary" disabled={ocupado||!archivo}>{ocupado?'Guardando…':'Adjuntar PDF'}</button></form>}
-  {cargando?<p>Cargando adjuntos…</p>:items.length===0?<p>No hay documentos adjuntos.</p>:<ul>{items.map(a=><li key={a.id}>{a.tipo}: {a.nombreArchivo} · {(a.tamanoBytes/1024/1024).toFixed(2)} MiB · SHA-256 {a.huellaSha256} · subido{a.subidoPorNombre?` por ${a.subidoPorNombre}`:''} el {new Date(a.fechaSubidaUtc).toLocaleString('es-EC')} <button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={()=>descargar(a)}>Descargar</button></li>)}</ul>}
+  {cargando?<p>Cargando adjuntos…</p>:items.length===0?<p>No hay documentos adjuntos.</p>:<ul>{items.map(a=><li key={a.id}>{a.tipo}: {a.nombreArchivo} · {tamano(a.tamanoBytes)}{a.huellaSha256&&<> · SHA-256 <abbr title={a.huellaSha256}>{a.huellaSha256.slice(0,12)}…</abbr></>} · subido{a.subidoPorNombre?` por ${a.subidoPorNombre}`:''} el {fechaHora(a.fechaSubidaUtc)} <button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={()=>descargar(a)}>Descargar</button></li>)}</ul>}
  </section>;
 }

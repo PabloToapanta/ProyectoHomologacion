@@ -1,3 +1,4 @@
+import {fechaHora} from '../../shared/fecha';
 import {useEffect,useState} from 'react';
 import {AnalisisSolicitud,type Analisis} from './SolicitudesDocentePage';
 import {RevisionDocentePanel} from './RevisionDocentePanel';
@@ -26,7 +27,8 @@ function RequisitosExternos({requisitos:r}:{requisitos:Requisitos}) {
  </section>;
 }
 /** HU-18 (interno) y HU-19 (externo): el motor calcula, se guarda el último intento por pareja y no se aprueba nada. */
-export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo='Interno'}:{request:Request;solicitudId:string;aprobadas:Aprobada[];inicial:Analisis;tipo?:'Interno'|'Externo'}) {
+/** `soloLectura`: con el informe remitido o la solicitud finalizada, los análisis solo se consultan. */
+export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo='Interno',soloLectura=false}:{request:Request;solicitudId:string;aprobadas:Aprobada[];inicial:Analisis;tipo?:'Interno'|'Externo';soloLectura?:boolean}) {
  const externo=tipo==='Externo';
  const base=`/api/homologaciones/solicitudes/${solicitudId}`;
  const ruta=`${base}/${externo?'analisis-externo':'analisis-interno'}`;
@@ -76,22 +78,23 @@ export function AnalisisInternoPanel({request,solicitudId,aprobadas,inicial,tipo
     :'El motor calcula la equivalencia y qwen3:4b explica las evidencias. Cada pareja conserva su último intento. No es una aprobación oficial.'}</p>
    <label>Asignatura aprobada<select value={aprobada} disabled={ocupado} onChange={e=>cambiar(setAprobada,e.target.value)}><option value="">Seleccione</option>{aprobadas.map(a=><option key={a.id} value={a.id}>{a.nombreAsignatura}</option>)}</select></label>
    <label>Asignatura receptora<select value={receptora} disabled={ocupado} onChange={e=>cambiar(setReceptora,e.target.value)}><option value="">Seleccione</option>{receptoras.map(a=><option key={a.id} value={a.id}>Nivel {a.nivel} · {a.codigo} · {a.nombre}</option>)}</select></label>
+   {soloLectura?<p>El informe ya fue remitido: los análisis de esta solicitud quedan solo en consulta.</p>:<>
    {!externo&&<fieldset>
     <label><input type="checkbox" checked={forzar} disabled={ocupado} onChange={e=>setForzar(e.target.checked)}/>Forzar un análisis nuevo</label>
     {forzar&&<label>Motivo<textarea value={motivo} maxLength={500} required disabled={ocupado} onChange={e=>setMotivo(e.target.value)}/></label>}
     <p>Si los programas, las correspondencias, los parámetros y el modelo no cambiaron, se reutiliza la explicación anterior del agente. Al forzar, la anterior se conserva.</p>
    </fieldset>}
-   <button className="app-button" disabled={ocupado||!aprobada||!receptora||faltaMotivo} onClick={ejecutar}>Ejecutar análisis y guardar</button>
+   <button className="app-button" disabled={ocupado||!aprobada||!receptora||faltaMotivo} onClick={ejecutar}>Ejecutar análisis y guardar</button></>}
    {guardados.length>0&&<ul aria-label="Análisis guardados por pareja">{guardados.map(x=><li key={`${x.analisis.asignaturaAprobadaId}/${x.analisis.asignaturaReceptoraId}`}>
     <button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>{setResultado(x.analisis);setAprobada(x.analisis.asignaturaAprobadaId);setReceptora(x.analisis.asignaturaReceptoraId);setConfirmado(false);}}>Ver {aprobadas.find(a=>a.id===x.analisis.asignaturaAprobadaId)?.nombreAsignatura??'Asignatura histórica'} → {receptoras.find(a=>a.id===x.analisis.asignaturaReceptoraId)?.nombre??'Receptora histórica'} ({x.analisis.estado})</button>
    </li>)}</ul>}
   </>}
   {confirmado&&<p role="status">Análisis guardado.</p>}
-  {resultado?.agente?.reutilizada&&<p>{`Reutilizado · ${resultado.agente.fechaOriginal?new Date(resultado.agente.fechaOriginal).toLocaleString('es-EC'):'fecha no registrada'} · análisis ${resultado.agente.explicacionOriginalId??resultado.agente.explicacionId}`}</p>}
+  {resultado?.agente?.reutilizada&&<p>{`Reutilizado · ${resultado.agente.fechaOriginal?fechaHora(resultado.agente.fechaOriginal):'fecha no registrada'} · análisis ${resultado.agente.explicacionOriginalId??resultado.agente.explicacionId}`}</p>}
   <AnalisisSolicitud analisis={resultado??(abierto?pendiente:inicial)}/>
   {resultado?.advertencias?.map(a=><p key={a}>{a}</p>)}
   {/* HU-31: el docente registra su análisis sobre la pareja seleccionada, haya o no sugerencia del agente. */}
-  {abierto&&aprobada&&receptora&&<RevisionDocentePanel request={request} solicitudId={solicitudId} aprobadaId={aprobada} receptoraId={receptora}
+  {abierto&&aprobada&&receptora&&<RevisionDocentePanel soloLectura={soloLectura} request={request} solicitudId={solicitudId} aprobadaId={aprobada} receptoraId={receptora}
    sugerenciaAgente={resultado?.estado==='Completo'&&resultado.asignaturaAprobadaId===aprobada&&resultado.asignaturaReceptoraId===receptora?resultado.resultado?.sugerencia??null:null}/>}
   {externo&&abierto&&requisitos&&<RequisitosExternos requisitos={requisitos}/>}
  </section>;

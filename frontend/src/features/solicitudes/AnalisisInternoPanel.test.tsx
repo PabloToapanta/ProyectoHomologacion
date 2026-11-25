@@ -1,3 +1,4 @@
+import {fechaHora} from '../../shared/fecha';
 import {render,screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {it,expect,vi} from 'vitest';
@@ -52,7 +53,7 @@ it('HU-37 indica que la explicación del agente se reutilizó, con su fecha e id
  const user=await abrirYSeleccionar();
  await user.click(screen.getByRole('button',{name:'Ejecutar análisis y guardar'}));
  const nota=await screen.findByText(/^Reutilizado ·/);
- expect(nota).toHaveTextContent(new Date('2026-11-20T15:00:00Z').toLocaleString('es-EC'));
+ expect(nota).toHaveTextContent(fechaHora('2026-11-20T15:00:00Z'));
  expect(nota).toHaveTextContent('análisis exp-1');
 });
 it('HU-37 una explicación nueva no se marca como reutilizada',async()=>{

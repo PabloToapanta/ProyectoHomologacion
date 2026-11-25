@@ -18,7 +18,7 @@ it('sin sugerencia del agente solo permite ajuste con decisión y observación, 
  const lista=await screen.findByRole('list',{name:'Análisis de los docentes'});
  expect(within(lista).getByText(/docente\.luis/)).toHaveTextContent('Ajuste · Homologable');
  expect(within(lista).queryByText(/docente\.rosa/)).not.toBeInTheDocument();
- expect(screen.getByLabelText('De acuerdo con el agente')).toBeDisabled();
+ expect(screen.queryByLabelText('De acuerdo con el agente')).not.toBeInTheDocument();
  await user.click(screen.getByLabelText('Ajuste con mi decisión'));
  await user.selectOptions(screen.getByLabelText('Mi decisión'),'NoHomologable');
  await user.type(screen.getByLabelText('Observación'),'Faltan contenidos de la receptora.');
