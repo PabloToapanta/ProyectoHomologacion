@@ -25,4 +25,29 @@ public sealed class AsignaturaRepository(CatalogoDbContext db) : IAsignaturaRepo
             throw new CatalogoException("no_encontrada", "No se pudo registrar la asignatura; comprueba que su carrera todavía existe.");
         }
     }
+
+    public async Task<bool> EliminarAsync(Guid id, CancellationToken ct)
+    {
+        await using var transaction = await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, ct);
+        try
+        {
+            if (!await db.Asignaturas.AnyAsync(a => a.Id == id, ct)) return false;
+            var unidades = db.Set<UnidadCurricular>().Where(u => u.AsignaturaId == id).Select(u => u.Id);
+            // Orden explícito: las claves foráneas del catálogo son restrictivas.
+            await db.Set<Contenido>().Where(c => unidades.Contains(c.UnidadCurricularId)).ExecuteDeleteAsync(ct);
+            await db.Set<UnidadTematica>().Where(t => unidades.Contains(t.UnidadCurricularId)).ExecuteDeleteAsync(ct);
+            await db.Set<UnidadCurricular>().Where(u => u.AsignaturaId == id).ExecuteDeleteAsync(ct);
+            await db.Set<RevisionComparacion>().Where(r => r.OrigenId == id || r.ReceptoraId == id).ExecuteDeleteAsync(ct);
+            await db.Set<PerfilComparacion>().Where(p => p.AsignaturaId == id).ExecuteDeleteAsync(ct);
+            await db.Set<ProgramaAnalitico>().Where(p => p.AsignaturaId == id).ExecuteDeleteAsync(ct);
+            await db.Asignaturas.Where(a => a.Id == id).ExecuteDeleteAsync(ct);
+            await transaction.CommitAsync(ct);
+            return true;
+        }
+        catch (SqlException ex) when (ex.Number is 547 or 1205)
+        {
+            await transaction.RollbackAsync(CancellationToken.None);
+            throw new CatalogoException("conflicto", "La asignatura cambió mientras se eliminaba. Actualiza el listado e inténtalo de nuevo.");
+        }
+    }
 }

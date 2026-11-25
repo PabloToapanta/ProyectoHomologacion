@@ -57,6 +57,7 @@ public class AsignaturaServiceTests
         public Task<IReadOnlyList<Asignatura>> ListarPorCarreraAsync(Guid carreraId, CancellationToken ct) => Task.FromResult<IReadOnlyList<Asignatura>>(Items.Where(a => a.CarreraId == carreraId).OrderBy(a => a.Nivel).ThenBy(a => a.CodigoNormalizado).ToList());
         public Task<bool> ExisteCodigoAsync(Guid carreraId, string codigoNormalizado, CancellationToken ct, Guid? mallaId = null) => Task.FromResult(Items.Any(a => a.CarreraId == carreraId && a.CodigoNormalizado == codigoNormalizado));
         public Task CrearAsync(Asignatura asignatura, CancellationToken ct) { Items.Add(asignatura); return Task.CompletedTask; }
+        public Task<bool> EliminarAsync(Guid id, CancellationToken ct) => Task.FromResult(Items.RemoveAll(a => a.Id == id) > 0);
         Task<Carrera?> ICarreraRepository.BuscarAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Carrera.Id ? Carrera : null);
         public Task<IReadOnlyList<Carrera>> ListarAsync(CancellationToken ct) => Task.FromResult<IReadOnlyList<Carrera>>([Carrera]);
         public Task<bool> ExisteNombreAsync(string nombre, string facultad, Guid? excluirId, CancellationToken ct) => Task.FromResult(false);

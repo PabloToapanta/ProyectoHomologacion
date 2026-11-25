@@ -129,3 +129,40 @@ it('filtra por nivel y restablece todos los niveles sin volver a consultar', asy
   expect(screen.getByRole('cell', { name: algebra.nombre })).toBeInTheDocument();
   expect(request).toHaveBeenCalledTimes(2);
 });
+
+it('elimina una asignatura equivocada tras confirmar y muestra el error si el servidor la rechaza', async () => {
+  const u = user();
+  let borrar = 0;
+  const request = vi.fn(async (path: string, init?: RequestInit) => {
+    if (init?.method === 'DELETE') {
+      borrar++;
+      expect(path).toBe('/api/asignaturas/a1');
+      return borrar === 1 ? json({ detail: 'La asignatura cambió mientras se eliminaba.' }, 409) : new Response(null, { status: 204 });
+    }
+    return path === '/api/carreras' ? json(carreras) : json([algebra]);
+  }) as unknown as CatalogoRequest;
+  render(<AsignaturasPage request={request} />);
+  await u.selectOptions(await screen.findByLabelText('Carrera'), 'c1');
+  await u.click(await screen.findByRole('button', { name: 'Eliminar Álgebra Lineal' }));
+  const dialogo = screen.getByRole('dialog', { name: 'Eliminar Álgebra Lineal' });
+  expect(dialogo).toHaveTextContent('DEMO-ALG · Álgebra Lineal');
+  expect(dialogo).toHaveTextContent('correspondencias revisadas');
+  await u.click(within(dialogo).getByRole('button', { name: 'Eliminar definitivamente' }));
+  expect(await within(dialogo).findByRole('alert')).toHaveTextContent('La asignatura cambió mientras se eliminaba.');
+  await u.click(within(dialogo).getByRole('button', { name: 'Eliminar definitivamente' }));
+  expect(await screen.findByRole('status')).toHaveTextContent('DEMO-ALG · Álgebra Lineal eliminada');
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(screen.getByText('No hay asignaturas registradas en esta carrera.')).toBeInTheDocument();
+});
+
+it('cancelar la confirmación no elimina', async () => {
+  const u = user();
+  const request = vi.fn(async (path: string) => path === '/api/carreras' ? json(carreras) : json([algebra])) as unknown as CatalogoRequest;
+  render(<AsignaturasPage request={request} />);
+  await u.selectOptions(await screen.findByLabelText('Carrera'), 'c1');
+  await u.click(await screen.findByRole('button', { name: 'Eliminar Álgebra Lineal' }));
+  await u.click(screen.getByRole('button', { name: 'Cancelar' }));
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(screen.getByText('Álgebra Lineal')).toBeInTheDocument();
+  expect(vi.mocked(request).mock.calls.some(c => c[1]?.method === 'DELETE')).toBe(false);
+});

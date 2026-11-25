@@ -38,6 +38,20 @@ export function AsignaturasPage({ request, carreraSeleccionada, onSeleccion }: {
   const [guardando, setGuardando] = useState(false);
   const [seleccionada, setSeleccionada] = useState<Asignatura | null>(null);
   const [perfilSeleccionado, setPerfilSeleccionado] = useState<Asignatura | null>(null);
+  const [porEliminar, setPorEliminar] = useState<Asignatura | null>(null);
+  const [errorEliminar, setErrorEliminar] = useState('');
+
+  async function eliminar() {
+    if (!porEliminar) return;
+    setGuardando(true); setErrorEliminar(''); setAviso('');
+    try {
+      await api.eliminar(porEliminar.id);
+      setAsignaturas(lista => lista.filter(a => a.id !== porEliminar.id));
+      setAviso(`Asignatura ${porEliminar.codigo} · ${porEliminar.nombre} eliminada. Su código queda libre para registrarla de nuevo.`);
+      setPorEliminar(null);
+    } catch (e) { setErrorEliminar(mensaje(e)); }
+    finally { setGuardando(false); }
+  }
   const codigoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -124,9 +138,19 @@ export function AsignaturasPage({ request, carreraSeleccionada, onSeleccion }: {
       {cargando ? <p role="status">Cargando asignaturas…</p> : errorListado ? <div><p role="alert" className="auth-error">{errorListado}</p><button className="app-button app-button--secondary" onClick={() => setIntento(i => i + 1)}>Reintentar asignaturas</button></div>
         : asignaturas.length === 0 ? <p className="catalogo-empty">No hay asignaturas registradas en esta carrera.</p>
         : <><p className="catalogo-scroll-hint">Desliza la tabla horizontalmente para ver todos los datos.</p><div className="catalogo-table-scroll" tabIndex={0} role="region" aria-label="Tabla de asignaturas con desplazamiento horizontal"><table className="malla-table"><caption className="sr-only">Asignaturas ordenadas por nivel y código</caption><thead><tr><th scope="col">Nivel</th><th scope="col">Código</th><th scope="col">Asignatura</th><th scope="col">Créditos</th><th scope="col">Horas</th><th scope="col">Malla</th><th scope="col">Contenidos</th></tr></thead>
-          <tbody>{[...visibles].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td><td>{a.malla ? `${a.malla.nombre} · ${a.malla.vigente ? 'Vigente' : 'No vigente'}` : 'Versión no registrada'}</td><td><button className="app-button app-button--secondary" onClick={() => setSeleccionada(a)}>Ver unidades de {a.nombre}</button><button className="app-button app-button--secondary" onClick={() => { setPerfilSeleccionado(a); setSeleccionada(null); }}>Perfil y equivalencias de {a.nombre}</button></td></tr>)}</tbody></table></div></>}
+          <tbody>{[...visibles].sort((a, b) => a.nivel - b.nivel || a.codigo.localeCompare(b.codigo, 'es')).map(a => <tr key={a.id}><td>{a.nivel}</td><td>{a.codigo}</td><td>{a.nombre}</td><td>{a.creditos}</td><td>{a.horas}</td><td>{a.malla ? `${a.malla.nombre} · ${a.malla.vigente ? 'Vigente' : 'No vigente'}` : 'Versión no registrada'}</td><td><button className="app-button app-button--secondary" onClick={() => setSeleccionada(a)}>Ver unidades de {a.nombre}</button><button className="app-button app-button--secondary" onClick={() => { setPerfilSeleccionado(a); setSeleccionada(null); }}>Perfil y equivalencias de {a.nombre}</button><button className="app-button app-button--danger" disabled={guardando} onClick={() => { setPorEliminar(a); setErrorEliminar(''); setSeleccionada(null); setPerfilSeleccionado(null); }}>Eliminar {a.nombre}</button></td></tr>)}</tbody></table></div></>}
     </section>}
     {seleccionada && <UnidadesPanel key={seleccionada.id} asignaturaId={seleccionada.id} nombre={seleccionada.nombre} request={request} cerrar={() => setSeleccionada(null)} />}
+    {porEliminar && <FormDialog title={`Eliminar ${porEliminar.nombre}`} titleId="eliminar-asignatura" busy={guardando} onDismiss={() => setPorEliminar(null)}>
+      <p>Vas a eliminar <strong>{porEliminar.codigo} · {porEliminar.nombre}</strong> ({porEliminar.creditos} créditos, {porEliminar.horas} horas). Úsalo solo para corregir un registro equivocado.</p>
+      <p>También se eliminarán sus unidades, contenidos, perfil de comparación, programa analítico y las correspondencias revisadas con otras asignaturas. No se puede deshacer.</p>
+      <p>Las solicitudes y los análisis ya guardados conservan los datos que registraron.</p>
+      {errorEliminar && <p role="alert" className="auth-error">{errorEliminar}</p>}
+      <div className="catalogo-actions">
+        <button type="button" className="app-button app-button--secondary" disabled={guardando} onClick={() => setPorEliminar(null)}>Cancelar</button>
+        <button type="button" className="app-button app-button--danger" disabled={guardando} onClick={() => void eliminar()}>{guardando ? 'Eliminando…' : 'Eliminar definitivamente'}</button>
+      </div>
+    </FormDialog>}
     {perfilSeleccionado && <PerfilComparacionPanel key={perfilSeleccionado.id} id={perfilSeleccionado.id} nombre={perfilSeleccionado.nombre} request={request} cerrar={() => setPerfilSeleccionado(null)} />}
   </div>;
 }

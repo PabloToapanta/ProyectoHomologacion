@@ -73,3 +73,6 @@
 .selector-par > label { min-width: 0; }
 .selector-par .auth-input { min-width: 0; max-width: 100%; text-overflow: ellipsis; }
 @media (max-width: 650px) { .selector-par { grid-template-columns: minmax(0, 1fr); } }
+/* Eliminar una asignatura registrada por error. */
+.catalogo .app-button--danger { border-color: #b3261e; color: #fff; background: #b3261e; }
+.catalogo .app-button--danger:hover { background: #8f1e18; }

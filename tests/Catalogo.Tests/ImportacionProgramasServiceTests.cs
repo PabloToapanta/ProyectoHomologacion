@@ -32,6 +32,7 @@ public class ImportacionProgramasServiceTests
         public Task<IReadOnlyList<Asignatura>> ListarPorCarreraAsync(Guid carreraId, CancellationToken ct) => Task.FromResult<IReadOnlyList<Asignatura>>(Asignaturas);
         public Task<bool> ExisteCodigoAsync(Guid carreraId, string codigo, CancellationToken ct, Guid? mallaId = null) => Task.FromResult(Asignaturas.Any(a => a.CarreraId == carreraId && a.CodigoNormalizado == codigo));
         public Task CrearAsync(Asignatura asignatura, CancellationToken ct) { Asignaturas.Add(asignatura); return Task.CompletedTask; }
+        public Task<bool> EliminarAsync(Guid id, CancellationToken ct) => Task.FromResult(Asignaturas.RemoveAll(a => a.Id == id) > 0);
         Task<Carrera?> ICarreraRepository.BuscarAsync(Guid id, CancellationToken ct) => Task.FromResult(id == Carrera.Id ? Carrera : null);
         public Task<IReadOnlyList<Carrera>> ListarAsync(CancellationToken ct) => Task.FromResult<IReadOnlyList<Carrera>>([Carrera]);
         public Task<bool> ExisteNombreAsync(string nombre, string facultad, Guid? excluirId, CancellationToken ct) => Task.FromResult(false);

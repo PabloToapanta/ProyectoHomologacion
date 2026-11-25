@@ -21,7 +21,7 @@ export function asignaturasApi(request: CatalogoRequest) {
         }
         throw new AsignaturasError(message);
       }
-      return await response.json() as T;
+      return (response.status === 204 ? undefined : await response.json()) as T;
     } catch (error) {
       if (init?.signal?.aborted || error instanceof AsignaturasError) throw error;
       throw new AsignaturasError('No pudimos conectar con el catálogo. Revisa tu conexión e inténtalo de nuevo.');
@@ -31,5 +31,6 @@ export function asignaturasApi(request: CatalogoRequest) {
     listar: (carreraId: string, signal?: AbortSignal, mallaId?: string) => enviar<Asignatura[]>(`/api/carreras/${encodeURIComponent(carreraId)}/asignaturas${mallaId ? `?mallaId=${encodeURIComponent(mallaId)}` : ''}`, { signal }),
     obtener: (id: string) => enviar<Asignatura>(`/api/asignaturas/${encodeURIComponent(id)}`),
     crear: (input: AsignaturaInput) => enviar<Asignatura>('/api/asignaturas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) }),
+    eliminar: (id: string) => enviar<void>(`/api/asignaturas/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   };
 }

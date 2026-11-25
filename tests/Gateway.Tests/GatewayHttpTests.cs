@@ -55,6 +55,25 @@ public sealed class GatewayHttpTests(GatewayFactory factory) : IClassFixture<Gat
         Assert.Equal(GatewayFactory.InternalKey, factory.Forwarded.Last().InternalKey);
     }
 
+    [Fact]
+    public async Task EliminarAsignatura_solo_administrador_y_clave_interna()
+    {
+        using var client = factory.CreateClient();
+        var antes = factory.Forwarded.Count;
+        const string ruta = "/api/asignaturas/asignatura-prueba";
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.DeleteAsync(ruta)).StatusCode);
+        foreach (var rol in new[] { "Docente", "Coordinador" })
+        {
+            client.DefaultRequestHeaders.Authorization = new("Bearer", Token(role: rol));
+            Assert.Equal(HttpStatusCode.Forbidden, (await client.DeleteAsync(ruta)).StatusCode);
+        }
+        Assert.Equal(antes, factory.Forwarded.Count);
+        client.DefaultRequestHeaders.Authorization = new("Bearer", Token());
+        Assert.Equal(HttpStatusCode.OK, (await client.DeleteAsync(ruta)).StatusCode);
+        Assert.Equal("catalogo", factory.Forwarded.Last().Service);
+        Assert.Equal(GatewayFactory.InternalKey, factory.Forwarded.Last().InternalKey);
+    }
+
     public static TheoryData<string, string> RutasGestionHu02 => new()
     {
         { "GET", "/api/usuarios" }, { "POST", "/api/usuarios" },
