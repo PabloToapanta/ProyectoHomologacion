@@ -26,7 +26,8 @@ export function WorkspaceLayout({ children }: { children: ReactNode }) {
         <Link to="/admin/carreras?seccion=asignaturas" className={catalogo && asignaturas ? 'active' : undefined} aria-current={catalogo && asignaturas ? 'page' : undefined}><span aria-hidden="true">▥</span>Asignaturas</Link></>}
         {session?.role === 'Administrador' && <NavLink to="/admin/usuarios"><span aria-hidden="true">♙</span>Usuarios</NavLink>}
         {session?.role === 'Coordinador' && <NavLink to="/solicitudes"><span aria-hidden="true">▤</span>Solicitudes</NavLink>}
-        {session?.role === 'Coordinador' && <NavLink to="/configuracion"><span aria-hidden="true">⚙</span>Configuración</NavLink>}
+        {(session?.role === 'Coordinador' || session?.role === 'Administrador') && <NavLink to="/configuracion"><span aria-hidden="true">⚙</span>Configuración</NavLink>}
+        {session && <NavLink to="/normativas"><span aria-hidden="true">§</span>Normativas</NavLink>}
         {session?.role === 'Docente' && <NavLink to="/docente/solicitudes"><span aria-hidden="true">▤</span>Mis solicitudes</NavLink>}
         {(session?.role === 'Docente' || session?.role === 'Coordinador') && <NavLink to="/consulta-homologables"><span aria-hidden="true">⇄</span>Homologables FISEI</NavLink>}
         <NavLink to="/validaciones"><span aria-hidden="true">✓</span>Validaciones académicas</NavLink>

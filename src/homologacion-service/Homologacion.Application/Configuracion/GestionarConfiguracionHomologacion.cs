@@ -30,7 +30,7 @@ public sealed class GestionarConfiguracionHomologacion(IConfiguracionHomologacio
         Guid actorId, CancellationToken ct)
     {
         if (versionEsperada == Guid.Empty) throw new ConfiguracionInvalidaException("If-Match debe contener una versión válida.");
-        if (actorId == Guid.Empty) throw new ConfiguracionInvalidaException("No se pudo identificar al Coordinador.");
+        if (actorId == Guid.Empty) throw new ConfiguracionInvalidaException("No se pudo identificar a quien modifica la configuración.");
         if (cambio is null) throw new ConfiguracionInvalidaException("Indique todos los parámetros.");
         var motivo = cambio.Motivo?.Trim();
         var respaldo = cambio.Respaldo?.Trim();
