@@ -1,3 +1,4 @@
+import {fechaHora} from '../../shared/fecha';
 import {MallasAnalisisResumen,type MallasGuardadas} from './MallasAnalisisResumen';
 import {useEffect,useState} from 'react';
 import {GruposInforme,type GrupoInforme} from './GruposInforme';
@@ -42,7 +43,7 @@ function exportarInformePdf(){
 type Remision={solicitudId:string;fecha:string;remitidoPorId:string;remitidoPor:string};
 
 /** HU-23: informe fijo; HU-32 añade la remisión del docente asignado; puede deshabilitarse para la vista del coordinador. */
-export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRemitida,puedeGenerar=true}:{request:Request;solicitudId:string;aprobadas:Aprobada[];
+export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRemitida,puedeGenerar=true,numeroQuipux}:{request:Request;solicitudId:string;aprobadas:Aprobada[];numeroQuipux?:string;
  estadoSolicitud?:string;onRemitida?:(estado:'Remitida')=>void;puedeGenerar?:boolean}) {
  const ruta=`/api/homologaciones/solicitudes/${solicitudId}/informe`;
  const [informe,setInforme]=useState<Informe|null>(null),[pendiente,setPendiente]=useState(false),[cargando,setCargando]=useState(true);
@@ -91,8 +92,8 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
    <button type="button" className="app-button informe-pdf__exportar" onClick={exportarInformePdf}>Exportar informe a PDF</button>
    <div className="informe-pdf__contenido">
    <header className="informe-pdf__cabecera"><p className="informe-pdf__rotulo">Sistema de Homologación FISEI-UTA</p><h2>Informe técnico de homologación</h2>
-    <p>Solicitud: {informe.solicitudId} · Tipo de cambio: {informe.tipoCambio}</p>
-    <p>Generado por {informe.generadoPor} el {new Date(informe.fecha).toLocaleString('es-EC')}.</p>
+    <p>Trámite Quipux: {numeroQuipux??'no indicado'} · Tipo de cambio: {informe.tipoCambio}</p>
+    <p>Generado por {informe.generadoPor} el {fechaHora(informe.fecha)}.</p>
     <p className="informe-pdf__aviso">Este documento es un informe técnico y no constituye una resolución oficial.</p>
    </header>
    <p>Parejas analizadas: {informe.parejas.length} · Convalidar: {informe.convalidar} · No convalidar: {informe.noConvalidar} · Sin acuerdo: {informe.sinAcuerdo}.</p>
@@ -110,7 +111,7 @@ export function InformePanel({request,solicitudId,aprobadas,estadoSolicitud,onRe
    {!!informe.grupos?.length&&<GruposInforme grupos={informe.grupos} nombre={nombre}/>}
    {informe.aprobadasSinAnalisis.length>0&&<p>Sin análisis docente: {informe.aprobadasSinAnalisis.map(nombre).join(', ')}.</p>}
    {informe.advertencias.map(a=><p key={a}>{a}</p>)}
-   {remision?<p role="status">{`Informe remitido al coordinador de carrera por ${remision.remitidoPor} el ${new Date(remision.fecha).toLocaleString('es-EC')}.`}</p>
+   {remision?<p role="status">{`Informe remitido al coordinador de carrera por ${remision.remitidoPor} el ${fechaHora(remision.fecha)}.`}</p>
     :estadoSolicitud==='Finalizada'?<p role="status">Solicitud finalizada por el coordinador de carrera.</p>
     :remitida?<p role="status">Informe remitido al coordinador de carrera.</p>
     :estadoSolicitud!==undefined&&<>

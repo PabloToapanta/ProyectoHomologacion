@@ -1,3 +1,4 @@
+import {fechaHora} from '../../shared/fecha';
 import {MallasAnalisisResumen,type MallasGuardadas} from './MallasAnalisisResumen';
 import {useEffect,useState} from 'react';
 import {FormDialog} from '../../shared/ui/FormDialog';
@@ -7,15 +8,19 @@ import {InformePanel} from './InformePanel';
 import {AdjuntosSolicitud} from './AdjuntosSolicitud';
 import type {DocenteAsignado} from './DocentesAsignados';
 import '../catalogo/catalogo.css';
+import './detalle.css';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Solicitud={id:string;numeroQuipux:string;identificacionEstudiante:string;nombreEstudiante:string;tipoCambio:string;institucionOrigen:string|null;carreraOrigenExterna:string|null;estado:string;fechaRegistro:string};
-type Asignatura={id:string;nombreAsignatura:string;creditos:number;horas:number;nota:number;estado:string};
+type Asignatura={id:string;codigoAsignatura?:string|null;nombreAsignatura:string;creditos:number;horas:number;nota:number;estado:string;intentoMatricula?:number};
+const intentos=['Primera','Segunda','Tercera'];
 type Detalle=Solicitud&{asignaturasAprobadas:Asignatura[];docentesAsignados:DocenteAsignado[];periodosCursados?:number|null;cambiosPreviosCarrera?:number|null};
 /** Propuesta HU-30: HU-18 y HU-20 fijan el contrato definitivo del resultado. */
 export type ResultadoAnalisis={porcentajeAcademico:number|null;porcentajeHoras:number|null;porcentajeCreditos:number|null;sugerencia:string;justificacion:string;evidencias:string[]};
 export type Analisis={estado:string;mensaje:string;resultado:ResultadoAnalisis|null;mallas?:MallasGuardadas|null};
 type SolicitudAsignada={solicitud:Detalle;analisis:Analisis};
 const mensaje=(e:unknown)=>e instanceof Error?e.message:'No se pudo completar la operación.';
+/** «C1: uuid/uuid [plan-O/U1] → uuid [plan-R/U1]» → «C1 · plan-O/U1 → plan-R/U1». Si no reconoce el formato, lo deja igual. */
+export const evidenciaLegible=(e:string)=>{const m=/^(\w+):.*?\[([^\]]*)\]\s*→.*?\[([^\]]*)\]\s*$/.exec(e);return m?`${m[1]} · ${m[2]} → ${m[3]}`:e;};
 const porcentaje=(v:number|null)=>v===null?'Sin dato':`${v.toLocaleString('es-EC',{maximumFractionDigits:2})} %`;
 /** Solo «Completo» con resultado presenta una sugerencia; cualquier otro caso se muestra como no concluido. */
 export function AnalisisSolicitud({analisis}:{analisis:Analisis}) {
@@ -25,7 +30,7 @@ export function AnalisisSolicitud({analisis}:{analisis:Analisis}) {
   <p>Insumo para su revisión académica: no es la decisión final de homologación.</p>
   <dl><dt>Académico combinado</dt><dd>{porcentaje(resultado.porcentajeAcademico)}</dd><dt>Horas</dt><dd>{porcentaje(resultado.porcentajeHoras)}</dd><dt>Créditos</dt><dd>{porcentaje(resultado.porcentajeCreditos)}</dd>
    <dt>Sugerencia</dt><dd>{resultado.sugerencia}</dd><dt>Justificación</dt><dd>{resultado.justificacion}</dd></dl>
-  <h4>Evidencia disponible</h4>{resultado.evidencias.length?<ul>{resultado.evidencias.map(e=><li key={e}>{e}</li>)}</ul>:<p>Sin evidencia registrada.</p>}
+  <h4>Evidencia disponible</h4>{resultado.evidencias.length?<ul>{resultado.evidencias.map(e=><li key={e}>{evidenciaLegible(e)}</li>)}</ul>:<p>Sin evidencia registrada.</p>}
  </section>;
  const titulo=estado==='Pendiente'?'Análisis pendiente':estado==='Fallido'?'El análisis falló':'Información incompleta';
  return <section aria-labelledby="analisis-titulo" role="status"><h3 id="analisis-titulo">{titulo}</h3><p>{texto||'No hay un resultado de análisis disponible para esta solicitud.'}</p>{estado!=='Pendiente'&&<MallasAnalisisResumen mallas={analisis.mallas}/>}</section>;
@@ -58,17 +63,17 @@ export function SolicitudesDocentePage({request}:{request:Request}) {
   {cargando?<p>Cargando solicitudes asignadas…</p>:errorCarga?<div role="alert"><p>{errorCarga}</p><button className="app-button app-button--secondary" onClick={()=>setIntento(i=>i+1)}>Reintentar</button></div>:
    items.length===0?<p>No tiene solicitudes asignadas.</p>:<div className="solicitudes-table"><table><caption>Solicitudes asignadas</caption><thead><tr><th>Trámite Quipux</th><th>Estudiante</th><th>Tipo</th><th>Estado</th><th>Consulta</th></tr></thead>
    <tbody>{items.map(x=><tr key={x.id}><td>{x.numeroQuipux}</td><td>{x.nombreEstudiante}</td><td>{x.tipoCambio}</td><td>{x.estado}</td><td><button className="app-button app-button--secondary" disabled={ocupado} onClick={()=>ver(x.id)}>Ver {x.numeroQuipux}</button></td></tr>)}</tbody></table></div>}
-  {detalle&&s&&<FormDialog title={`Solicitud ${s.numeroQuipux}`} titleId="detalle-asignada" busy={ocupado} onDismiss={()=>setDetalle(null)}>
-   <dl><dt>Estudiante</dt><dd>{s.nombreEstudiante} · {s.identificacionEstudiante}</dd><dt>Tipo de cambio</dt><dd>{s.tipoCambio}{s.tipoCambio==='Externo'&&` · ${s.institucionOrigen} · ${s.carreraOrigenExterna}`}</dd><dt>Estado</dt><dd>{s.estado}</dd><dt>Fecha de registro</dt><dd>{new Date(s.fechaRegistro).toLocaleString('es-EC')}</dd>
+  {detalle&&s&&<FormDialog title={`Solicitud ${s.numeroQuipux}`} titleId="detalle-asignada" busy={ocupado} onDismiss={()=>setDetalle(null)}><div className="detalle-solicitud">
+   <dl><dt>Estudiante</dt><dd>{s.nombreEstudiante} · {s.identificacionEstudiante}</dd><dt>Tipo de cambio</dt><dd>{s.tipoCambio}{s.tipoCambio==='Externo'&&` · ${s.institucionOrigen} · ${s.carreraOrigenExterna}`}</dd><dt>Estado</dt><dd>{s.estado}</dd><dt>Fecha de registro</dt><dd>{fechaHora(s.fechaRegistro)}</dd>
     {s.tipoCambio==='Externo'&&<><dt>Períodos cursados</dt><dd>{s.periodosCursados??'Sin dato'}</dd><dt>Cambios previos de carrera</dt><dd>{s.cambiosPreviosCarrera??'Sin dato'}</dd></>}</dl>
    <h3>Docentes asignados</h3><ul aria-label="Docentes asignados">{s.docentesAsignados.map(d=><li key={d.id}>{d.nombreUsuario}</li>)}</ul>
-   <h3>Asignaturas aprobadas</h3>{s.asignaturasAprobadas.length?<ul>{s.asignaturasAprobadas.map(a=><li key={a.id}>{a.nombreAsignatura} · {a.creditos} créditos · {a.horas} horas · nota {a.nota} ({a.estado})</li>)}</ul>:<p>Sin asignaturas aprobadas registradas.</p>}
-   {s.tipoCambio==='Interno'||s.tipoCambio==='Externo'?<AnalisisInternoPanel key={s.id} tipo={s.tipoCambio} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas} inicial={detalle.analisis}/>:<AnalisisSolicitud analisis={detalle.analisis}/>}
+   <h3>Asignaturas aprobadas</h3>{s.asignaturasAprobadas.length?<ul>{s.asignaturasAprobadas.map(a=><li key={a.id}>{a.codigoAsignatura&&`${a.codigoAsignatura} · `}{a.nombreAsignatura} · {a.creditos} créditos · {a.horas} horas · nota {a.nota} ({a.estado}){a.intentoMatricula&&` · ${intentos[a.intentoMatricula-1]??a.intentoMatricula} matrícula`}{a.intentoMatricula===3&&<strong> · excluida (RN-07)</strong>}</li>)}</ul>:<p>Sin asignaturas aprobadas registradas.</p>}
+   {s.tipoCambio==='Interno'||s.tipoCambio==='Externo'?<AnalisisInternoPanel key={s.id} soloLectura={s.estado==='Remitida'||s.estado==='Finalizada'} tipo={s.tipoCambio} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas} inicial={detalle.analisis}/>:<AnalisisSolicitud analisis={detalle.analisis}/>}
    <AdjuntosSolicitud solicitudId={s.id} request={request} puedeSubir={false} finalizada={s.estado==='Finalizada'}/>
     {(s.tipoCambio==='Interno'||s.tipoCambio==='Externo')&&<InformePanel key={`informe-${s.id}`} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas} estadoSolicitud={s.estado}
-     onRemitida={estado=>{setDetalle(d=>d&&{...d,solicitud:{...d.solicitud,estado}});setItems(old=>old.map(x=>x.id===s.id?{...x,estado}:x));}}/>}
+     numeroQuipux={s.numeroQuipux} onRemitida={estado=>{setDetalle(d=>d&&{...d,solicitud:{...d.solicitud,estado}});setItems(old=>old.map(x=>x.id===s.id?{...x,estado}:x));}}/>}
    {(s.tipoCambio==='Interno'||s.tipoCambio==='Externo')&&<AgrupacionesPanel key={`grupos-${s.id}`} request={request} solicitudId={s.id} aprobadas={s.asignaturasAprobadas}/>}
    <button className="app-button app-button--secondary" onClick={()=>setDetalle(null)}>Cerrar detalle</button>
-  </FormDialog>}
+  </div></FormDialog>}
  </section>;
 }

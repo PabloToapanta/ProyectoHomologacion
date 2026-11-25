@@ -1,3 +1,4 @@
+import {fechaHora} from '../../shared/fecha';
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { ConfiguracionApiError, configuracionApi } from './configuracion-api';
@@ -108,7 +109,7 @@ export function ConfiguracionPage({ request }: { request: ConfiguracionRequest }
         <h2 id="historial-title">Historial de cambios</h2>
         <div className="configuracion-tabla"><table><thead><tr><th>Fecha y hora</th><th>Actor</th><th>Valores anteriores</th><th>Valores nuevos</th><th>Motivo</th><th>Respaldo</th></tr></thead>
           <tbody>{historial.map(entrada => <tr key={entrada.versionId}>
-            <td>{new Date(entrada.fechaHoraUtc).toLocaleString('es-EC')}</td><td><code>{entrada.actorId === '00000000-0000-0000-0000-000000000000' ? 'Sistema' : entrada.actorId}</code></td>
+            <td>{fechaHora(entrada.fechaHoraUtc)}</td><td><code>{entrada.actorId === '00000000-0000-0000-0000-000000000000' ? 'Sistema' : entrada.actorId}</code></td>
             <td>{entrada.anterior ? resumen(entrada.anterior) : 'Configuración inicial'}</td><td>{resumen(entrada.nueva)}</td>
             <td>{entrada.motivo}</td><td>{entrada.respaldo}</td></tr>)}</tbody></table></div>
         {cursorSiguiente && <button type="button" className="app-button app-button--secondary" disabled={ocupado} onClick={() => void masHistorial()}>Ver más</button>}

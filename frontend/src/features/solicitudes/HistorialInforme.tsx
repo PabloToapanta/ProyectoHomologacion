@@ -1,3 +1,4 @@
+import {fechaHora} from '../../shared/fecha';
 import {useEffect,useState} from 'react';
 type Request=(path:string,init?:RequestInit)=>Promise<Response>;
 type Evento={id:string;tipo:'Generado'|'Remitido'|'Finalizado';fecha:string;usuarioId:string;usuario:string;rol:string};
@@ -25,7 +26,7 @@ export function HistorialInforme({request,solicitudId}:{request:Request;solicitu
   {!error&&eventos===null&&<p>Consultando historial…</p>}
   {eventos?.length===0&&<p>Sin eventos registrados: el informe aún no se ha generado.</p>}
   {eventos&&eventos.length>0&&<ol aria-label="Historial del informe">{eventos.map(e=><li key={e.id}>
-   {`${tipos[e.tipo]} · ${new Date(e.fecha).toLocaleString('es-EC')} · ${e.usuario} (${e.rol})`}
+   {`${tipos[e.tipo]} · ${fechaHora(e.fecha)} · ${e.usuario} (${e.rol})`}
   </li>)}</ol>}
  </section>;
 }
